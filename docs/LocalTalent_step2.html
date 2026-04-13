@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LocalTalent_step2 修订版</title>
+<style>
+:root{
+  --bg:#f4f7fb; --card:#fff; --text:#1f2937; --muted:#667085; --line:#e6eaf2;
+  --blue:#2563eb; --blue-soft:#eef4ff; --green:#16a34a; --green-soft:#ecfdf3;
+  --amber:#d97706; --amber-soft:#fff7ed; --red:#dc2626; --red-soft:#fef2f2;
+  --purple:#7c3aed; --purple-soft:#f3e8ff; --shadow:0 16px 42px rgba(15,23,42,.08); --radius:24px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"PingFang SC","Microsoft YaHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#f8fafc 0%,#f4f7fb 100%);color:var(--text);line-height:1.72}
+.wrap{max-width:1460px;margin:0 auto;padding:28px 20px 60px}
+.hero{position:relative;overflow:hidden;color:#fff;border-radius:32px;padding:40px 38px 30px;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 52%,#60a5fa 100%);box-shadow:0 26px 64px rgba(37,99,235,.28)}
+.hero:after{content:"";position:absolute;right:-90px;top:-80px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.12)}
+.hero small{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);font-size:12px}
+h1{margin:14px 0 12px;font-size:40px;line-height:1.2}
+.hero p{margin:0;max-width:1080px;color:rgba(255,255,255,.92);font-size:15px}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.hero-card{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(8px);border-radius:18px;padding:16px}
+.hero-card h3{margin:0 0 8px;font-size:13px;color:#dbeafe;font-weight:600}
+.hero-card .v{font-size:18px;font-weight:800;line-height:1.45}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-top:18px}
+.section-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.tag.blue{background:var(--blue-soft);color:var(--blue)}
+.tag.green{background:var(--green-soft);color:var(--green)}
+.tag.amber{background:var(--amber-soft);color:var(--amber)}
+.tag.red{background:var(--red-soft);color:var(--red)}
+.tag.purple{background:var(--purple-soft);color:var(--purple)}
+h2{margin:0;font-size:26px;line-height:1.28}
+h3{margin:0 0 8px;font-size:18px;line-height:1.4}
+p{margin:0 0 10px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:14px}
+.stat{border:1px solid var(--line);border-radius:18px;padding:16px;background:#fbfcff}
+.stat .label{font-size:13px;color:var(--muted);margin-bottom:8px}
+.stat .value{font-size:18px;font-weight:800;line-height:1.45}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.mini-card{border:1px solid var(--line);background:#fbfcff;border-radius:18px;padding:18px}
+.list{margin:0;padding-left:20px}
+.list li{margin:8px 0}
+.callout{margin-top:14px;padding:16px 18px;border-left:4px solid var(--blue);border-radius:16px;background:#f7faff;color:#1d4ed8;font-weight:700}
+.warn{margin-top:14px;padding:16px 18px;border-left:4px solid var(--amber);border-radius:16px;background:#fff8ef;color:#9a5b00;font-weight:700}
+.success{margin-top:14px;padding:16px 18px;border-left:4px solid var(--green);border-radius:16px;background:#f3fff7;color:#147a3a;font-weight:700}
+table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:8px}
+th,td{padding:14px;text-align:left;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:14px}
+th{background:#f8fafc;font-weight:700}
+tr:last-child td{border-bottom:none}
+td:last-child,th:last-child{border-right:none}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch;margin-top:12px}
+.node{border:1px solid var(--line);border-radius:18px;background:#fff;padding:16px 14px;min-height:160px}
+.node strong{display:block;margin-bottom:8px;font-size:15px}
+.node small{display:block;color:#667085;margin-top:6px}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#94a3b8}
+.footer{margin-top:18px;text-align:center;color:#667085;font-size:12px}
+@media (max-width:1100px){
+  .hero-grid,.kpis,.grid2,.grid3,.grid4,.flow{grid-template-columns:1fr}
+  .arrow{display:none}
+  h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<small>第二步骤修订版 · 作为 DDL 与权限设计的上位约束文件</small>
+<h1>LocalTalent_step2 修订版</h1>
+<p>本稿基于原 LocalTalent_step2 重写修订，保留《合规场景清单》《候选人数据地图》《字段分级 / 接口字段 / 权限边界》三段结构，并新增《候选人生命周期矩阵》与《核心边界字段归属矩阵》。本稿仅覆盖地方人才服务平台一期范围，不扩展到 ATS 或受控候选池正式落地，但允许保留后续对接接口约束所需的边界表达。</p>
+<div class="hero-grid">
+  <div class="hero-card"><h3>保留结构</h3><div class="v">合规场景 / 数据地图 / 字段与权限收口</div></div>
+  <div class="hero-card"><h3>本轮新增</h3><div class="v">生命周期矩阵 / 核心边界字段归属矩阵</div></div>
+  <div class="hero-card"><h3>当前范围</h3><div class="v">地方人才服务平台一期</div></div>
+  <div class="hero-card"><h3>使用定位</h3><div class="v">后续 DDL 与权限设计上位约束</div></div>
+</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag blue">总览</span><h2>一、文件目标与使用方式</h2></div>
+<div class="kpis">
+  <div class="stat"><div class="label">目标</div><div class="value">把“合规—数据—生命周期—边界字段”一次定清</div></div>
+  <div class="stat"><div class="label">适用对象</div><div class="value">产品 / 研发 / 法务 / 测试 / 安全</div></div>
+  <div class="stat"><div class="label">直接作用</div><div class="value">约束 DDL、接口、权限与日志设计</div></div>
+  <div class="stat"><div class="label">当前范围</div><div class="value">仅限地方人才服务平台一期</div></div>
+  <div class="stat"><div class="label">设计原则</div><div class="value">不改方向，只做收口</div></div>
+</div>
+<div class="callout">本稿不再重复项目是否继续，也不展开后续实施规划；它的职责是把候选人数据怎么生成、怎么流转、什么条件下能进入人才服务区、什么条件下必须撤回或冻结，全部写成后续数据库与权限设计的硬约束。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag purple">术语统一</span><h2>一-A、关键术语统一说明</h2></div>
+<div class="grid4">
+  <div class="mini-card"><h3>人才服务区</h3><p>前台公开展示“候选人发布快照”的业务区，不是公共简历库。</p></div>
+  <div class="mini-card"><h3>发布快照</h3><p>满足发布条件后进入公开展示链路的最小必要候选人展示副本。</p></div>
+  <div class="mini-card"><h3>原始候选人数据</h3><p>联系方式、简历正文、附件、证据材料及其他未进入公开展示链路的数据。</p></div>
+  <div class="mini-card"><h3>对接接口</h3><p>一期只预留对接约束，不落地 ATS 或候选池正式接入与正式运营。</p></div>
+</div>
+<div class="grid2" style="margin-top:16px;">
+  <div class="mini-card"><h3>数据域</h3><p>控制“谁能看哪一批数据、哪一个企业、哪一个候选人范围”的边界规则。</p></div>
+  <div class="mini-card"><h3>字段级权限</h3><p>控制“在已获准查看的数据内，还能看哪些字段、看原值还是脱敏值”的边界规则。</p></div>
+</div>
+<div class="success">本稿进一步明确：“原始候选人数据”和“发布快照”是两类不同的数据产品。前者用于业务处理与留痕，后者用于人才服务区公开展示。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag red">Part 1</span><h2>二、《合规场景清单》</h2></div>
+<div class="flow">
+  <div class="node"><strong>场景识别</strong>围绕注册、简历、投递、签到、同意、发布、撤回、审计逐项拆解。<small>对象：地方人才服务平台一期</small></div>
+  <div class="arrow">→</div>
+  <div class="node"><strong>法律属性判断</strong>判断是否涉及个人信息、敏感个人信息、公开展示、向其他处理者提供等。<small>输出：风险等级与控制动作</small></div>
+  <div class="arrow">→</div>
+  <div class="node"><strong>设计约束落地</strong>转化为字段、权限、日志、状态和生命周期约束。<small>输出：可开发约束</small></div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th style="width:14%">场景名称</th>
+<th style="width:14%">触发动作</th>
+<th style="width:16%">涉及数据</th>
+<th style="width:10%">是否涉及个人信息/敏感信息</th>
+<th style="width:12%">处理依据</th>
+<th style="width:10%">是否涉及向其他处理者提供</th>
+<th style="width:8%">是否需单独同意</th>
+<th style="width:8%">是否建议做影响评估</th>
+<th>控制措施</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>求职者注册</strong></td><td>手机号/邮箱注册、登录</td><td>手机号、邮箱、验证码、登录日志</td><td>个人信息；通常不属于敏感个人信息</td><td>用户主动注册、平台提供基础服务所必需</td><td>否</td><td>否，按注册规则和隐私告知处理</td><td>低</td><td>最小收集；账号与业务数据分表；日志脱敏</td></tr>
+<tr><td><strong>求职者创建/编辑简历</strong></td><td>填写教育、经历、技能、附件</td><td>姓名、联系方式、教育经历、工作经历、技能、附件简历</td><td>个人信息；完整简历可能包含敏感内容</td><td>求职者主动提交，用于求职服务</td><td>否</td><td>否，但需显著告知用途、保存期限、可见范围</td><td>中</td><td>默认不公开；字段分级；附件受限访问</td></tr>
+<tr><td><strong>企业注册与认证</strong></td><td>企业提交营业执照、联系人信息</td><td>企业信息、联系人姓名、手机号、邮箱、证照</td><td>涉及联系人个人信息</td><td>企业入驻、平台履行服务所必需</td><td>否</td><td>否</td><td>低</td><td>企业信息与联系人信息分字段管理；证照访问受控</td></tr>
+<tr><td><strong>职位发布</strong></td><td>企业创建职位并提交审核</td><td>职位名称、描述、地点、薪资、企业 ID</td><td>通常不涉及候选人个人信息</td><td>平台招聘信息服务</td><td>否</td><td>否</td><td>低</td><td>职位公开层与候选人数据层物理/逻辑分开</td></tr>
+<tr><td><strong>站内投递</strong></td><td>求职者向职位投递简历</td><td>candidate_id、resume_id、job_id、投递时间</td><td>涉及个人信息</td><td>求职者主动投递，属于履行求职服务所必需</td><td>否</td><td>否，但需在投递前告知企业可见范围</td><td>中</td><td>投递仅对本职位所属企业开放；投递日志可追溯</td></tr>
+<tr><td><strong>面试签到</strong></td><td>扫码签到/签到码签到</td><td>candidate_id、session_id、签到时间、设备信息</td><td>涉及个人信息；若叠加实名则可能涉及敏感信息</td><td>面试服务流程所必需</td><td>否</td><td>若仅签到通常不需单独同意；若附带发布授权则需拆分</td><td>中</td><td>签到动作与同意动作分离；签到后再进入同意页</td></tr>
+<tr><td><strong>候选人同意发布</strong></td><td>实名核验、勾选同意、二次确认</td><td>candidate_id、consent_status、consent_scope、consent_version、evidence</td><td>涉及个人信息；实名核验可能涉及敏感个人信息</td><td>个人明确知情后自愿同意</td><td>一期不落地外部共享，但需保留对接边界表达</td><td><strong>是</strong></td><td><strong>是</strong></td><td>显著告知、分范围勾选、二次确认、证据留存、撤回入口</td></tr>
+<tr><td><strong>候选人进入人才服务区</strong></td><td>平台生成并展示候选人发布快照</td><td>脱敏姓名、城市、技能、经验年限、岗位方向等发布快照</td><td>涉及个人信息；属于公开展示链路</td><td>基于明确授权 + 发布控制规则</td><td>否</td><td><strong>是</strong></td><td><strong>是</strong></td><td>只展示发布快照，不展示原始候选人数据；撤回后联动下架</td></tr>
+<tr><td><strong>候选人撤回同意</strong></td><td>候选人主动撤回</td><td>revoke_status、revoke_time、当前发布状态</td><td>涉及同意状态变更</td><td>撤回同意权利</td><td>否</td><td>不适用</td><td><strong>是</strong></td><td>撤回后必须停止继续发布；保留历史证据与审计轨迹</td></tr>
+<tr><td><strong>数据导出 / 报表导出</strong></td><td>企业或运营导出数据</td><td>投递记录、候选人卡片、活动名单、统计数据</td><td>可能涉及个人信息</td><td>内部管理必需 + 审批授权</td><td>否</td><td>通常不以同意为主，而以权限与审批为主</td><td>中到高</td><td>导出审批、脱敏模板、下载留痕、超范围禁止导出</td></tr>
+<tr><td><strong>审计日志 / 字段访问日志</strong></td><td>系统记录查看、导出、发布、撤回等动作</td><td>operator_id、biz_id、field_name、access_type、trace_id</td><td>可能包含个人信息引用，但不应复制原始内容</td><td>安全与审计管理所必需</td><td>否</td><td>否</td><td>中</td><td>日志白名单；原始正文禁入日志；日志单独保护并设置留存期</td></tr>
+</tbody>
+</table>
+
+<div class="warn">合规场景清单的核心结论：一期风险最高的不是职位公开，而是“候选人同意发布 → 进入人才服务区 → 撤回联动下架”这条链路。后续数据库与权限设计必须优先围绕这条链路收口。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag amber">新增</span><h2>三、《候选人生命周期矩阵》</h2></div>
+<table>
+<thead>
+<tr>
+<th style="width:12%">生命周期阶段</th>
+<th style="width:16%">触发动作</th>
+<th style="width:16%">数据形态</th>
+<th style="width:16%">关键控制字段</th>
+<th style="width:16%">业务结果</th>
+<th>留痕要求</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>创建</strong></td><td>注册、创建账号、创建简历</td><td>原始候选人数据</td><td>source_type、candidate_id、status</td><td>形成求职者主档与简历主档</td><td>账号创建日志、简历创建日志</td></tr>
+<tr><td><strong>投递</strong></td><td>向职位投递简历</td><td>原始候选人数据 + 投递流程数据</td><td>job_id、application_status、source_type</td><td>进入企业投递池</td><td>投递记录、状态变更日志</td></tr>
+<tr><td><strong>签到</strong></td><td>面试签到 / 活动签到</td><td>原始候选人数据 + 签到流程数据</td><td>session_id、sign_time、sign_channel</td><td>形成签到记录，可进入同意流程</td><td>签到日志、设备信息留痕</td></tr>
+<tr><td><strong>同意</strong></td><td>实名核验、勾选同意、二次确认</td><td>原始候选人数据 + 同意记录 + 证据材料</td><td>consent_status、consent_scope、consent_version、legal_basis</td><td>形成有效授权状态</td><td>同意记录、证据快照、trace_id</td></tr>
+<tr><td><strong>发布</strong></td><td>生成发布快照并进入人才服务区</td><td><strong>发布快照</strong></td><td>publishable_flag、visibility_scope、consent_status</td><td>候选人发布快照可进入公开展示层</td><td>发布日志、快照版本记录</td></tr>
+<tr><td><strong>撤回</strong></td><td>候选人主动撤回同意</td><td>原始候选人数据 + 同意状态变更</td><td>revoke_status、revoke_time、consent_status</td><td>停止继续发布，触发下架联动</td><td>撤回日志、联动日志</td></tr>
+<tr><td><strong>下线</strong></td><td>快照停止展示</td><td>发布快照</td><td>publishable_flag、snapshot_status</td><td>人才服务区不再展示</td><td>下线日志、状态变更日志</td></tr>
+<tr><td><strong>删除 / 冻结</strong></td><td>账号注销、违规冻结、按规则停用</td><td>原始候选人数据 + 生命周期状态</td><td>status、control_status、deleted_flag</td><td>停止正常业务处理</td><td>冻结/删除日志、审批记录（如有）</td></tr>
+<tr><td><strong>留痕归档</strong></td><td>归档历史记录、审计保留</td><td>历史日志、证据材料、审计记录</td><td>archive_flag、retention_rule</td><td>形成争议处理与审计支撑材料</td><td>归档记录、留存策略记录</td></tr>
+</tbody>
+</table>
+<div class="callout">生命周期矩阵的作用，是把“候选人数据从创建到归档”的业务链路写成数据库与权限设计必须遵守的状态主线。后续 DDL 和权限模型不得跳过这条主线自行定义状态。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag green">Part 2</span><h2>四、《候选人数据地图》</h2></div>
+<div class="flow">
+<div class="node"><strong>数据来源</strong>注册、简历填写、投递、签到、同意。<small>一期只讨论平台内来源</small></div>
+<div class="arrow">→</div>
+<div class="node"><strong>数据分层</strong>账号层、简历层、投递层、签到层、同意层、发布快照层。<small>先分层，再分级</small></div>
+<div class="arrow">→</div>
+<div class="node"><strong>数据去向</strong>平台内业务使用 / 人才服务区展示 / 日志审计。<small>每类去向单独定义允许范围</small></div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th style="width:14%">数据类别</th>
+<th style="width:20%">代表字段</th>
+<th style="width:14%">出现系统</th>
+<th style="width:14%">当前是否允许跨系统流转</th>
+<th style="width:12%">保存期限建议</th>
+<th style="width:14%">脱敏/加密建议</th>
+<th>限制说明</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>账号身份信息</strong></td><td>candidate_id、mobile、email、register_channel、login_time</td><td>求职者中心、登录认证、审计中心</td><td>一期不做正式外部流转</td><td>账号存续期 + 注销后按规则留存</td><td>手机号、邮箱脱敏展示；库内建议加密或哈希索引辅助查询</td><td>不得进入人才服务区，不得写入普通业务日志正文</td></tr>
+<tr><td><strong>简历正文信息</strong></td><td>姓名、教育、经历、技能、附件简历</td><td>简历中心、投递中心、企业查看页</td><td>一期仅平台内流转</td><td>与求职关系存续期相关，需支持删除/下线/停用</td><td>附件受限访问；正文分字段脱敏显示；敏感字段不进发布快照</td><td>不得默认公开；不得进入人才服务区全文检索</td></tr>
+<tr><td><strong>投递与流程信息</strong></td><td>job_id、application_status、apply_time、source_type</td><td>投递中心、企业后台、运营统计</td><td>一期仅平台内流转</td><td>建议按招聘流程留存周期管理</td><td>一般无需加密，但需做企业隔离</td><td>可进入聚合统计，不应暴露候选人明细给无权限方</td></tr>
+<tr><td><strong>面试签到信息</strong></td><td>session_id、sign_time、sign_channel、device_id</td><td>签到中心、企业后台、运营后台</td><td>一期仅平台内流转</td><td>建议按面试流程管理</td><td>设备信息不对企业前台开放；必要字段脱敏</td><td>签到动作与同意动作不得混同</td></tr>
+<tr><td><strong>同意与撤回信息</strong></td><td>consent_status、consent_scope、consent_version、consent_time、revoke_status</td><td>同意中心、发布控制、审计中心</td><td>一期仅平台内保留；可保留对接表达</td><td>建议长周期留存，至少覆盖争议处理和审计周期</td><td>证据材料受限访问；关键信息防篡改存储</td><td>属高重要性数据；撤回必须联动业务状态</td></tr>
+<tr><td><strong>同意证据材料</strong></td><td>page_snapshot_url、content_hash、ip、user_agent、sms_record_id、实名核验结果</td><td>同意证据中心、审计中心</td><td>原则上不对外流转</td><td>建议覆盖争议举证和合规审计周期</td><td>严格加密、访问审批、日志留痕</td><td>不得进入普通业务查询界面</td></tr>
+<tr><td><strong>发布快照信息</strong></td><td>name_masked、city_code、skills、experience_years、publishable_flag</td><td>人才服务区（公开展示层）</td><td>一期只在平台公开展示层使用</td><td>与发布状态绑定</td><td>必须脱敏、最小必要</td><td>发布快照 ≠ 原始候选人数据；人才服务区只接受快照</td></tr>
+<tr><td><strong>审计与访问日志</strong></td><td>operator_id、field_name、access_type、trace_id、create_time</td><td>审计中心</td><td>一般不流转</td><td>按审计与追责周期管理</td><td>日志正文禁入原始简历全文与聊天全文</td><td>只记录行为与对象，不复制整份个人信息正文</td></tr>
+</tbody>
+</table>
+
+<div class="grid2">
+<div class="mini-card">
+<h3>原始候选人数据的定义</h3>
+<ul class="list">
+<li>手机号、邮箱、微信号等直接联系方式</li>
+<li>完整简历原文、附件全文</li>
+<li>聊天记录、内部评价、内部标签</li>
+<li>证件照、实名核验结果、同意证据材料</li>
+<li>任何未经过 publishable_flag 判断的字段</li>
+</ul>
+</div>
+<div class="mini-card">
+<h3>可发布快照的定义</h3>
+<ul class="list">
+<li>脱敏姓名或匿名标识</li>
+<li>城市、行业方向、岗位方向</li>
+<li>经验年限、技能标签摘要</li>
+<li>经规则裁剪后的教育/经历摘要</li>
+<li>publishable_flag=1 且 consent_status=有效的最小必要内容</li>
+</ul>
+</div>
+</div>
+<div class="success">候选人数据地图的核心结论：平台必须把“原始候选人数据”和“发布快照”当成两类不同的数据产品管理。前者用于业务处理与留痕，后者仅用于人才服务区公开展示。前者用于业务处理与留痕，后者仅用于人才服务区公开展示。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag amber">新增</span><h2>五、《核心边界字段归属矩阵》</h2></div>
+<table>
+<thead>
+<tr>
+<th style="width:18%">字段</th>
+<th style="width:18%">主表建议</th>
+<th style="width:18%">历史/明细表建议</th>
+<th>归属逻辑说明</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>source_type</strong></td><td>candidate_control_profile</td><td>job_application / candidate_publish_snapshot</td><td>候选人主链路来源应有统一主归属；业务子链路可保留局部来源字段。</td></tr>
+<tr><td><strong>legal_basis</strong></td><td>candidate_control_profile</td><td>candidate_publish_snapshot</td><td>候选人继续处理、公开展示的法律基础主口径应集中管理。</td></tr>
+<tr><td><strong>consent_status</strong></td><td>candidate_control_profile</td><td>candidate_consent</td><td>candidate_control_profile 保存当前生效状态；candidate_consent 保存每次同意/撤回历史。</td></tr>
+<tr><td><strong>publishable_flag</strong></td><td>candidate_control_profile</td><td>candidate_publish_snapshot</td><td>是否允许进入人才服务区的主控制字段，应有统一当前值；快照表保存已生成的展示副本。</td></tr>
+<tr><td><strong>visibility_scope</strong></td><td>candidate_control_profile</td><td>candidate_publish_snapshot</td><td>控制当前可见范围，发布快照表保存已对外展示副本的生效范围。</td></tr>
+<tr><td><strong>consent_version</strong></td><td>candidate_control_profile</td><td>candidate_consent</td><td>当前生效版本由主控制表保存；历史版本由同意记录表保存。</td></tr>
+</tbody>
+</table>
+<div class="warn">本矩阵是后续 step4 DDL 设计的直接上位约束：这些边界字段不能再分散地各自定义“当前状态”，必须有统一主归属表来管理当前生效值。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag purple">Part 3</span><h2>六、字段分级 / 接口字段 / 权限边界</h2></div>
+<div class="grid4">
+<div class="mini-card"><h3>S1 公开级</h3><p>可公开展示的职位、企业、活动、资讯内容，以及候选人发布快照中的最小必要展示字段。</p></div>
+<div class="mini-card"><h3>S2 业务级</h3><p>平台内部业务流转字段，不可公开，但一般不属于高度敏感。</p></div>
+<div class="mini-card"><h3>S3 受限级</h3><p>候选人个人信息、简历正文、投递与面试相关个人数据。</p></div>
+<div class="mini-card"><h3>S4 高敏级</h3><p>同意证据、实名核验结果、导出材料、审计关键证据。</p></div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th style="width:16%">数据对象</th>
+<th style="width:14%">分级</th>
+<th style="width:22%">代表字段</th>
+<th style="width:20%">访问要求</th>
+<th>日志要求</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>职位公开信息</strong></td><td>S1</td><td>job_title、city_code、salary_min、salary_max、job_desc_summary</td><td>可公开展示</td><td>常规访问日志即可</td></tr>
+<tr><td><strong>企业公开信息</strong></td><td>S1</td><td>company_name、industry_code、company_profile、auth_status</td><td>可公开展示</td><td>常规访问日志即可</td></tr>
+<tr><td><strong>候选人发布快照</strong></td><td>S1（限快照）</td><td>name_masked、city_code、skills_summary、experience_years</td><td>仅在人才服务区按发布规则展示</td><td>发布/下线需审计</td></tr>
+<tr><td><strong>投递流程字段</strong></td><td>S2</td><td>application_status、apply_time、job_id、session_id</td><td>企业内和运营内按业务权限访问</td><td>记录查看、修改、导出动作</td></tr>
+<tr><td><strong>候选人账号信息</strong></td><td>S3</td><td>mobile、email、candidate_id、register_channel</td><td>仅本人、必要企业角色、审计角色按需访问</td><td>字段级访问日志</td></tr>
+<tr><td><strong>简历正文信息</strong></td><td>S3</td><td>education_json、experience_json、skills_json、resume_attachment</td><td>默认不公开；企业角色按授权和流程访问</td><td>查看/导出需留痕；正文禁入普通日志</td></tr>
+<tr><td><strong>同意状态信息</strong></td><td>S3</td><td>consent_status、consent_scope、consent_version、revoke_status</td><td>业务控制层与审计角色可访问</td><td>变更必须审计</td></tr>
+<tr><td><strong>同意证据材料</strong></td><td>S4</td><td>page_snapshot_url、content_hash、sms_record_id、ip、user_agent、实名核验结果</td><td>仅审计/法务/高权限安全角色访问</td><td>全部访问动作留痕，严禁正文扩散</td></tr>
+<tr><td><strong>字段访问日志与导出记录</strong></td><td>S4</td><td>field_name、operator_id、export_scope_json、trace_id</td><td>仅审计角色访问</td><td>不可删除或需严格留存控制</td></tr>
+</tbody>
+</table>
+
+<div class="warn">字段分级的直接含义：后端表设计、接口出参、前端展示、日志记录和导出模板都必须以分级为准，不能只靠页面隐藏来做保护。</div>
+
+<table>
+<thead>
+<tr>
+<th style="width:18%">接口类型</th>
+<th style="width:24%">允许字段</th>
+<th style="width:20%">限制字段</th>
+<th>规则</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>公开前台接口</strong></td><td>S1 字段 + 候选人发布快照中的最小必要字段</td><td>全部 S3、S4 原始字段禁止直出</td><td>人才服务区只接受发布快照，不接受原始候选人数据</td></tr>
+<tr><td><strong>企业后台查询接口</strong></td><td>与本企业职位、投递、面试相关的 S2 / S3 字段</td><td>跨企业候选人明细禁止；S4 禁止直出</td><td>按企业、角色、候选人状态联合判断</td></tr>
+<tr><td><strong>求职者本人接口</strong></td><td>本人账号、简历、投递、签到、同意状态</td><td>其他候选人或企业内部字段禁止直出</td><td>候选人仅见本人数据</td></tr>
+<tr><td><strong>运营后台接口</strong></td><td>审核数据、聚合统计、必要业务明细</td><td>未经授权的候选人联系方式、简历全文、同意证据材料</td><td>默认看聚合，不看高敏正文</td></tr>
+<tr><td><strong>对接接口（预留表达）</strong></td><td>状态字段、映射字段、发布快照约束字段</td><td>原始候选人数据、证据材料</td><td>一期仅保留约束表达，不视为正式落地接入方案</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+<tr>
+<th style="width:16%">角色</th>
+<th style="width:18%">可查看对象</th>
+<th style="width:18%">可查看字段级别</th>
+<th style="width:16%">可执行动作</th>
+<th>禁止动作</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>游客</strong></td><td>职位、企业、活动、资讯、人才服务区发布快照</td><td>S1</td><td>浏览、搜索</td><td>查看原始候选人数据、查看企业后台、导出</td></tr>
+<tr><td><strong>求职者本人</strong></td><td>本人账号、简历、投递、签到、同意记录</td><td>本人 S2 / S3</td><td>编辑简历、投递、签到、同意、撤回</td><td>查看他人数据、查看审计证据</td></tr>
+<tr><td><strong>企业管理员</strong></td><td>本企业职位、投递、面试、授权范围内候选人卡片</td><td>本企业相关 S2 / 部分 S3</td><td>发布职位、处理投递、管理面试、申请导出</td><td>跨企业查看候选人、查看 S4 证据材料</td></tr>
+<tr><td><strong>招聘专员 / 面试官</strong></td><td>本企业面试流程中需要的候选人数据</td><td>受控 S2 / S3</td><td>查看、更新流程状态、签到管理</td><td>跨企业查看、超范围导出、查看 S4</td></tr>
+<tr><td><strong>运营人员</strong></td><td>企业审核、职位审核、活动、聚合统计、必要明细</td><td>S1 / S2 为主，谨慎访问 S3</td><td>审核、配置内容、查看统计</td><td>默认查看原始候选人全文、导出高敏数据</td></tr>
+<tr><td><strong>系统审计员</strong></td><td>审计日志、字段访问日志、导出记录、同意证据</td><td>S4</td><td>审计查看、追溯</td><td>修改业务数据、直接参与招聘业务</td></tr>
+</tbody>
+</table>
+<div class="success">权限边界结论：地方人才服务平台一期必须做到“角色边界 + 企业边界 + 字段分级边界 + 生命周期状态边界”同时成立，后续 step4 DDL 与权限设计不得偏离本文件。</div>
+<div class="callout">权限术语统一：数据域控制“能看哪一批数据”，字段级权限控制“在已允许查看的数据内，哪些字段可见、脱敏或隐藏”。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag green">收口结论</span><h2>七、第二步骤输出结论</h2></div>
+<div class="grid3">
+  <div class="mini-card"><h3>结论 1</h3><p>合规场景已经明确，高风险集中在“同意发布 → 人才服务区展示 → 撤回联动下架”链路。</p></div>
+  <div class="mini-card"><h3>结论 2</h3><p>候选人数据地图已经明确，必须把“原始候选人数据”和“发布快照”分开管理。</p></div>
+  <div class="mini-card"><h3>结论 3</h3><p>生命周期矩阵和核心边界字段归属矩阵已经补齐，后续 DDL 与权限设计必须以此为上位约束。</p></div>
+</div>
+<div class="callout">本文件完成后，后续 step4 的数据库设计和权限模型设计应直接引用本稿中的生命周期阶段、边界字段主归属和字段分级口径，不得重新各自定义。</div>
+</section>
+
+<div class="footer">LocalTalent_step2 修订版</div>
+</div>
+</body>
+</html>

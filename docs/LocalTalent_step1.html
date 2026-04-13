@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LocalTalent_step1 修订版</title>
+<style>
+:root{
+  --bg:#f4f7fb; --card:#fff; --text:#1f2937; --muted:#667085; --line:#e6eaf2;
+  --blue:#2563eb; --blue-soft:#eef4ff; --green:#16a34a; --green-soft:#ecfdf3;
+  --amber:#d97706; --amber-soft:#fff7ed; --red:#dc2626; --red-soft:#fef2f2;
+  --purple:#7c3aed; --purple-soft:#f3e8ff; --shadow:0 16px 42px rgba(15,23,42,.08); --radius:24px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"PingFang SC","Microsoft YaHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#f8fafc 0%,#f4f7fb 100%);color:var(--text);line-height:1.72}
+.wrap{max-width:1400px;margin:0 auto;padding:28px 20px 60px}
+.hero{position:relative;overflow:hidden;color:#fff;border-radius:32px;padding:40px 38px 30px;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 52%,#60a5fa 100%);box-shadow:0 26px 64px rgba(37,99,235,.28)}
+.hero:after{content:"";position:absolute;right:-90px;top:-80px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.12)}
+.hero small{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);font-size:12px}
+h1{margin:14px 0 12px;font-size:40px;line-height:1.2}
+.hero p{margin:0;max-width:1060px;color:rgba(255,255,255,.92);font-size:15px}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.hero-card{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(8px);border-radius:18px;padding:16px}
+.hero-card h3{margin:0 0 8px;font-size:13px;color:#dbeafe;font-weight:600}
+.hero-card .v{font-size:18px;font-weight:800;line-height:1.45}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-top:18px}
+.section-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.tag.blue{background:var(--blue-soft);color:var(--blue)}
+.tag.green{background:var(--green-soft);color:var(--green)}
+.tag.amber{background:var(--amber-soft);color:var(--amber)}
+.tag.red{background:var(--red-soft);color:var(--red)}
+.tag.purple{background:var(--purple-soft);color:var(--purple)}
+h2{margin:0;font-size:26px;line-height:1.28}
+h3{margin:0 0 8px;font-size:18px;line-height:1.4}
+h4{margin:0 0 8px;font-size:15px;line-height:1.4}
+p{margin:0 0 10px}
+small.note{color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:14px}
+.stat{border:1px solid var(--line);border-radius:18px;padding:16px;background:#fbfcff}
+.stat .label{font-size:13px;color:var(--muted);margin-bottom:8px}
+.stat .value{font-size:18px;font-weight:800;line-height:1.45}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.mini-card{border:1px solid var(--line);background:#fbfcff;border-radius:18px;padding:18px}
+.list{margin:0;padding-left:20px}
+.list li{margin:8px 0}
+.callout{margin-top:14px;padding:16px 18px;border-left:4px solid var(--blue);border-radius:16px;background:#f7faff;color:#1d4ed8;font-weight:700}
+.warn{margin-top:14px;padding:16px 18px;border-left:4px solid var(--amber);border-radius:16px;background:#fff8ef;color:#9a5b00;font-weight:700}
+.success{margin-top:14px;padding:16px 18px;border-left:4px solid var(--green);border-radius:16px;background:#f3fff7;color:#147a3a;font-weight:700}
+table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:8px}
+th,td{padding:14px;text-align:left;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:14px}
+th{background:#f8fafc;font-weight:700}
+tr:last-child td{border-bottom:none}
+td:last-child,th:last-child{border-right:none}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch;margin-top:12px}
+.node{border:1px solid var(--line);border-radius:18px;background:#fff;padding:16px 14px;min-height:160px}
+.node strong{display:block;margin-bottom:8px;font-size:15px}
+.node small{display:block;color:#667085;margin-top:6px}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#94a3b8}
+.api-box{border:1px solid var(--line);border-radius:18px;background:#fff;padding:16px}
+.api-box code{display:block;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:12px;white-space:pre-wrap;line-height:1.6}
+.footer{margin-top:18px;text-align:center;color:#667085;font-size:12px}
+@media (max-width:1100px){
+  .hero-grid,.kpis,.grid2,.grid3,.grid4,.flow{grid-template-columns:1fr}
+  .arrow{display:none}
+  h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<small>第一步骤修订版 · 方案 B：两个主体 + 三个系统</small>
+<h1>LocalTalent_step1 修订版</h1>
+<p>本稿基于原 LocalTalent_step1 文档完成修订重写，保留“方案 B：两个主体 + 三个系统”的主体方向不变，并在此基础上完成设计对齐。当前阶段仅启动地方人才服务平台建设；ATS 与受控候选池暂不实施，只保留接口位、数据库兼容位和审计预留位。本稿重点把一期冻结边界、人才服务区展示边界、对接接口边界写成明确且可执行的评审口径。</p>
+<div class="hero-grid">
+<div class="hero-card"><h3>总体方案</h3><div class="v">方案 B：两个主体 + 三个系统</div></div>
+<div class="hero-card"><h3>当前启动范围</h3><div class="v">仅启动地方人才服务平台</div></div>
+<div class="hero-card"><h3>冻结性边界</h3><div class="v">ATS 与受控候选池只预留，不落地</div></div>
+<div class="hero-card"><h3>展示边界</h3><div class="v">人才服务区只展示发布快照</div></div>
+</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag red">冻结边界</span><h2>一、一期冻结边界声明</h2></div>
+<div class="grid2">
+<div class="mini-card">
+<h3>必须执行的冻结边界</h3>
+<ul class="list">
+<li>一期仅建设地方人才服务平台，不建设 ATS 系统，不建设受控候选池系统。</li>
+<li>一期仅允许预留对接接口、字段兼容位、数据库结构兼容位，不得以任何形式提前落地 ATS 与受控候选池业务能力。</li>
+<li>一期禁止直接接入 ATS 原始候选人数据。</li>
+<li>一期禁止直接接入受控候选池原始主库。</li>
+<li>一期人才服务区仅展示候选人发布快照，不展示原始简历、联系方式、聊天记录、附件、证据材料。</li>
+</ul>
+</div>
+<div class="mini-card">
+<h3>冻结边界的设计含义</h3>
+<ul class="list">
+<li>平台先独立完成职位、企业、求职者、活动、签到、同意、发布控制等闭环。</li>
+<li>后续若接入 ATS 或受控候选池，应通过对接接口、状态回调、发布快照同步等方式增强，而不是提前打穿原始主库。</li>
+<li>任何试图把“一期预留端口”升级成“一期提前落地功能”的行为，均视为范围漂移。</li>
+</ul>
+</div>
+</div>
+<div class="warn">本节为强约束，不属于建议项。后续步骤二、步骤三、步骤四的所有设计，均不得突破本节冻结边界。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag blue">一页总览</span><h2>二、项目目标 / 输入 / 输出 / 不做范围</h2></div>
+<div class="kpis">
+<div class="stat"><div class="label">项目目标</div><div class="value">完成地方人才服务平台的一期建设</div></div>
+<div class="stat"><div class="label">一期输出</div><div class="value">人才网前台 + 企业后台 + 求职者中心 + 运营后台</div></div>
+<div class="stat"><div class="label">必须预留</div><div class="value">ATS 接口位 / 受控候选池接口位 / 审计链路</div></div>
+<div class="stat"><div class="label">当前不做</div><div class="value">ATS / 受控候选池正式实施与正式接入</div></div>
+<div class="stat"><div class="label">后续基线</div><div class="value">平台先独立可运行，再平滑增强</div></div>
+</div>
+<div class="callout">本项目应被定义为“一个可独立运营的人才服务平台”，而不是“ATS 前端皮肤”或“候选池展示页”。因此当前建设必须完成完整的人才网基础能力，同时为未来两系统预留标准接口与数据库兼容位。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag red">结构定义</span><h2>三、主体与系统边界</h2></div>
+<table>
+<thead><tr><th style="width:18%">层级</th><th style="width:20%">对象</th><th>边界定义</th></tr></thead>
+<tbody>
+<tr><td><strong>主体 A</strong></td><td>高风险主处理主体</td><td>未来负责 ATS 中台、受控候选池、候选人授权与更高风险的数据处理能力。当前阶段不实施系统建设，仅允许保留接口与字段兼容表达。</td></tr>
+<tr><td><strong>主体 B</strong></td><td>地方人才服务平台主体</td><td>当前阶段唯一启动的建设主体。负责职位、企业、求职者、活动、投递、签到、同意、人才服务区、运营后台等能力。</td></tr>
+<tr><td><strong>系统 1</strong></td><td>地方人才服务平台</td><td>当前正式建设对象，必须独立可运行。</td></tr>
+<tr><td><strong>系统 2</strong></td><td>ATS 系统</td><td>当前不实施，仅预留职位同步、投递同步、面试安排同步、授权回传接口位。</td></tr>
+<tr><td><strong>系统 3</strong></td><td>受控候选池系统</td><td>当前不实施，仅预留发布快照同步、发布撤回联动、映射关系接口位。</td></tr>
+</tbody>
+</table>
+<div class="success">方案 B 的核心不变：两个主体 + 三个系统。当前只启动系统 1；系统 2 和系统 3 一律视为“后续增强对象”，不得提前落地为一期功能。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag purple">术语统一</span><h2>四、关键术语统一说明</h2></div>
+<div class="grid4">
+<div class="mini-card"><h3>人才服务区</h3><p>前台公开展示候选人发布快照的业务区，不是公共简历库。</p></div>
+<div class="mini-card"><h3>发布快照</h3><p>满足发布条件后进入公开展示链路的最小必要候选人展示副本。</p></div>
+<div class="mini-card"><h3>原始候选人数据</h3><p>原始简历、联系方式、聊天记录、附件、证据材料及其他未进入公开展示链路的数据。</p></div>
+<div class="mini-card"><h3>对接接口</h3><p>面向 ATS 与受控候选池预留的接口能力，一期只定义，不正式启用业务接入。</p></div>
+</div>
+<div class="grid4" style="margin-top:16px;">
+<div class="mini-card"><h3>同意</h3><p>候选人完成明确授权并处于有效状态的业务结果，是进入发布快照展示链路的前置条件之一。</p></div>
+<div class="mini-card"><h3>撤回</h3><p>候选人取消原同意状态的动作，发生后应触发停止展示、下架联动与审计留痕。</p></div>
+<div class="mini-card"><h3>数据域</h3><p>控制“谁能看哪一批数据、哪一个企业、哪一个候选人范围”的边界规则。</p></div>
+<div class="mini-card"><h3>字段级权限</h3><p>控制“在已允许查看的数据内，哪些字段可见、脱敏或隐藏”的边界规则。</p></div>
+</div>
+<div class="callout">人才服务区的展示边界在本稿中写死：人才服务区只展示发布快照，不展示原始候选人数据；同意、撤回、数据域、字段级权限的后续实现口径应与步骤二至步骤四保持一致。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag green">定位</span><h2>五、平台产品定位与建设目标</h2></div>
+<div class="grid2">
+<div class="mini-card">
+<h3>平台定位</h3>
+<ul class="list">
+<li>面向地方企业、求职者、活动组织方、运营方的地方人才服务平台。</li>
+<li>既承接基础招聘信息服务，也承接活动、签到、人才服务等能力。</li>
+<li>当前可独立运营，不依赖 ATS 与受控候选池即可落地。</li>
+<li>未来可接入 ATS 提供职位、面试、授权等增强能力，可接入受控候选池提供发布快照增强能力。</li>
+</ul>
+</div>
+<div class="mini-card">
+<h3>建设目标</h3>
+<ul class="list">
+<li>建设一个功能较完整、可独立运行、可审计、可扩展的人才服务平台。</li>
+<li>具备职位、企业、求职者、投递、活动、签到、同意、发布控制等完整闭环。</li>
+<li>具备审计留痕、可见范围控制、展示边界控制能力。</li>
+<li>为后续接入 ATS 与受控候选池保留响应端口、字段位、数据库兼容位。</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag amber">范围清单</span><h2>六、一期功能范围</h2></div>
+<div class="grid2">
+<div class="mini-card">
+<h3>一期必做</h3>
+<ul class="list">
+<li>人才网前台：首页、职位列表、职位详情、企业列表、企业详情、活动列表、活动详情、政策资讯、人才服务区。</li>
+<li>企业后台：企业入驻、认证、职位发布、职位管理、投递查看、活动报名管理。</li>
+<li>求职者中心：注册登录、简历管理、投递记录、活动报名、面试通知、签到记录。</li>
+<li>运营后台：企业审核、职位审核、活动管理、内容管理、统计看板、审计日志查看。</li>
+<li>面试签到与同意中心：签到码、签到记录、同意状态展示、撤回入口预留。</li>
+<li>权限中心、日志中心、审计中心。</li>
+</ul>
+</div>
+<div class="mini-card">
+<h3>一期只预留端口，不落地实现</h3>
+<ul class="list">
+<li>ATS：职位同步、投递同步、面试安排同步、授权回传。</li>
+<li>受控候选池：候选人受控发布、候选人一键同步、发布撤回联动。</li>
+<li>复杂画像、复杂推荐、复杂标签体系。</li>
+<li>公共简历库深度运营能力。</li>
+<li>跨平台复杂同步编排。</li>
+</ul>
+</div>
+</div>
+<div class="warn">“只预留端口，不落地实现”在一期中属于冻结性范围控制，不得在开发过程中被理解成“可先做一部分”。</div>
+<div class="success">一期设计原则：平台自身先具备独立可运营的业务闭环；未来接入 ATS 与受控候选池时，采用“增强模式”接入，而不是“重构模式”接入。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag blue">角色模型</span><h2>七、用户角色与核心权限</h2></div>
+<table>
+<thead><tr><th style="width:18%">角色</th><th style="width:28%">核心能力</th><th>权限边界</th></tr></thead>
+<tbody>
+<tr><td><strong>游客</strong></td><td>浏览职位、企业、活动、资讯、人才服务区发布快照</td><td>不可查看原始候选人数据</td></tr>
+<tr><td><strong>求职者</strong></td><td>注册、维护简历、投递职位、报名活动、接收面试通知、签到、查看同意状态、撤回同意</td><td>仅可访问本人数据，不可查看他人数据</td></tr>
+<tr><td><strong>企业管理员</strong></td><td>企业认证、职位发布、查看投递、发起面试、生成签到码</td><td>仅可访问本企业相关职位、投递和活动数据</td></tr>
+<tr><td><strong>招聘专员 / 面试官</strong></td><td>查看授权范围内候选人卡片、处理投递、管理面试签到</td><td>按企业角色、数据域、候选人状态和字段级权限决定字段可见性</td></tr>
+<tr><td><strong>运营人员</strong></td><td>审核企业、职位、活动，管理内容，查看聚合统计</td><td>默认不可查看未授权候选人原始明细字段</td></tr>
+<tr><td><strong>系统审计员</strong></td><td>查看审计日志、导出审批、异常日志</td><td>仅审计，不参与业务操作</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag green">功能模块</span><h2>八、详细功能模块需求</h2></div>
+<div class="grid3">
+<div class="mini-card"><h3>模块 1：门户前台</h3><ul class="list"><li>首页：轮播、重点职位、重点企业、活动推荐、政策资讯</li><li>职位列表：筛选、排序、搜索、地区维度</li><li>职位详情：岗位信息、企业信息、投递按钮</li><li>企业列表 / 详情：企业简介、招聘职位、认证状态</li><li>活动列表 / 详情：招聘会、宣讲会、就业服务活动</li><li>人才服务区：仅展示候选人发布快照</li></ul></div>
+<div class="mini-card"><h3>模块 2：企业后台</h3><ul class="list"><li>企业注册与认证</li><li>职位发布、编辑、上下架</li><li>接收并处理站内投递</li><li>创建面试场次、发送签到码</li><li>管理活动报名</li></ul></div>
+<div class="mini-card"><h3>模块 3：求职者中心</h3><ul class="list"><li>账号注册与登录</li><li>简历创建与管理</li><li>投递记录与状态跟踪</li><li>活动报名记录</li><li>面试签到与后续同意状态查看</li></ul></div>
+<div class="mini-card"><h3>模块 4：面试签到中心</h3><ul class="list"><li>签到码生成、扫码签到</li><li>签到记录、签到状态</li><li>签到后跳转同意页 / 同意状态页</li><li>为未来 ATS 面试场次同步预留对接接口</li></ul></div>
+<div class="mini-card"><h3>模块 5：同意中心</h3><ul class="list"><li>展示同意文本与版本</li><li>实名核验、勾选同意、二次确认</li><li>记录同意快照与证据链</li><li>支持撤回入口</li><li>为未来受控候选池发布控制预留回调接口</li></ul></div>
+<div class="mini-card"><h3>模块 6：运营后台</h3><ul class="list"><li>企业审核、职位审核、活动审核</li><li>首页内容配置、专题配置、资讯配置</li><li>统计看板：职位、企业、投递、签到、同意、发布</li><li>审计日志、导出审批、异常告警</li></ul></div>
+</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag red">边界控制</span><h2>九、业务规则与数据控制规则</h2></div>
+<table>
+<thead><tr><th style="width:24%">规则主题</th><th>规则内容</th></tr></thead>
+<tbody>
+<tr><td><strong>职位公开规则</strong></td><td>职位信息可公开展示，但须经过企业与运营规则校验；职位同步到平台后不涉及候选人数据。</td></tr>
+<tr><td><strong>候选人展示规则</strong></td><td>候选人不得默认进入人才服务区；只有满足 consent_status=同意 且 publishable_flag=1 时，才允许生成并展示候选人发布快照。</td></tr>
+<tr><td><strong>人才服务区规则</strong></td><td>人才服务区只展示候选人发布快照，不展示原始简历、联系方式、聊天记录、附件、证据材料。</td></tr>
+<tr><td><strong>撤回规则</strong></td><td>候选人撤回同意后，平台必须停止继续展示，并记录 revoke_status 与 revoke_time；未来接入受控候选池时要能触发联动下架。</td></tr>
+<tr><td><strong>企业可见规则</strong></td><td>企业默认仅可见本企业相关数据；未来接入候选池后，也必须遵循 visibility_scope、source_type、consent_status 的联合控制。</td></tr>
+<tr><td><strong>运营看板规则</strong></td><td>默认展示聚合统计，不展示未经授权的候选人原始明细。</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag purple">对接接口预留</span><h2>十、为其他两个系统预留的响应端口</h2></div>
+<div class="grid2">
+<div class="api-box">
+<h3>预留接口 A：ATS → 人才服务平台职位同步</h3>
+<code>POST /api/open/v1/jobs/sync
+{
+  "source_system": "ats",
+  "tenant_id": "T1001",
+  "company_external_id": "C9001",
+  "job_external_id": "J5001",
+  "job_title": "招商主管",
+  "job_desc": "...",
+  "salary_min": 8000,
+  "salary_max": 12000,
+  "city_code": "450200",
+  "status": "online",
+  "sync_version": 1
+}</code>
+<small class="note">作用：未来由 ATS 推送职位数据到平台，不影响当前平台自建职位能力。</small>
+</div>
+<div class="api-box">
+<h3>预留接口 B：ATS → 人才服务平台投递同步</h3>
+<code>POST /api/open/v1/applications/sync
+{
+  "source_system": "ats",
+  "application_external_id": "A7001",
+  "job_external_id": "J5001",
+  "candidate_external_id": "U9001",
+  "source_type": "ats_push",
+  "apply_time": "2026-04-09 10:30:00"
+}</code>
+<small class="note">作用：未来 ATS 可把合法入口候选人的投递记录同步到平台投递中心；一期不正式启用。</small>
+</div>
+<div class="api-box">
+<h3>预留接口 C：人才服务平台 → 受控候选池同意结果回传</h3>
+<code>POST /api/open/v1/consents/callback
+{
+  "candidate_id": "U9001",
+  "consent_status": "agreed",
+  "consent_scope": ["portal_publish","talent_pool"],
+  "consent_version": "v1.0.0",
+  "consent_time": "2026-04-09 11:00:00",
+  "revoke_status": "normal"
+}</code>
+<small class="note">作用：未来同意结果回传给受控候选池，用于发布与同步控制；一期不正式启用。</small>
+</div>
+<div class="api-box">
+<h3>预留接口 D：受控候选池 → 人才服务平台发布快照推送</h3>
+<code>POST /api/open/v1/candidates/publishable-sync
+{
+  "candidate_id": "U9001",
+  "source_type": "controlled_pool",
+  "publishable_flag": 1,
+  "visibility_scope": "portal_publish",
+  "resume_snapshot": {
+    "name_masked": "张*",
+    "city_code": "450200",
+    "skills": ["招商主管","招商主管理"],
+    "experience_years": 5
+  },
+  "sync_version": 3
+}</code>
+<small class="note">作用：未来平台只接收发布快照，不直接读取受控候选池原始主库。</small>
+</div>
+</div>
+<div class="callout">对接接口预留原则：平台当前按“独立可运行”建设；未来接入 ATS 与受控候选池时，采用“推送发布快照 / 回调状态 / 不直连原始主库”的方式集成。</div>
+<div class="warn">一期阶段，这些对接接口仅可作为接口设计与数据库兼容依据，不得视为正式业务接入范围。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag green">数据库</span><h2>十一、数据库设计总原则</h2></div>
+<div class="grid3">
+<div class="mini-card"><h3>原则 1</h3><p>平台数据库当前可独立支撑人才服务平台运行，不依赖未来系统存在。</p></div>
+<div class="mini-card"><h3>原则 2</h3><p>主表必须预留 source_type、legal_basis、consent_status、publishable_flag、visibility_scope 等未来集成字段。</p></div>
+<div class="mini-card"><h3>原则 3</h3><p>平台不设计成“直连 ATS 或受控候选池原始主库”，而设计成“发布快照表 + 同意回执表 + 同步日志表”的兼容模式。</p></div>
+</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag red">表设计</span><h2>十二、核心数据库表设计建议</h2></div>
+<table>
+<thead><tr><th style="width:18%">表名</th><th style="width:18%">作用</th><th>关键字段建议</th></tr></thead>
+<tbody>
+<tr><td><strong>company</strong></td><td>企业主表</td><td>id, company_name, license_no, industry_code, scale_code, city_code, auth_status, source_system</td></tr>
+<tr><td><strong>company_user</strong></td><td>企业账号表</td><td>id, company_id, user_name, role_code, mobile, email, status</td></tr>
+<tr><td><strong>job_post</strong></td><td>职位主表</td><td>id, company_id, title, category_code, city_code, salary_min, salary_max, job_desc, status, source_type, external_job_id, sync_version</td></tr>
+<tr><td><strong>candidate_user</strong></td><td>求职者账号表</td><td>id, mobile, email, realname_verified_flag, register_channel, status</td></tr>
+<tr><td><strong>candidate_resume</strong></td><td>求职者简历表</td><td>id, candidate_id, resume_name, base_profile_json, education_json, experience_json, skills_json, status</td></tr>
+<tr><td><strong>job_application</strong></td><td>投递记录表</td><td>id, job_id, candidate_id, source_type, application_status, apply_time, external_application_id</td></tr>
+<tr><td><strong>activity_event</strong></td><td>活动主表</td><td>id, title, type_code, city_code, start_time, end_time, location, status</td></tr>
+<tr><td><strong>activity_registration</strong></td><td>活动报名表</td><td>id, event_id, candidate_id, register_time, sign_status</td></tr>
+<tr><td><strong>interview_session</strong></td><td>面试场次表</td><td>id, job_id, company_id, event_id, session_name, session_time, qr_code, status</td></tr>
+<tr><td><strong>interview_signin</strong></td><td>面试签到表</td><td>id, session_id, candidate_id, sign_time, sign_channel, consent_redirect_flag</td></tr>
+<tr><td><strong>candidate_consent</strong></td><td>同意主记录表</td><td>id, candidate_id, consent_status, consent_scope, consent_version, consent_channel, consent_time, realname_verified_flag, second_confirm_flag, revoke_status, revoke_time</td></tr>
+<tr><td><strong>candidate_consent_evidence</strong></td><td>同意证据表</td><td>id, consent_id, page_snapshot_url, content_hash, device_id, ip, user_agent, sms_record_id, realname_verify_result, audit_log_id</td></tr>
+<tr><td><strong>candidate_publish_snapshot</strong></td><td>候选人发布快照表（未来对接受控候选池）</td><td>id, candidate_id, source_type, legal_basis, consent_status, publishable_flag, consent_version, visibility_scope, snapshot_json, sync_version, status</td></tr>
+<tr><td><strong>integration_sync_task</strong></td><td>对接任务表</td><td>id, source_system, target_system, biz_type, biz_id, payload_json, sync_status, retry_count, last_sync_time</td></tr>
+<tr><td><strong>integration_mapping</strong></td><td>外部 ID 映射表</td><td>id, local_biz_type, local_id, source_system, external_id, version</td></tr>
+<tr><td><strong>audit_log</strong></td><td>审计日志表</td><td>id, operator_id, operator_role, biz_type, biz_id, action_type, before_json, after_json, trace_id, create_time</td></tr>
+<tr><td><strong>field_access_log</strong></td><td>字段级访问日志表</td><td>id, operator_id, biz_type, biz_id, field_name, access_type, access_time, trace_id</td></tr>
+<tr><td><strong>export_apply</strong></td><td>导出审批表</td><td>id, apply_user_id, biz_type, reason, approve_status, approve_user_id, export_scope_json, create_time</td></tr>
+</tbody>
+</table>
+<div class="warn">数据库设计上最关键的是：即使当前未接入 ATS 与受控候选池，也要先把未来会影响权限、来源、可发布性、同步性的字段埋入主模型；但这不等于一期允许直接接入原始候选人数据。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag amber">审计与安全</span><h2>十三、日志、审计与可追溯要求</h2></div>
+<div class="grid3">
+<div class="mini-card"><h3>日志中心</h3><p>记录登录、发布、审核、投递、签到、同意、撤回、同步、导出等行为。</p></div>
+<div class="mini-card"><h3>审计中心</h3><p>重点保留候选人展示控制、同意变更、导出审批、字段访问日志。</p></div>
+<div class="mini-card"><h3>追溯能力</h3><p>要求任何一个候选人发布结果，均能追溯到来源、同意版本、操作人、时间和同步链路。</p></div>
+</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag purple">交付顺序</span><h2>十四、建议研发交付顺序</h2></div>
+<table>
+<thead><tr><th style="width:20%">阶段</th><th>交付内容</th></tr></thead>
+<tbody>
+<tr><td><strong>第一阶段</strong></td><td>权限中心、日志中心、审计中心、基础字典、企业认证、职位主流程。</td></tr>
+<tr><td><strong>第二阶段</strong></td><td>求职者中心、简历管理、投递流程、活动模块。</td></tr>
+<tr><td><strong>第三阶段</strong></td><td>面试签到、同意中心、展示控制、撤回控制。</td></tr>
+<tr><td><strong>第四阶段</strong></td><td>对接接口、同步任务、外部映射、运营看板。</td></tr>
+</tbody>
+</table>
+<div class="success">建议先做“控制底座”和“主流程”，再做“同意展示链路”，最后做“外部系统预留接口”。这样能保证平台先独立跑起来，再平滑增强。</div>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag red">依据说明</span><h2>十五、法律与合规设计依据（用于方案解释）</h2></div>
+<table>
+<thead><tr><th style="width:24%">规则依据</th><th>本方案中的设计含义</th></tr></thead>
+<tbody>
+<tr><td><strong>个人信息向其他处理者提供需告知并取得单独同意</strong></td><td>因此“候选人同意后展示/同步”必须单独设计同意接口、同意范围、接收方与版本记录，而不能把展示视为默认动作。</td></tr>
+<tr><td><strong>向其他网络数据处理者提供、委托处理个人信息应通过合同约定并保存处理记录</strong></td><td>因此未来平台与 ATS / 受控候选池对接时，不能只做技术接口，还要保留接口日志、审计记录和合同化管理的基础条件。</td></tr>
+<tr><td><strong>可靠电子签名与手写签名、盖章具有同等法律效力</strong></td><td>第一期可采用“实名核验 + 勾选同意 + 二次确认 + 快照 + 审计”组合方案，后续如需更强证明力，可升级对接可靠电子签署。</td></tr>
+</tbody>
+</table>
+<small class="note">参考口径：官方个人信息保护、网络数据安全及电子签名相关规则，以及公共招聘服务实践中的公开招聘与授权边界要求。</small>
+</section>
+
+<section class="card">
+<div class="section-title"><span class="tag green">阶段结论</span><h2>十六、第一步骤修订版结论</h2></div>
+<div class="grid3">
+<div class="mini-card"><h3>结论 1</h3><p>方案 B：两个主体 + 三个系统继续成立，主体方向不变。</p></div>
+<div class="mini-card"><h3>结论 2</h3><p>当前只启动地方人才服务平台，ATS 与受控候选池一律视为后续增强对象。</p></div>
+<div class="mini-card"><h3>结论 3</h3><p>一期冻结边界已经写死：禁止直接接入 ATS 原始候选人数据，禁止直接接入受控候选池原始主库，人才服务区只展示候选人发布快照。</p></div>
+</div>
+<div class="callout">本稿形成后，步骤二、步骤三、步骤四的所有后续设计均应建立在本稿边界之上，不得再重新放宽一期范围。</div>
+</section>
+
+<div class="footer">LocalTalent_step1 修订版</div>
+</div>
+</body>
+</html>

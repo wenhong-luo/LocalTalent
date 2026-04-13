@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LocalTalent_step3 修订版</title>
+<style>
+:root{
+  --bg:#f4f7fb; --card:#ffffff; --text:#1f2937; --muted:#667085; --line:#e6eaf2;
+  --blue:#2563eb; --blue-soft:#eef4ff; --green:#16a34a; --green-soft:#ecfdf3;
+  --amber:#d97706; --amber-soft:#fff7ed; --red:#dc2626; --red-soft:#fef2f2;
+  --purple:#7c3aed; --purple-soft:#f3e8ff; --shadow:0 16px 42px rgba(15,23,42,.08); --radius:24px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:"PingFang SC","Microsoft YaHei","Segoe UI",Arial,sans-serif;
+  background:linear-gradient(180deg,#f8fafc 0%,#f4f7fb 100%); color:var(--text); line-height:1.72;
+}
+.wrap{max-width:1460px;margin:0 auto;padding:28px 20px 60px}
+.hero{
+  position:relative;overflow:hidden;color:#fff;border-radius:32px;padding:40px 38px 30px;
+  background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 52%,#60a5fa 100%);
+  box-shadow:0 26px 64px rgba(37,99,235,.28);
+}
+.hero:after{
+  content:"";position:absolute;right:-90px;top:-80px;width:320px;height:320px;border-radius:50%;
+  background:rgba(255,255,255,.12)
+}
+.hero small{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);font-size:12px}
+h1{margin:14px 0 12px;font-size:40px;line-height:1.2}
+.hero p{margin:0;max-width:1080px;color:rgba(255,255,255,.92);font-size:15px}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.hero-card{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(8px);border-radius:18px;padding:16px}
+.hero-card h3{margin:0 0 8px;font-size:13px;color:#dbeafe;font-weight:600}
+.hero-card .v{font-size:18px;font-weight:800;line-height:1.45}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-top:18px}
+.section-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.tag.blue{background:var(--blue-soft);color:var(--blue)}
+.tag.green{background:var(--green-soft);color:var(--green)}
+.tag.amber{background:var(--amber-soft);color:var(--amber)}
+.tag.red{background:var(--red-soft);color:var(--red)}
+.tag.purple{background:var(--purple-soft);color:var(--purple)}
+h2{margin:0;font-size:26px;line-height:1.28}
+h3{margin:0 0 8px;font-size:18px;line-height:1.4}
+h4{margin:0 0 8px;font-size:15px;line-height:1.4}
+p{margin:0 0 10px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
+.stat{border:1px solid var(--line);border-radius:18px;padding:16px;background:#fbfcff}
+.stat .label{font-size:13px;color:var(--muted);margin-bottom:8px}
+.stat .value{font-size:18px;font-weight:800;line-height:1.45}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.mini-card{border:1px solid var(--line);background:#fbfcff;border-radius:18px;padding:18px}
+.list{margin:0;padding-left:20px}
+.list li{margin:8px 0}
+.callout{margin-top:14px;padding:16px 18px;border-left:4px solid var(--blue);border-radius:16px;background:#f7faff;color:#1d4ed8;font-weight:700}
+.warn{margin-top:14px;padding:16px 18px;border-left:4px solid var(--amber);border-radius:16px;background:#fff8ef;color:#9a5b00;font-weight:700}
+.success{margin-top:14px;padding:16px 18px;border-left:4px solid var(--green);border-radius:16px;background:#f3fff7;color:#147a3a;font-weight:700}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch;margin-top:12px}
+.node{border:1px solid var(--line);border-radius:18px;background:#fff;padding:16px 14px;min-height:160px}
+.node strong{display:block;margin-bottom:8px;font-size:15px}
+.node small{display:block;color:#667085;margin-top:6px}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#94a3b8}
+table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:8px}
+th,td{padding:14px;text-align:left;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:14px}
+th{background:#f8fafc;font-weight:700}
+tr:last-child td{border-bottom:none}
+td:last-child,th:last-child{border-right:none}
+.codebox{
+  border:1px solid var(--line);border-radius:16px;background:#0f172a;color:#e5eefc;
+  padding:14px;font-family:Consolas,Monaco,monospace;font-size:13px;white-space:pre-wrap;line-height:1.65
+}
+.footer{margin-top:18px;text-align:center;color:#667085;font-size:12px}
+@media (max-width:1100px){
+  .hero-grid,.kpis,.grid2,.grid3,.grid4,.flow{grid-template-columns:1fr}
+  .arrow{display:none}
+  h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <small>第三步骤修订版 · 产品原型结构 + 页面状态原型 + 对接接口统一契约</small>
+    <h1>LocalTalent_step3 修订版</h1>
+    <p>本稿基于原 LocalTalent_step3 重写修订，保留门户前台、求职者中心、企业后台、运营后台四大页面域与 A/B/C/D/E 接口分组，并重点补齐《页面状态原型补充》与《对接接口统一契约》。本稿聚焦产品、研发、测试共同评审所需的业务结构、状态口径与接口契约，不展开数据库 DDL 与权限实现细节。</p>
+    <div class="hero-grid">
+      <div class="hero-card"><h3>页面域</h3><div class="v">门户前台 / 求职者中心 / 企业后台 / 运营后台</div></div>
+      <div class="hero-card"><h3>接口分组</h3><div class="v">A / B / C / D / E 五组接口</div></div>
+      <div class="hero-card"><h3>本轮重点补齐</h3><div class="v">页面状态原型 / 对接接口统一契约</div></div>
+      <div class="hero-card"><h3>评审对象</h3><div class="v">产品 / 研发 / 测试</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag amber">结论</span><h2>一、第三步骤修订结论</h2></div>
+    <div class="kpis">
+      <div class="stat"><div class="label">保留内容</div><div class="value">四大页面域 + A/B/C/D/E 接口分组</div></div>
+      <div class="stat"><div class="label">新增内容</div><div class="value">页面状态原型补充</div></div>
+      <div class="stat"><div class="label">新增内容</div><div class="value">对接接口统一契约</div></div>
+      <div class="stat"><div class="label">术语强化</div><div class="value">人才服务区 = 发布快照展示区</div></div>
+    </div>
+    <div class="callout">本稿的目标不是做高保真视觉稿，而是把“页面怎么分区、状态怎么流转、接口怎么统一”定清楚，避免后续研发与测试在状态和接口契约上各自理解。</div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag blue">术语校对</span><h2>一-A、术语统一说明</h2></div>
+    <div class="grid4">
+      <div class="mini-card"><h3>人才服务区</h3><p>指前台公开展示候选人发布快照的业务区，不是公共简历库。</p></div>
+      <div class="mini-card"><h3>发布快照</h3><p>指满足发布条件后进入公开展示链路的最小必要展示副本。</p></div>
+      <div class="mini-card"><h3>原始候选人数据</h3><p>指联系方式、简历正文、附件、证据材料等未进入公开展示链路的数据。</p></div>
+      <div class="mini-card"><h3>数据域 / 字段级权限</h3><p>数据域控制“能看哪一批数据”，字段级权限控制“能看哪些字段、看原值还是脱敏值”。</p></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag blue">总原型</span><h2>二、平台总体产品原型结构</h2></div>
+    <div class="flow">
+      <div class="node"><strong>门户前台</strong>面向游客、求职者。<small>首页 / 职位 / 企业 / 活动 / 资讯 / 人才服务区</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>求职者中心</strong>面向求职者本人。<small>账号 / 简历 / 投递 / 活动 / 面试签到 / 同意与撤回</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>企业后台</strong>面向企业与招聘人员。<small>企业认证 / 职位管理 / 投递管理 / 面试场次 / 活动管理</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>运营后台</strong>面向审核与运营。<small>企业审核 / 职位审核 / 内容管理 / 活动管理 / 统计看板 / 审计中心</small></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag green">前台原型</span><h2>三、门户前台产品原型</h2></div>
+    <div class="grid3">
+      <div class="mini-card">
+        <h3>页面 1：首页</h3>
+        <ul class="list">
+          <li>顶部导航：职位、企业、活动、资讯、人才服务、登录注册</li>
+          <li>首屏搜索：关键词 + 城市 + 职位类型</li>
+          <li>推荐区：重点职位 / 重点企业 / 热门活动</li>
+          <li>信息区：政策资讯 / 公告 / 平台介绍</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 2：职位列表 / 详情</h3>
+        <ul class="list">
+          <li>列表支持城市、行业、薪资、经验筛选</li>
+          <li>详情展示岗位职责、要求、企业信息、投递按钮</li>
+          <li>未登录点击投递先引导注册登录</li>
+          <li>已登录点击投递进入投递确认页</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 3：企业列表 / 详情</h3>
+        <ul class="list">
+          <li>企业卡片展示认证状态、招聘职位数、企业简介</li>
+          <li>企业详情展示企业介绍、在招职位、活动信息</li>
+          <li>不展示任何候选人明细</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 4：活动列表 / 详情</h3>
+        <ul class="list">
+          <li>招聘会 / 宣讲会 / 地方人才服务活动分类</li>
+          <li>支持报名按钮、时间地点信息、企业参会信息</li>
+          <li>详情页支持报名与签到引导</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 5：资讯中心</h3>
+        <ul class="list">
+          <li>政策资讯、平台公告、人才服务内容</li>
+          <li>按栏目、地区、发布时间分类</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 6：人才服务区</h3>
+        <ul class="list">
+          <li><strong>人才服务区 = 发布快照展示区，不是公共简历库</strong></li>
+          <li>只展示发布快照，不展示原始候选人数据</li>
+          <li>仅允许 publishable_flag=1 且 consent_status=已同意 的快照进入</li>
+          <li>支持脱敏展示与条件检索</li>
+        </ul>
+      </div>
+    </div>
+    <div class="success">门户前台的核心原则：公开层只展示职位、企业、活动、资讯和“候选人发布快照”，不得直接展示原始候选人数据、联系方式、简历正文、附件和证据材料。</div>
+    <div class="callout">术语统一口径：人才服务区 = 发布快照展示区；发布快照 = 进入公开展示链路的最小必要候选人展示副本；原始候选人数据 = 联系方式、简历正文、附件、证据材料及其他未进入公开展示链路的数据。</div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag purple">求职者中心</span><h2>四、求职者中心产品原型</h2></div>
+    <div class="grid3">
+      <div class="mini-card">
+        <h3>页面 1：账号与安全</h3>
+        <ul class="list">
+          <li>手机号/邮箱登录</li>
+          <li>基础资料维护</li>
+          <li>实名核验入口</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 2：简历管理</h3>
+        <ul class="list">
+          <li>创建、编辑、预览简历</li>
+          <li>支持多份简历</li>
+          <li>上传附件简历</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 3：投递记录</h3>
+        <ul class="list">
+          <li>查看职位投递状态</li>
+          <li>查看企业反馈、面试通知</li>
+          <li>支持撤销投递策略位预留</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 4：活动报名记录</h3>
+        <ul class="list">
+          <li>查看已报名活动</li>
+          <li>查看签到入口</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 5：面试签到</h3>
+        <ul class="list">
+          <li>签到二维码 / 签到码录入</li>
+          <li>签到成功页</li>
+          <li>签到后进入同意页或状态页</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 6：同意与撤回</h3>
+        <ul class="list">
+          <li>查看同意文本版本</li>
+          <li>勾选同意、二次确认</li>
+          <li>查看同意记录与撤回状态</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag red">企业后台</span><h2>五、企业后台产品原型</h2></div>
+    <div class="grid3">
+      <div class="mini-card">
+        <h3>页面 1：企业入驻与认证</h3>
+        <ul class="list">
+          <li>企业资料填写</li>
+          <li>证照上传</li>
+          <li>认证状态查询</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 2：职位管理</h3>
+        <ul class="list">
+          <li>职位创建、编辑、上下架</li>
+          <li>职位审核状态查看</li>
+          <li>职位数据统计</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 3：投递管理</h3>
+        <ul class="list">
+          <li>查看本企业职位的投递记录</li>
+          <li>筛选、标记处理状态</li>
+          <li>查看授权范围内候选人卡片</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 4：面试场次管理</h3>
+        <ul class="list">
+          <li>创建面试场次</li>
+          <li>生成签到码</li>
+          <li>查看签到结果</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 5：活动管理</h3>
+        <ul class="list">
+          <li>参与招聘会、活动报名管理</li>
+          <li>查看活动报名求职者名单（按规则）</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 6：导出申请</h3>
+        <ul class="list">
+          <li>对投递结果或活动名单发起导出审批</li>
+          <li>查看审批状态</li>
+        </ul>
+      </div>
+    </div>
+    <div class="warn">企业后台的关键要求是“只处理本企业边界内的数据”。第三步骤不展开权限实现，但页面与接口设计必须已经体现企业边界与无权限状态。</div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag amber">运营后台</span><h2>六、运营后台产品原型</h2></div>
+    <div class="grid3">
+      <div class="mini-card">
+        <h3>页面 1：企业审核</h3>
+        <ul class="list">
+          <li>审核企业入驻与认证</li>
+          <li>查看企业基本资料、证照</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 2：职位审核</h3>
+        <ul class="list">
+          <li>审核职位发布内容</li>
+          <li>执行上下架和违规处理</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 3：活动与内容管理</h3>
+        <ul class="list">
+          <li>活动发布、活动审核</li>
+          <li>资讯、公告、首页栏目配置</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 4：统计看板</h3>
+        <ul class="list">
+          <li>职位数、企业数、投递数、签到数、同意数、发布数</li>
+          <li>默认看聚合统计</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 5：审计中心</h3>
+        <ul class="list">
+          <li>审计日志、字段访问日志、导出记录</li>
+          <li>异常查询与追溯</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h3>页面 6：对接任务中心</h3>
+        <ul class="list">
+          <li>查看对接接口同步任务</li>
+          <li>查看重试状态、映射状态、失败原因</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag blue">流程原型</span><h2>七、关键业务流程原型</h2></div>
+    <div class="flow">
+      <div class="node"><strong>流程 1：投递</strong>浏览职位 → 登录/注册 → 选择简历 → 投递成功<small>投递后进入企业投递池</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>流程 2：面试签到</strong>企业创建场次 → 生成签到码 → 候选人签到<small>签到后进入同意页或结果页</small></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>流程 3：同意发布/同步</strong>实名核验 → 勾选同意 → 二次确认 → 写入同意记录<small>触发发布控制或对接接口回调</small></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag red">新增</span><h2>八、《页面状态原型补充》</h2></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%">场景</th>
+          <th style="width:18%">状态</th>
+          <th style="width:22%">页面表现</th>
+          <th>操作与说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>企业认证</strong></td>
+          <td>待审核</td>
+          <td>显示“认证审核中”状态条，不开放职位正式发布</td>
+          <td>允许查看提交资料；允许补充资料入口预留</td>
+        </tr>
+        <tr>
+          <td><strong>企业认证</strong></td>
+          <td>已驳回</td>
+          <td>显示驳回原因、重新提交入口</td>
+          <td>禁止继续使用需认证后才能使用的功能</td>
+        </tr>
+        <tr>
+          <td><strong>企业认证</strong></td>
+          <td>已通过</td>
+          <td>显示“已认证”标识</td>
+          <td>开放职位发布、场次创建等正式能力</td>
+        </tr>
+        <tr>
+          <td><strong>职位</strong></td>
+          <td>待审核</td>
+          <td>职位管理列表显示“待审核”</td>
+          <td>前台不可见；允许企业编辑或撤回</td>
+        </tr>
+        <tr>
+          <td><strong>职位</strong></td>
+          <td>在线</td>
+          <td>前台可见；职位详情可投递</td>
+          <td>支持查看数据统计、手动下线</td>
+        </tr>
+        <tr>
+          <td><strong>职位</strong></td>
+          <td>下线</td>
+          <td>前台不可见；后台保留记录</td>
+          <td>可重新上线或归档</td>
+        </tr>
+        <tr>
+          <td><strong>候选人发布控制</strong></td>
+          <td>已同意</td>
+          <td>求职者中心显示“已同意发布/同步”</td>
+          <td>满足规则时允许生成发布快照</td>
+        </tr>
+        <tr>
+          <td><strong>候选人发布控制</strong></td>
+          <td>已撤回</td>
+          <td>求职者中心显示“已撤回”</td>
+          <td>平台停止继续发布；对接接口触发撤回回调或下架任务</td>
+        </tr>
+        <tr>
+          <td><strong>候选人发布控制</strong></td>
+          <td>不可发布</td>
+          <td>人才服务区不展示；企业后台不显示公开层候选卡片</td>
+          <td>可能原因：未同意、已撤回、publishable_flag=0</td>
+        </tr>
+        <tr>
+          <td><strong>无权限查看</strong></td>
+          <td>无访问权</td>
+          <td>显示“无权限查看”空态页，不显示敏感字段</td>
+          <td>不得通过前端隐藏但接口仍返回原值</td>
+        </tr>
+        <tr>
+          <td><strong>对接任务</strong></td>
+          <td>同步失败</td>
+          <td>对接任务中心显示失败标识、错误信息、trace_id</td>
+          <td>支持查看失败原因；进入重试队列前不可直接标记成功</td>
+        </tr>
+        <tr>
+          <td><strong>对接任务</strong></td>
+          <td>重试中</td>
+          <td>显示“重试中”状态与重试次数</td>
+          <td>达到上限后转失败并告警</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">状态原型的目标不是补视觉细节，而是把“同一对象在不同状态下页面如何表现、允许做什么、不允许做什么”提前定清楚。</div>
+    <div class="success">状态术语统一：同意 = 候选人完成明确授权并处于有效状态；撤回 = 候选人取消原同意且应触发发布停止或下架联动。</div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag red">接口总览</span><h2>九、接口分组总览</h2></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%">接口分组</th>
+          <th style="width:22%">服务对象</th>
+          <th>主要功能</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>A. 门户公开接口</strong></td>
+          <td>游客 / 搜索引擎 / 前台页面</td>
+          <td>首页、职位列表、职位详情、企业列表、活动列表、资讯、人才服务区发布快照</td>
+        </tr>
+        <tr>
+          <td><strong>B. 求职者中心接口</strong></td>
+          <td>求职者</td>
+          <td>注册登录、简历管理、投递、活动报名、签到、同意与撤回</td>
+        </tr>
+        <tr>
+          <td><strong>C. 企业后台接口</strong></td>
+          <td>企业管理员 / 招聘专员 / 面试官</td>
+          <td>企业认证、职位管理、投递管理、面试场次、活动管理、导出申请</td>
+        </tr>
+        <tr>
+          <td><strong>D. 运营后台接口</strong></td>
+          <td>运营人员 / 审计员</td>
+          <td>企业审核、职位审核、内容管理、统计看板、审计日志</td>
+        </tr>
+        <tr>
+          <td><strong>E. 对接接口（预留）</strong></td>
+          <td>ATS / 受控候选池 / 未来集成方</td>
+          <td>职位同步、投递同步、同意回调、发布快照同步、映射查询</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag green">A 组</span><h2>十、门户公开接口清单</h2></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:16%">接口</th>
+          <th style="width:14%">方法</th>
+          <th style="width:18%">用途</th>
+          <th style="width:20%">关键入参</th>
+          <th>关键出参</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>/api/portal/home</td><td>GET</td><td>首页数据聚合</td><td>city_code</td><td>banners, featured_jobs, featured_companies, hot_events, news_list</td></tr>
+        <tr><td>/api/portal/jobs</td><td>GET</td><td>职位列表</td><td>keyword, city_code, salary_range, category_code, page</td><td>job_list, total</td></tr>
+        <tr><td>/api/portal/jobs/{id}</td><td>GET</td><td>职位详情</td><td>id</td><td>job_detail, company_summary</td></tr>
+        <tr><td>/api/portal/companies</td><td>GET</td><td>企业列表</td><td>keyword, city_code, industry_code, page</td><td>company_list, total</td></tr>
+        <tr><td>/api/portal/companies/{id}</td><td>GET</td><td>企业详情</td><td>id</td><td>company_detail, jobs</td></tr>
+        <tr><td>/api/portal/events</td><td>GET</td><td>活动列表</td><td>type_code, city_code, date_range, page</td><td>event_list, total</td></tr>
+        <tr><td>/api/portal/news</td><td>GET</td><td>资讯列表</td><td>category, page</td><td>news_list, total</td></tr>
+        <tr><td>/api/portal/talent-snapshots</td><td>GET</td><td>人才服务区发布快照列表</td><td>city_code, category_code, page</td><td>snapshot_list, total</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">A 组接口只允许输出 S1 字段和“发布快照”最小必要字段，不允许输出原始候选人数据。</div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag purple">B 组</span><h2>十一、求职者中心接口清单</h2></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:16%">接口</th>
+          <th style="width:14%">方法</th>
+          <th style="width:18%">用途</th>
+          <th style="width:20%">关键入参</th>
+          <th>关键出参</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>/api/user/register</td><td>POST</td><td>注册</td><td>mobile/email, code, password</td><td>user_id, token</td></tr>
+        <tr><td>/api/user/profile</td><td>GET/PUT</td><td>查看/修改个人资料</td><td>基础资料字段</td><td>profile</td></tr>
+        <tr><td>/api/resumes</td><td>GET/POST</td><td>简历列表/创建简历</td><td>resume payload</td><td>resume_list / resume_id</td></tr>
+        <tr><td>/api/resumes/{id}</td><td>GET/PUT/DELETE</td><td>查看/编辑/删除简历</td><td>id, resume payload</td><td>resume_detail</td></tr>
+        <tr><td>/api/applications</td><td>POST</td><td>职位投递</td><td>job_id, resume_id</td><td>application_id, status</td></tr>
+        <tr><td>/api/my/applications</td><td>GET</td><td>我的投递记录</td><td>page, status</td><td>application_list</td></tr>
+        <tr><td>/api/events/{id}/register</td><td>POST</td><td>活动报名</td><td>event_id</td><td>registration_id</td></tr>
+        <tr><td>/api/interview/signin</td><td>POST</td><td>面试签到</td><td>qr_code / session_code</td><td>signin_id, redirect_type</td></tr>
+        <tr><td>/api/consents</td><td>POST</td><td>提交同意</td><td>candidate_id, consent_scope, consent_version, verify payload</td><td>consent_id, consent_status</td></tr>
+        <tr><td>/api/consents/my</td><td>GET</td><td>查看同意记录</td><td>page</td><td>consent_list</td></tr>
+        <tr><td>/api/consents/{id}/revoke</td><td>POST</td><td>撤回同意</td><td>id, reason</td><td>revoke_status</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag red">C 组</span><h2>十二、企业后台接口清单</h2></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:16%">接口</th>
+          <th style="width:14%">方法</th>
+          <th style="width:18%">用途</th>
+          <th style="width:20%">关键入参</th>
+          <th>关键出参</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>/api/company/apply</td><td>POST</td><td>企业入驻申请</td><td>company profile, license files</td><td>company_id, auth_status</td></tr>
+        <tr><td>/api/company/jobs</td><td>GET/POST</td><td>职位列表/创建职位</td><td>job payload</td><td>job_list / job_id</td></tr>
+        <tr><td>/api/company/jobs/{id}</td><td>GET/PUT</td><td>查看/编辑职位</td><td>job payload</td><td>job_detail</td></tr>
+        <tr><td>/api/company/jobs/{id}/status</td><td>POST</td><td>上下架职位</td><td>status</td><td>status</td></tr>
+        <tr><td>/api/company/applications</td><td>GET</td><td>本企业投递管理</td><td>job_id, status, page</td><td>application_list</td></tr>
+        <tr><td>/api/company/interview-sessions</td><td>GET/POST</td><td>场次列表/创建场次</td><td>job_id, session_time, location</td><td>session_list / session_id</td></tr>
+        <tr><td>/api/company/interview-sessions/{id}/qrcode</td><td>POST</td><td>生成签到码</td><td>id</td><td>qr_code, expire_time</td></tr>
+        <tr><td>/api/company/events</td><td>GET</td><td>活动参与记录</td><td>page</td><td>event_join_list</td></tr>
+        <tr><td>/api/company/export-apply</td><td>POST</td><td>导出申请</td><td>biz_type, scope_json, reason</td><td>apply_id, approve_status</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag amber">D 组</span><h2>十三、运营后台接口清单</h2></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:16%">接口</th>
+          <th style="width:14%">方法</th>
+          <th style="width:18%">用途</th>
+          <th style="width:20%">关键入参</th>
+          <th>关键出参</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>/api/admin/companies/review</td><td>GET/POST</td><td>企业审核列表/审核提交</td><td>company_id, audit_status, memo</td><td>review_result</td></tr>
+        <tr><td>/api/admin/jobs/review</td><td>GET/POST</td><td>职位审核列表/审核提交</td><td>job_id, audit_status, memo</td><td>review_result</td></tr>
+        <tr><td>/api/admin/events</td><td>GET/POST/PUT</td><td>活动管理</td><td>event payload</td><td>event_detail</td></tr>
+        <tr><td>/api/admin/content</td><td>GET/POST/PUT</td><td>资讯与首页配置</td><td>content payload</td><td>content_detail</td></tr>
+        <tr><td>/api/admin/dashboard</td><td>GET</td><td>统计看板</td><td>date_range, city_code</td><td>job_count, company_count, apply_count, sign_count, consent_count, publish_count</td></tr>
+        <tr><td>/api/admin/audit-logs</td><td>GET</td><td>审计日志查询</td><td>biz_type, operator_id, date_range</td><td>audit_log_list</td></tr>
+        <tr><td>/api/admin/field-access-logs</td><td>GET</td><td>字段访问日志查询</td><td>field_name, operator_id, date_range</td><td>access_log_list</td></tr>
+        <tr><td>/api/admin/export-approve</td><td>POST</td><td>导出审批</td><td>apply_id, approve_status</td><td>approve_result</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag purple">E 组</span><h2>十四、对接接口清单（预留）</h2></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:16%">接口</th>
+          <th style="width:14%">方法</th>
+          <th style="width:18%">用途</th>
+          <th style="width:20%">关键入参</th>
+          <th>关键出参</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>/api/open/v1/jobs/sync</td><td>POST</td><td>ATS 同步职位</td><td>source_system, company_external_id, job_external_id, job payload, sync_version</td><td>local_job_id, sync_status</td></tr>
+        <tr><td>/api/open/v1/applications/sync</td><td>POST</td><td>ATS 同步投递记录</td><td>application_external_id, job_external_id, candidate_external_id, source_type</td><td>local_application_id, sync_status</td></tr>
+        <tr><td>/api/open/v1/consents/callback</td><td>POST</td><td>平台回传同意状态</td><td>candidate_id, consent_status, consent_scope, consent_version, revoke_status</td><td>callback_status</td></tr>
+        <tr><td>/api/open/v1/candidates/publishable-sync</td><td>POST</td><td>候选池推送发布快照</td><td>candidate_id, publishable_flag, visibility_scope, snapshot_json, sync_version</td><td>local_snapshot_id, sync_status</td></tr>
+        <tr><td>/api/open/v1/mappings/query</td><td>GET</td><td>外部映射查询</td><td>source_system, local_biz_type, local_id</td><td>external_id, version</td></tr>
+      </tbody>
+    </table>
+    <div class="success">E 组对接接口只交换“业务状态、映射关系、发布快照、授权状态”，不交换不必要的原始候选人数据和高敏证据材料。</div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag red">新增</span><h2>十五、《对接接口统一契约》</h2></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%">契约项</th>
+          <th>统一规则</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>接口版本号</strong></td>
+          <td>统一放入 URI，例如 <code>/api/open/v1/...</code>；重大变更再升 v2。</td>
+        </tr>
+        <tr>
+          <td><strong>签名方式</strong></td>
+          <td>采用 client_code + timestamp + nonce + body_hash 的签名机制；服务端校验签名与时间窗。</td>
+        </tr>
+        <tr>
+          <td><strong>时间戳</strong></td>
+          <td>请求头必须包含 <code>X-Timestamp</code>；默认允许时间窗建议 5 分钟。</td>
+        </tr>
+        <tr>
+          <td><strong>trace_id</strong></td>
+          <td>请求头必须包含 <code>X-Trace-Id</code>；若未传入，平台生成并回传。</td>
+        </tr>
+        <tr>
+          <td><strong>幂等键</strong></td>
+          <td>写接口必须包含 <code>X-Idempotency-Key</code>；服务端按接口类型 + 幂等键做幂等控制。</td>
+        </tr>
+        <tr>
+          <td><strong>错误码规范</strong></td>
+          <td>统一分为：认证类、签名类、参数类、业务状态类、权限类、重试类、系统类错误码。</td>
+        </tr>
+        <tr>
+          <td><strong>请求体规范</strong></td>
+          <td>统一 JSON；必须带 <code>source_system</code>、业务主键、版本号、必要状态字段。</td>
+        </tr>
+        <tr>
+          <td><strong>响应结构</strong></td>
+          <td>统一返回：<code>code / message / trace_id / data</code>。</td>
+        </tr>
+        <tr>
+          <td><strong>回调重试策略</strong></td>
+          <td>失败后进入重试队列；建议按 1min / 5min / 15min / 1h 退避；达到上限后转人工处理或失败告警。</td>
+        </tr>
+        <tr>
+          <td><strong>版本兼容策略</strong></td>
+          <td>新增字段向后兼容；删除字段或改含义必须升版本。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="codebox">建议的对接接口请求头：
+X-Client-Code: partner_xxx
+X-Timestamp: 2026-04-12T10:00:00+08:00
+X-Nonce: 8f3d1ab2
+X-Trace-Id: trace-20260412-000001
+X-Idempotency-Key: idem-20260412-apply-000001
+X-Signature: sha256(...)
+
+统一响应体：
+{
+  "code": "0",
+  "message": "success",
+  "trace_id": "trace-20260412-000001",
+  "data": { ... }
+}</div>
+    <div class="callout">统一契约的目标，是让 E 组对接接口从“接口清单”升级成“真正可对接的接口设计基础”。</div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="tag green">收口</span><h2>十六、修订版结论</h2></div>
+    <div class="grid3">
+      <div class="mini-card">
+        <h3>本稿已经明确</h3>
+        <p>四大页面域与 A/B/C/D/E 五组接口继续保留。</p>
+      </div>
+      <div class="mini-card">
+        <h3>本稿新增补齐</h3>
+        <p>页面状态原型补充、对接接口统一契约。</p>
+      </div>
+      <div class="mini-card">
+        <h3>本稿术语统一</h3>
+        <p>人才服务区 = 发布快照展示区，不是公共简历库。</p>
+      </div>
+    </div>
+    <div class="success">结论：本稿已形成《LocalTalent_step3 修订版》，可以作为产品、研发、测试对 step3 的统一修订版本，并与 step4 最终定稿版继续保持一致。</div>
+  </section>
+
+  <div class="footer">LocalTalent_step3 修订版</div>
+</div>
+</body>
+</html>
