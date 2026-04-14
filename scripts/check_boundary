@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+README_FILE="$ROOT_DIR/README.md"
+
+required_phrases=(
+  "人才服务区仅展示发布快照"
+  "对接接口仅 stub"
+  "不输出原始候选人数据"
+  "人才服务区"
+  "发布快照"
+  "原始候选人数据"
+  "同意"
+  "撤回"
+  "对接接口"
+  "数据域"
+  "字段级权限"
+)
+
+implementation_paths=(
+  "$ROOT_DIR/backend/src"
+  "$ROOT_DIR/backend/pom.xml"
+  "$ROOT_DIR/backend/mvnw"
+  "$ROOT_DIR/backend/mvnw.cmd"
+  "$ROOT_DIR/backend/.mvn"
+  "$ROOT_DIR/backend/src/main/resources/application.yaml"
+  "$ROOT_DIR/frontend/src"
+  "$ROOT_DIR/frontend/package.json"
+  "$ROOT_DIR/frontend/vite.config.ts"
+  "$ROOT_DIR/frontend/vitest.config.ts"
+  "$ROOT_DIR/frontend/tsconfig.json"
+  "$ROOT_DIR/frontend/index.html"
+  "$ROOT_DIR/infra/docker-compose.yml"
+  "$ROOT_DIR/scripts/run_all"
+)
+
+if command -v rg >/dev/null 2>&1; then
+  search_cmd() {
+    rg -i -n "$1" "${implementation_paths[@]}" >/dev/null 2>&1
+  }
+else
+  search_cmd() {
+    grep -RIniE "$1" "${implementation_paths[@]}" >/dev/null 2>&1
+  }
+fi
+
+for phrase in "${required_phrases[@]}"; do
+  if ! grep -Fq "$phrase" "$README_FILE"; then
+    echo "FAIL: README missing required phrase: $phrase"
+    exit 1
+  fi
+done
+
+forbidden_patterns=(
+  "ats client"
+  "candidate pool connector"
+  "受控候选池连接器"
+  "real sync client"
+  "candidate_mobile"
+  "candidate_email"
+  "resume_content"
+  "attachment_url"
+  "chat_record"
+  "evidence_material"
+)
+
+for pattern in "${forbidden_patterns[@]}"; do
+  if search_cmd "$pattern"; then
+    echo "FAIL: forbidden implementation marker detected: $pattern"
+    exit 1
+  fi
+done
+
+echo "PASS"

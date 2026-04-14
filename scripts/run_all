@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+
+if [ -n "${NODE_BIN_DIR:-}" ]; then
+  export PATH="$NODE_BIN_DIR:$PATH"
+fi
+
+if [ -n "${JAVA_HOME_OVERRIDE:-}" ]; then
+  export JAVA_HOME="$JAVA_HOME_OVERRIDE"
+fi
+
+require_node() {
+  if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+    echo "FAIL: node/npm not found. Install Node 24 LTS or set NODE_BIN_DIR before running scripts/run_all."
+    exit 1
+  fi
+}
+
+require_java() {
+  if command -v java >/dev/null 2>&1 && command -v javac >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if [ -n "${JAVA_HOME:-}" ] && [ -x "${JAVA_HOME}/bin/java" ] && [ -x "${JAVA_HOME}/bin/javac" ]; then
+    return 0
+  fi
+
+  echo "FAIL: java/javac not found. Install JDK 21 or set JAVA_HOME_OVERRIDE before running scripts/run_all."
+  exit 1
+}
+
+echo "[1/3] boundary checks"
+"$ROOT_DIR/scripts/check_boundary"
+
+echo "[2/3] backend tests"
+require_java
+(
+  cd "$ROOT_DIR/backend"
+  # Allow callers to inject offline repo or other Maven flags without editing the script.
+  ./mvnw ${BACKEND_MAVEN_ARGS:-} test
+)
+
+echo "[3/3] frontend tests"
+require_node
+(
+  cd "$ROOT_DIR/frontend"
+  npm test
+)
+
+echo "PASS"

@@ -1,0 +1,11 @@
+backend/target/
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+.idea/
+.vscode/
+*.log
+*.tmp
+*.swp
+*.swo
+.DS_Store
