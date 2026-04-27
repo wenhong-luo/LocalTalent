@@ -81,7 +81,17 @@ VALUES
   ('company_console', '企业后台', NULL, 'page', '/company', NULL, 200, 1),
   ('operator_console', '运营后台', NULL, 'page', '/admin', NULL, 300, 1),
   ('audit_console', '审计中心', NULL, 'page', '/audit', NULL, 400, 1),
-  ('open_api_stub', '对接接口占位', NULL, 'api', NULL, 'open.stub', 500, 1)
+  ('open_api_stub', '对接接口占位', NULL, 'api', NULL, 'open.stub', 500, 1),
+  ('candidate_consent_create', '候选人提交同意', NULL, 'api', NULL, 'candidate.consent.create', 610, 1),
+  ('candidate_consent_revoke', '候选人撤回同意', NULL, 'api', NULL, 'candidate.consent.revoke', 620, 1),
+  ('company_apply', '企业认证提交', NULL, 'api', NULL, 'company.apply', 710, 1),
+  ('company_job_list', '企业职位列表', NULL, 'api', NULL, 'company.job.list', 720, 1),
+  ('company_job_create', '企业职位创建', NULL, 'api', NULL, 'company.job.create', 730, 1),
+  ('company_job_read', '企业职位查看', NULL, 'api', NULL, 'company.job.read', 740, 1),
+  ('company_job_update', '企业职位编辑', NULL, 'api', NULL, 'company.job.update', 750, 1),
+  ('company_job_status', '企业职位状态变更', NULL, 'api', NULL, 'company.job.status', 760, 1),
+  ('admin_company_review', '运营企业审核', NULL, 'api', NULL, 'admin.company.review', 810, 1),
+  ('admin_job_review', '运营职位审核', NULL, 'api', NULL, 'admin.job.review', 820, 1)
 AS new
 ON DUPLICATE KEY UPDATE
   menu_name = new.menu_name,
@@ -96,11 +106,40 @@ INSERT INTO sys_role_menu (role_id, menu_id)
 SELECT r.id, m.id
 FROM sys_role r
 JOIN sys_menu m ON (
-  (r.role_code = 'candidate' AND m.menu_code IN ('portal_home', 'portal_jobs', 'portal_companies', 'portal_activities', 'portal_snapshots', 'candidate_center'))
-  OR (r.role_code = 'company_admin' AND m.menu_code IN ('company_console'))
-  OR (r.role_code = 'recruiter' AND m.menu_code IN ('company_console'))
+  (r.role_code = 'candidate' AND m.menu_code IN (
+    'portal_home',
+    'portal_jobs',
+    'portal_companies',
+    'portal_activities',
+    'portal_snapshots',
+    'candidate_center',
+    'candidate_consent_create',
+    'candidate_consent_revoke'
+  ))
+  OR (r.role_code = 'company_admin' AND m.menu_code IN (
+    'company_console',
+    'company_apply',
+    'company_job_list',
+    'company_job_create',
+    'company_job_read',
+    'company_job_update',
+    'company_job_status'
+  ))
+  OR (r.role_code = 'recruiter' AND m.menu_code IN (
+    'company_console',
+    'company_apply',
+    'company_job_list',
+    'company_job_create',
+    'company_job_read',
+    'company_job_update',
+    'company_job_status'
+  ))
   OR (r.role_code = 'interviewer' AND m.menu_code IN ('company_console'))
-  OR (r.role_code = 'operator' AND m.menu_code IN ('operator_console'))
+  OR (r.role_code = 'operator' AND m.menu_code IN (
+    'operator_console',
+    'admin_company_review',
+    'admin_job_review'
+  ))
   OR (r.role_code = 'auditor' AND m.menu_code IN ('audit_console'))
   OR (r.role_code = 'open_client' AND m.menu_code IN ('open_api_stub'))
 )

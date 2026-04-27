@@ -23,6 +23,7 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
@@ -37,6 +38,7 @@ import org.testcontainers.utility.DockerImageName;
                 "localtalent.auth.jwt.secret=auth-integration-secret-change-me-with-enough-length",
                 "localtalent.auth.jwt.ttl-seconds=3600"
         })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ExtendWith(OutputCaptureExtension.class)
 class AuthIntegrationTest {
 

@@ -58,7 +58,7 @@
 
 <div class="ok">
   <div class="label">当前投喂进度</div>
-  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT 最小认证闭环已落地。下一轮默认从 <b>Prompt 3：RBAC + 数据域 + 字段级权限 + 审计</b> 开始。</p>
+  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机已落地。下一轮默认从 <b>Prompt 6：投递与面试签到</b> 开始。</p>
 </div>
 
 <div class="note">
@@ -84,7 +84,19 @@
     <li><b>Prompt 2 本地默认 operator 账号</b>：<code>operator / LocalTalent@123456</code> 仅用于 Prompt 2 验收和本地开发；账号由 <code>admin_user</code> 表与 <code>R__seed_auth_internal_accounts.sql</code> 写入，SQL 中只保存 BCrypt hash，不保存明文密码。</li>
     <li><b>Prompt 2 生产提醒</b>：生产前必须在后续阶段替换 operator 初始化、强制改密和权限治理方案；不得直接把本地默认 operator 账号作为生产账号使用。</li>
     <li><b>Prompt 2 安全验收事实</b>：<code>AuthIntegrationTest</code> 已覆盖 candidate/company/operator 登录闭环、JWT 缺失/篡改/过期统一错误、trace_id 回传、密码 BCrypt 存储、日志无密码明文。</li>
-    <li><b>下一轮默认起点</b>：Prompt 3（RBAC + 数据域 + 字段级权限 + 审计）。Prompt 3 之前不得在认证接口中提前实现权限策略、同意/撤回或发布快照业务。</li>
+    <li><b>Prompt 3 已完成</b>：<code>authz/</code> 与 <code>audit/</code> 基础设施已落地；生产代码新增的是 <code>@RequirePermission</code>、<code>DataScopeService</code>、<code>FieldPolicyEngine</code>、<code>@AuditAction</code>、<code>AuditService</code>、<code>FieldAccessAuditService</code>，没有新增真实业务接口。</li>
+    <li><b>Prompt 3 权限口径</b>：权限错误统一返回 <code>AUTHZ_403</code> 并带 <code>trace_id</code>；字段级权限默认 S1 允许、S2/S3/S4 未配置即拒绝；多角色按显式策略并集取更高可见级别；敏感字段访问写入 <code>field_access_log</code>。</li>
+    <li><b>Prompt 3 测试口径</b>：IDOR/BOLA 验证使用 <code>src/test</code> 下测试专用 Controller/Service 夹具，不是生产 API；<code>FieldPolicyEngineTest</code>、<code>DataScopeIntegrationTest</code>、<code>IdorBlockIntegrationTest</code> 已覆盖字段裁剪、数据域阻断、审计落库与 trace 关联。</li>
+    <li><b>Prompt 4 已完成</b>：候选人同意/发布快照/撤回闭环已落地；接口为 <code>POST /api/consents</code>、<code>POST /api/consents/{id}/revoke</code>、<code>GET /api/portal/talent-snapshots</code>。</li>
+    <li><b>Prompt 4 数据边界</b>：人才服务区查询唯一公开数据源是 <code>candidate_publish_snapshot</code>；公开响应只返回白名单字段 <code>snapshot_id/display_name_masked/city_code/category_code/skills_summary/experience_years/updated_at</code>，不得返回手机号、邮箱、简历正文、附件、证据或任何原始候选人数据字段。</li>
+    <li><b>Prompt 4 幂等与审计口径</b>：同意/撤回写接口必须带 <code>X-Idempotency-Key</code>，幂等记录表为 <code>api_idempotency_record</code>；同意/撤回写 <code>audit_log</code>，生成发布快照读取敏感原始字段写 <code>field_access_log</code> 并关联 <code>trace_id</code>。</li>
+    <li><b>Prompt 4 公开接口口径</b>：<code>GET /api/portal/talent-snapshots</code> 使用显式 <code>@PublicEndpoint</code> 标记；除明确公开接口外，生产 Controller 仍必须通过 <code>@RequirePermission</code> 服务端鉴权。</li>
+    <li><b>Prompt 4 验收口径</b>：<code>ConsentSnapshotFlowIT</code>、<code>PortalFieldBlacklistTest</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖同意生成快照、撤回下线、字段黑名单、幂等冲突、审计/字段访问日志和 <code>api_idempotency_record</code> 表存在。</li>
+    <li><b>Prompt 5 已完成</b>：企业认证/职位审核/上下线状态机已落地；接口覆盖 <code>POST /api/company/apply</code>、<code>/api/company/jobs</code>、<code>/api/admin/companies/review</code>、<code>/api/admin/jobs/review</code>、<code>GET /api/portal/jobs</code> 与 <code>GET /api/portal/jobs/{id}</code>。</li>
+    <li><b>Prompt 5 状态机口径</b>：企业认证使用 <code>1=待审核, 2=通过, 3=驳回</code>；职位使用 <code>status: 1=待审核, 2=在线, 3=下线</code> 与 <code>audit_status: 1=待审核, 2=通过, 3=驳回</code>；未认证企业的职位不得审核上线。</li>
+    <li><b>Prompt 5 权限与可见性口径</b>：企业后台接口只允许本企业数据域；运营审核必须是 <code>operator</code>；<code>auditor</code> 只读不得改业务状态；门户职位只展示 <code>job_post.status=2</code>、<code>audit_status=2</code> 且企业 <code>auth_status=2</code> 的职位。</li>
+    <li><b>Prompt 5 验收口径</b>：<code>JobVisibilityIT</code>、<code>JobIdorBlockIT</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖企业三态、职位门户可见性、未认证上线阻断、跨企业阻断、auditor 只读和 <code>audit_log</code> 留痕。</li>
+    <li><b>下一轮默认起点</b>：Prompt 6（投递与面试签到）。Prompt 6 之前不得实现投递池、面试场次、签到码、防重放或相关业务流程。</li>
   </ul>
 </div>
 

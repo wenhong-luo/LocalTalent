@@ -50,7 +50,8 @@ class MigrationTest {
                 "open_client",
                 "open_api_log",
                 "audit_log",
-                "field_access_log"));
+                "field_access_log",
+                "api_idempotency_record"));
         assertTablesExist(jdbcTemplate, List.of("admin_user"));
 
         assertColumnsExist(jdbcTemplate, "candidate_control_profile", List.of(
@@ -63,6 +64,18 @@ class MigrationTest {
         assertColumnsExist(jdbcTemplate, "candidate_publish_snapshot", List.of("snapshot_json"));
         assertColumnsAbsent(jdbcTemplate, "candidate_publish_snapshot", List.of("mobile", "email", "password_hash"));
         assertColumnsAbsent(jdbcTemplate, "candidate_user", List.of("snapshot_json"));
+        assertColumnsExist(jdbcTemplate, "company", List.of(
+                "auth_reject_reason",
+                "auth_review_user_id",
+                "auth_review_time",
+                "auth_submit_time"));
+        assertColumnsExist(jdbcTemplate, "job_post", List.of(
+                "review_memo",
+                "reject_reason",
+                "review_user_id",
+                "review_time",
+                "offline_reason",
+                "status_changed_at"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");

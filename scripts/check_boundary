@@ -72,4 +72,123 @@ for pattern in "${forbidden_patterns[@]}"; do
   fi
 done
 
+prompt3_required_paths=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/authz"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/audit"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/authz/FieldPolicyEngineTest.java"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/authz/DataScopeIntegrationTest.java"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/authz/IdorBlockIntegrationTest.java"
+)
+
+for required_path in "${prompt3_required_paths[@]}"; do
+  if [ ! -e "$required_path" ]; then
+    echo "FAIL: Prompt 3 required path missing: $required_path"
+    exit 1
+  fi
+done
+
+while IFS= read -r controller_file; do
+  case "$controller_file" in
+    */auth/api/AuthController.java|*/health/HealthController.java)
+      ;;
+    *)
+      if ! grep -Eq "@RequirePermission|@PublicEndpoint" "$controller_file"; then
+        echo "FAIL: production controller without @RequirePermission or @PublicEndpoint: $controller_file"
+        exit 1
+      fi
+      ;;
+  esac
+
+  if grep -Eiq "mask|MASK|脱敏|\\*\\*\\*" "$controller_file"; then
+    echo "FAIL: controller-level masking marker detected: $controller_file"
+    exit 1
+  fi
+done < <(find "$ROOT_DIR/backend/src/main/java" -name '*Controller.java' -type f)
+
+if ! grep -Fq "unconfiguredSensitiveFieldsShouldNotLeak" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/authz/FieldPolicyEngineTest.java"; then
+  echo "FAIL: sensitive field no-leak test missing"
+  exit 1
+fi
+
+if ! grep -Fq "AUTHZ_403" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/authz/IdorBlockIntegrationTest.java"; then
+  echo "FAIL: authorization denial integration assertion missing"
+  exit 1
+fi
+
+prompt4_required_paths=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate"
+  "$ROOT_DIR/backend/src/main/resources/db/migration/V0006__create_api_idempotency_records.sql"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/candidate/ConsentSnapshotFlowIT.java"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/candidate/PortalFieldBlacklistTest.java"
+)
+
+for required_path in "${prompt4_required_paths[@]}"; do
+  if [ ! -e "$required_path" ]; then
+    echo "FAIL: Prompt 4 required path missing: $required_path"
+    exit 1
+  fi
+done
+
+while IFS= read -r portal_file; do
+  if grep -Eiq "candidate_user|candidate_resume" "$portal_file"; then
+    echo "FAIL: portal talent snapshot code must not read raw candidate tables: $portal_file"
+    exit 1
+  fi
+done < <(find "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate" -type f \( -name '*Portal*.java' -o -name '*TalentSnapshot*.java' \))
+
+while IFS= read -r response_file; do
+  if grep -Eiq "mobile|email|password_hash|resume_body|attachment_object_key|evidence|base_profile_json|education_json|experience_json|skills_json" "$response_file"; then
+    echo "FAIL: portal response DTO contains raw candidate field marker: $response_file"
+    exit 1
+  fi
+done < <(find "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate/api" -type f -name '*Snapshot*Response.java')
+
+if ! grep -Fq "IDEMPOTENCY_409" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/candidate/ConsentSnapshotFlowIT.java"; then
+  echo "FAIL: Prompt 4 idempotency conflict assertion missing"
+  exit 1
+fi
+
+if ! grep -Fq "doesNotContain(\"mobile\")" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/candidate/PortalFieldBlacklistTest.java"; then
+  echo "FAIL: Prompt 4 portal field blacklist assertion missing"
+  exit 1
+fi
+
+prompt5_required_paths=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/company"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/job"
+  "$ROOT_DIR/backend/src/main/resources/db/migration/V0007__add_company_job_review_fields.sql"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/job/JobVisibilityIT.java"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/job/JobIdorBlockIT.java"
+)
+
+for required_path in "${prompt5_required_paths[@]}"; do
+  if [ ! -e "$required_path" ]; then
+    echo "FAIL: Prompt 5 required path missing: $required_path"
+    exit 1
+  fi
+done
+
+if grep -RIEiq "job_application|interview_session|export_apply|open_api|integration_sync|ats|candidate_pool" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/company" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/job"; then
+  echo "FAIL: Prompt 5 company/job module contains later-scope implementation marker"
+  exit 1
+fi
+
+if ! grep -Fq "company is not certified" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/job/JobVisibilityIT.java"; then
+  echo "FAIL: Prompt 5 uncertified company online-block assertion missing"
+  exit 1
+fi
+
+if ! grep -Fq "AUTHZ_403" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/job/JobIdorBlockIT.java"; then
+  echo "FAIL: Prompt 5 IDOR denial assertion missing"
+  exit 1
+fi
+
 echo "PASS"
