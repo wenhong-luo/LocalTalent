@@ -80,6 +80,33 @@ td:last-child,th:last-child{border-right:none}
 </div>
 </section>
 
+<!-- DEV_READ_CARD_START -->
+<section class="card dev-read-card">
+  <div class="section-title"><span class="tag green">开发前必读</span><h2>开发前必读卡</h2></div>
+  <div class="grid2">
+    <div class="mini-card"><h3>文件定位</h3><p>数据库、权限、审批、审计一体化最终口径；后续迁移脚本与权限实现以此为主。</p></div>
+    <div class="mini-card"><h3>实现约束</h3><p>DDL、RBAC、数据域、字段级权限、导出审批、审计日志必须同步设计并在服务端强制执行。</p></div>
+    <div class="mini-card"><h3>禁止越界点</h3><p>禁止人才服务区裸查原始候选人表；禁止用前端隐藏代替字段级权限；禁止导出绕过审批。</p></div>
+    <div class="mini-card"><h3>下游影响</h3><p>直接约束 Flyway 迁移、Service 查询、DTO 组装、权限引擎、审计打点和导出审批。</p></div>
+    <div class="mini-card"><h3>自动化验收关注点</h3><p>迁移测试、越权阻断、字段级裁剪、审计日志、导出审批、公开层字段黑名单。</p></div>
+  </div>
+  <div class="warn"><strong>统一硬边界提醒：</strong>人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</div>
+  <div class="section-title" style="margin-top:18px;"><span class="tag blue">执行索引</span><h2>执行索引</h2></div>
+  <ul class="list">
+  <li>总体原则</li>
+  <li>candidate 核心边界字段主归属</li>
+  <li>分库分表建议</li>
+  <li>枚举字典策略</li>
+  <li>核心业务表 DDL</li>
+  <li>集成/日志/审计/证据表 DDL</li>
+  <li>角色/菜单/数据域/字段级权限</li>
+  <li>导出审批与高风险动作控制</li>
+  <li>日志打点位置</li>
+  <li>权限附加表 DDL</li>
+  <li>接口 × 权限 × 审批 × 日志矩阵</li>
+  </ul>
+</section>
+<!-- DEV_READ_CARD_END -->
 <section class="card">
   <div class="section-title"><span class="tag blue">总纲</span><h2>一、总体原则</h2></div>
   <div class="grid3">

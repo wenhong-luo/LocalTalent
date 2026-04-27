@@ -29,6 +29,38 @@
 
 <h1>LocalTalent 第一期研发实施蓝图与任务拆解（最终版）</h1>
 
+
+<!-- DEV_READ_CARD_START -->
+<div class="note dev-read-card">
+  <div class="label">开发前必读卡</div>
+  <ul class="small check">
+    <li><b>文件定位</b>：一期里程碑、任务拆解、测试矩阵、部署运维和风险清单文件。</li>
+    <li><b>实现约束</b>：用于排期与验收复核；设计权威仍以 Step1–Step4 和 00_MASTER_BOUNDARY 为准。</li>
+    <li><b>禁止越界点</b>：禁止把后续阶段、可选假设或建议项提前实现为当前轮功能。</li>
+    <li><b>下游影响</b>：约束每轮任务优先级、测试矩阵、CI/CD、Runbook、安全与合规验收。</li>
+    <li><b>自动化验收关注点</b>：阶段 DoD、测试矩阵覆盖、安全合规清单、上线前回归与边界扫描。</li>
+  </ul>
+</div>
+
+<div class="warn">
+  <div class="label">统一硬边界提醒</div>
+  <p class="small">人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</p>
+</div>
+
+<div class="note">
+  <div class="label">执行索引</div>
+  <ul class="small check">
+    <li>输入与假设</li>
+    <li>第一期目标与范围硬边界</li>
+    <li>里程碑与阶段划分</li>
+    <li>详细任务拆解</li>
+    <li>测试与验收矩阵</li>
+    <li>部署与运维要点</li>
+    <li>安全与合规检查清单与风险清单</li>
+    <li>输出格式与交付物清单</li>
+  </ul>
+</div>
+<!-- DEV_READ_CARD_END -->
 <div class="note">
   <b>执行摘要</b><br/>
   本报告将已定稿的 Step1–Step4 设计文档转译为「地方人才服务平台一期」可交付、可排期、可验收的研发实施蓝图与任务拆解。重点收口：一期硬边界（禁止接入 ATS/受控候选池原始主库）、两类数据产品隔离（原始候选人数据 vs 发布快照）、人才服务区仅展示发布快照、RBAC + 数据域 + 字段级权限 + 导出审批 + 审计日志闭环落地。设计权威以 Step1–Step4 为准。fileciteturn1file0 fileciteturn1file1 fileciteturn1file2 fileciteturn1file3

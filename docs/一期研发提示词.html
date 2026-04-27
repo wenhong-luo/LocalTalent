@@ -38,6 +38,70 @@
 
 <h1>LocalTalent（地方人才服务平台一期）Codex 投喂手册（可执行版 · Prompt 0–14）</h1>
 
+
+<!-- DEV_READ_CARD_START -->
+<div class="note dev-read-card">
+  <div class="label">开发前必读卡</div>
+  <ul class="small check">
+    <li><b>文件定位</b>：Codex 逐轮投喂执行手册，覆盖 Prompt 0–14 的目标、禁止事项、输出和验收。</li>
+    <li><b>实现约束</b>：每轮只做当前 Prompt 的目标；通用边界、统一响应、trace、审计和失败处理规则全轮次继承。</li>
+    <li><b>禁止越界点</b>：禁止跨 Prompt 偷跑后续功能；Prompt 中出现后续能力不代表当前轮可以实现。</li>
+    <li><b>下游影响</b>：约束每轮开发输入、修复流程、验收命令、PR 检查和开发日志更新。</li>
+    <li><b>自动化验收关注点</b>：代码能跑、测试通、没越界；每轮至少有可自动化 DoD。</li>
+  </ul>
+</div>
+
+<div class="warn">
+  <div class="label">统一硬边界提醒</div>
+  <p class="small">人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</p>
+</div>
+
+<div class="ok">
+  <div class="label">当前投喂进度</div>
+  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT 最小认证闭环已落地。下一轮默认从 <b>Prompt 3：RBAC + 数据域 + 字段级权限 + 审计</b> 开始。</p>
+</div>
+
+<div class="note">
+  <div class="label">每轮开发读取顺序</div>
+  <ol class="small">
+    <li>先读 <code>docs/00_MASTER_BOUNDARY.md</code>，确认本轮是否触碰硬边界。</li>
+    <li>再读本手册的“执行摘要 / 输入文件与工程约束 / 运营模型与一轮的标准闭环”。</li>
+    <li>读取 Step1–Step4 与实施蓝图顶部的“开发前必读卡”，只把当前轮相关正文展开细读。</li>
+    <li>定位当前 Prompt 卡片，只执行该轮“本轮目标 / 输出要求 / 验收要求”。</li>
+    <li>开发后按“校验提示词模板”和“失败情形处理矩阵”自查，再运行 <code>scripts/check_boundary</code> 与本轮测试命令。</li>
+  </ol>
+</div>
+
+<div class="warn">
+  <div class="label">已完成轮次基线记录（开发前必读）</div>
+  <p class="small">这部分记录已经落地的工程事实、默认账号和本地占位决策。后续每轮开发前必须先看这里，避免重复实现、误删迁移或把本地占位当成生产方案。</p>
+  <ul class="small check">
+    <li><b>Prompt 0 已完成</b>：monorepo 骨架已落地；后端已有 <code>/health</code>、统一响应体与 <code>X-Trace-Id</code>；前端已有空启动与 <code>StateView</code>；<code>infra/docker-compose.yml</code> 已提供 MySQL/Redis/MinIO；<code>scripts/check_boundary</code> 与 <code>scripts/run_all</code> 已可用。</li>
+    <li><b>Prompt 0 本地占位提醒</b>：MySQL/Redis/MinIO 仅服务本地开发；MinIO 当前使用历史官方镜像作为一期本地开发占位，后续生产/正式部署前需重新确认对象存储方案。</li>
+    <li><b>Prompt 1 已完成</b>：Flyway 迁移 <code>V0000</code>–<code>V0004</code> 与 repeatable seed 已落地；<code>candidate_control_profile</code> 是候选人核心边界字段当前值主归属；迁移测试覆盖空库迁移、seed 幂等和关键表存在。</li>
+    <li><b>Prompt 1 迁移纪律</b>：已执行过的版本化迁移不得反复改旧脚本；后续修复必须新增更高版本迁移向前修复，repeatable seed 只用于幂等基础数据。</li>
+    <li><b>Prompt 2 已完成</b>：本地账号 + JWT 最小认证闭环已落地；接口为 <code>POST /api/auth/register</code>、<code>POST /api/auth/login</code>、<code>GET /api/auth/me</code>；JWT 只承载身份识别，不承载 RBAC、数据域、字段级权限。</li>
+    <li><b>Prompt 2 本地默认 operator 账号</b>：<code>operator / LocalTalent@123456</code> 仅用于 Prompt 2 验收和本地开发；账号由 <code>admin_user</code> 表与 <code>R__seed_auth_internal_accounts.sql</code> 写入，SQL 中只保存 BCrypt hash，不保存明文密码。</li>
+    <li><b>Prompt 2 生产提醒</b>：生产前必须在后续阶段替换 operator 初始化、强制改密和权限治理方案；不得直接把本地默认 operator 账号作为生产账号使用。</li>
+    <li><b>Prompt 2 安全验收事实</b>：<code>AuthIntegrationTest</code> 已覆盖 candidate/company/operator 登录闭环、JWT 缺失/篡改/过期统一错误、trace_id 回传、密码 BCrypt 存储、日志无密码明文。</li>
+    <li><b>下一轮默认起点</b>：Prompt 3（RBAC + 数据域 + 字段级权限 + 审计）。Prompt 3 之前不得在认证接口中提前实现权限策略、同意/撤回或发布快照业务。</li>
+  </ul>
+</div>
+
+<div class="note">
+  <div class="label">执行索引</div>
+  <ul class="small check">
+    <li>执行摘要</li>
+    <li>输入文件与工程约束</li>
+    <li>运营模型与一轮的标准闭环</li>
+    <li>失败情形处理矩阵</li>
+    <li>轮次总览与时间线</li>
+    <li>当前 Prompt 卡片</li>
+    <li>最小 CI/CD 与 infra 落地清单</li>
+    <li>最终快速参考清单</li>
+  </ul>
+</div>
+<!-- DEV_READ_CARD_END -->
 <h2>执行摘要</h2>
 <p>
 本手册面向 PM/Tech Lead/Dev 团队，提供<strong>从零到可交付</strong>的一期（Phase‑1）Codex 逐轮投喂方法：共 15 轮（Prompt 0–14），每轮固定五段结构（主控说明 / 本轮目标 / 禁止事项 / 输出要求 / 验收要求），并将三条闸门固化为可自动化 DoD：<b>代码能跑、测试通、没越界</b>。
@@ -357,7 +421,7 @@ cd frontend && npm ci && npm test && npm run dev</code></pre>
 </details>
 
 <!-- Prompt 1 -->
-<details>
+<details open>
   <summary>数据库迁移 DDL-0..DDL-4 与种子<span class="pill">Prompt 1 · 估算 4/3/2 天</span></summary>
 
   <div class="sec"><div class="label">主控说明</div>

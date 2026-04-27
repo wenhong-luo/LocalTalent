@@ -79,6 +79,30 @@ td:last-child,th:last-child{border-right:none}
 </div>
 </section>
 
+<!-- DEV_READ_CARD_START -->
+<section class="card dev-read-card">
+  <div class="section-title"><span class="tag green">开发前必读</span><h2>开发前必读卡</h2></div>
+  <div class="grid2">
+    <div class="mini-card"><h3>文件定位</h3><p>合规、候选人生命周期、数据地图、边界字段归属的上位约束文件。</p></div>
+    <div class="mini-card"><h3>实现约束</h3><p>原始候选人数据与发布快照必须分离；同意→发布→撤回→下线是候选人主状态线。</p></div>
+    <div class="mini-card"><h3>禁止越界点</h3><p>禁止将联系方式、简历正文、附件、证据材料放入人才服务区；禁止把签到动作等同于同意。</p></div>
+    <div class="mini-card"><h3>下游影响</h3><p>直接约束 DDL 字段归属、DTO 白名单、字段级权限、审计日志和字段黑名单测试。</p></div>
+    <div class="mini-card"><h3>自动化验收关注点</h3><p>字段黑名单、生命周期状态测试、撤回后下架/不可见、日志不记录敏感明文。</p></div>
+  </div>
+  <div class="warn"><strong>统一硬边界提醒：</strong>人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</div>
+  <div class="section-title" style="margin-top:18px;"><span class="tag blue">执行索引</span><h2>执行索引</h2></div>
+  <ul class="list">
+  <li>文件目标与使用方式</li>
+  <li>关键术语统一说明</li>
+  <li>合规场景清单</li>
+  <li>候选人生命周期矩阵</li>
+  <li>候选人数据地图</li>
+  <li>核心边界字段归属矩阵</li>
+  <li>字段分级 / 接口字段 / 权限边界</li>
+  <li>第二步骤输出结论</li>
+  </ul>
+</section>
+<!-- DEV_READ_CARD_END -->
 <section class="card">
 <div class="section-title"><span class="tag blue">总览</span><h2>一、文件目标与使用方式</h2></div>
 <div class="kpis">

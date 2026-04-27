@@ -83,6 +83,30 @@ td:last-child,th:last-child{border-right:none}
 </div>
 </section>
 
+<!-- DEV_READ_CARD_START -->
+<section class="card dev-read-card">
+  <div class="section-title"><span class="tag green">开发前必读</span><h2>开发前必读卡</h2></div>
+  <div class="grid2">
+    <div class="mini-card"><h3>文件定位</h3><p>一期范围冻结与平台边界文件，定义“两个主体 + 三个系统”，但当前只建设地方人才服务平台。</p></div>
+    <div class="mini-card"><h3>实现约束</h3><p>平台必须先独立可运行；ATS 与受控候选池只允许保留接口位、字段兼容位和审计预留位。</p></div>
+    <div class="mini-card"><h3>禁止越界点</h3><p>禁止 ATS/受控候选池正式接入、真实同步、连接配置；禁止把人才服务区做成公共简历库。</p></div>
+    <div class="mini-card"><h3>下游影响</h3><p>约束 Step2 数据治理、Step3 页面/接口、Step4 DDL/权限，以及后续 Prompt 的范围判断。</p></div>
+    <div class="mini-card"><h3>自动化验收关注点</h3><p>边界扫描、README 硬边界、公开接口/页面不得出现原始候选人数据字段。</p></div>
+  </div>
+  <div class="warn"><strong>统一硬边界提醒：</strong>人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</div>
+  <div class="section-title" style="margin-top:18px;"><span class="tag blue">执行索引</span><h2>执行索引</h2></div>
+  <ul class="list">
+  <li>一期冻结边界声明</li>
+  <li>主体与系统边界</li>
+  <li>关键术语统一说明</li>
+  <li>一期功能范围</li>
+  <li>业务规则与数据控制规则</li>
+  <li>预留响应端口</li>
+  <li>日志、审计与可追溯要求</li>
+  <li>第一步骤修订版结论</li>
+  </ul>
+</section>
+<!-- DEV_READ_CARD_END -->
 <section class="card">
 <div class="section-title"><span class="tag red">冻结边界</span><h2>一、一期冻结边界声明</h2></div>
 <div class="grid2">

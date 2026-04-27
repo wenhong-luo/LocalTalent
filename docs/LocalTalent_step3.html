@@ -95,6 +95,30 @@ td:last-child,th:last-child{border-right:none}
     </div>
   </section>
 
+<!-- DEV_READ_CARD_START -->
+<section class="card dev-read-card">
+  <div class="section-title"><span class="tag green">开发前必读</span><h2>开发前必读卡</h2></div>
+  <div class="grid2">
+    <div class="mini-card"><h3>文件定位</h3><p>页面域、接口分组、状态原型与对接接口契约文件。</p></div>
+    <div class="mini-card"><h3>实现约束</h3><p>前后端必须使用统一响应、trace 与状态视图；公开层只读取发布快照 DTO。</p></div>
+    <div class="mini-card"><h3>禁止越界点</h3><p>禁止真实外部同步客户端；禁止公开层读取原始候选人数据；禁止把对接接口从 stub 扩成业务接入。</p></div>
+    <div class="mini-card"><h3>下游影响</h3><p>约束 Controller/API 路径、前端页面状态、OpenAPI 契约、对接接口 stub 和回归测试。</p></div>
+    <div class="mini-card"><h3>自动化验收关注点</h3><p>统一响应体、X-Trace-Id、状态视图、对接契约、公开层字段裁剪。</p></div>
+  </div>
+  <div class="warn"><strong>统一硬边界提醒：</strong>人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</div>
+  <div class="section-title" style="margin-top:18px;"><span class="tag blue">执行索引</span><h2>执行索引</h2></div>
+  <ul class="list">
+  <li>第三步骤修订结论</li>
+  <li>术语统一说明</li>
+  <li>页面结构总览</li>
+  <li>页面状态原型</li>
+  <li>接口分组总览</li>
+  <li>对接接口统一契约</li>
+  <li>权限与字段裁剪要求</li>
+  <li>第三步骤结论</li>
+  </ul>
+</section>
+<!-- DEV_READ_CARD_END -->
   <section class="card">
     <div class="section-title"><span class="tag amber">结论</span><h2>一、第三步骤修订结论</h2></div>
     <div class="kpis">
