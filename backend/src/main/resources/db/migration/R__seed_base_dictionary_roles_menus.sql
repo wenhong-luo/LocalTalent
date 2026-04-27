@@ -90,6 +90,12 @@ VALUES
   ('company_job_read', '企业职位查看', NULL, 'api', NULL, 'company.job.read', 740, 1),
   ('company_job_update', '企业职位编辑', NULL, 'api', NULL, 'company.job.update', 750, 1),
   ('company_job_status', '企业职位状态变更', NULL, 'api', NULL, 'company.job.status', 760, 1),
+  ('candidate_application_create', '候选人职位投递', NULL, 'api', NULL, 'candidate.application.create', 770, 1),
+  ('candidate_interview_signin', '候选人面试签到', NULL, 'api', NULL, 'candidate.interview.signin', 780, 1),
+  ('company_application_list', '企业投递池列表', NULL, 'api', NULL, 'company.application.list', 790, 1),
+  ('company_application_read', '企业投递详情', NULL, 'api', NULL, 'company.application.read', 800, 1),
+  ('company_interview_session_create', '企业创建面试场次', NULL, 'api', NULL, 'company.interview.session.create', 805, 1),
+  ('company_interview_qrcode_generate', '企业生成签到码', NULL, 'api', NULL, 'company.interview.qrcode.generate', 806, 1),
   ('admin_company_review', '运营企业审核', NULL, 'api', NULL, 'admin.company.review', 810, 1),
   ('admin_job_review', '运营职位审核', NULL, 'api', NULL, 'admin.job.review', 820, 1)
 AS new
@@ -114,7 +120,9 @@ JOIN sys_menu m ON (
     'portal_snapshots',
     'candidate_center',
     'candidate_consent_create',
-    'candidate_consent_revoke'
+    'candidate_consent_revoke',
+    'candidate_application_create',
+    'candidate_interview_signin'
   ))
   OR (r.role_code = 'company_admin' AND m.menu_code IN (
     'company_console',
@@ -123,7 +131,11 @@ JOIN sys_menu m ON (
     'company_job_create',
     'company_job_read',
     'company_job_update',
-    'company_job_status'
+    'company_job_status',
+    'company_application_list',
+    'company_application_read',
+    'company_interview_session_create',
+    'company_interview_qrcode_generate'
   ))
   OR (r.role_code = 'recruiter' AND m.menu_code IN (
     'company_console',
@@ -132,7 +144,11 @@ JOIN sys_menu m ON (
     'company_job_create',
     'company_job_read',
     'company_job_update',
-    'company_job_status'
+    'company_job_status',
+    'company_application_list',
+    'company_application_read',
+    'company_interview_session_create',
+    'company_interview_qrcode_generate'
   ))
   OR (r.role_code = 'interviewer' AND m.menu_code IN ('company_console'))
   OR (r.role_code = 'operator' AND m.menu_code IN (

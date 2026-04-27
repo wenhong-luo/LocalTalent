@@ -76,6 +76,11 @@ class MigrationTest {
                 "review_time",
                 "offline_reason",
                 "status_changed_at"));
+        assertColumnsExist(jdbcTemplate, "interview_session", List.of(
+                "application_id",
+                "signin_code_hash",
+                "signin_code_expires_at",
+                "signin_code_used_at"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");

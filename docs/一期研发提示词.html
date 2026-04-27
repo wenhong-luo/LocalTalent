@@ -58,7 +58,7 @@
 
 <div class="ok">
   <div class="label">当前投喂进度</div>
-  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机已落地。下一轮默认从 <b>Prompt 6：投递与面试签到</b> 开始。</p>
+  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5、Prompt 6 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机、投递与面试签到闭环已落地。下一轮默认从 <b>Prompt 7：运营审核 + 内容/活动管理</b> 开始。</p>
 </div>
 
 <div class="note">
@@ -96,7 +96,11 @@
     <li><b>Prompt 5 状态机口径</b>：企业认证使用 <code>1=待审核, 2=通过, 3=驳回</code>；职位使用 <code>status: 1=待审核, 2=在线, 3=下线</code> 与 <code>audit_status: 1=待审核, 2=通过, 3=驳回</code>；未认证企业的职位不得审核上线。</li>
     <li><b>Prompt 5 权限与可见性口径</b>：企业后台接口只允许本企业数据域；运营审核必须是 <code>operator</code>；<code>auditor</code> 只读不得改业务状态；门户职位只展示 <code>job_post.status=2</code>、<code>audit_status=2</code> 且企业 <code>auth_status=2</code> 的职位。</li>
     <li><b>Prompt 5 验收口径</b>：<code>JobVisibilityIT</code>、<code>JobIdorBlockIT</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖企业三态、职位门户可见性、未认证上线阻断、跨企业阻断、auditor 只读和 <code>audit_log</code> 留痕。</li>
-    <li><b>下一轮默认起点</b>：Prompt 6（投递与面试签到）。Prompt 6 之前不得实现投递池、面试场次、签到码、防重放或相关业务流程。</li>
+    <li><b>Prompt 6 已完成</b>：投递与面试签到闭环已落地；接口覆盖 <code>POST /api/applications</code>、<code>GET /api/company/applications</code>、<code>GET /api/company/applications/{id}</code>、<code>POST /api/company/applications/{id}/interview-sessions</code>、<code>POST /api/company/interview-sessions/{id}/qrcode</code>、<code>POST /api/interview/signin</code>。</li>
+    <li><b>Prompt 6 签到码口径</b>：签到码明文只在生成接口响应一次，数据库只保存 <code>signin_code_hash</code>；签到码必须过期且一次性使用，重复使用或过期使用返回统一错误，不得把签到动作混同为同意。</li>
+    <li><b>Prompt 6 权限与数据域口径</b>：candidate 只能给在线且企业认证通过的职位投递；企业投递池仅查询本企业 applications；面试场次与签到均按 application/session 对象级授权阻断 IDOR。</li>
+    <li><b>Prompt 6 验收口径</b>：<code>ApplicationInterviewFlowIT</code>、<code>ApplicationIdorBlockIT</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖投递→企业查询→创建场次→签到成功、过期/重放阻断、跨企业阻断、非本人签到阻断和 <code>audit_log</code> 留痕。</li>
+    <li><b>下一轮默认起点</b>：Prompt 7（运营审核 + 内容/活动管理）。Prompt 7 之前不得实现活动管理、CMS 内容管理、运营内容发布或活动报名流程。</li>
   </ul>
 </div>
 

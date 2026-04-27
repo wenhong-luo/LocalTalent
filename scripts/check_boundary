@@ -191,4 +191,50 @@ if ! grep -Fq "AUTHZ_403" \
   exit 1
 fi
 
+prompt6_required_paths=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/application"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/interview"
+  "$ROOT_DIR/backend/src/main/resources/db/migration/V0008__add_interview_signin_code_fields.sql"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/application/ApplicationInterviewFlowIT.java"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/application/ApplicationIdorBlockIT.java"
+)
+
+for required_path in "${prompt6_required_paths[@]}"; do
+  if [ ! -e "$required_path" ]; then
+    echo "FAIL: Prompt 6 required path missing: $required_path"
+    exit 1
+  fi
+done
+
+if grep -RIEiq "export_apply|open_api|integration_sync|ats|candidate_pool|同意|撤回|publish_snapshot" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/application" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/interview"; then
+  echo "FAIL: Prompt 6 application/interview module contains out-of-scope implementation marker"
+  exit 1
+fi
+
+if ! grep -Fq "signin_code_hash" \
+  "$ROOT_DIR/backend/src/main/resources/db/migration/V0008__add_interview_signin_code_fields.sql"; then
+  echo "FAIL: Prompt 6 signin code hash migration missing"
+  exit 1
+fi
+
+if ! grep -Fq "trace-p6-signin-replay" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/application/ApplicationInterviewFlowIT.java"; then
+  echo "FAIL: Prompt 6 replay-block assertion missing"
+  exit 1
+fi
+
+if ! grep -Fq "trace-p6-signin-expired" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/application/ApplicationInterviewFlowIT.java"; then
+  echo "FAIL: Prompt 6 expired-code assertion missing"
+  exit 1
+fi
+
+if ! grep -Fq "AUTHZ_403" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/application/ApplicationIdorBlockIT.java"; then
+  echo "FAIL: Prompt 6 IDOR denial assertion missing"
+  exit 1
+fi
+
 echo "PASS"
