@@ -12,6 +12,7 @@ import cn.localtalent.backend.authz.AuthzPrincipal;
 import cn.localtalent.backend.authz.DataScopeService;
 import cn.localtalent.backend.authz.ResourceOwner;
 import cn.localtalent.backend.common.exception.ApiException;
+import cn.localtalent.backend.common.json.AuditJsonMapper;
 import cn.localtalent.backend.company.application.CompanyService;
 import cn.localtalent.backend.job.application.JobService;
 import cn.localtalent.backend.job.domain.JobPostRow;
@@ -36,7 +37,7 @@ public class ApplicationService {
     private final JobJdbcRepository jobRepository;
     private final DataScopeService dataScopeService;
     private final AuditService auditService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = AuditJsonMapper.create();
 
     public ApplicationService(
             ApplicationJdbcRepository applicationRepository,

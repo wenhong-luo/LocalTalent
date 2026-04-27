@@ -237,4 +237,73 @@ if ! grep -Fq "AUTHZ_403" \
   exit 1
 fi
 
+prompt7_required_paths=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/admin"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/admin/review/api/AdminCompanyReviewController.java"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/admin/review/api/AdminJobReviewController.java"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/admin/cms"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/admin/event"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/admin/ReviewAffectsVisibilityIT.java"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/admin/AdminCmsEventCrudIT.java"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/admin/AuditorWriteDeniedIT.java"
+)
+
+for required_path in "${prompt7_required_paths[@]}"; do
+  if [ ! -e "$required_path" ]; then
+    echo "FAIL: Prompt 7 required path missing: $required_path"
+    exit 1
+  fi
+done
+
+if grep -RIEiq "candidate_user|candidate_resume|activity_registration|export_apply|open_api|integration_sync|ats|candidate_pool" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/admin"; then
+  echo "FAIL: Prompt 7 admin module contains out-of-scope implementation marker"
+  exit 1
+fi
+
+if grep -RIEiq "DELETE[[:space:]]+FROM[[:space:]]+(cms_content|activity_event)" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/admin"; then
+  echo "FAIL: Prompt 7 cms/event must use soft delete, not physical delete"
+  exit 1
+fi
+
+for api_code in \
+  "admin.company.review.read" \
+  "admin.company.review.write" \
+  "admin.job.review.read" \
+  "admin.job.review.write" \
+  "admin.cms.read" \
+  "admin.cms.write" \
+  "admin.event.read" \
+  "admin.event.write"; do
+  if ! grep -Fq "$api_code" "$ROOT_DIR/backend/src/main/resources/db/migration/R__seed_base_dictionary_roles_menus.sql"; then
+    echo "FAIL: Prompt 7 seed permission missing: $api_code"
+    exit 1
+  fi
+done
+
+if ! grep -Fq "trace-p7-portal-job-visible" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/admin/ReviewAffectsVisibilityIT.java"; then
+  echo "FAIL: Prompt 7 review visibility assertion missing"
+  exit 1
+fi
+
+if ! grep -Fq "cms_soft_delete" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/admin/AdminCmsEventCrudIT.java"; then
+  echo "FAIL: Prompt 7 cms soft-delete audit assertion missing"
+  exit 1
+fi
+
+if ! grep -Fq "event_soft_delete" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/admin/AdminCmsEventCrudIT.java"; then
+  echo "FAIL: Prompt 7 event soft-delete audit assertion missing"
+  exit 1
+fi
+
+if ! grep -Fq "AUTHZ_403" \
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/admin/AuditorWriteDeniedIT.java"; then
+  echo "FAIL: Prompt 7 auditor write-denial assertion missing"
+  exit 1
+fi
+
 echo "PASS"

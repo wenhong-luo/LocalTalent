@@ -97,7 +97,15 @@ VALUES
   ('company_interview_session_create', '企业创建面试场次', NULL, 'api', NULL, 'company.interview.session.create', 805, 1),
   ('company_interview_qrcode_generate', '企业生成签到码', NULL, 'api', NULL, 'company.interview.qrcode.generate', 806, 1),
   ('admin_company_review', '运营企业审核', NULL, 'api', NULL, 'admin.company.review', 810, 1),
-  ('admin_job_review', '运营职位审核', NULL, 'api', NULL, 'admin.job.review', 820, 1)
+  ('admin_company_review_read', '运营企业审核读取', NULL, 'api', NULL, 'admin.company.review.read', 811, 1),
+  ('admin_company_review_write', '运营企业审核写入', NULL, 'api', NULL, 'admin.company.review.write', 812, 1),
+  ('admin_job_review', '运营职位审核', NULL, 'api', NULL, 'admin.job.review', 820, 1),
+  ('admin_job_review_read', '运营职位审核读取', NULL, 'api', NULL, 'admin.job.review.read', 821, 1),
+  ('admin_job_review_write', '运营职位审核写入', NULL, 'api', NULL, 'admin.job.review.write', 822, 1),
+  ('admin_cms_read', '运营内容读取', NULL, 'api', NULL, 'admin.cms.read', 830, 1),
+  ('admin_cms_write', '运营内容写入', NULL, 'api', NULL, 'admin.cms.write', 831, 1),
+  ('admin_event_read', '运营活动读取', NULL, 'api', NULL, 'admin.event.read', 840, 1),
+  ('admin_event_write', '运营活动写入', NULL, 'api', NULL, 'admin.event.write', 841, 1)
 AS new
 ON DUPLICATE KEY UPDATE
   menu_name = new.menu_name,
@@ -154,9 +162,23 @@ JOIN sys_menu m ON (
   OR (r.role_code = 'operator' AND m.menu_code IN (
     'operator_console',
     'admin_company_review',
-    'admin_job_review'
+    'admin_company_review_read',
+    'admin_company_review_write',
+    'admin_job_review',
+    'admin_job_review_read',
+    'admin_job_review_write',
+    'admin_cms_read',
+    'admin_cms_write',
+    'admin_event_read',
+    'admin_event_write'
   ))
-  OR (r.role_code = 'auditor' AND m.menu_code IN ('audit_console'))
+  OR (r.role_code = 'auditor' AND m.menu_code IN (
+    'audit_console',
+    'admin_company_review_read',
+    'admin_job_review_read',
+    'admin_cms_read',
+    'admin_event_read'
+  ))
   OR (r.role_code = 'open_client' AND m.menu_code IN ('open_api_stub'))
 )
 ON DUPLICATE KEY UPDATE

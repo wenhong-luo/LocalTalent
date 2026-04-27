@@ -9,6 +9,7 @@ import cn.localtalent.backend.authz.AuthzPrincipal;
 import cn.localtalent.backend.authz.DataScopeService;
 import cn.localtalent.backend.authz.ResourceOwner;
 import cn.localtalent.backend.common.exception.ApiException;
+import cn.localtalent.backend.common.json.AuditJsonMapper;
 import cn.localtalent.backend.interview.api.InterviewSessionCreateRequest;
 import cn.localtalent.backend.interview.api.InterviewSessionResponse;
 import cn.localtalent.backend.interview.api.InterviewSigninRequest;
@@ -35,7 +36,7 @@ public class InterviewService {
     private final DataScopeService dataScopeService;
     private final AuditService auditService;
     private final SigninCodeService signinCodeService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = AuditJsonMapper.create();
 
     public InterviewService(
             InterviewJdbcRepository interviewRepository,

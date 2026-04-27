@@ -7,6 +7,7 @@ import cn.localtalent.backend.authz.AuthzPrincipal;
 import cn.localtalent.backend.authz.DataScopeService;
 import cn.localtalent.backend.authz.ResourceOwner;
 import cn.localtalent.backend.common.exception.ApiException;
+import cn.localtalent.backend.common.json.AuditJsonMapper;
 import cn.localtalent.backend.company.api.CompanyApplyRequest;
 import cn.localtalent.backend.company.api.CompanyReviewItemResponse;
 import cn.localtalent.backend.company.api.CompanyReviewPageResponse;
@@ -33,7 +34,7 @@ public class CompanyService {
     private final CompanyJdbcRepository companyRepository;
     private final DataScopeService dataScopeService;
     private final AuditService auditService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = AuditJsonMapper.create();
 
     public CompanyService(
             CompanyJdbcRepository companyRepository,
@@ -66,7 +67,7 @@ public class CompanyService {
     }
 
     public CompanyReviewPageResponse listForReview(Integer authStatus, int page, int size) {
-        AuthzPrincipal principal = requireOperator();
+        requireAdminReader();
         int normalizedPage = Math.max(page, 1);
         int normalizedSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
         int offset = (normalizedPage - 1) * normalizedSize;
@@ -76,6 +77,11 @@ public class CompanyService {
                 .map(this::reviewItem)
                 .toList();
         return new CompanyReviewPageResponse(items, companyRepository.countForReview(authStatus));
+    }
+
+    public CompanyReviewItemResponse getForReview(long companyId) {
+        requireAdminReader();
+        return reviewItem(requireCompany(companyId));
     }
 
     @Transactional
@@ -134,6 +140,13 @@ public class CompanyService {
             throw forbidden("operator role required");
         }
         return principal;
+    }
+
+    private void requireAdminReader() {
+        AuthzPrincipal principal = AuthzContext.requireCurrentPrincipal();
+        if (!principal.hasRole("operator") && !principal.hasRole("auditor")) {
+            throw forbidden("admin review reader role required");
+        }
     }
 
     private CompanyStatusResponse statusResponse(CompanyReviewRow row) {

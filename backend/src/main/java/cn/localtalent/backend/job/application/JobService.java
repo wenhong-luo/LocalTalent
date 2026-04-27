@@ -7,6 +7,7 @@ import cn.localtalent.backend.authz.AuthzPrincipal;
 import cn.localtalent.backend.authz.DataScopeService;
 import cn.localtalent.backend.authz.ResourceOwner;
 import cn.localtalent.backend.common.exception.ApiException;
+import cn.localtalent.backend.common.json.AuditJsonMapper;
 import cn.localtalent.backend.company.application.CompanyService;
 import cn.localtalent.backend.job.api.JobCreateRequest;
 import cn.localtalent.backend.job.api.JobPageResponse;
@@ -40,7 +41,7 @@ public class JobService {
     private final JobJdbcRepository jobRepository;
     private final DataScopeService dataScopeService;
     private final AuditService auditService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = AuditJsonMapper.create();
 
     public JobService(
             JobJdbcRepository jobRepository,
@@ -115,7 +116,7 @@ public class JobService {
     }
 
     public JobPageResponse listForReview(Integer auditStatus, int page, int size) {
-        requireOperator();
+        requireAdminReader();
         int normalizedPage = Math.max(page, 1);
         int normalizedSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
         int offset = (normalizedPage - 1) * normalizedSize;
@@ -125,6 +126,11 @@ public class JobService {
                 .map(this::response)
                 .toList();
         return new JobPageResponse(items, jobRepository.countForReview(auditStatus));
+    }
+
+    public JobResponse getForReview(long jobId) {
+        requireAdminReader();
+        return response(requireJob(jobId));
     }
 
     @Transactional
@@ -186,6 +192,13 @@ public class JobService {
             throw forbidden("operator role required");
         }
         return principal;
+    }
+
+    private void requireAdminReader() {
+        AuthzPrincipal principal = AuthzContext.requireCurrentPrincipal();
+        if (!principal.hasRole("operator") && !principal.hasRole("auditor")) {
+            throw forbidden("admin review reader role required");
+        }
     }
 
     private JobCreateRequest normalizeCreate(JobCreateRequest request) {

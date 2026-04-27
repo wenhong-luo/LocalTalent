@@ -15,6 +15,7 @@ import cn.localtalent.backend.candidate.domain.ConsentRecord;
 import cn.localtalent.backend.candidate.domain.IdempotentActionResult;
 import cn.localtalent.backend.candidate.infrastructure.CandidateJdbcRepository;
 import cn.localtalent.backend.common.exception.ApiException;
+import cn.localtalent.backend.common.json.AuditJsonMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -50,7 +51,7 @@ public class CandidateConsentService {
         this.snapshotAssembler = snapshotAssembler;
         this.dataScopeService = dataScopeService;
         this.auditService = auditService;
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = AuditJsonMapper.create();
     }
 
     @Transactional
