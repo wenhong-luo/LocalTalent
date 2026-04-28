@@ -1,0 +1,51 @@
+:root {
+  --lt-ink: #14213d;
+  --lt-ink-muted: #526071;
+  --lt-paper: #fffaf0;
+  --lt-card: rgba(255, 255, 255, 0.88);
+  --lt-line: rgba(20, 33, 61, 0.14);
+  --lt-accent: #0f766e;
+  --lt-accent-strong: #115e59;
+  --lt-sand: #f2d492;
+  --lt-clay: #c96f43;
+  --lt-danger: #b42318;
+  --lt-warning: #b7791f;
+  --lt-shadow: 0 26px 80px rgba(20, 33, 61, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: #f8f1df;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--lt-ink);
+  background:
+    radial-gradient(circle at 15% 12%, rgba(242, 212, 146, 0.68), transparent 32rem),
+    radial-gradient(circle at 82% 4%, rgba(15, 118, 110, 0.2), transparent 28rem),
+    linear-gradient(135deg, #fffaf0 0%, #eef6f3 52%, #f7ead5 100%);
+  font-family: "LXGW WenKai Screen", "Noto Serif SC", "Songti SC", Georgia, serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(15, 118, 110, 0.38);
+  outline-offset: 3px;
+}

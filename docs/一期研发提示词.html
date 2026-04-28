@@ -58,7 +58,7 @@
 
 <div class="ok">
   <div class="label">当前投喂进度</div>
-  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5、Prompt 6、Prompt 7、Prompt 8、Prompt 9、Prompt 10 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机、投递与面试签到闭环、运营审核 + 内容/活动管理、导出审批与一次性下载、对接接口 Stub、审计中心与可观测性查询已落地。下一轮默认从 <b>Prompt 11：前端门户 + 人才服务区状态机</b> 开始。</p>
+  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5、Prompt 6、Prompt 7、Prompt 8、Prompt 9、Prompt 10 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机、投递与面试签到闭环、运营审核 + 内容/活动管理、导出审批与一次性下载、对接接口 Stub、审计中心与可观测性查询已落地。Prompt 11 已选择 Next/SSR、Node SSR、强 SEO、几万日活、SSR 首屏 + CSR 复访；下一轮默认从 <b>Prompt 11.5：Next/SSR 架构基线回填 + 门户读路径容量补强</b> 开始。</p>
 </div>
 
 <div class="note">
@@ -119,7 +119,9 @@
     <li><b>Prompt 10 只读与权限口径</b>：审计中心只提供查询接口，不新增任何写接口；<code>operator</code> 与 <code>auditor</code> 仅授予审计中心 read 权限，candidate/company 无权读取，auditor 调用代表性 admin 写接口仍必须返回 <code>AUTHZ_403</code>。</li>
     <li><b>Prompt 10 脱敏与 trace 口径</b>：审计中心响应必须统一脱敏 <code>before_json/after_json/request_summary_json/response_summary_json/error_msg/request_uri</code> 中的手机号、邮箱、正文、附件、证据、password、secret、token；<code>trace_id</code> 可串联 <code>audit_log</code>、<code>field_access_log</code>、<code>open_api_log</code>。</li>
     <li><b>Prompt 10 验收口径</b>：<code>AuditTraceQueryIT</code>、<code>AuditMaskingTest</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖 trace 聚合查询、分页过滤、operator/auditor 只读、candidate/company 阻断、日志脱敏和审计中心索引迁移。</li>
-    <li><b>下一轮默认起点</b>：Prompt 11（前端门户 + 人才服务区状态机）。Prompt 11 之前不得实现前端对接任务中心、真实对接、外部主库同步、ATS/受控候选池接入。</li>
+    <li><b>Prompt 11 架构决策</b>：前端门户已选择 <code>Next.js 16.2.4 + React 19.2</code>、Node SSR、强 SEO、几万日活、SSR 首屏 + CSR 复访；该决策不要求重写 Prompt 0–10，但后续必须回填 README、部署说明、SEO 基础和门户读路径容量。</li>
+    <li><b>Prompt 11.5 必做前置</b>：Prompt 12 之前必须先执行 Prompt 11.5（Next/SSR 架构基线回填 + 门户读路径容量补强），避免求职者中心直接踩到 SSR 登录态、缓存、SEO 与门户索引返工。</li>
+    <li><b>下一轮默认起点</b>：Prompt 11.5（Next/SSR 架构基线回填 + 门户读路径容量补强）。Prompt 11.5 之前不得实现前端求职者中心、同意/撤回前端、前端对接任务中心、真实对接、外部主库同步、ATS/受控候选池接入。</li>
   </ul>
 </div>
 
@@ -361,7 +363,8 @@
     <tr><td>9</td><td>对接接口 Stub（签名/幂等/trace/重试）</td><td>3</td><td>open_client/open_api_log/sync_task + 契约测试</td><td>5 / 3 / 2</td></tr>
     <tr><td>10</td><td>审计中心与可观测性</td><td>8,9</td><td>审计日志查询 + 脱敏 + trace 关联</td><td>4 / 3 / 2</td></tr>
     <tr><td>11</td><td>前端门户 + 人才服务区（状态机）</td><td>4</td><td>发布快照展示 + 空态/无权限/失败/重试中</td><td>5 / 3 / 2</td></tr>
-    <tr><td>12</td><td>前端求职者中心（简历/同意/撤回）</td><td>11</td><td>同意撤回联调 + 状态覆盖</td><td>6 / 4 / 3</td></tr>
+    <tr><td>11.5</td><td>Next/SSR 架构基线回填 + 门户读路径容量补强</td><td>11</td><td>README/docs/部署口径 + SEO 基础 + 发布快照查询索引</td><td>4 / 3 / 2</td></tr>
+    <tr><td>12</td><td>前端求职者中心（简历/同意/撤回）</td><td>11.5</td><td>同意撤回联调 + 状态覆盖</td><td>6 / 4 / 3</td></tr>
     <tr><td>13</td><td>前端企业/运营后台（审核/导出审批）</td><td>11,7,8,10</td><td>审核台 + 审批 UI + 路由守卫</td><td>8 / 6 / 4</td></tr>
     <tr><td>14</td><td>测试矩阵 + CI/CD + infra + Runbook</td><td>0–13</td><td>阻断式闸门 + GitHub Actions CI + docker-compose</td><td>7 / 5 / 4</td></tr>
   </tbody>
@@ -1048,6 +1051,68 @@ cd frontend && npm ci && npm test && npm run dev</code></pre>
 禁止越界事项：禁止渲染原始候选人数据；禁止用前端隐藏替代服务端裁剪。
 需要输出文件清单：页面/组件 + 单测 + 运行命令。
 完成后自检项：状态覆盖测试通过；字段白名单渲染；X-Trace-Id 注入生效。</code></pre>
+  </div>
+</details>
+
+<!-- Prompt 11.5 -->
+<details>
+  <summary>Next/SSR 架构基线回填 + 门户读路径容量补强<span class="pill">Prompt 11.5 · 估算 4/3/2 天</span></summary>
+
+  <div class="sec"><div class="label">主控说明</div>
+    <ul class="small">
+      <li>Codex 必读：<code>docs/LocalTalent_step3.md</code>（门户公开接口与状态原型）+ <code>docs/LocalTalent_step2.md</code>（发布快照字段分级）+ Prompt 11 已落地的 Next/SSR 前端代码。</li>
+      <li>架构决策：Prompt 11 已选择 <code>Next.js 16.2.4 + React 19.2</code>、Node SSR、强 SEO、几万日活、SSR 首屏 + CSR 复访。</li>
+      <li>迁移纪律：不得修改 <code>V0000</code>–<code>V0011</code> 旧迁移；容量补强只能新增 forward-only 迁移。</li>
+    </ul>
+  </div>
+
+  <div class="sec"><div class="label">本轮目标</div>
+    <ul class="small">
+      <li>更新 README 与 <code>docs/一期研发提示词.md/html</code>：前端基线从 Vite SPA 修订为 Next/SSR，记录 Node SSR、强 SEO、几万日活、SSR 首屏 + CSR 复访口径。</li>
+      <li>补充 Next/SSR 部署说明：本地 <code>npm ci/test/build/dev</code>，生产默认 Next standalone Node 服务。</li>
+      <li>补强人才服务区读路径：新增 <code>V0012__optimize_portal_snapshot_query.sql</code>，让门户筛选排序不依赖 <code>JSON_EXTRACT</code> 全表扫描。</li>
+      <li>补 SEO 基础：Next metadata route 覆盖 <code>robots.txt</code> 与 <code>sitemap.xml</code>，至少包含 <code>/</code> 与 <code>/portal/talent-service-area</code>。</li>
+    </ul>
+  </div>
+
+  <div class="sec"><div class="label">禁止事项</div>
+    <ul class="small">
+      <li>禁止实现 Prompt 12 求职者中心、同意/撤回前端、职位投递前端。</li>
+      <li>禁止新增 ATS/受控候选池连接器、真实同步或外部主库连接。</li>
+      <li>禁止把手机号、邮箱、简历正文、附件、证据等原始候选人数据加入人才服务区响应或前端展示。</li>
+      <li>禁止用前端隐藏替代后端字段裁剪。</li>
+    </ul>
+  </div>
+
+  <div class="sec"><div class="label">输出要求（文件与命令）</div>
+    <ul class="small">
+      <li>文档：<code>README.md</code>、<code>docs/一期研发提示词.md</code>、<code>docs/一期研发提示词.html</code>。</li>
+      <li>迁移：<code>backend/src/main/resources/db/migration/V0012__optimize_portal_snapshot_query.sql</code>。</li>
+      <li>后端：人才服务区发布快照查询改用索引列，公开响应字段保持不变。</li>
+      <li>前端：<code>frontend/src/app/robots.ts</code>、<code>frontend/src/app/sitemap.ts</code> 或等价 Next metadata route。</li>
+      <li>测试：<code>MigrationTest</code> 增加 V0012 字段/索引断言；人才服务区字段黑名单测试保持通过。</li>
+    </ul>
+    <pre><code>本地命令：
+./scripts/check_boundary
+cd backend && ./mvnw test
+cd frontend && npm ci && npm test && npm run build</code></pre>
+  </div>
+
+  <div class="sec"><div class="label">验收要求（DoD，可自动化）</div>
+    <ul class="small check">
+      <li>[ ] README 不再宣称前端是 Vite SPA，且写明 Next/SSR/Node SSR 启动与构建命令。</li>
+      <li>[ ] <code>docs/一期研发提示词.md/html</code> 记录 Prompt 11 的 Next/SSR/强 SEO/几万日活基线。</li>
+      <li>[ ] <code>candidate_publish_snapshot</code> 门户筛选不再依赖 <code>JSON_EXTRACT</code> 全表扫描。</li>
+      <li>[ ] 人才服务区响应字段不变且字段黑名单测试通过。</li>
+      <li>[ ] Next sitemap/robots 构建通过。</li>
+      <li>[ ] <code>scripts/check_boundary</code>、backend test、frontend test/build 全部通过。</li>
+    </ul>
+    <pre><code>最小投喂片段：
+项目背景摘要：Prompt 11 已完成 Next/SSR 重构，目标为几万日活与强 SEO；本轮只做架构基线回填和门户读路径容量补强。
+当前轮允许改动范围：README/docs、Next SEO metadata route、candidate_publish_snapshot 查询索引与最小查询改造、对应测试。
+禁止越界事项：禁止 Prompt 12 页面；禁止同意/撤回前端；禁止原始候选人数据进入人才服务区；禁止修改旧迁移。
+需要输出文件清单：README/docs + V0012 迁移 + 后端查询最小改造 + robots/sitemap + MigrationTest/字段黑名单回归 + 运行命令。
+完成后自检项：文档基线一致；门户查询可走索引；SEO 基础可构建；边界扫描和测试全绿。</code></pre>
   </div>
 </details>
 

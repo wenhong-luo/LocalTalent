@@ -1,6 +1,6 @@
 import { type CSSProperties } from 'react';
 
-export type StateVariant = 'loading' | 'error' | 'forbidden' | 'retrying';
+export type StateVariant = 'loading' | 'empty' | 'error' | 'unauthorized' | 'retrying';
 
 export type StateViewProps = {
   variant: StateVariant;
@@ -12,23 +12,28 @@ export type StateViewProps = {
 
 const palette: Record<StateVariant, { accent: string; background: string; badge: string }> = {
   loading: {
-    accent: '#2563eb',
-    background: '#eef4ff',
+    accent: '#0f766e',
+    background: '#ecfdf5',
     badge: '加载中'
   },
+  empty: {
+    accent: '#6b7280',
+    background: '#f8fafc',
+    badge: '暂无数据'
+  },
   error: {
-    accent: '#dc2626',
-    background: '#fff1f2',
+    accent: '#b42318',
+    background: '#fff1f0',
     badge: '错误'
   },
-  forbidden: {
-    accent: '#7c3aed',
-    background: '#f5f3ff',
+  unauthorized: {
+    accent: '#9a3412',
+    background: '#fff7ed',
     badge: '无权限'
   },
   retrying: {
-    accent: '#d97706',
-    background: '#fff7ed',
+    accent: '#b7791f',
+    background: '#fffbeb',
     badge: '重试中'
   }
 };
@@ -46,13 +51,17 @@ const cardStyle: CSSProperties = {
 const defaultCopy: Record<StateVariant, { title: string; description: string }> = {
   loading: {
     title: '加载中',
-    description: '页面正在准备基础占位内容。'
+    description: '正在读取发布快照列表。'
+  },
+  empty: {
+    title: '暂无发布快照',
+    description: '当前筛选条件下还没有可展示的发布快照。'
   },
   error: {
     title: '加载失败',
     description: '页面未获取到可用结果，请稍后重试。'
   },
-  forbidden: {
+  unauthorized: {
     title: '无权限查看',
     description: '当前状态下不允许访问目标内容。'
   },
@@ -102,7 +111,7 @@ export function StateView({
         </p>
       </div>
 
-      {variant === 'error' && onRetry ? (
+      {(variant === 'error' || variant === 'unauthorized' || variant === 'empty') && onRetry ? (
         <button
           type="button"
           onClick={onRetry}

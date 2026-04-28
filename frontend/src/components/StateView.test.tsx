@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { StateView, type StateVariant } from './StateView';
 
 describe('StateView', () => {
-  it.each<StateVariant>(['loading', 'error', 'forbidden', 'retrying'])(
+  it.each<StateVariant>(['loading', 'empty', 'error', 'unauthorized', 'retrying'])(
     'renders %s variant',
     (variant) => {
       render(<StateView variant={variant} />);
@@ -11,12 +11,12 @@ describe('StateView', () => {
     }
   );
 
-  it('calls retry handler for the error variant', () => {
+  it.each<StateVariant>(['empty', 'error', 'unauthorized'])('calls retry handler for the %s variant', (variant) => {
     const onRetry = vi.fn();
 
     render(
       <StateView
-        variant="error"
+        variant={variant}
         title="请求失败"
         description="请重试"
         retryLabel="重新加载"
