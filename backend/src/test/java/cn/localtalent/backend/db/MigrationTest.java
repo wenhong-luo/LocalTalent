@@ -49,6 +49,7 @@ class MigrationTest {
                 "export_apply",
                 "open_client",
                 "open_api_log",
+                "open_api_nonce_record",
                 "audit_log",
                 "field_access_log",
                 "api_idempotency_record"));
@@ -94,6 +95,18 @@ class MigrationTest {
                 "download_issued_at",
                 "download_count",
                 "error_msg"));
+        assertColumnsExist(jdbcTemplate, "open_api_log", List.of(
+                "client_code",
+                "request_hash",
+                "idempotency_key",
+                "duration_ms",
+                "request_summary_json",
+                "response_summary_json"));
+        assertColumnsExist(jdbcTemplate, "integration_sync_task", List.of(
+                "trace_id",
+                "api_code",
+                "open_api_log_id",
+                "max_retry_count"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");
@@ -102,11 +115,14 @@ class MigrationTest {
         int roleMenuCount = countRows(jdbcTemplate, "sys_role_menu");
         int fieldPolicyCount = countRows(jdbcTemplate, "sys_role_field_policy");
         int adminUserCount = countRows(jdbcTemplate, "admin_user");
+        int openClientCount = countRows(jdbcTemplate, "open_client");
 
         executeSeedScript();
         executeAuthSeedScript();
+        executeOpenApiSeedScript();
         executeSeedScript();
         executeAuthSeedScript();
+        executeOpenApiSeedScript();
 
         assertThat(countRows(jdbcTemplate, "sys_dict_type")).isEqualTo(dictTypeCount);
         assertThat(countRows(jdbcTemplate, "sys_dict_item")).isEqualTo(dictItemCount);
@@ -115,6 +131,11 @@ class MigrationTest {
         assertThat(countRows(jdbcTemplate, "sys_role_menu")).isEqualTo(roleMenuCount);
         assertThat(countRows(jdbcTemplate, "sys_role_field_policy")).isEqualTo(fieldPolicyCount);
         assertThat(countRows(jdbcTemplate, "admin_user")).isEqualTo(adminUserCount);
+        assertThat(countRows(jdbcTemplate, "open_client")).isEqualTo(openClientCount);
+        assertThat(queryString(jdbcTemplate,
+                "SELECT client_secret_hash FROM open_client WHERE client_code = 'localtalent_stub'"))
+                .isEqualTo("97911de7ae1a8392865d8a6ce438d39b59236664f2985d0e84fd4be47be5779b")
+                .doesNotContain("LocalTalentOpen");
     }
 
     private static DataSource dataSource() {
@@ -167,6 +188,10 @@ class MigrationTest {
         return count == null ? 0 : count;
     }
 
+    private static String queryString(JdbcTemplate jdbcTemplate, String sql) {
+        return jdbcTemplate.queryForObject(sql, String.class);
+    }
+
     private static void executeSeedScript() throws SQLException {
         try (Connection connection = DriverManager.getConnection(
                 MYSQL.getJdbcUrl(), MYSQL.getUsername(), MYSQL.getPassword())) {
@@ -182,6 +207,15 @@ class MigrationTest {
             ScriptUtils.executeSqlScript(
                     connection,
                     new ClassPathResource("db/migration/R__seed_auth_internal_accounts.sql"));
+        }
+    }
+
+    private static void executeOpenApiSeedScript() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(
+                MYSQL.getJdbcUrl(), MYSQL.getUsername(), MYSQL.getPassword())) {
+            ScriptUtils.executeSqlScript(
+                    connection,
+                    new ClassPathResource("db/migration/R__seed_open_api_stub_client.sql"));
         }
     }
 }

@@ -30,7 +30,7 @@ import org.testcontainers.utility.DockerImageName;
         properties = {
                 "localtalent.auth.jwt.secret=prompt8-export-secret-change-me-with-enough-length",
                 "localtalent.auth.jwt.ttl-seconds=3600",
-                "localtalent.export.download-ttl-seconds=1"
+                "localtalent.export.download-ttl-seconds=5"
         })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ExportApprovalFlowIT {
@@ -131,7 +131,7 @@ class ExportApprovalFlowIT {
                 "Bearer " + company.token());
         assertError(secondIssue, 409, "EXPORT_409", "trace-p8-download-repeat");
 
-        Thread.sleep(2500L);
+        Thread.sleep(6500L);
         HttpResponse<String> expiredResponse = getText(downloadUrl);
         assertThat(expiredResponse.statusCode())
                 .as("trace-p8-url-expired should prove the presigned URL expires")

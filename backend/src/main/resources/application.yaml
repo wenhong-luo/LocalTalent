@@ -23,3 +23,5 @@ localtalent:
     bucket: ${LOCALTALENT_MINIO_EXPORT_BUCKET:export}
   export:
     download-ttl-seconds: ${LOCALTALENT_EXPORT_DOWNLOAD_TTL_SECONDS:900}
+  openapi:
+    timestamp-window-seconds: ${LOCALTALENT_OPENAPI_TIMESTAMP_WINDOW_SECONDS:300}

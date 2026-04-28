@@ -58,7 +58,7 @@
 
 <div class="ok">
   <div class="label">当前投喂进度</div>
-  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5、Prompt 6、Prompt 7、Prompt 8 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机、投递与面试签到闭环、运营审核 + 内容/活动管理、导出审批与一次性下载已落地。下一轮默认从 <b>Prompt 9：对接接口 Stub</b> 开始。</p>
+  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5、Prompt 6、Prompt 7、Prompt 8、Prompt 9 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机、投递与面试签到闭环、运营审核 + 内容/活动管理、导出审批与一次性下载、对接接口 Stub 已落地。下一轮默认从 <b>Prompt 10：审计中心与可观测性</b> 开始。</p>
 </div>
 
 <div class="note">
@@ -109,7 +109,13 @@
     <li><b>Prompt 8 MinIO 与一次性下载口径</b>：导出文件写入 MinIO bucket <code>export</code>；企业下载接口只发放一次短期预签名 URL，记录 <code>download_count/download_issued_at/expire_time</code>，二次发放返回统一错误；预签名 URL 本身在过期前可能重复访问，若未来要求真正单次对象读取，需要改为后端代理下载或读后删除。</li>
     <li><b>Prompt 8 字段裁剪与审计口径</b>：导出 CSV 固定字段为 <code>application_id/job_title/application_status/apply_time/display_name/mobile/email/skills_summary</code>；候选人姓名、手机号、邮箱、技能摘要必须走 <code>FieldPolicyEngine</code>，无权字段不明文导出；申请、审批、驳回、生成、下载链接发放写 <code>audit_log</code>，敏感字段读取写 <code>field_access_log</code> 并关联同一 <code>trace_id</code>。</li>
     <li><b>Prompt 8 验收口径</b>：<code>ExportApprovalFlowIT</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖未审批不可下载、审批后生成并短期下载、过期/二次发放拒绝、字段脱敏、驳回不可下载、审计与字段访问日志。</li>
-    <li><b>下一轮默认起点</b>：Prompt 9（对接接口 Stub）。Prompt 9 之前不得实现真实对接、外部主库同步、ATS/受控候选池接入或审计中心查询。</li>
+    <li><b>Prompt 9 已完成</b>：对接接口 Stub 已落地到 <code>backend/.../openapi/</code>；接口覆盖 <code>POST /api/open/v1/jobs/sync</code>、<code>POST /api/open/v1/applications/sync</code>、<code>POST /api/open/v1/consents/callback</code>、<code>POST /api/open/v1/candidates/publishable-sync</code>、<code>GET /api/open/v1/mappings/query</code>。</li>
+    <li><b>Prompt 9 本地 stub client</b>：本地默认 <code>client_code=localtalent_stub</code>、<code>source_system=stub_partner</code>、明文 secret 为 <code>LocalTalentOpen@123456</code>，仅用于 Prompt 9 验收和本地开发；数据库 <code>open_client.client_secret_hash</code> 只保存 <code>SHA-256(secret)=97911de7ae1a8392865d8a6ce438d39b59236664f2985d0e84fd4be47be5779b</code>，不保存明文。</li>
+    <li><b>Prompt 9 契约口径</b>：开放接口必须带 <code>X-Client-Code / X-Timestamp / X-Nonce / X-Body-SHA256 / X-Signature</code>；POST 写接口必须带 <code>X-Idempotency-Key</code>；签名串固定为 <code>METHOD + path_with_query + client_code + timestamp + nonce + idempotency_key_or_empty + body_sha256</code>，以 <code>SHA-256(secret)</code> 作为 HMAC-SHA256 key。</li>
+    <li><b>Prompt 9 trace 与重试口径</b>：<code>X-Trace-Id</code> 优先，缺失时兼容 W3C <code>traceparent</code>；签名、时间窗、nonce 防重放、幂等冲突都返回统一响应；故障注入仅支持 <code>stub_mode=retry</code> 写入 <code>integration_sync_task</code>，重试只更新本地 stub 队列，不连接外部系统。</li>
+    <li><b>Prompt 9 日志与边界口径</b>：<code>open_api_log</code> 只记录摘要、hash、耗时、状态与 <code>trace_id</code>，不得记录敏感明文；对接接口不得传输手机号、邮箱、简历正文、附件、证据，不写业务主表、不创建真实映射、不触发真实同步。</li>
+    <li><b>Prompt 9 验收口径</b>：<code>OpenApiContractTest</code>、<code>OpenApiRetryQueueIT</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖签名错误、时间过期、nonce 重放、幂等、traceparent、敏感字段拒绝、日志落库、失败入队与退避重试。</li>
+    <li><b>下一轮默认起点</b>：Prompt 10（审计中心与可观测性）。Prompt 10 之前不得实现前端对接任务中心、真实对接、外部主库同步、ATS/受控候选池接入。</li>
   </ul>
 </div>
 

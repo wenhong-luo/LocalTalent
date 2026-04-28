@@ -82,6 +82,11 @@ VALUES
   ('operator_console', '运营后台', NULL, 'page', '/admin', NULL, 300, 1),
   ('audit_console', '审计中心', NULL, 'page', '/audit', NULL, 400, 1),
   ('open_api_stub', '对接接口占位', NULL, 'api', NULL, 'open.stub', 500, 1),
+  ('open_jobs_sync', '对接职位同步 Stub', NULL, 'api', NULL, 'open.jobs.sync', 501, 1),
+  ('open_applications_sync', '对接投递同步 Stub', NULL, 'api', NULL, 'open.applications.sync', 502, 1),
+  ('open_consents_callback', '对接同意回调 Stub', NULL, 'api', NULL, 'open.consents.callback', 503, 1),
+  ('open_candidates_publishable_sync', '对接发布快照同步 Stub', NULL, 'api', NULL, 'open.candidates.publishable_sync', 504, 1),
+  ('open_mappings_query', '对接映射查询 Stub', NULL, 'api', NULL, 'open.mappings.query', 505, 1),
   ('candidate_consent_create', '候选人提交同意', NULL, 'api', NULL, 'candidate.consent.create', 610, 1),
   ('candidate_consent_revoke', '候选人撤回同意', NULL, 'api', NULL, 'candidate.consent.revoke', 620, 1),
   ('company_apply', '企业认证提交', NULL, 'api', NULL, 'company.apply', 710, 1),
@@ -193,7 +198,14 @@ JOIN sys_menu m ON (
     'admin_event_read',
     'admin_export_review_read'
   ))
-  OR (r.role_code = 'open_client' AND m.menu_code IN ('open_api_stub'))
+  OR (r.role_code = 'open_client' AND m.menu_code IN (
+    'open_api_stub',
+    'open_jobs_sync',
+    'open_applications_sync',
+    'open_consents_callback',
+    'open_candidates_publishable_sync',
+    'open_mappings_query'
+  ))
 )
 ON DUPLICATE KEY UPDATE
   sys_role_menu.id = sys_role_menu.id;

@@ -92,7 +92,7 @@ while IFS= read -r controller_file; do
     */auth/api/AuthController.java|*/health/HealthController.java)
       ;;
     *)
-      if ! grep -Eq "@RequirePermission|@PublicEndpoint" "$controller_file"; then
+      if ! grep -Eq "@RequirePermission|@PublicEndpoint|@OpenApiEndpoint" "$controller_file"; then
         echo "FAIL: production controller without @RequirePermission or @PublicEndpoint: $controller_file"
         exit 1
       fi
@@ -351,6 +351,62 @@ for assertion_marker in \
   "export_download_url_issue"; do
   if ! grep -Fq "$assertion_marker" "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/exporting/ExportApprovalFlowIT.java"; then
     echo "FAIL: Prompt 8 export approval assertion missing: $assertion_marker"
+    exit 1
+  fi
+done
+
+prompt9_required_paths=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/openapi"
+  "$ROOT_DIR/backend/src/main/resources/db/migration/V0010__extend_open_api_stub_contract.sql"
+  "$ROOT_DIR/backend/src/main/resources/db/migration/R__seed_open_api_stub_client.sql"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/openapi/OpenApiContractTest.java"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/openapi/OpenApiRetryQueueIT.java"
+)
+
+for required_path in "${prompt9_required_paths[@]}"; do
+  if [ ! -e "$required_path" ]; then
+    echo "FAIL: Prompt 9 required path missing: $required_path"
+    exit 1
+  fi
+done
+
+if grep -RIEiq "WebClient|RestTemplate|HttpClient|DriverManager|getConnection|jdbc:|external[[:space:]_-]*database|candidate_pool|ats[[:space:]_-]*client|real[[:space:]_-]*sync" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/openapi"; then
+  echo "FAIL: Prompt 9 openapi module contains external sync/client implementation marker"
+  exit 1
+fi
+
+while IFS= read -r response_file; do
+  if grep -Eiq "mobile|email|resume_body|attachment_object_key|evidence" "$response_file"; then
+    echo "FAIL: Prompt 9 openapi response DTO contains raw candidate field marker: $response_file"
+    exit 1
+  fi
+done < <(find "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/openapi/api" -type f -name '*Response.java')
+
+if grep -Fq "LocalTalentOpen@123456" "$ROOT_DIR/backend/src/main/resources/db/migration/R__seed_open_api_stub_client.sql"; then
+  echo "FAIL: Prompt 9 open client seed must not store plaintext secret"
+  exit 1
+fi
+
+for assertion_marker in \
+  "trace-p9-signature-invalid" \
+  "trace-p9-timestamp-expired" \
+  "trace-p9-nonce-replay" \
+  "trace-p9-sensitive-payload" \
+  "open_api_log"; do
+  if ! grep -Fq "$assertion_marker" "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/openapi/OpenApiContractTest.java"; then
+    echo "FAIL: Prompt 9 open api contract assertion missing: $assertion_marker"
+    exit 1
+  fi
+done
+
+for assertion_marker in \
+  "trace-p9-retry-enqueue" \
+  "integration_sync_task" \
+  "retry_count" \
+  "stub retry max attempts reached"; do
+  if ! grep -Fq "$assertion_marker" "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/openapi/OpenApiRetryQueueIT.java"; then
+    echo "FAIL: Prompt 9 retry queue assertion missing: $assertion_marker"
     exit 1
   fi
 done
