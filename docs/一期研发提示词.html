@@ -121,7 +121,9 @@
     <li><b>Prompt 10 验收口径</b>：<code>AuditTraceQueryIT</code>、<code>AuditMaskingTest</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖 trace 聚合查询、分页过滤、operator/auditor 只读、candidate/company 阻断、日志脱敏和审计中心索引迁移。</li>
     <li><b>Prompt 11 已完成</b>：前端门户已选择并落地 <code>Next.js 16.2.4 + React 19.2</code>、Node SSR、强 SEO、几万日活、SSR 首屏 + CSR 复访；人才服务区页面只渲染发布快照字段白名单。</li>
     <li><b>Prompt 11.5 已完成</b>：Next/SSR 架构基线已回填到 README 与本手册；门户 SEO 基础已提供 <code>robots.txt</code> 与 <code>sitemap.xml</code>；<code>candidate_publish_snapshot</code> 已通过 <code>V0012</code> 补生成列与组合索引，门户筛选不再依赖 <code>JSON_EXTRACT</code> 全表扫描。</li>
-    <li><b>下一轮默认起点</b>：Prompt 12（前端求职者中心）。Prompt 12 之前不得再回退到 Vite SPA 口径；Prompt 12 仍禁止真实对接、外部主库同步、ATS/受控候选池接入，且不得把原始候选人数据加入人才服务区前端展示。</li>
+    <li><b>Prompt 12 已完成</b>：前端求职者中心已落地到 <code>/candidate/center</code>；本轮采用“前端契约先行”，页面读取 <code>localStorage.localtalent_access_token</code>，调用约定的 <code>GET /api/candidate/center/overview</code>，状态完全由接口返回驱动，不在前端推断 <code>consent_status</code>。</li>
+    <li><b>Prompt 12.5 必做前置</b>：Prompt 13 之前必须先执行 Prompt 12.5（求职者中心只读接口 + 联调收口），补齐 <code>GET /api/candidate/center/overview</code> 后端只读接口与联调测试，避免进入企业/运营前端后留下求职者中心无法真实联调的断点。</li>
+    <li><b>下一轮默认起点</b>：Prompt 12.5（求职者中心只读接口 + 联调收口）。Prompt 12.5 之前不得开启 Prompt 13；仍禁止真实对接、外部主库同步、ATS/受控候选池接入，且不得把原始候选人数据加入人才服务区或不该展示的页面。</li>
   </ul>
 </div>
 
@@ -1165,6 +1167,66 @@ cd frontend && npm test && npm run dev
 禁止越界事项：禁止前端推断状态；禁止展示原始候选人数据。
 需要输出文件清单：candidate 页面 + 单测/可选 E2E + 运行命令。
 完成后自检项：状态测试全绿；撤回提示正确；空态组件复用。</code></pre>
+  </div>
+</details>
+
+<!-- Prompt 12.5 -->
+<details>
+  <summary>求职者中心只读接口 + 联调收口<span class="pill">Prompt 12.5 · 估算 3/2/2 天</span></summary>
+
+  <div class="sec"><div class="label">主控说明</div>
+    <ul class="small">
+      <li>Codex 必读：<code>docs/LocalTalent_step2.md</code>（候选人生命周期/撤回→下线）+ <code>docs/LocalTalent_step3.md</code>（求职者中心状态）+ Prompt 12 已落地的前端求职者中心代码。</li>
+      <li>前置事实：Prompt 12 采用“前端契约先行”，<code>GET /api/candidate/center/overview</code> 尚未由后端实现。</li>
+      <li>迁移纪律：本轮优先不新增迁移；如发现必须补字段，只能新增 forward-only 迁移，不得修改旧迁移。</li>
+    </ul>
+  </div>
+
+  <div class="sec"><div class="label">本轮目标</div>
+    <ul class="small">
+      <li>后端补齐 <code>GET /api/candidate/center/overview</code> 只读接口，JWT candidate 必须登录，状态完全由服务端返回。</li>
+      <li>返回求职者中心最小摘要：简历摘要、投递摘要、签到摘要、同意/撤回发布状态。</li>
+      <li><code>publish_status</code> 由服务端明确返回：<code>consented | revoked | not_publishable | unauthorized | unavailable</code>。</li>
+      <li>前端 <code>candidateCenterApi</code> 与真实接口联调；保留 Prompt 12 的状态测试和字段黑名单测试。</li>
+      <li>验证撤回后 overview 与人才服务区可见性一致。</li>
+    </ul>
+  </div>
+
+  <div class="sec"><div class="label">禁止事项</div>
+    <ul class="small">
+      <li>禁止实现简历编辑、投递创建、签到码输入等新页面/新业务流程。</li>
+      <li>禁止前端推断 <code>consent_status</code> 或 <code>publishable_flag</code>。</li>
+      <li>禁止在 overview 返回手机号、邮箱、简历正文、附件对象 key、证据、<code>password_hash</code>。</li>
+      <li>禁止新增 ATS/受控候选池连接器、真实同步或外部主库连接。</li>
+    </ul>
+  </div>
+
+  <div class="sec"><div class="label">输出要求（文件与命令）</div>
+    <ul class="small">
+      <li>后端：<code>backend/.../candidate</code> 或独立 <code>candidatecenter</code> 只读 controller/service/repository。</li>
+      <li>前端：必要时仅微调 <code>frontend/src/pages/candidate/candidateCenterApi.ts</code> 以匹配真实响应，不改页面业务范围。</li>
+      <li>测试：<code>CandidateCenterOverviewIT</code>；前端 <code>CandidateCenter.test.tsx</code> 保持通过；复用 <code>ConsentSnapshotFlowIT</code>。</li>
+    </ul>
+    <pre><code>本地命令：
+./scripts/check_boundary
+cd backend && ./mvnw -Dtest=CandidateCenterOverviewIT,ConsentSnapshotFlowIT test
+cd frontend && npm test && npm run build</code></pre>
+  </div>
+
+  <div class="sec"><div class="label">验收要求（DoD，可自动化）</div>
+    <ul class="small check">
+      <li>[ ] candidate JWT 调 <code>GET /api/candidate/center/overview</code> 返回 200，且含 <code>trace_id</code>。</li>
+      <li>[ ] 未登录、非 candidate、越权访问返回统一错误与无权限态。</li>
+      <li>[ ] overview 状态与 <code>candidate_control_profile/candidate_consent/candidate_publish_snapshot</code> 一致。</li>
+      <li>[ ] overview 字段黑名单断言通过，不返回原始候选人数据。</li>
+      <li>[ ] Prompt 12 前端状态测试与 Next build 继续通过。</li>
+    </ul>
+    <pre><code>最小投喂片段：
+项目背景摘要：Prompt 12 已完成前端求职者中心，但 overview 是前端先行契约；Prompt 13 前必须补齐只读接口和联调闭环。
+当前轮允许改动范围：仅求职者中心 overview 只读接口、联调适配和测试。
+禁止越界事项：禁止新增求职者业务写流程；禁止返回原始候选人数据；禁止前端推断状态。
+需要输出文件清单：overview 后端只读接口 + CandidateCenterOverviewIT + 前端契约微调（如需要）+ 运行命令。
+完成后自检项：overview 可真实联调；状态服务端驱动；撤回后不可见回归通过。</code></pre>
   </div>
 </details>
 

@@ -1,4 +1,4 @@
-import { apiGet, HttpClientError } from './httpClient';
+import { apiGet, apiPost, HttpClientError } from './httpClient';
 
 describe('httpClient', () => {
   afterEach(() => {
@@ -58,5 +58,32 @@ describe('httpClient', () => {
       status: 0,
       code: 'NETWORK_ERROR'
     });
+  });
+
+  it('injects POST headers for token and idempotency key', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          code: '0',
+          message: 'success',
+          trace_id: 'trace-post',
+          data: { accepted: true }
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    );
+
+    await apiPost('/api/consents', { consent_scope: ['talent_service_area'] }, {
+      token: 'candidate-token',
+      idempotencyKey: 'idem-123'
+    });
+
+    const [, init] = fetchMock.mock.calls[0];
+    const headers = init?.headers as Headers;
+    expect(init?.method).toBe('POST');
+    expect(headers.get('Authorization')).toBe('Bearer candidate-token');
+    expect(headers.get('X-Idempotency-Key')).toBe('idem-123');
+    expect(headers.get('X-Trace-Id')).toMatch(/^trace-|^[0-9a-f-]{36}$/);
+    expect(init?.body).toBe(JSON.stringify({ consent_scope: ['talent_service_area'] }));
   });
 });

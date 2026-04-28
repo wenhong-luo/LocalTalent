@@ -10,6 +10,15 @@ export type ApiResult<T> = {
   traceId: string;
 };
 
+export type ApiRequestInit = {
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  body?: unknown;
+  traceId?: string;
+  signal?: AbortSignal;
+  token?: string;
+  idempotencyKey?: string;
+};
+
 export type HttpClientErrorKind = 'unauthorized' | 'error';
 
 export class HttpClientError extends Error {
@@ -40,6 +49,10 @@ export function createTraceId(): string {
   return `trace-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+export function createIdempotencyKey(prefix = 'localtalent'): string {
+  return `${prefix}-${createTraceId()}`;
+}
+
 function resolveUrl(path: string): string {
   if (typeof window !== 'undefined') {
     return path;
@@ -62,19 +75,33 @@ async function parseJson<T>(response: Response): Promise<ApiResponse<T> | null> 
   return JSON.parse(text) as ApiResponse<T>;
 }
 
-export async function apiGet<T>(path: string, init?: { traceId?: string; signal?: AbortSignal }): Promise<ApiResult<T>> {
+export async function apiRequest<T>(path: string, init: ApiRequestInit = {}): Promise<ApiResult<T>> {
   const traceId = init?.traceId ?? createTraceId();
   const headers = new Headers();
   headers.set('X-Trace-Id', traceId);
   headers.set('Accept', 'application/json');
 
+  if (init.token) {
+    headers.set('Authorization', `Bearer ${init.token}`);
+  }
+
+  if (init.idempotencyKey) {
+    headers.set('X-Idempotency-Key', init.idempotencyKey);
+  }
+
+  const hasBody = typeof init.body !== 'undefined';
+  if (hasBody) {
+    headers.set('Content-Type', 'application/json');
+  }
+
   let response: Response;
 
   try {
     response = await fetch(resolveUrl(path), {
-      method: 'GET',
+      method: init.method ?? 'GET',
       headers,
       signal: init?.signal,
+      body: hasBody ? JSON.stringify(init.body) : undefined,
       cache: 'no-store'
     });
   } catch (error) {
@@ -102,4 +129,19 @@ export async function apiGet<T>(path: string, init?: { traceId?: string; signal?
     data: payload.data,
     traceId: responseTraceId
   };
+}
+
+export async function apiGet<T>(
+  path: string,
+  init?: Omit<ApiRequestInit, 'method' | 'body' | 'idempotencyKey'>
+): Promise<ApiResult<T>> {
+  return apiRequest<T>(path, { ...init, method: 'GET' });
+}
+
+export async function apiPost<T>(
+  path: string,
+  body: unknown,
+  init?: Omit<ApiRequestInit, 'method' | 'body'>
+): Promise<ApiResult<T>> {
+  return apiRequest<T>(path, { ...init, method: 'POST', body });
 }
