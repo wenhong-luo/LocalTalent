@@ -58,7 +58,7 @@
 
 <div class="ok">
   <div class="label">当前投喂进度</div>
-  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5、Prompt 6、Prompt 7、Prompt 8、Prompt 9 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机、投递与面试签到闭环、运营审核 + 内容/活动管理、导出审批与一次性下载、对接接口 Stub 已落地。下一轮默认从 <b>Prompt 10：审计中心与可观测性</b> 开始。</p>
+  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5、Prompt 6、Prompt 7、Prompt 8、Prompt 9、Prompt 10 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机、投递与面试签到闭环、运营审核 + 内容/活动管理、导出审批与一次性下载、对接接口 Stub、审计中心与可观测性查询已落地。下一轮默认从 <b>Prompt 11：前端门户 + 人才服务区状态机</b> 开始。</p>
 </div>
 
 <div class="note">
@@ -115,7 +115,11 @@
     <li><b>Prompt 9 trace 与重试口径</b>：<code>X-Trace-Id</code> 优先，缺失时兼容 W3C <code>traceparent</code>；签名、时间窗、nonce 防重放、幂等冲突都返回统一响应；故障注入仅支持 <code>stub_mode=retry</code> 写入 <code>integration_sync_task</code>，重试只更新本地 stub 队列，不连接外部系统。</li>
     <li><b>Prompt 9 日志与边界口径</b>：<code>open_api_log</code> 只记录摘要、hash、耗时、状态与 <code>trace_id</code>，不得记录敏感明文；对接接口不得传输手机号、邮箱、简历正文、附件、证据，不写业务主表、不创建真实映射、不触发真实同步。</li>
     <li><b>Prompt 9 验收口径</b>：<code>OpenApiContractTest</code>、<code>OpenApiRetryQueueIT</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖签名错误、时间过期、nonce 重放、幂等、traceparent、敏感字段拒绝、日志落库、失败入队与退避重试。</li>
-    <li><b>下一轮默认起点</b>：Prompt 10（审计中心与可观测性）。Prompt 10 之前不得实现前端对接任务中心、真实对接、外部主库同步、ATS/受控候选池接入。</li>
+    <li><b>Prompt 10 已完成</b>：审计中心与可观测性查询已落地到 <code>backend/.../auditcenter/</code>；接口覆盖 <code>GET /api/admin/audit-logs</code>、<code>GET /api/admin/field-access-logs</code>、<code>GET /api/admin/open-api-logs</code>、<code>GET /api/admin/audit-traces/{trace_id}</code>。</li>
+    <li><b>Prompt 10 只读与权限口径</b>：审计中心只提供查询接口，不新增任何写接口；<code>operator</code> 与 <code>auditor</code> 仅授予审计中心 read 权限，candidate/company 无权读取，auditor 调用代表性 admin 写接口仍必须返回 <code>AUTHZ_403</code>。</li>
+    <li><b>Prompt 10 脱敏与 trace 口径</b>：审计中心响应必须统一脱敏 <code>before_json/after_json/request_summary_json/response_summary_json/error_msg/request_uri</code> 中的手机号、邮箱、正文、附件、证据、password、secret、token；<code>trace_id</code> 可串联 <code>audit_log</code>、<code>field_access_log</code>、<code>open_api_log</code>。</li>
+    <li><b>Prompt 10 验收口径</b>：<code>AuditTraceQueryIT</code>、<code>AuditMaskingTest</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖 trace 聚合查询、分页过滤、operator/auditor 只读、candidate/company 阻断、日志脱敏和审计中心索引迁移。</li>
+    <li><b>下一轮默认起点</b>：Prompt 11（前端门户 + 人才服务区状态机）。Prompt 11 之前不得实现前端对接任务中心、真实对接、外部主库同步、ATS/受控候选池接入。</li>
   </ul>
 </div>
 

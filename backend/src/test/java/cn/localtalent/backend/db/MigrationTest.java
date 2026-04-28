@@ -107,6 +107,9 @@ class MigrationTest {
                 "api_code",
                 "open_api_log_id",
                 "max_retry_count"));
+        assertIndexesExist(jdbcTemplate, "audit_log", List.of("idx_audit_trace_time"));
+        assertIndexesExist(jdbcTemplate, "field_access_log", List.of("idx_field_access_trace_time"));
+        assertIndexesExist(jdbcTemplate, "open_api_log", List.of("idx_open_api_trace_time"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");
@@ -170,6 +173,20 @@ class MigrationTest {
             assertThat(columnCount(jdbcTemplate, tableName, columnName))
                     .as("column %s.%s should not exist", tableName, columnName)
                     .isZero();
+        }
+    }
+
+    private static void assertIndexesExist(JdbcTemplate jdbcTemplate, String tableName, List<String> indexNames) {
+        for (String indexName : indexNames) {
+            Integer count = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM information_schema.statistics "
+                            + "WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?",
+                    Integer.class,
+                    tableName,
+                    indexName);
+            assertThat(count == null ? 0 : count)
+                    .as("index %s.%s should exist", tableName, indexName)
+                    .isGreaterThan(0);
         }
     }
 

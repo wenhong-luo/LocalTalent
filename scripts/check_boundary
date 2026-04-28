@@ -411,4 +411,67 @@ for assertion_marker in \
   fi
 done
 
+prompt10_required_paths=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/auditcenter"
+  "$ROOT_DIR/backend/src/main/resources/db/migration/V0011__add_audit_center_query_indexes.sql"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/auditcenter/AuditTraceQueryIT.java"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/auditcenter/AuditMaskingTest.java"
+)
+
+for required_path in "${prompt10_required_paths[@]}"; do
+  if [ ! -e "$required_path" ]; then
+    echo "FAIL: Prompt 10 required path missing: $required_path"
+    exit 1
+  fi
+done
+
+if grep -RIEq "@(PostMapping|PutMapping|PatchMapping|DeleteMapping)" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/auditcenter"; then
+  echo "FAIL: Prompt 10 audit center must expose read-only controllers"
+  exit 1
+fi
+
+if grep -RIEiq "candidate_user|candidate_resume|resume_body|attachment_object_key|evidence_material|ats|candidate_pool" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/auditcenter"; then
+  echo "FAIL: Prompt 10 audit center module contains raw candidate or out-of-scope implementation marker"
+  exit 1
+fi
+
+for api_code in \
+  "admin.audit-log.read" \
+  "admin.field-access-log.read" \
+  "admin.open-api-log.read" \
+  "admin.audit-trace.read"; do
+  if ! grep -Fq "$api_code" "$ROOT_DIR/backend/src/main/resources/db/migration/R__seed_base_dictionary_roles_menus.sql"; then
+    echo "FAIL: Prompt 10 seed permission missing: $api_code"
+    exit 1
+  fi
+done
+
+for assertion_marker in \
+  "trace-p10-chain" \
+  "audit_log" \
+  "field_access_log" \
+  "open_api_log" \
+  "AUTHZ_403"; do
+  if ! grep -Fq "$assertion_marker" "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/auditcenter/AuditTraceQueryIT.java"; then
+    echo "FAIL: Prompt 10 audit trace assertion missing: $assertion_marker"
+    exit 1
+  fi
+done
+
+for assertion_marker in \
+  "13900001234" \
+  "candidate@example.com" \
+  "resume_body" \
+  "attachment_object_key" \
+  "evidence" \
+  "client_secret" \
+  "access_token"; do
+  if ! grep -Fq "$assertion_marker" "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/auditcenter/AuditMaskingTest.java"; then
+    echo "FAIL: Prompt 10 masking assertion missing: $assertion_marker"
+    exit 1
+  fi
+done
+
 echo "PASS"

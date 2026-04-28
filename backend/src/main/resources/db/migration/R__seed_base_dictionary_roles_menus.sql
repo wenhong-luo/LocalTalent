@@ -115,7 +115,11 @@ VALUES
   ('company_export_read', '企业导出查看', NULL, 'api', NULL, 'company.export.read', 851, 1),
   ('company_export_download', '企业导出下载链接', NULL, 'api', NULL, 'company.export.download', 852, 1),
   ('admin_export_review_read', '运营导出审批读取', NULL, 'api', NULL, 'admin.export.review.read', 860, 1),
-  ('admin_export_review_write', '运营导出审批写入', NULL, 'api', NULL, 'admin.export.review.write', 861, 1)
+  ('admin_export_review_write', '运营导出审批写入', NULL, 'api', NULL, 'admin.export.review.write', 861, 1),
+  ('admin_audit_log_read', '审计日志读取', NULL, 'api', NULL, 'admin.audit-log.read', 870, 1),
+  ('admin_field_access_log_read', '字段访问日志读取', NULL, 'api', NULL, 'admin.field-access-log.read', 871, 1),
+  ('admin_open_api_log_read', '对接调用日志读取', NULL, 'api', NULL, 'admin.open-api-log.read', 872, 1),
+  ('admin_audit_trace_read', '审计链路读取', NULL, 'api', NULL, 'admin.audit-trace.read', 873, 1)
 AS new
 ON DUPLICATE KEY UPDATE
   menu_name = new.menu_name,
@@ -188,7 +192,11 @@ JOIN sys_menu m ON (
     'admin_event_read',
     'admin_event_write',
     'admin_export_review_read',
-    'admin_export_review_write'
+    'admin_export_review_write',
+    'admin_audit_log_read',
+    'admin_field_access_log_read',
+    'admin_open_api_log_read',
+    'admin_audit_trace_read'
   ))
   OR (r.role_code = 'auditor' AND m.menu_code IN (
     'audit_console',
@@ -196,7 +204,11 @@ JOIN sys_menu m ON (
     'admin_job_review_read',
     'admin_cms_read',
     'admin_event_read',
-    'admin_export_review_read'
+    'admin_export_review_read',
+    'admin_audit_log_read',
+    'admin_field_access_log_read',
+    'admin_open_api_log_read',
+    'admin_audit_trace_read'
   ))
   OR (r.role_code = 'open_client' AND m.menu_code IN (
     'open_api_stub',
