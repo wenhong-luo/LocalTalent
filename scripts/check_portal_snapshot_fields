@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+
+required_backend_files=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate/api/PortalTalentSnapshotItemResponse.java"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate/api/PortalTalentSnapshotPageResponse.java"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate/application/PortalTalentSnapshotService.java"
+)
+
+required_frontend_files=(
+  "$ROOT_DIR/frontend/src/pages/portal/talentSnapshotApi.ts"
+  "$ROOT_DIR/frontend/src/pages/portal/TalentServiceArea.tsx"
+  "$ROOT_DIR/frontend/src/pages/portal/TalentServiceArea.test.tsx"
+)
+
+for required_file in "${required_backend_files[@]}" "${required_frontend_files[@]}"; do
+  if [ ! -f "$required_file" ]; then
+    echo "FAIL: required portal snapshot file missing: $required_file"
+    exit 1
+  fi
+done
+
+allowed_fields=(
+  "snapshot_id"
+  "display_name_masked"
+  "city_code"
+  "category_code"
+  "skills_summary"
+  "experience_years"
+  "updated_at"
+  "snapshot_list"
+  "total"
+  "page"
+  "size"
+)
+
+for allowed_field in "${allowed_fields[@]}"; do
+  if ! grep -R --include='*.java' --include='*.ts' --include='*.tsx' -Fq "$allowed_field" \
+    "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate/api" \
+    "$ROOT_DIR/frontend/src/pages/portal"; then
+    echo "FAIL: portal snapshot allowed field not found in public contract: $allowed_field"
+    exit 1
+  fi
+done
+
+forbidden_fields=(
+  "mobile"
+  "email"
+  "password_hash"
+  "resume_body"
+  "attachment_object_key"
+  "evidence"
+  "base_profile_json"
+  "education_json"
+  "experience_json"
+  "skills_json"
+)
+
+public_contract_paths=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate/api/PortalTalentSnapshotItemResponse.java"
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate/api/PortalTalentSnapshotPageResponse.java"
+  "$ROOT_DIR/frontend/src/pages/portal/talentSnapshotApi.ts"
+  "$ROOT_DIR/frontend/src/pages/portal/TalentServiceArea.tsx"
+)
+
+for forbidden_field in "${forbidden_fields[@]}"; do
+  if grep -R -Fq "$forbidden_field" "${public_contract_paths[@]}"; then
+    echo "FAIL: forbidden raw candidate field in portal snapshot public contract: $forbidden_field"
+    exit 1
+  fi
+done
+
+if grep -R -Eiq "candidate_user|candidate_resume" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate/api/PortalTalentSnapshotController.java" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/candidate/application/PortalTalentSnapshotService.java"; then
+  echo "FAIL: portal talent snapshot public read path must not query raw candidate tables"
+  exit 1
+fi
+
+for forbidden_field in "${forbidden_fields[@]}"; do
+  if ! grep -Fq "$forbidden_field" "$ROOT_DIR/frontend/src/pages/portal/TalentServiceArea.test.tsx"; then
+    echo "FAIL: frontend portal field blacklist test missing marker: $forbidden_field"
+    exit 1
+  fi
+done
+
+if ! grep -Fq "doesNotContain(\"mobile\")" "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/candidate/PortalFieldBlacklistTest.java"; then
+  echo "FAIL: backend portal field blacklist test missing mobile assertion"
+  exit 1
+fi
+
+if ! grep -Fq "TALENT_SNAPSHOT_RENDER_FIELDS" "$ROOT_DIR/frontend/src/pages/portal/talentSnapshotApi.ts"; then
+  echo "FAIL: frontend portal render field allowlist missing"
+  exit 1
+fi
+
+echo "PASS"

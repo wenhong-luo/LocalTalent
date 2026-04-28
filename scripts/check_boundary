@@ -33,6 +33,7 @@ implementation_paths=(
   "$ROOT_DIR/frontend/index.html"
   "$ROOT_DIR/infra/docker-compose.yml"
   "$ROOT_DIR/scripts/run_all"
+  "$ROOT_DIR/scripts/check_portal_snapshot_fields"
 )
 
 if command -v rg >/dev/null 2>&1; then
@@ -470,6 +471,69 @@ for assertion_marker in \
   "access_token"; do
   if ! grep -Fq "$assertion_marker" "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/auditcenter/AuditMaskingTest.java"; then
     echo "FAIL: Prompt 10 masking assertion missing: $assertion_marker"
+    exit 1
+  fi
+done
+
+prompt14_required_paths=(
+  "$ROOT_DIR/.github/workflows/ci.yml"
+  "$ROOT_DIR/scripts/check_portal_snapshot_fields"
+  "$ROOT_DIR/docs/RUNBOOK.md"
+  "$ROOT_DIR/docs/TESTING.md"
+)
+
+for required_path in "${prompt14_required_paths[@]}"; do
+  if [ ! -e "$required_path" ]; then
+    echo "FAIL: Prompt 14 required path missing: $required_path"
+    exit 1
+  fi
+done
+
+for workflow_marker in \
+  "scripts/check_boundary" \
+  "scripts/check_portal_snapshot_fields" \
+  "./mvnw test" \
+  "npm test" \
+  "npm run build"; do
+  if ! grep -Fq "$workflow_marker" "$ROOT_DIR/.github/workflows/ci.yml"; then
+    echo "FAIL: Prompt 14 CI workflow missing marker: $workflow_marker"
+    exit 1
+  fi
+done
+
+if ! grep -Fq "check_portal_snapshot_fields" "$ROOT_DIR/scripts/run_all"; then
+  echo "FAIL: scripts/run_all must include portal snapshot field gate"
+  exit 1
+fi
+
+if ! grep -Fq "npm run build" "$ROOT_DIR/scripts/run_all"; then
+  echo "FAIL: scripts/run_all must include frontend build gate"
+  exit 1
+fi
+
+for testing_marker in \
+  "PortalFieldBlacklistTest" \
+  "ConsentSnapshotFlowIT" \
+  "ExportApprovalFlowIT" \
+  "IdorBlock" \
+  "AuditMaskingTest" \
+  "OpenApiContractTest"; do
+  if ! grep -Fq "$testing_marker" "$ROOT_DIR/docs/TESTING.md"; then
+    echo "FAIL: docs/TESTING.md missing boundary mapping: $testing_marker"
+    exit 1
+  fi
+done
+
+for runbook_marker in \
+  "发布" \
+  "回滚" \
+  "备份" \
+  "监控" \
+  "日志脱敏" \
+  "预签名" \
+  "MinIO"; do
+  if ! grep -Fq "$runbook_marker" "$ROOT_DIR/docs/RUNBOOK.md"; then
+    echo "FAIL: docs/RUNBOOK.md missing runbook topic: $runbook_marker"
     exit 1
   fi
 done

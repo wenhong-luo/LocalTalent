@@ -115,6 +115,7 @@ npm start
 
 ```bash
 ./scripts/check_boundary
+./scripts/check_portal_snapshot_fields
 cd backend && ./mvnw test
 cd frontend && npm ci && npm test && npm run build
 ./scripts/run_all
@@ -122,12 +123,21 @@ cd frontend && npm ci && npm test && npm run build
 
 若当前终端未直接提供 `node/npm` 或 `java/javac`，可先设置 `NODE_BIN_DIR` 或 `JAVA_HOME_OVERRIDE` 后再执行 `scripts/run_all`。若需复用本地 Maven 缓存或离线仓库，可额外设置 `BACKEND_MAVEN_ARGS`。
 
+## CI / 测试矩阵 / Runbook
+
+- CI workflow：`.github/workflows/ci.yml`，PR 与主干 push 必跑边界脚本、后端测试、前端测试与前端构建。
+- 测试矩阵：`docs/TESTING.md`，列出一期硬边界与对应自动化测试/脚本。
+- 运维手册：`docs/RUNBOOK.md`，覆盖发布、回滚、备份、监控、日志脱敏、MinIO 预签名短期下载策略。
+- 本地总闸门：`./scripts/run_all`，顺序执行边界扫描、人才服务区字段扫描、后端测试、前端测试与前端构建。
+
 ## 自检清单
 
 - [ ] `/health` 返回 200，且响应体包含 `code / message / trace_id / data`
 - [ ] `scripts/check_boundary` 可执行并输出 `PASS`
+- [ ] `scripts/check_portal_snapshot_fields` 可执行并输出 `PASS`
 - [ ] 后端测试通过，Flyway 迁移只向前新增，不修改旧版本迁移
 - [ ] 前端 `npm test` 与 `npm run build` 通过
+- [ ] CI workflow 任一门禁失败时阻断合并
 - [ ] README 与研发提示词明确一期硬边界和统一术语
 - [ ] 人才服务区只使用 `candidate_publish_snapshot`，公开响应只包含发布快照白名单字段
 - [ ] 对接接口仍为 stub，无真实 ATS、受控候选池或外部主库同步
