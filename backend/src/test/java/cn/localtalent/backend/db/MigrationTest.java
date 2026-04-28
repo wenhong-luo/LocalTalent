@@ -62,7 +62,20 @@ class MigrationTest {
                 "publishable_flag",
                 "visibility_scope",
                 "consent_version"));
-        assertColumnsExist(jdbcTemplate, "candidate_publish_snapshot", List.of("snapshot_json"));
+        assertColumnsExist(jdbcTemplate, "candidate_publish_snapshot", List.of(
+                "snapshot_json",
+                "city_code",
+                "category_code",
+                "display_name_masked",
+                "experience_years"));
+        assertGeneratedColumnsExist(jdbcTemplate, "candidate_publish_snapshot", List.of(
+                "city_code",
+                "category_code",
+                "display_name_masked",
+                "experience_years"));
+        assertIndexesExist(jdbcTemplate, "candidate_publish_snapshot", List.of(
+                "idx_portal_snapshot_visible_time",
+                "idx_portal_snapshot_filter_time"));
         assertColumnsAbsent(jdbcTemplate, "candidate_publish_snapshot", List.of("mobile", "email", "password_hash"));
         assertColumnsAbsent(jdbcTemplate, "candidate_user", List.of("snapshot_json"));
         assertColumnsExist(jdbcTemplate, "company", List.of(
@@ -187,6 +200,24 @@ class MigrationTest {
             assertThat(count == null ? 0 : count)
                     .as("index %s.%s should exist", tableName, indexName)
                     .isGreaterThan(0);
+        }
+    }
+
+    private static void assertGeneratedColumnsExist(
+            JdbcTemplate jdbcTemplate,
+            String tableName,
+            List<String> columnNames
+    ) {
+        for (String columnName : columnNames) {
+            String extra = jdbcTemplate.queryForObject(
+                    "SELECT extra FROM information_schema.columns "
+                            + "WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?",
+                    String.class,
+                    tableName,
+                    columnName);
+            assertThat(extra)
+                    .as("column %s.%s should be stored generated", tableName, columnName)
+                    .containsIgnoringCase("STORED GENERATED");
         }
     }
 

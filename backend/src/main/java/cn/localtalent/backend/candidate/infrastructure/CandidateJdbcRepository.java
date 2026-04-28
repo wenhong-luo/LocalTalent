@@ -174,8 +174,8 @@ public class CandidateJdbcRepository {
         StringBuilder where = new StringBuilder(
                 " WHERE publishable_flag = 1 AND consent_status = 1 AND status = 1 AND visibility_scope = 4");
         List<Object> args = new ArrayList<>();
-        addJsonFilter(where, args, "city_code", cityCode);
-        addJsonFilter(where, args, "category_code", categoryCode);
+        addColumnFilter(where, args, "city_code", cityCode);
+        addColumnFilter(where, args, "category_code", categoryCode);
 
         Long total = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM candidate_publish_snapshot" + where,
@@ -200,14 +200,12 @@ public class CandidateJdbcRepository {
         return new PortalSnapshotRows(rows, total == null ? 0 : total);
     }
 
-    private void addJsonFilter(StringBuilder where, List<Object> args, String fieldName, String value) {
+    private void addColumnFilter(StringBuilder where, List<Object> args, String columnName, String value) {
         String normalized = normalize(value);
         if (normalized == null) {
             return;
         }
-        where.append(" AND JSON_UNQUOTE(JSON_EXTRACT(snapshot_json, '$.")
-                .append(fieldName)
-                .append("')) = ?");
+        where.append(" AND ").append(columnName).append(" = ?");
         args.add(normalized);
     }
 

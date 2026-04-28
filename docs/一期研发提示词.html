@@ -119,9 +119,9 @@
     <li><b>Prompt 10 只读与权限口径</b>：审计中心只提供查询接口，不新增任何写接口；<code>operator</code> 与 <code>auditor</code> 仅授予审计中心 read 权限，candidate/company 无权读取，auditor 调用代表性 admin 写接口仍必须返回 <code>AUTHZ_403</code>。</li>
     <li><b>Prompt 10 脱敏与 trace 口径</b>：审计中心响应必须统一脱敏 <code>before_json/after_json/request_summary_json/response_summary_json/error_msg/request_uri</code> 中的手机号、邮箱、正文、附件、证据、password、secret、token；<code>trace_id</code> 可串联 <code>audit_log</code>、<code>field_access_log</code>、<code>open_api_log</code>。</li>
     <li><b>Prompt 10 验收口径</b>：<code>AuditTraceQueryIT</code>、<code>AuditMaskingTest</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖 trace 聚合查询、分页过滤、operator/auditor 只读、candidate/company 阻断、日志脱敏和审计中心索引迁移。</li>
-    <li><b>Prompt 11 架构决策</b>：前端门户已选择 <code>Next.js 16.2.4 + React 19.2</code>、Node SSR、强 SEO、几万日活、SSR 首屏 + CSR 复访；该决策不要求重写 Prompt 0–10，但后续必须回填 README、部署说明、SEO 基础和门户读路径容量。</li>
-    <li><b>Prompt 11.5 必做前置</b>：Prompt 12 之前必须先执行 Prompt 11.5（Next/SSR 架构基线回填 + 门户读路径容量补强），避免求职者中心直接踩到 SSR 登录态、缓存、SEO 与门户索引返工。</li>
-    <li><b>下一轮默认起点</b>：Prompt 11.5（Next/SSR 架构基线回填 + 门户读路径容量补强）。Prompt 11.5 之前不得实现前端求职者中心、同意/撤回前端、前端对接任务中心、真实对接、外部主库同步、ATS/受控候选池接入。</li>
+    <li><b>Prompt 11 已完成</b>：前端门户已选择并落地 <code>Next.js 16.2.4 + React 19.2</code>、Node SSR、强 SEO、几万日活、SSR 首屏 + CSR 复访；人才服务区页面只渲染发布快照字段白名单。</li>
+    <li><b>Prompt 11.5 已完成</b>：Next/SSR 架构基线已回填到 README 与本手册；门户 SEO 基础已提供 <code>robots.txt</code> 与 <code>sitemap.xml</code>；<code>candidate_publish_snapshot</code> 已通过 <code>V0012</code> 补生成列与组合索引，门户筛选不再依赖 <code>JSON_EXTRACT</code> 全表扫描。</li>
+    <li><b>下一轮默认起点</b>：Prompt 12（前端求职者中心）。Prompt 12 之前不得再回退到 Vite SPA 口径；Prompt 12 仍禁止真实对接、外部主库同步、ATS/受控候选池接入，且不得把原始候选人数据加入人才服务区前端展示。</li>
   </ul>
 </div>
 
