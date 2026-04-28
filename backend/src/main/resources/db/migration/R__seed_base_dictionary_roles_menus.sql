@@ -105,7 +105,12 @@ VALUES
   ('admin_cms_read', '运营内容读取', NULL, 'api', NULL, 'admin.cms.read', 830, 1),
   ('admin_cms_write', '运营内容写入', NULL, 'api', NULL, 'admin.cms.write', 831, 1),
   ('admin_event_read', '运营活动读取', NULL, 'api', NULL, 'admin.event.read', 840, 1),
-  ('admin_event_write', '运营活动写入', NULL, 'api', NULL, 'admin.event.write', 841, 1)
+  ('admin_event_write', '运营活动写入', NULL, 'api', NULL, 'admin.event.write', 841, 1),
+  ('company_export_apply', '企业导出申请', NULL, 'api', NULL, 'company.export.apply', 850, 1),
+  ('company_export_read', '企业导出查看', NULL, 'api', NULL, 'company.export.read', 851, 1),
+  ('company_export_download', '企业导出下载链接', NULL, 'api', NULL, 'company.export.download', 852, 1),
+  ('admin_export_review_read', '运营导出审批读取', NULL, 'api', NULL, 'admin.export.review.read', 860, 1),
+  ('admin_export_review_write', '运营导出审批写入', NULL, 'api', NULL, 'admin.export.review.write', 861, 1)
 AS new
 ON DUPLICATE KEY UPDATE
   menu_name = new.menu_name,
@@ -143,7 +148,10 @@ JOIN sys_menu m ON (
     'company_application_list',
     'company_application_read',
     'company_interview_session_create',
-    'company_interview_qrcode_generate'
+    'company_interview_qrcode_generate',
+    'company_export_apply',
+    'company_export_read',
+    'company_export_download'
   ))
   OR (r.role_code = 'recruiter' AND m.menu_code IN (
     'company_console',
@@ -156,7 +164,10 @@ JOIN sys_menu m ON (
     'company_application_list',
     'company_application_read',
     'company_interview_session_create',
-    'company_interview_qrcode_generate'
+    'company_interview_qrcode_generate',
+    'company_export_apply',
+    'company_export_read',
+    'company_export_download'
   ))
   OR (r.role_code = 'interviewer' AND m.menu_code IN ('company_console'))
   OR (r.role_code = 'operator' AND m.menu_code IN (
@@ -170,16 +181,45 @@ JOIN sys_menu m ON (
     'admin_cms_read',
     'admin_cms_write',
     'admin_event_read',
-    'admin_event_write'
+    'admin_event_write',
+    'admin_export_review_read',
+    'admin_export_review_write'
   ))
   OR (r.role_code = 'auditor' AND m.menu_code IN (
     'audit_console',
     'admin_company_review_read',
     'admin_job_review_read',
     'admin_cms_read',
-    'admin_event_read'
+    'admin_event_read',
+    'admin_export_review_read'
   ))
   OR (r.role_code = 'open_client' AND m.menu_code IN ('open_api_stub'))
 )
 ON DUPLICATE KEY UPDATE
   sys_role_menu.id = sys_role_menu.id;
+
+INSERT INTO sys_role_field_policy (role_id, biz_type, field_name, policy_type, mask_rule, status)
+SELECT r.id, v.biz_type, v.field_name, v.policy_type, v.mask_rule, 1
+FROM sys_role r
+JOIN (
+  SELECT 'company_admin' AS role_code, 'export_application' AS biz_type, 'application_id' AS field_name, 'ALLOW' AS policy_type, NULL AS mask_rule
+  UNION ALL SELECT 'company_admin', 'export_application', 'job_title', 'ALLOW', NULL
+  UNION ALL SELECT 'company_admin', 'export_application', 'application_status', 'ALLOW', NULL
+  UNION ALL SELECT 'company_admin', 'export_application', 'apply_time', 'ALLOW', NULL
+  UNION ALL SELECT 'company_admin', 'export_application', 'display_name', 'MASK', 'NAME'
+  UNION ALL SELECT 'company_admin', 'export_application', 'mobile', 'MASK', 'MOBILE'
+  UNION ALL SELECT 'company_admin', 'export_application', 'email', 'MASK', 'EMAIL'
+  UNION ALL SELECT 'company_admin', 'export_application', 'skills_summary', 'MASK', 'DEFAULT'
+  UNION ALL SELECT 'recruiter', 'export_application', 'application_id', 'ALLOW', NULL
+  UNION ALL SELECT 'recruiter', 'export_application', 'job_title', 'ALLOW', NULL
+  UNION ALL SELECT 'recruiter', 'export_application', 'application_status', 'ALLOW', NULL
+  UNION ALL SELECT 'recruiter', 'export_application', 'apply_time', 'ALLOW', NULL
+  UNION ALL SELECT 'recruiter', 'export_application', 'display_name', 'MASK', 'NAME'
+  UNION ALL SELECT 'recruiter', 'export_application', 'mobile', 'MASK', 'MOBILE'
+  UNION ALL SELECT 'recruiter', 'export_application', 'email', 'MASK', 'EMAIL'
+  UNION ALL SELECT 'recruiter', 'export_application', 'skills_summary', 'MASK', 'DEFAULT'
+) v ON v.role_code = r.role_code
+ON DUPLICATE KEY UPDATE
+  policy_type = v.policy_type,
+  mask_rule = v.mask_rule,
+  status = 1;

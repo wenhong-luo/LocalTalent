@@ -306,4 +306,53 @@ if ! grep -Fq "AUTHZ_403" \
   exit 1
 fi
 
+prompt8_required_paths=(
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/exporting"
+  "$ROOT_DIR/backend/src/main/resources/db/migration/V0009__extend_export_apply_for_minio_download.sql"
+  "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/exporting/ExportApprovalFlowIT.java"
+)
+
+for required_path in "${prompt8_required_paths[@]}"; do
+  if [ ! -e "$required_path" ]; then
+    echo "FAIL: Prompt 8 required path missing: $required_path"
+    exit 1
+  fi
+done
+
+if grep -RIEiq "open_api|integration_sync|ats|candidate_pool|activity_registration" \
+  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/exporting"; then
+  echo "FAIL: Prompt 8 export module contains out-of-scope implementation marker"
+  exit 1
+fi
+
+while IFS= read -r response_file; do
+  if grep -Eiq "mobile|email|resume_body|attachment_object_key|evidence" "$response_file"; then
+    echo "FAIL: Prompt 8 export API response DTO contains raw candidate field marker: $response_file"
+    exit 1
+  fi
+done < <(find "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/exporting/api" -type f -name '*Response.java')
+
+for api_code in \
+  "company.export.apply" \
+  "company.export.read" \
+  "company.export.download" \
+  "admin.export.review.read" \
+  "admin.export.review.write"; do
+  if ! grep -Fq "$api_code" "$ROOT_DIR/backend/src/main/resources/db/migration/R__seed_base_dictionary_roles_menus.sql"; then
+    echo "FAIL: Prompt 8 seed permission missing: $api_code"
+    exit 1
+  fi
+done
+
+for assertion_marker in \
+  "trace-p8-download-unapproved" \
+  "trace-p8-url-expired" \
+  "field_access_log" \
+  "export_download_url_issue"; do
+  if ! grep -Fq "$assertion_marker" "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend/exporting/ExportApprovalFlowIT.java"; then
+    echo "FAIL: Prompt 8 export approval assertion missing: $assertion_marker"
+    exit 1
+  fi
+done
+
 echo "PASS"

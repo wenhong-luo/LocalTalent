@@ -1,0 +1,15 @@
+ALTER TABLE export_apply
+  ADD COLUMN company_id BIGINT UNSIGNED DEFAULT NULL AFTER id,
+  ADD COLUMN apply_identity_type VARCHAR(32) NOT NULL DEFAULT 'company' AFTER apply_user_id,
+  ADD COLUMN apply_role_code VARCHAR(64) NOT NULL DEFAULT 'company_admin' AFTER apply_identity_type,
+  ADD COLUMN reject_reason VARCHAR(500) DEFAULT NULL AFTER approve_time,
+  ADD COLUMN generate_status TINYINT NOT NULL DEFAULT 0 AFTER reject_reason,
+  ADD COLUMN file_object_key VARCHAR(500) DEFAULT NULL AFTER generate_status,
+  ADD COLUMN file_sha256 VARCHAR(64) DEFAULT NULL AFTER file_object_key,
+  ADD COLUMN file_size_bytes BIGINT UNSIGNED DEFAULT NULL AFTER file_sha256,
+  ADD COLUMN generated_at DATETIME DEFAULT NULL AFTER file_size_bytes,
+  ADD COLUMN download_issued_at DATETIME DEFAULT NULL AFTER expire_time,
+  ADD COLUMN download_count INT NOT NULL DEFAULT 0 AFTER download_issued_at,
+  ADD COLUMN error_msg VARCHAR(500) DEFAULT NULL AFTER download_count,
+  ADD KEY idx_export_company_status_time (company_id, approve_status, created_at),
+  ADD KEY idx_export_generate_status (generate_status, created_at);

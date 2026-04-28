@@ -16,3 +16,10 @@ localtalent:
     jwt:
       secret: ${LOCALTALENT_JWT_SECRET:localtalent-dev-jwt-secret-change-before-production-2026}
       ttl-seconds: ${LOCALTALENT_JWT_TTL_SECONDS:7200}
+  minio:
+    endpoint: ${LOCALTALENT_MINIO_ENDPOINT:http://localhost:9000}
+    access-key: ${LOCALTALENT_MINIO_ACCESS_KEY:localtalent}
+    secret-key: ${LOCALTALENT_MINIO_SECRET_KEY:localtalent123}
+    bucket: ${LOCALTALENT_MINIO_EXPORT_BUCKET:export}
+  export:
+    download-ttl-seconds: ${LOCALTALENT_EXPORT_DOWNLOAD_TTL_SECONDS:900}

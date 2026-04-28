@@ -58,7 +58,7 @@
 
 <div class="ok">
   <div class="label">当前投喂进度</div>
-  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5、Prompt 6、Prompt 7 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机、投递与面试签到闭环、运营审核 + 内容/活动管理已落地。下一轮默认从 <b>Prompt 8：导出审批与一次性下载</b> 开始。</p>
+  <p class="small"><b>Prompt 0、Prompt 1、Prompt 2、Prompt 3、Prompt 4、Prompt 5、Prompt 6、Prompt 7、Prompt 8 已完成</b>：仓库骨架、数据库迁移与 seed、本地账号 + JWT、权限审计基础设施、候选人同意/发布快照/撤回闭环、企业与职位状态机、投递与面试签到闭环、运营审核 + 内容/活动管理、导出审批与一次性下载已落地。下一轮默认从 <b>Prompt 9：对接接口 Stub</b> 开始。</p>
 </div>
 
 <div class="note">
@@ -104,7 +104,12 @@
     <li><b>Prompt 7 权限口径</b>：operator 拥有 admin read/write；auditor 只授予 admin read，调用企业审核、职位审核、CMS 写、活动写接口必须返回 <code>AUTHZ_403</code> 并带 <code>trace_id</code>；审核接口按 read/write 权限拆分。</li>
     <li><b>Prompt 7 软删除与审计口径</b>：CMS/event 删除语义固定为软删除或下线，仅将 <code>status</code> 置 <code>0</code>，不得物理删除；审核、CMS、活动写动作写入 <code>audit_log</code>，动作包括 <code>cms_create/cms_update/cms_soft_delete/event_create/event_update/event_soft_delete</code>，审核驳回必须保留原因。</li>
     <li><b>Prompt 7 验收口径</b>：<code>ReviewAffectsVisibilityIT</code>、<code>AdminCmsEventCrudIT</code>、<code>AuditorWriteDeniedIT</code> 与 <code>scripts/check_boundary</code> 已覆盖审核影响门户可见性、CMS/event CRUD 与软删除、auditor 写拒绝、审计留痕和 admin 模块禁止输出原始候选人数据。</li>
-    <li><b>下一轮默认起点</b>：Prompt 8（导出审批与一次性下载）。Prompt 8 之前不得实现导出审批、导出文件生成、MinIO 下载链接、审计中心查询或对接接口实现。</li>
+    <li><b>Prompt 8 已完成</b>：导出审批与一次性下载已落地到 <code>backend/.../exporting/</code>；接口覆盖 <code>POST /api/company/exports</code>、<code>GET /api/company/exports/{id}</code>、<code>GET /api/company/exports/{id}/download-url</code>、<code>GET /api/admin/exports/review</code>、<code>GET /api/admin/exports/review/{id}</code>、<code>POST /api/admin/exports/review</code>。</li>
+    <li><b>Prompt 8 导出口径</b>：首版导出范围只支持 <code>biz_type=application_candidate_detail</code>，即企业导出本企业投递池候选人明细；导出必须先写 <code>export_apply</code> 并经 operator 审批，通过后异步生成 CSV，不得绕过审批直接下载。</li>
+    <li><b>Prompt 8 MinIO 与一次性下载口径</b>：导出文件写入 MinIO bucket <code>export</code>；企业下载接口只发放一次短期预签名 URL，记录 <code>download_count/download_issued_at/expire_time</code>，二次发放返回统一错误；预签名 URL 本身在过期前可能重复访问，若未来要求真正单次对象读取，需要改为后端代理下载或读后删除。</li>
+    <li><b>Prompt 8 字段裁剪与审计口径</b>：导出 CSV 固定字段为 <code>application_id/job_title/application_status/apply_time/display_name/mobile/email/skills_summary</code>；候选人姓名、手机号、邮箱、技能摘要必须走 <code>FieldPolicyEngine</code>，无权字段不明文导出；申请、审批、驳回、生成、下载链接发放写 <code>audit_log</code>，敏感字段读取写 <code>field_access_log</code> 并关联同一 <code>trace_id</code>。</li>
+    <li><b>Prompt 8 验收口径</b>：<code>ExportApprovalFlowIT</code>、<code>MigrationTest</code> 与 <code>scripts/check_boundary</code> 已覆盖未审批不可下载、审批后生成并短期下载、过期/二次发放拒绝、字段脱敏、驳回不可下载、审计与字段访问日志。</li>
+    <li><b>下一轮默认起点</b>：Prompt 9（对接接口 Stub）。Prompt 9 之前不得实现真实对接、外部主库同步、ATS/受控候选池接入或审计中心查询。</li>
   </ul>
 </div>
 

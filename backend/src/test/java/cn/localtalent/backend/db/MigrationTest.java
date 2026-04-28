@@ -81,12 +81,26 @@ class MigrationTest {
                 "signin_code_hash",
                 "signin_code_expires_at",
                 "signin_code_used_at"));
+        assertColumnsExist(jdbcTemplate, "export_apply", List.of(
+                "company_id",
+                "apply_identity_type",
+                "apply_role_code",
+                "reject_reason",
+                "generate_status",
+                "file_object_key",
+                "file_sha256",
+                "file_size_bytes",
+                "generated_at",
+                "download_issued_at",
+                "download_count",
+                "error_msg"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");
         int roleCount = countRows(jdbcTemplate, "sys_role");
         int menuCount = countRows(jdbcTemplate, "sys_menu");
         int roleMenuCount = countRows(jdbcTemplate, "sys_role_menu");
+        int fieldPolicyCount = countRows(jdbcTemplate, "sys_role_field_policy");
         int adminUserCount = countRows(jdbcTemplate, "admin_user");
 
         executeSeedScript();
@@ -99,6 +113,7 @@ class MigrationTest {
         assertThat(countRows(jdbcTemplate, "sys_role")).isEqualTo(roleCount);
         assertThat(countRows(jdbcTemplate, "sys_menu")).isEqualTo(menuCount);
         assertThat(countRows(jdbcTemplate, "sys_role_menu")).isEqualTo(roleMenuCount);
+        assertThat(countRows(jdbcTemplate, "sys_role_field_policy")).isEqualTo(fieldPolicyCount);
         assertThat(countRows(jdbcTemplate, "admin_user")).isEqualTo(adminUserCount);
     }
 
