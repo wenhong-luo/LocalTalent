@@ -186,7 +186,7 @@ public class CandidateConsentService {
         }
         List<String> scope = new ArrayList<>();
         for (String value : rawScope) {
-            String normalized = normalize(value);
+            String normalized = normalizeConsentScope(value);
             if (normalized != null && !scope.contains(normalized)) {
                 scope.add(normalized);
             }
@@ -196,6 +196,14 @@ public class CandidateConsentService {
             throw validation("consent_scope is required");
         }
         return scope;
+    }
+
+    private String normalizeConsentScope(String value) {
+        String normalized = normalize(value);
+        if ("talent_service_area".equals(normalized)) {
+            return "talent_service";
+        }
+        return normalized;
     }
 
     private String normalizeRequired(String value, String fieldName, int maxLength) {
