@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { PortalShell } from '@/components/portal/PortalShell';
 import { isHttpClientError } from '@/lib/httpClient';
 import { TalentServiceArea, type TalentServiceAreaInitialState } from '@/pages/portal/TalentServiceArea';
 import { fetchTalentSnapshots, type TalentSnapshotQuery } from '@/pages/portal/talentSnapshotApi';
@@ -55,5 +56,9 @@ export default async function TalentServiceAreaPage({
     };
   }
 
-  return <TalentServiceArea initialState={initialState} />;
+  return (
+    <PortalShell>
+      <TalentServiceArea initialState={initialState} />
+    </PortalShell>
+  );
 }
