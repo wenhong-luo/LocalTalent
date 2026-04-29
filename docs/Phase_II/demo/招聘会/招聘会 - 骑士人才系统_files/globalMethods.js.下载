@@ -1,0 +1,1120 @@
+// 创建弹窗元素
+// params:{
+//    title:标题,
+//    content:内容,
+//    appendId:被添加的vue根元素标签id(不传的话默认为app)
+//    funName:回调函数方法名
+//    funParam:回调函数参数
+//    errorMsg:提示消息
+//    className:弹窗额外class类名(不传的话默认白色背景)
+//    reload:关闭时是否需要刷新页面
+// }
+function QSdialog(params) {
+  params.funParam = encodeURIComponent(JSON.stringify(params.funParam))
+  try {
+    var html = `
+                <div class="qs_dialog_modal" id="QSdialog">
+                  <div class="qs_dialog">
+                    <div class="qs_dialog_wapper">
+                      <div class="qs_dialog_top">
+                          <div class="qs_dialog_title">
+                              ${params.title}
+                          </div>
+                          <div class="qs_dialog_close_wapper">
+                            <div class="qs_dialog_close"></div>
+                          </div>
+                      </div>
+                      <div class="errorMsg">
+                        
+                      </div>
+                      <div class="qs_dialog_content">
+                          ${params.content}
+                      </div>
+                      <input type="hidden" class="nextFun" value="${params.funName}"/>
+                      <input type="hidden" class="nextFunParam" value="${params.funParam}"/>
+                    </div>
+                  </div>
+                </div>
+             `
+
+    // 添加到页面vue根元素中
+    if (params.appendId) {
+      $("#" + params.appendId).append(html)
+      $("#QSdialog").fadeIn(100)
+    } else {
+      $("#app").append(html)
+      $("#QSdialog").fadeIn(100)
+    }
+    // 添加错误消息
+    if (params.errorMsg) {
+      let errorHTML = `
+                          <div class="qs_dialog_errorMsg">
+                              <div class="qs_dialog_errorMsg_content">
+                                ${params.errorMsg}
+                              </div>
+                          </div>
+                        `
+      $(".errorMsg").html(errorHTML)
+    }
+    // 添加额外class类名
+    if (params.className) {
+      $(".qs_dialog_wapper").addClass(params.className)
+    }
+    document.body.style.overflow = "hidden"
+
+    // 弹窗关闭事件
+    $(".qs_dialog_close").on("click", function () {
+      $("#QSdialog").fadeOut(200)
+      setTimeout(() => {
+        $("#QSdialog").remove()
+        // 如果有简历详情的弹窗开启,防止关闭其他弹窗时导致页面滚动
+        if ($(".resume_show_box").length > 0) {
+          return
+        }
+        document.body.style.overflow = "auto"
+      }, 200)
+      if (params.reload) {
+        window.location.reload()
+      }
+    })
+    $(".qs_dialog").on("click", function (event) {
+      if (event.target == this) {
+        if ($(this).find(".login_dialog_wapper").length > 0) {
+          // 登录弹窗点击空白不关闭
+          return
+        }
+        $("#QSdialog").fadeOut(200)
+        setTimeout(() => {
+          $("#QSdialog").remove()
+          // 如果有简历详情的弹窗开启,防止关闭其他弹窗时导致页面滚动
+          if ($(".resume_show_box").length > 0) {
+            return
+          }
+          document.body.style.overflow = "auto"
+        }, 200)
+        if (params.reload) {
+          window.location.reload()
+        }
+      }
+    })
+  } catch (err) {
+    console.log(err, "QSdialog")
+  }
+}
+
+// 关闭弹窗
+function QSdialogClose() {
+  $("#QSdialog").fadeOut(200)
+  setTimeout(() => {
+    $("#QSdialog").remove()
+    document.body.style.overflow = "auto"
+  }, 200)
+}
+
+// 成功消息提示
+// msg:内容
+function QSmessage(msg) {
+  var html = `
+                <div class="qs_message">
+                  <div class="success-icon"></div>
+                    ${msg}
+                </div>
+              `
+  $("body").append(html)
+  setTimeout(() => {
+    $(".qs_message").addClass("qs_message_fadeIn")
+  }, 100)
+  setTimeout(() => {
+    $(".qs_message").remove("qs_message_fadeIn").addClass("qs_message_fadeOut")
+    $(".qs_message")
+  }, 1500)
+}
+
+// 消息对话框
+// content:内容,
+// confirmButtonText/cancelButtonText:确认/取消按钮文字(不传默认:确认/取消)
+// callbackConfirm/callbackCancel:确认/取消按钮执行函数方法名(不传默认关闭弹窗)
+function QSmessageBox(params) {
+  try {
+    if (!params.confirmButtonText) {
+      params.confirmButtonText = "确认"
+    }
+    if (!params.cancelButtonText) {
+      params.cancelButtonText = "取消"
+    }
+    if (params.val1) {
+      params.val1 = JSON.stringify(params.val1)
+    }
+    if (params.val2) {
+      params.val2 = JSON.stringify(params.val2)
+    }
+    var html = `
+            <div class="qs_dialog qs_messagebox_center" id="QSmessageBox">
+              <div class="qs_messagebox">
+                <div class="qs_messagebox_title">
+                  <div>提示</div>
+                  <div class="qs_dialog_close"></div>
+                </div>
+                <div class="qs_messagebox_content">
+                  <div class="msg_icon"></div>
+                  ${params.content}
+                </div>
+                <div class="qs_messagebox_btnWapper">
+                  <div class="btn btn1">${params.cancelButtonText}</div>
+                  <div class="btn btn2">${params.confirmButtonText}</div>
+                </div>
+                <input type="hidden" class="val1" value="${params.val1}"/>
+                <input type="hidden" class="val2" value="${params.val2}"/>
+              </div>
+            </div>
+  `
+    $("body").append(html)
+    // 确认按钮执行操作
+    $(".qs_messagebox_btnWapper .btn2").on("click", function () {
+      if (params.callbackConfirm) {
+        eval(params.callbackConfirm + "(" + params.val1 + ")")
+      } else {
+        $("#QSmessageBox").fadeOut(200)
+        setTimeout(() => {
+          $("#QSmessageBox").remove()
+          document.body.style.overflow = "auto"
+        }, 200)
+      }
+    })
+    // 取消按钮执行操作
+    $(".qs_messagebox .btn1").on("click", function () {
+      if (params.callbackCancel) {
+        eval(params.callbackCancel + "(" + params.val2 + ")")
+      } else {
+        $("#QSmessageBox").fadeOut(200)
+        setTimeout(() => {
+          $("#QSmessageBox").remove()
+          document.body.style.overflow = "auto"
+        }, 200)
+      }
+    })
+
+    // 对话框关闭事件
+    $(".qs_dialog_close").on("click", function () {
+      $("#QSmessageBox").fadeOut(200)
+      setTimeout(() => {
+        $("#QSmessageBox").remove()
+        document.body.style.overflow = "auto"
+      }, 200)
+    })
+    $(".qs_dialog").on("click", function (event) {
+      if (event.target == this) {
+        $("#QSmessageBox").fadeOut(200)
+        setTimeout(() => {
+          $("#QSmessageBox").remove()
+          document.body.style.overflow = "auto"
+        }, 200)
+      }
+    })
+  } catch (err) {
+    console.log(err, "QSmessageBox")
+  }
+}
+
+// 执行传入的回调方法
+function QSdialogCallBack() {
+  try {
+    var nextFun = $(".nextFun").val()
+    var nextFunParam = $(".nextFunParam").val()
+    QSdialogClose()
+    nextFunParam = decodeURIComponent(nextFunParam)
+    nextFunParam = JSON.parse(nextFunParam)
+    window[nextFun](nextFunParam)
+    // eval(nextFun + "(" + nextFunParam + ")")
+  } catch (err) {
+    console.log(err,'QSdialogCallBack');
+  }
+}
+
+// 通用跳转
+function jumpUrl(url) {
+  location.href = url
+}
+
+// 个人/企业会员err方法
+function errorMethods(dialog_err) {
+  try {
+    let dialog_params = {
+      funName: dialog_err.funName,
+      funParam: dialog_err.funParam,
+      errorMsg: dialog_err.errorMsg
+    }
+    switch (dialog_err.code) {
+      // 个人会员 需要登录
+      case 50010:
+        doLoginDialog(dialog_params, 2)
+        break
+      //个人会员 需要创建简历
+      case 50007:
+        resumeAddDialog(dialog_params, dialog_err.isApply)
+        break
+      // 企业会员 需要登录
+      case 50011:
+        doLoginDialog(dialog_params, 1)
+        break
+      case 50009:
+        doLoginDialog(dialog_params, 1)
+        break
+      // 企业会员 需要完善企业资料
+      case 50003:
+        let params = {
+          content: dialog_err.errorMsg,
+          confirmButtonText: "去填写",
+          callbackConfirm: "jumpUrl",
+          val1: qscms.locationList.companyInfo
+        }
+        QSmessageBox(params)
+        break
+      default:
+        break
+    }
+  } catch (err) {
+    console.log(err, "errorMethods")
+  }
+}
+
+// 登录弹窗
+// utype 企业1,个人2   isReload登录成功后是否需要刷新页面(传1刷新,否则不刷新)
+function doLoginDialog(dialog_params, utype, isReload) {
+  try {
+    httppost(qscms.sitedomain + qscms.apiList.dialog_login, { utype, isReload })
+      .then(function (res) {
+        var params = {
+          title: "快速登录",
+          content: res.data,
+          funName: dialog_params.funName,
+          funParam: dialog_params.funParam,
+          errorMsg: dialog_params.errorMsg
+        }
+        QSdialog(params)
+      })
+      .catch(function () {})
+  } catch (err) {
+    console.log(err, "doLoginDialog")
+  }
+}
+
+// 创建简历弹窗
+function resumeAddDialog(dialog_params, isApply) {
+  try {
+    httppost(qscms.sitedomain + qscms.apiList.dialog_resumeAdd, {
+      type: isApply
+    })
+      .then(function (res) {
+        var params = {
+          title: "快速完善简历",
+          content: res.data,
+          funName: dialog_params.funName,
+          funParam: dialog_params.funParam,
+          className: "resumeAdd_dialog_bg"
+        }
+        QSdialog(params)
+      })
+      .catch(function () {})
+  } catch (err) {
+    console.log(err, "resumeAddDialog")
+  }
+}
+
+// 列表投递
+function doApplyList(id) {
+  try {
+    var params = {
+      jobid: id
+    }
+    httppost(qscms.apiList.jobapply, params)
+      .then(function (res) {
+        // 投递成功
+        if (res.code == 200) {
+          QSmessage(res.message)
+          var element = $(`[data-id="${id}"].hand_in_resume`)
+          $(element)
+            .removeClass("doApplyBtn")
+            .addClass("already_apply")
+            .text("已投递")
+        }
+      })
+      .catch(function (err) {
+        let dialog_err = {
+          funName: "doApplyList",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code,
+          isApply: "apply"
+        }
+        if (err.code == 50007) {
+          dialog_err.funName = "doApplyQuickList"
+          resumeAddDialog(dialog_err, dialog_err.isApply)
+        } else {
+          errorMethods(dialog_err)
+        }
+      })
+  } catch (err) {
+    console.log(err, "doApply")
+  }
+}
+// 职位收藏列表
+function handleFavJobList(id) {
+  try {
+    httppost(qscms.apiList.jobFav, { jobid: id })
+      .then((res) => {
+        if (res.code == 200) {
+          QSmessage(res.message)
+          var element = $(`[data-id="${id}"].fav_box`)
+          $(element).addClass("active")
+          // setTimeout(() => {
+          //   window.location.reload()
+          // }, 2000)
+        }
+      })
+      .catch((err) => {
+        let dialog_err = {
+          funName: "handleFavJobList",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_err)
+      })
+  } catch (err) {
+    console.log(err, "handleFavJobList")
+  }
+}
+
+// 职位取消收藏列表
+function handleFavJobCancelList(id) {
+  try {
+    httppost(qscms.apiList.jobFavCancel, { jobid: id })
+      .then((res) => {
+        if (res.code == 200) {
+          QSmessage(res.message)
+          var element = $(`[data-id="${id}"].fav_box`)
+          $(element).removeClass("active")
+        }
+      })
+      .catch((err) => {
+        let dialog_err = {
+          funName: "handleFavJobCancelList",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_err)
+      })
+  } catch (err) {
+    console.log(err, "handleFavJobCancelList")
+  }
+}
+
+// 投递简历
+function doApply(id) {
+  try {
+    var params = {
+      jobid: id
+    }
+    httppost(qscms.apiList.jobapply, params)
+      .then(function (res) {
+        // 投递成功
+        if (res.code == 200) {
+          QSmessage(res.message)
+          popupWechatQrcodeWindow(
+            "user_pc_collect_job",
+            "扫码绑定公众号，求职快人一步",
+            true
+          )
+          // setTimeout(() => {
+          //   window.location.reload()
+          // }, 2000)
+        }
+      })
+      .catch(function (err) {
+        let dialog_err = {
+          funName: "doApply",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code,
+          isApply: "apply"
+        }
+        if (err.code == 50007) {
+          dialog_err.funName = "doApplyQuick"
+          resumeAddDialog(dialog_err, dialog_err.isApply)
+        } else {
+          errorMethods(dialog_err)
+        }
+      })
+  } catch (err) {
+    console.log(err, "doApply")
+  }
+}
+// 快速投递列表
+function doApplyQuickList(id) {
+  try {
+    var params = {
+      jobid: id
+    }
+    httppost(qscms.apiList.regResumeQuickApply, params).then((res) => {
+      if (res.code == 200) {
+        QSmessage(res.message)
+        var element = $(`[data-id="${id}"].hand_in_resume`)
+        $(element)
+          .removeClass("doApplyBtn")
+          .addClass("already_apply")
+          .text("已投递")
+      }
+    })
+  } catch (err) {
+    console.log(err, "doApplyQuick")
+  }
+}
+// 快速投递
+function doApplyQuick(id) {
+  try {
+    var params = {
+      jobid: id
+    }
+    httppost(qscms.apiList.regResumeQuickApply, params).then((res) => {
+      if (res.code == 200) {
+        QSmessage(res.message)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      }
+    })
+  } catch (err) {
+    console.log(err, "doApplyQuick")
+  }
+}
+// 职位收藏
+function handleFavJob(id) {
+  try {
+    httppost(qscms.apiList.jobFav, { jobid: id })
+      .then((res) => {
+        if (res.code == 200) {
+          QSmessage(res.message)
+          popupWechatQrcodeWindow(
+            "user_pc_collect_job",
+            "扫码绑定公众号，求职快人一步",
+            true
+          )
+          // setTimeout(() => {
+          //   window.location.reload()
+          // }, 2000)
+        }
+      })
+      .catch((err) => {
+        let dialog_err = {
+          funName: "handleFavJob",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_err)
+      })
+  } catch (err) {
+    console.log(err, "handleFavJob")
+  }
+}
+
+// 职位取消收藏
+function handleFavJobCancel(id) {
+  try {
+    httppost(qscms.apiList.jobFavCancel, { jobid: id })
+      .then((res) => {
+        if (res.code == 200) {
+          QSmessage(res.message)
+          setTimeout(() => {
+            window.location.reload()
+          }, 2000)
+        }
+      })
+      .catch((err) => {
+        let dialog_err = {
+          funName: "handleFavJobCancel",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_err)
+      })
+  } catch (err) {
+    console.log(err, "handleFavJobCancel")
+  }
+}
+
+// 企业收藏
+function handleFavCom(id) {
+  try {
+    httppost(qscms.apiList.companyAttention, { comid: id })
+      .then((res) => {
+        if (res.code == 200) {
+          QSmessage(res.message)
+          popupWechatQrcodeWindow(
+            "user_pc_attention_company",
+            "扫码绑定公众号，求职快人一步",
+            true
+          )
+          // setTimeout(() => {
+          //   window.location.reload()
+          // }, 2000)
+        }
+      })
+      .catch((err) => {
+        let dialog_err = {
+          funName: "handleFavCom",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_err)
+      })
+  } catch (err) {
+    console.log(err, "handleFavCom")
+  }
+}
+
+// 企业取消收藏
+function handleFavComCancel(id) {
+  try {
+    httppost(qscms.apiList.companyAttentionCancel, { comid: id })
+      .then((res) => {
+        if (res.code == 200) {
+          QSmessage(res.message)
+          setTimeout(() => {
+            window.location.reload()
+          }, 2000)
+        }
+      })
+      .catch((err) => {
+        let dialog_err = {
+          funName: "handleFavComCancel",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_err)
+      })
+  } catch (err) {
+    console.log(err, "handleFavComCancel")
+  }
+}
+
+// 简历收藏
+function handleFavResume(id) {
+  try {
+    httppost(qscms.apiList.resumeFav, { resume_id: id })
+      .then((res) => {
+        if (res.code == 200) {
+          resumeDetial_dialog(id)
+          QSmessage(res.message)
+          popupWechatQrcodeWindow(
+            "company_pc_collect_resume",
+            "扫码绑定，随时随地接收简历信息",
+            false
+          )
+        }
+      })
+      .catch((err) => {
+        let dialog_err = {
+          funName: "handleFavResume",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_err)
+      })
+  } catch (err) {
+    console.log(err, "handleFavResume")
+  }
+}
+
+// 简历取消收藏
+function handleFavResumeCancel(id) {
+  try {
+    httppost(qscms.apiList.resumeFavCancel, { resume_id: id })
+      .then((res) => {
+        if (res.code == 200) {
+          resumeDetial_dialog(id)
+          QSmessage(res.message)
+        }
+      })
+      .catch((err) => {
+        let dialog_err = {
+          funName: "handleFavResumeCancel",
+          funParam: id,
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_err)
+      })
+  } catch (err) {
+    console.log(err, "handleFavResumeCancel")
+  }
+}
+
+// 简历详情
+// 获取简历详情弹窗
+function resumeDetial_dialog(id) {
+  try {
+    httpget(qscms.sitedomain + qscms.apiList.dialog_resumeDetail + id).then(
+      (res) => {
+        $("#showResume").html(res.data)
+      }
+    )
+  } catch (err) {
+    console.log(err, "resumeDetial_dialog")
+  }
+}
+
+function initWebSocket() {
+  try {
+    httpget(qscms.apiList.imGetToken, {}).then(function (res) {
+      if (res.data != "") {
+        qscms.imToken = res.data
+        window.ws = new WebSocket("wss://imserv.v2.74cms.com")
+      }
+    })
+  } catch (err) {
+    console.log(err, "initWebSocket")
+  }
+}
+
+// 开始聊天操作
+// id 简历/职位id,type:1企业,2个人
+function startIm(funParam, type) {
+  try {
+    var params = {
+      token: qscms.imToken,
+      jobid: funParam.jobid === undefined ? '' : funParam.jobid,
+      resumeid: funParam.resumeid === undefined ? '' : funParam.resumeid
+    }
+    httppost(qscms.apiList.imStart, params)
+      .then((res) => {
+        if (res.data.next == "") {
+          let href = ""
+          if (type == 1 || funParam.type == 1) { 
+            href = qscms.locationList.companyIm + "?chat=" + res.data.chatid
+          } else {
+            href = qscms.locationList.personalIm + "?chat=" + res.data.chatid
+          }
+          location.href = href
+          return false
+        }
+        if (res.data.next == "disabled") {
+          let messageBox = {
+            content: res.message
+          }
+          QSmessageBox(messageBox)
+          return false
+        }
+        if (res.data.next == "bind_weixin") {
+          if(type == 1 || funParam.type == 1){
+             bindwx_im(false)
+          }else{
+            bindwx_im(true)
+          }
+          return false
+        }
+        if (res.data.next == "choose_job") {
+          chooseJob(funParam.resumeid)
+          return false
+        }
+        if (res.data.next == "pay") {
+          let messageBox = {
+            content: res.message,
+            confirmButtonText: "升级套餐",
+            callbackConfirm: "jumpUrl",
+            val1: qscms.locationList.companyService,
+            cancelButtonText: "购买增值包",
+            callbackCancel: "jumpUrl",
+            val2: qscms.locationList.companyServiceIm
+          }
+          QSmessageBox(messageBox)
+          return false
+        }
+        if (res.data.next == "complete_resume") {
+          let messageBox = {
+            content: res.message,
+            confirmButtonText: "去完善简历",
+            callbackConfirm: "jumpUrl",
+            val1: qscms.locationList.personalResume
+          }
+          QSmessageBox(messageBox)
+          return false
+        }
+      })
+      .catch((error) => {
+        let dialog_params = {
+          errorMsg: error.message,
+          code: error.code
+        }
+        errorMethods(dialog_params)
+      })
+  } catch (err) {
+    console.log(err, "startIm")
+  }
+}
+
+// 聊天绑定微信
+function bindwx_im(reload) {
+  try {
+    httpget(qscms.apiList.qrcode, { type: "bind_weixin" })
+      .then(function (res) {
+        let dialog_params = {
+          title: "系统提示",
+          content: `
+          <div class="im_wx">
+            <p>您当前未绑定微信，绑定后可发起聊天。</p>
+            <div><img src="${res.data}" width="175" height="175"><img></div>
+            <p class="p2">使用微信扫一扫，按提示快速绑定</p>
+          </div>
+        `
+        }
+        QSdialog(dialog_params)
+        if(!qscms.imToken){
+          initWebSocket()
+        }
+        bind_timer = setInterval(function(){
+          verifyWeChatBind(reload)
+        }, 3000)
+      })
+      .catch(function () {})
+  } catch (err) {
+    console.log(err, "bindwx_im")
+  }
+}
+
+// 面试邀请弹窗
+function interview_dialog(id) {
+  try {
+    httppost(qscms.sitedomain + qscms.apiList.dialog_interviewInvitation, {
+      id
+    }).then((res) => {
+      let params = {
+        title: "面试邀请",
+        content: res.data
+      }
+      QSdialog(params)
+    })
+  } catch (err) {
+    console.log(err, "interview_dialog")
+  }
+}
+
+function imWindowGlobal(params) {
+  try {
+    httpget(qscms.apiList.imGlobal)
+      .then((res) => {
+        if (res.code == 200) {
+          initWebSocket()
+        }
+      })
+      .catch((err) => {
+        if (err.code == 50009) {
+          let dialog_params = {
+            errorMsg: err.message
+          }
+          doLoginDialog(dialog_params, qscms.loginUtype)
+        }
+      })
+  } catch (err) {
+    console.log(err, "imWindowGlobal")
+  }
+}
+
+// 职位选择
+function chooseJob(resumeid) {
+  try {
+    httppost(qscms.sitedomain + qscms.apiList.dialog_chooseJob, {
+      resumeid
+    }).then((res) => {
+      let params = {
+        title: "选择职位",
+        content: res.data
+      }
+      QSdialog(params)
+    })
+  } catch (err) {
+    console.log(err, "chooseJob")
+  }
+}
+
+// 举报 type:1职位,2简历
+function tipoff(type) {
+  try {
+    httppost(qscms.sitedomain + qscms.apiList.dialog_tipoff, { type })
+      .then((res) => {
+        let params = {
+          title: "举报",
+          content: res.data
+        }
+        QSdialog(params)
+      })
+      .catch((err) => {
+        let dialog_err = {
+          funName: "tipoff",
+          funParam: type,
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_err)
+      })
+  } catch (err) {
+    console.log(err, "tipoff")
+  }
+}
+
+// 下载简历
+function downloadResume(params) {
+  try {
+    httppost(qscms.apiList.resumeDownload, { resume_id:params.resume_id })
+      .then((res) => {
+        if (res.data.done == 0) {
+          downloadResume_dialog(params.resume_id)
+        } else {
+          // 刷新简历弹窗
+          QSmessage(res.message)
+          resumeDetial_dialog(params.resume_id)
+          popupWechatQrcodeWindow(
+            "company_pc_download_resume",
+            "扫码绑定，随时随地接收简历信息",
+            false
+          )
+        }
+      })
+      .catch((err) => {
+        if(err.code == 500){
+          resumeDetial_dialog(params.resume_id)
+        }
+        let dialog_params = {
+          funName: "downloadResume",
+          funParam: {
+            resume_id:params.resume_id,
+            next_methods:params.next_methods
+          },
+          errorMsg: err.message,
+          code: err.code
+        }
+        errorMethods(dialog_params)
+      })
+  } catch (err) {
+    console.log(err, "downloadResume")
+  }
+}
+
+// 下载简历弹窗
+function downloadResume_dialog(resume_id) {
+  try {
+    httppost(qscms.sitedomain + qscms.apiList.dialog_resumeService, {
+      resume_id
+    }).then((res) => {
+      $("#showService").remove()
+      $("body").append('<div id="showService"></div>')
+      $("#showService").html(res.data)
+    })
+  } catch (err) {
+    console.log(err, "downloadResume_dialog")
+  }
+}
+
+// 打印,导出简历
+function handlerDownPdf(isExport, resume_id) {
+  if (isExport == 1) {
+    window.open(
+      qscms.sitedir + qscms.memberDirname + "/resume_save/" + resume_id
+    )
+  } else {
+    httppost(qscms.apiList.exportPdfByPhp, {
+      id: resume_id
+    })
+      .then(function (res) {
+        // 打开页面并自动调用打印功能
+        var newWindow = window.open(res.data.url)
+        newWindow.onload = function () {
+          newWindow.print()
+        }
+      })
+      .catch(function () {})
+  }
+}
+
+// 扫码绑定公众号
+let bind_timer
+function popupWechatQrcodeWindow(val, content, reload) {
+  if (true === whetherPopupWeChatQrcodeWindow(val)) {
+    var requestUrl = qscms.apiUrl + qscms.apiList.member_account
+    httppost(requestUrl).then((res) => {
+      if (parseInt(res.data.bind_weixin) === 0) {
+        httpget(qscms.apiList.qrcode, { type: "bind_weixin" })
+          .then(function (res) {
+            if (res.data) {
+              let html = `
+              <div class="wx_img global_wx" style="text-align: center;">
+                    <div>
+                        <img src="${res.data}" width="215" height="215"/>
+                    </div>
+                    <p class="wx_p1" style="font-size: 14px;color: #4CBF00;display: flex;align-items: center;justify-content: center;">
+                        <span class="wx_p1_span1" style="background: url('/assets/images/weixin_ico.png') center center no-repeat;display: inline-block;width: 16px;height: 16px;background-size: 100% 100%;margin-right: 8px;"></span>
+                        <span class="wx_p1_span2">微信扫一扫</span>
+                    </p>
+                    <p class="wx_p2" style="font-size: 16px;color: #000000;box-sizing: border-box;padding: 15px 0;">
+                        ${content}
+                    </p>
+              </div>
+              `
+              let dialog_params = {
+                title: "",
+                content: html,
+                className: "global_wx_wapper",
+                reload: reload
+              }
+              QSdialog(dialog_params)
+              whetherPopupWeChatQrcodeWindow(val, true)
+              bind_timer = setInterval(function(){
+                verifyWeChatBind(true)
+              }, 3000)
+            }
+          })
+          .catch(function () {})
+      } else {
+        if(!reload){
+          return
+        }
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      }
+    })
+  } else {
+    if(!reload){
+      return
+    }
+    setTimeout(() => {
+      window.location.reload()
+    }, 2000)
+  }
+}
+
+// 查看微信是否已绑定，绑定后自动关闭二维码
+function verifyWeChatBind(isReload) {
+  httpget(qscms.apiList.imCheckBind).then((res) => {
+    if (res.code == 200) {
+      if (res.data == 1) {
+        // 删除绑定微信弹窗
+        QSdialogClose()
+        // 清楚定时器
+        clearInterval(bind_timer)
+        QSmessage("绑定成功")
+        if(isReload){
+          setTimeout(() => {
+            window.location.reload()
+          }, 2000)
+        }
+      }
+    }
+  })
+}
+
+// 分享朋友圈海报弹窗
+function sharePosterDialog(funParam) {
+  httppost(qscms.sitedomain + qscms.apiList.dialog_sharePoster, funParam).then(
+    (res) => {
+      QSdialog({ title: "", content: res.data })
+    }
+  )
+}
+// 职位聊一聊
+function personalIm(funParam) {
+  if (qscms.loginUtype == 2) {
+    startIm(funParam, 2)
+  } else {
+    let dialog_params = {
+      errorMsg: "当前操作需要登录求职者账号"
+    }
+    doLoginDialog(dialog_params, 2, 1)
+  }
+}
+//简历详情聊一聊
+function companyIm(funParam) {
+  if (qscms.loginUtype == 1) {
+    startIm(funParam, 1)
+  } else {
+    let dialog_params = {
+      errorMsg: "当前操作需要登录企业账号"
+    }
+    doLoginDialog(dialog_params, 1)
+  }
+}
+
+// cookie存储
+function setCookie(key, value, days) {
+  var expires = new Date()
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000)
+  var cookieValue =
+    encodeURIComponent(key) +
+    "=" +
+    encodeURIComponent(value) +
+    "; expires=" +
+    expires.toUTCString() +
+    "; path=/"
+  document.cookie = cookieValue
+}
+
+
+// 加载骑士验证码所需依赖
+function qsCaptchaLoad(){
+      var script = document.createElement("script")
+      script.type = "text/javascript"
+      script.src = "https://cloud.zhitoo.cn/static/captcha/js/slidercaptcha.js"
+      document.body.appendChild(script)
+
+      var script2 = document.createElement("script");
+      script2.type = "text/javascript";
+      script2.src = "https://cloud.zhitoo.cn/static/captcha/js/crypto-js.min.js";
+      document.body.appendChild(script2);
+
+      const linkElement = document.createElement('link');
+      linkElement.rel = 'stylesheet';
+      linkElement.type = 'text/css';
+      linkElement.href = 'https://cloud.zhitoo.cn/static/captcha/css/slidercaptcha.css'; 
+      document.head.appendChild(linkElement);
+}
+// 使用骑士验证码
+function qsCaptchaShow(){
+  return new Promise((resolve, reject) => {
+      const divElement = document.createElement('div');
+      divElement.innerHTML = `
+          <div class="qscms_captcha_wrapper">
+              <div class="qscms_captcha_dialog">
+                  <div class="title">
+                      请完成下方验证
+                      <div class="close" id="qscms_captcha_close"></div>
+                  </div>
+                  <div id="qscms_captcha"></div>
+              </div>
+          </div>
+      `;
+      document.body.appendChild(divElement);
+      $('.qscms_captcha_wrapper').css('display', 'block');
+      $('#qscms_captcha_close').click(function() {
+          $('.qscms_captcha_wrapper').css('display', 'none');
+          $('.qscms_captcha_wrapper').remove();
+      });
+      $('#qscms_captcha').sliderCaptcha({
+          appkey:qscms.captcha_qscms_appkey, // appkey
+          onSuccess: function(ticket) {
+            $('.qscms_captcha_wrapper').css('display', 'none');
+            $('.qscms_captcha_wrapper').remove();
+            resolve(ticket)
+          },
+          onFail:(res)=>{
+            $('.qscms_captcha_wrapper').css('display', 'none');
+            window.ELEMENT.Message.error(res.message);
+          }
+      });
+  });
+}

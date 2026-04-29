@@ -1,0 +1,44 @@
+$(document).ready(function() {
+    var href = window.location.href
+    // if (href.includes("company.html")||href.includes("resume.html")||href.includes("job.html")) {
+    //     $('#new_search_box').show()
+    // } else {
+    //     $('#new_search_box').hide()
+    // }
+
+    $('.filter_box').hide()
+
+    // 头部吸顶
+    window.addEventListener('scroll', function() {
+        let t = $('body, html').scrollTop(); // 目前监听的是整个body的滚动条距离
+        if (t > 200) {
+            $('#header_box').addClass('nav_fixed')
+            $('.new_search_box').addClass('whiteBackground')
+            if (page_name == 'company' || page_name == 'job' || page_name == 'resume') {
+                $('.nav_fixed .top_header').hide()
+                $('.nav_fixed .new_nav_list').hide()
+                $('.filter_box').show()
+            }
+        } else {
+            $('#header_box').removeClass('nav_fixed')
+            $('.new_search_box').removeClass('whiteBackground')
+            $('.new_nav_list').show()
+            $('.top_header').show()
+            $('.filter_box').hide()
+        }
+        
+        if(t>35){
+            $('.rt_nav_box').addClass('scroll_rt_nav_box')
+        }else{
+            $('.rt_nav_box').removeClass('scroll_rt_nav_box')
+        }
+    })
+
+    // 点击回到顶部按钮时，使用动画效果滚动到页面顶部
+    $('#scroll-to-top').click(function() {
+        $('html, body').animate({
+            scrollTop: 0
+        }, 800);
+        return false;
+    });
+})

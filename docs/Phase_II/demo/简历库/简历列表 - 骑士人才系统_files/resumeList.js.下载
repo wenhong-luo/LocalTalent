@@ -1,0 +1,475 @@
+$(document).ready(function() {
+    $(function() {
+        // 所学专业分类样式
+        $('.dropdowbox_major .level_first_item').hover(function(){
+            let code = $(this).data('code')
+            $(this).addClass('level_first_item_hover').siblings().removeClass('level_first_item_hover')
+            $('.dropdowbox_major .level_second').each(function() {
+                if ($(this).data('code') == code) {
+                    console.log($(this))
+                    $(this).css({
+                        'display':'block'
+                    });
+                }else{
+                    $(this).css({
+                        'display':'none'
+                    });
+                }
+            });
+        })
+        
+        // 简历点击标题变色 start
+        var isLoginLocal = localStorage.getItem('isLogin');
+        var isLogin = window.qscms.isLogin;
+        if (!isLogin == isLoginLocal) { //登录状态改变时清空缓存数据
+            localStorage.setItem('selectArr', []); //职位
+            setCookie("selectArr", JSON.stringify([]))//用来查询看过的职位
+            localStorage.setItem('selectResumeArr', []); //简历
+            localStorage.setItem('selectComArr', []); //企业
+        }
+        var selectArrResumeOnload = localStorage.getItem('selectResumeArr') == null ||
+            localStorage.getItem('selectResumeArr') == 'null' ||
+            localStorage.getItem('selectResumeArr') == '' ||
+            localStorage.getItem('selectResumeArr') == undefined || localStorage.getItem('selectResumeArr').data == null ? [] : JSON.parse(
+                localStorage.getItem('selectResumeArr'))
+        preResumelist()
+
+        function preResumelist() {
+            for (let j of selectArrResumeOnload) {
+                $(".list_name_box").each(function() {
+                    if ($(this).data('id') == j) {
+                        $(this).addClass('list_name_box_active')
+                    }
+                });
+            }
+        }
+        var selectResumeArr = selectArrResumeOnload
+        $('.list_name_box').click(function(e) {
+            if (!$(this).hasClass('list_name_box_active')) {
+                var select_id = e.currentTarget.dataset.id
+                selectResumeArr.push(select_id)
+                var selectResumeArrStr = JSON.stringify(selectResumeArr)
+                localStorage.setItem('selectResumeArr', selectResumeArrStr)
+                if (!$(this).hasClass('list_name_box_active')) {
+                    $(this).addClass('list_name_box_active')
+                }
+            }
+        });
+        // 简历点击标题变色 end
+
+        // 专业类别 start
+        if (major) {
+            if (!major.length) {
+                $('.tab_list_all .tab_list').eq(0).addClass('select');
+                $('.tab_list_all .tab_content').eq(0).addClass('select');
+
+                $('.tab_list_head .tab_list').eq(0).addClass('select');
+                $('.tab_list_head .tab_content').eq(0).addClass('select');
+            } else {
+                var recoverIndex = $('.tab_list_all .tab_list').index($('.select'));
+                $('.tab_list_all .tab_content').eq(recoverIndex).addClass('select');
+
+                var recoverIndexHead = $('.tab_list_head .tab_list').index($(
+                    '.tab_list_head .tab_list.select'));
+                $('.tab_list_head .tab_content').eq(recoverIndexHead).addClass('select');
+            }
+        } else {
+            $('.tab_list_all .tab_list').eq(0).addClass('select');
+            $('.tab_list_all .tab_content').eq(0).addClass('select');
+
+            $('.tab_list_head .tab_list').eq(0).addClass('select');
+            $('.tab_list_head .tab_content').eq(0).addClass('select');
+        }
+        $('.tab_list_all .tab_list').click(function() {
+            $(this).addClass('select').siblings().removeClass('select');
+            var thisIndex = $('.tab_list_all .tab_list').index(this);
+            $('.tab_list_all .tab_content').eq(thisIndex).addClass('select').siblings(
+                    '.tab_list_all .tab_content')
+                .removeClass('select');
+        });
+        $('.tab_list_head .tab_list').click(function() {
+            $(this).addClass('select').siblings().removeClass('select');
+            var thisIndex = $('.tab_list_head .tab_list').index(this);
+            $('.tab_list_head .tab_content').eq(thisIndex).addClass('select').siblings(
+                    '.tab_list_head .tab_content')
+                .removeClass('select');
+        });
+        // 专业类别 end
+    })
+})
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        resumeId: 0, //简历id
+        resumeDetail: {}, //简历详情
+        isShowResume: false,
+        keyword: keyword,
+        d1: d1,
+        d2: d2,
+        d3: d3,
+        cityLevel: cityLevel,
+        citySelectedText: '',
+        c1: c1,
+        c2: c2,
+        c3: c3,
+        categoryLevel: categoryLevel,
+        categorySelectedText: '',
+        exp: exp,
+        expSelectedText: '',
+        tag: tag,
+        tagSelectedText: '',
+        sex: sex,
+        sexSelectedText: '',
+        a1: a1,
+        a2: a2,
+        ageSelectedText: '',
+        trade: trade,
+        tradeSelectedText: '',
+        major: major,
+        majorSelectedText: '',
+        edu: edu,
+        eduSelectedText: '',
+        nat: nat,
+        natSelectedText: '',
+        w1: w1,
+        w2: w2,
+        wageSelectedText: '',
+        settr: settr,
+        settrSelectedText: '',
+        showSelected: false,
+        scanQrcodeImg: '',
+        preview_id: 0,
+        jobid: 0,
+        utype: '',
+        ContrastUrl: ContrastUrl
+    },
+    created() {
+        this.getUserInfo()
+        if(resume_id > 0){
+            this.resumeId = resume_id
+            this.getResumeDetail()
+            let currentUrl = window.location.href;
+            // 使用正则表达式去掉 "/id/3070" 部分
+            let updatedUrl = currentUrl.replace(/\/id\/\d+/, '');
+            // 使用 history.replaceState() 更新 URL
+            window.history.replaceState(null, '', updatedUrl);
+        }
+    },
+    mounted: function() {
+        // 已选条件展示
+        if (this.d1) {
+            this.getClassify('citycategory'); // 地区
+        }
+        if (this.c1) {
+            this.getClassify('jobcategory'); // 职位分类
+        }
+        // 工作经验
+        if (this.exp) {
+            this.getClassify('experience');
+        }
+        // 简历标签
+        if (this.tag) {
+            this.getClassify('resumeTag');
+            $('.so_condition .J_dropdown').eq(2).addClass('active');
+        }
+        // 性别
+        if (this.sex) {
+            this.sexSelectedText = parseInt(this.sex) === 1 ? '男' : '女';
+            $('.so_condition .J_dropdown').eq(0).addClass('active');
+        }
+        // 年龄
+        if (this.a1 && !this.a2) {
+            // 最大年龄以上
+            this.ageSelectedText = this.a1 + '岁以上';
+        } else if (this.a1 && this.a2) {
+            // 年龄区间
+            this.ageSelectedText = this.a1 + '-' + this.a2 + '岁';
+        } else if (!this.a1 && this.a2) {
+            // 最小年龄以下
+            this.ageSelectedText = this.a2 + '岁以下';
+        }
+        if (this.a1 || this.a2) {
+            $('.so_condition .J_dropdown').eq(1).addClass('active');
+        }
+        // 行业类别
+        if (this.trade) {
+            this.getClassify('trade');
+            $('.so_condition .J_dropdown').eq(3).addClass('active');
+        }
+        // 专业
+        if (this.major) {
+            this.getClassify('major');
+            $('.so_condition .J_dropdown').eq(4).addClass('active');
+        }
+        // 学历要求
+        if (this.edu) {
+            this.getClassify('education');
+            // $('.so_condition .J_dropdown').eq(4).addClass('active');
+        }
+        // zdq 找人才列表，筛选项选择兼职的为实习，选择实习的为空
+        // 工作性质
+        if (this.nat) {
+            this.getClassify('resumeNature');
+            $('.so_condition .J_dropdown').eq(5).addClass('active');
+        }
+        // 薪资
+        if (this.w1 && !this.w2) {
+            // 最高薪资以上
+            this.wageSelectedText = this.w1 + '元以上';
+        } else if (this.w1 && this.w2) {
+            // 薪资区间
+            this.wageSelectedText = this.w1 + '-' + this.w2 + '元';
+        } else if (!this.w1 && this.w2) {
+            // 最低薪资以下
+            this.wageSelectedText = this.w2 + '元以下';
+        }
+        if (this.w1 || this.w2) {
+            $('.so_condition .J_dropdown').eq(6).addClass('active');
+        }
+        // 更新时间
+        if (this.settr) {
+            this.settrSelectedText = this.settr + '天内';
+            $('.so_condition .J_dropdown').eq(7).addClass('active');
+        }
+        // 是否显示已选条件
+        if (this.keyword || this.d1 || this.c1 || this.exp || this.tag || this.sex || this.a1 || this
+            .a2 ||
+            this.trade || this.major || this.edu || this.nat || this.w1 || this.w2 || this.settr) {
+            this.showSelected = true;
+        }
+
+        let _self = this
+        // 查看简历按钮点击
+        $('.showResumeDetail,.box2_list').click(function(e) {
+            event.stopPropagation();
+            var select_id = e.currentTarget.dataset.id
+            _self.resumeId = select_id
+            var url = e.currentTarget.dataset.url
+            var selectArrResumeOnload = localStorage.getItem('selectResumeArr') == null ||
+                localStorage.getItem('selectResumeArr') == 'null' ||
+                localStorage.getItem('selectResumeArr') == '' ||
+                localStorage.getItem('selectResumeArr') == undefined || localStorage.getItem('selectResumeArr').data == null ? [] : JSON.parse(
+                    localStorage.getItem('selectResumeArr'))
+            var selectResumeArr = selectArrResumeOnload
+            var parents = $('#resume_box_' + select_id)
+            if (!parents.hasClass('list_name_box_active')) {
+                if (selectResumeArr == null) {
+                    selectResumeArr = []
+                }
+                selectResumeArr.push(select_id)
+                var selectResumeArrStr = JSON.stringify(selectResumeArr)
+                localStorage.setItem('selectResumeArr', selectResumeArrStr)
+                var a = $(this)
+                $(parents).addClass('list_name_box_active')
+            }
+            _self.getResumeDetail()
+        });
+    },
+    methods: {
+        getResumeDetail: function() {
+            var that = this
+            that.$loading({
+                lock: true,
+                text: 'Loading',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.5)'
+            });
+            httpget(qscms.sitedomain + '/index/resume_show/index/id/' + that.resumeId).then(function(
+                res) {
+                $('#showResume').html(res.data)
+                that.$loading().close()
+            }).catch(function() {})
+            document.body.style.overflow = "hidden"
+        },
+
+        getUserInfo: function() {
+            var that = this
+            httpget(qscms.apiList.userinfo).then(function(res) {
+                if (res.data.login === true) {
+                    that.isLogin = true
+                    that.utype = res.data.userinfo.utype
+                    that.preview_id = res.data.preview_id
+                }
+            }).catch(function() {})
+        },
+        getClassify: function(type) {
+            var _this = this;
+            httpget(qscms.apiList.classify + '?type=' + type, {}).then(function(res) {
+                if (res.code === 200) {
+                    if (type === 'citycategory') {
+                        var cityList = res.data;
+                        if (_this.d1) {
+                            if (_this.cityLevel === 2) {
+                                // 地区为二级
+                                _this.citySelectedText = cityList.filter(function(item) {
+                                    if (parseInt(item.value) === _this.d1) {
+                                        return item
+                                    }
+                                })[0].label;
+                            }
+                            if (_this.cityLevel === 3) {
+                                // 地区为三级
+                                var levelTwoList = cityList.filter(function(item) {
+                                    if (parseInt(item.value) === _this.d1) {
+                                        return item
+                                    }
+                                })[0].children;
+                                if (_this.d3) {
+                                    var levelThreeList = levelTwoList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.d2) {
+                                            return item
+                                        }
+                                    })[0].children;
+                                    _this.citySelectedText = levelThreeList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.d3) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                } else {
+                                    _this.citySelectedText = levelTwoList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.d2) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                }
+                            }
+                        }
+                    } else if (type === 'jobcategory') {
+                        var categoryList = res.data;
+                        if (_this.c1) {
+                            if (_this.categoryLevel === 2) {
+                                // 地区为二级
+                                _this.categorySelectedText = categoryList.filter(function(
+                                    item) {
+                                    if (parseInt(item.value) === _this.c1) {
+                                        return item
+                                    }
+                                })[0].label;
+                            }
+                            if (_this.categoryLevel === 3) {
+                                // 地区为三级
+                                var levelTwoList = categoryList.filter(function(item) {
+                                    if (parseInt(item.value) === _this.c1) {
+                                        return item
+                                    }
+                                })[0].children;
+                                if (_this.c3) {
+                                    var levelThreeList = levelTwoList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.c2) {
+                                            return item
+                                        }
+                                    })[0].children;
+                                    _this.categorySelectedText = levelThreeList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.c3) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                } else {
+                                    _this.categorySelectedText = levelTwoList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.c2) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                }
+                            }
+                        }
+                    } else if (type === 'resumeTag') {
+                        var tagList = res.data;
+                        var selectedTagList = _this.tag.split('_');
+                        var tagTextArr = [];
+                        selectedTagList.forEach(function(value) {
+                            var cuText = tagList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(value)) {
+                                    return item
+                                }
+                            })[0].name;
+                            tagTextArr.push(cuText);
+                        })
+                        _this.tagSelectedText = tagTextArr.join('+');
+                    } else if (type === 'trade') {
+                        var tradeList = res.data;
+                        _this.tradeSelectedText = tradeList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.trade)) {
+                                return item
+                            }
+                        })[0].name;
+                    } else if (type === 'major') {
+                        var majorList = res.data;
+                        majorList.forEach(function(value) {
+                            value.children.filter(function(item) {
+                                if (parseInt(item.value) === parseInt(_this
+                                        .major)) {
+                                    _this.majorSelectedText = item.label
+                                }
+                            });
+                        })
+                        // zdq 找人才列表，筛选项选择兼职的为实习，选择实习的为空
+                    } else if (type === 'resumeNature') {
+                        var natureList = res.data;
+                        _this.natSelectedText = natureList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.nat)) {
+                                return item
+                            }
+                        })[0].name;
+                    } else if (type === 'education') {
+                        var eduList = res.data;
+                        _this.eduSelectedText = eduList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.edu)) {
+                                return item
+                            }
+                        })[0].name;
+                    } else if (type === 'experience') {
+                        var expList = res.data;
+                        _this.expSelectedText = expList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.exp)) {
+                                return item
+                            }
+                        })[0].name;
+                    }
+                } else {
+                    console.log(res.message);
+                }
+            }).catch(function(err) {
+                console.log(err);
+            });
+        },
+        handlerRecommend: function(jobid) {
+            if (qscms.loginUtype != 1) {
+                this.$confirm('当前操作需要登录企业账号', '提示', {
+                    type: 'warning',
+                    confirmButtonText: '去登录',
+                }).then(function() {
+                    location.href = qscms.locationList.loginCompany + '?redirect=' + qscms
+                        .sitedomain + qscms.locationList.recommendResume;
+                }).catch(function() {});
+            } else {
+                location.href = qscms.locationList.recommendResume;
+            }
+        },
+        doContrast: function() {
+            var idArr = qscms.getSelItemArr()
+            if (idArr.length == 0) {
+                this.$message.error('请选择简历');
+                return
+            }
+            idArr = arrayUnique(idArr)
+            var idStr = idArr.join(",")
+            window.open(this.ContrastUrl + '?id=' + idStr)
+        },
+        handlerLogin: function() {
+            location.href = qscms.locationList.loginCompany
+        },
+        handlerReg: function() {
+            if (closereg === 1) {
+                this.$message.error('网站已关闭会员注册')
+                return false
+            }
+            location.href = qscms.locationList.regCompany
+        }
+    },
+});

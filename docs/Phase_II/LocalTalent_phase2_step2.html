@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalTalent Phase-2 Step 2：门户公开页面与搜索体系</title>
+  <style>
+    :root{--ink:#142033;--muted:#5d6b7a;--line:#dfe6ee;--brand:#166a5b;--soft:#e8f5f1;--paper:#fff;--bg:#f5f7f8;--danger:#9f1f2f;--danger-soft:#fff0f2;--blue:#eef5ff}
+    *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg);line-height:1.72}
+    main{max-width:1180px;margin:0 auto;padding:44px 24px 88px}h1{margin:0 0 12px;font-size:34px;line-height:1.25}h2{margin:34px 0 16px;padding-left:12px;border-left:5px solid var(--brand);font-size:24px}h3{margin:24px 0 10px;color:#29445f}
+    .card{margin:18px 0;padding:22px 26px;border:1px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:0 12px 36px rgba(20,32,51,.06)}.note{padding:14px 16px;border-radius:14px;background:var(--soft);color:var(--brand)}.danger{padding:14px 16px;border-radius:14px;background:var(--danger-soft);color:var(--danger)}
+    table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--soft)}code{padding:2px 6px;border-radius:6px;background:#edf1f5}.pill{display:inline-block;margin:3px 4px 3px 0;padding:3px 10px;border-radius:999px;background:var(--blue);color:#214d7a}
+    @media(max-width:760px){main{padding:28px 14px 60px}h1{font-size:28px}table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>LocalTalent Phase-2 Step 2：门户公开页面与搜索体系</h1>
+  <p class="note">统一硬边界提醒：人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</p>
+
+  <section class="card">
+    <h2>开发前必读卡</h2>
+    <ul>
+      <li><strong>文件定位</strong>：冻结公开门户页面、搜索体系、SEO/Next SSR 策略与公开字段白名单。</li>
+      <li><strong>资料来源</strong>：边界文件、两份新 MD、Step1、本地 demo、一期文档；不再引用旧版资料文件。</li>
+      <li><strong>禁止越界点</strong>：禁止公共简历库、公开联系方式、真实 ATS/RPA 同步、真实受控候选池同步。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>1. 一期现有门户能力与二期增量</h2>
+    <table>
+      <tr><th>能力</th><th>一期现状</th><th>二期增量</th></tr>
+      <tr><td>Next/SSR 前端</td><td>已有首页、人才服务区、求职者中心、企业后台、运营后台基础路由。</td><td>扩展真正的人才网公开首页、找工作、找企业、招聘会、资讯/HR 工具箱。</td></tr>
+      <tr><td>人才服务区</td><td>只渲染发布快照字段白名单。</td><td>增强筛选和 SEO，但仍只查发布快照。</td></tr>
+      <tr><td>门户职位</td><td>只展示在线且企业认证通过的职位。</td><td>扩展找工作列表/详情、标签、稳定 query 和 SEO。</td></tr>
+      <tr><td>对接接口 stub</td><td>签名、幂等、trace、防重放、重试和日志。</td><td>公开搜索不得引入真实 ATS/RPA 或受控候选池同步。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>2. 高保真门户优先补充</h2>
+    <p>完整 demo 已同步到 <code>docs/Phase_II/demo</code>，并由 <code>LocalTalent_phase2_demo_inventory.md/html</code> 逐页盘点。Step2 的公开门户规划必须从“频道完整”升级为“页面结构高保真”。</p>
+    <ul>
+      <li>首页必须覆盖顶部工具条、Logo 搜索区、主导航、职位分类墙、快捷入口、登录卡片、公告/招聘会 tab、广告位、明星企业/推荐职位和浮动二维码占位。</li>
+      <li>找工作与名企直聘必须覆盖职位卡片、分类墙、投简历/收藏入口、认证/名企标签和扫码求职 CTA。</li>
+      <li>找企业必须覆盖企业卡片、行业/性质筛选、在招职位数、企业热度等公开展示结构。</li>
+      <li>人才服务区参考 demo 简历库布局，但必须只展示发布快照白名单字段。</li>
+      <li>招聘会、就业政策、HR 工具箱和更多服务按 demo 页面形成频道完整感；地图、视频、直播、自由职业、求职登记等高风险能力只做占位或进入风险池。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>3. 公开门户总原则</h2>
+    <p>公开门户面向游客、搜索引擎、未登录用户和公开浏览场景。它要承接 74cms demo 的地方人才网体验，但必须使用 LocalTalent 的合规边界重写高风险能力。</p>
+    <p><span class="pill">首屏清晰</span><span class="pill">搜索稳定</span><span class="pill">数据克制</span><span class="pill">状态明确</span><span class="pill">服务端兜底</span></p>
+    <p class="danger">不得把人才服务区做成公共简历库；不得公开手机号、邮箱、简历正文、附件对象 key、证据、聊天记录、审核材料、营业执照附件。</p>
+  </section>
+
+  <section class="card">
+    <h2>3. 页面规划</h2>
+    <table>
+      <tr><th>页面</th><th>规划口径</th></tr>
+      <tr><td>首页</td><td>SSR 首屏渲染，输出城市、主搜索、导航、职类、推荐职位、推荐企业、招聘会和资讯入口。</td></tr>
+      <tr><td>找工作</td><td>只展示在线职位和认证企业，支持关键词、城市、职类、薪资、经验、学历、更新时间、排序、分页。</td></tr>
+      <tr><td>找企业</td><td>展示已认证企业公开信息和在招职位聚合，不展示联系人与审核材料。</td></tr>
+      <tr><td>人才服务区</td><td>只展示已同意、可发布、未撤回的发布快照；唯一数据源是 <code>candidate_publish_snapshot</code>。</td></tr>
+      <tr><td>招聘会</td><td>首批只做公开列表与详情；报名、展位、参会名单后置。</td></tr>
+      <tr><td>就业政策/资讯/HR 工具箱</td><td>统一纳入公开内容中心，只展示 CMS 公开字段。</td></tr>
+      <tr><td>更多服务</td><td>今日招聘可做轻量入口；地图、视频、直播、自由职业、求职登记先占位。</td></tr>
+      <tr><td>管理中心</td><td>只做身份分流入口；真正访问由 JWT、RBAC、数据域和字段级权限服务端校验。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>4. 搜索体系</h2>
+    <table>
+      <tr><th>频道</th><th>公开查询维度</th><th>边界</th></tr>
+      <tr><td>全站搜索</td><td>职位、企业、人才服务区、资讯</td><td>不提供游客公开“搜索简历”。</td></tr>
+      <tr><td>找工作</td><td>keyword、city_code、category_code、salary_range、experience_code、education_code、updated_within_days、sort、page/size</td><td>只返回在线职位和认证企业。</td></tr>
+      <tr><td>找企业</td><td>keyword、city_code、industry_code、company_nature、company_scale、verified、has_online_jobs</td><td>不返回联系人、营业执照附件、审核材料。</td></tr>
+      <tr><td>人才服务区</td><td>keyword、city_code、category_code、experience_years、updated_within_days、sort、page/size</td><td>只查发布快照，不联表原始候选人表。</td></tr>
+      <tr><td>招聘会/内容</td><td>keyword、city_code、event_type、status、date、content_type、category_code</td><td>不返回候选人报名和签到证据。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>5. SEO 与 Next/SSR 策略</h2>
+    <ul>
+      <li>首页、找工作、职位详情、找企业、企业主页、人才服务区、招聘会、资讯、HR 工具箱优先 SSR 或 ISR 友好。</li>
+      <li>登录页、管理中心、后台页面、占位页、写操作结果页默认 <code>noindex</code>。</li>
+      <li>列表页首屏由服务端渲染，筛选变更可由 CSR 增强，但 URL query 必须同步。</li>
+      <li>sitemap 首批覆盖 <code>/</code>、<code>/jobs</code>、<code>/companies</code>、<code>/portal/talent-service-area</code>、<code>/job-fairs</code>、<code>/articles</code>、<code>/hr-tools</code>。</li>
+      <li>人才服务区 metadata 不写“简历库”，应写“人才服务区”“发布快照”“本地人才摘要”。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>6. 公开接口字段白名单</h2>
+    <table>
+      <tr><th>领域</th><th>允许</th><th>禁止</th></tr>
+      <tr><td>职位</td><td>职位标题、城市、职类、薪资展示、经验、学历、福利、企业公开摘要、状态、更新时间。</td><td>联系人手机号/邮箱、审核材料、营业执照附件、内部备注。</td></tr>
+      <tr><td>企业</td><td>企业名、Logo、城市、行业、性质、规模、认证标签、公开简介、在招职位数。</td><td>联系人手机号/邮箱、营业执照号全文、营业执照附件、审核材料。</td></tr>
+      <tr><td>人才服务区</td><td><code>snapshot_id/display_name_masked/city_code/category_code/skills_summary/experience_years/updated_at</code></td><td>mobile、email、resume_body、attachment_object_key、evidence、password_hash、原始 JSON。</td></tr>
+      <tr><td>招聘会/资讯/HR 工具箱</td><td>公开标题、摘要、时间、地点、主办方、公开正文。</td><td>参会个人名单、候选人联系方式、报名证据、签到证据。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>7. Step2 结论</h2>
+    <p>Step2 冻结了二期公开门户的首批页面、搜索维度、SEO/Next SSR 策略和字段白名单。</p>
+    <p>当前补充结论：Step2 已被 <code>LocalTalent_phase2_demo_inventory.md</code> 扩展为高保真公开门户页面策略；二期第一开发阶段应优先完成公共门户 Shell、首页高保真首屏、找工作/名企直聘、找企业、人才服务区改写和公开内容频道。</p>
+    <p class="danger">公开门户验收必须加入 DOM/视觉结构断言，避免“功能存在但不像人才网”的偏差。公共简历库、受控找人才、联系解锁、会员商业化和真实外部能力仍不进入当前主线。</p>
+  </section>
+</main>
+</body>
+</html>

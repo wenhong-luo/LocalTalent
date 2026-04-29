@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<!-- saved from url=(0034)https://demo.74cms.com/campus.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<title>校园招聘 - 骑士人才系统</title>
+<meta name="keywords" content="校园招聘,骑士人才系统">
+<meta name="description" content="校园招聘, 骑士人才系统">
+<meta property="og:type" content="招聘求职网">
+<meta property="og:title" content="骑士人才系统">
+<meta property="og:url" content="https://demo.74cms.com/campus.html">
+<meta property="og:site_name" content="骑士人才系统">
+<meta property="og:description" content="为求职者提供免费注册、求职指导、简历管理等服务，职位真实可靠，上骑士人才系统，找到满意工作">
+<meta name="author" content="骑士CMS">
+<meta name="copyright" content="74cms.com">
+<link rel="shortcut icon" href="https://demo.74cms.com/favicon.ico">
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/polyfill.7.11.5.min.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/vue.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/axios.min.js.下载"></script>
+<link rel="stylesheet" type="text/css" href="./校园招聘 - 骑士人才系统_files/element-ui.css">
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/element-ui.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/jquery.min.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/jquery.dropdown.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/jquery.listitem.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/utils.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/js.cookie.min.js.下载"></script>
+<script>
+
+    var qscms = {
+        subsiteid: "",
+        sitedomain: "https://demo.74cms.com",
+        subsite_open: "1",
+        subsite_domain: "74cms.com",
+        sitedir: "/",
+        mobiledomain: "https://demo.74cms.com/m/",
+        memberDirname: "member",
+        apiUrl: "https://demo.74cms.com/v1_0",
+        captcha_open: "1",
+        captcha_type: "qscms",
+        captcha_tencent_appid: "",
+        captcha_vaptcha_vid: "",
+        captcha_qscms_appkey:"bcenpbhb",
+        wechat_login_open: "1",
+        wechat_open_appid: "wx124300d944a40487",
+        wechat_open: "1",
+        account_qqlogin_open: "1",
+        guide_open: "1",
+        guide_qrcode: "",
+        closereg: "0",
+        wechat_qrcode: "https://demo.74cms.com/upload/resource/weixin_img.jpg",
+        wechat_miniprogram_qrcode: "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg",
+        douyin_miniprogram_qrcode: "",
+        app_android_download_url: "https://demo.74cms.com/74cms_android.apk",
+        app_ios_download_url: "https://demo.74cms.com/74cms_android.apk",
+        map_type: "2",
+        is_open_map: "1",
+        im_open: "1",
+        im_key: "7jKedNayxc6E7SGw",
+        isLogin: false,
+        loginUtype: 0,
+        userToken: '',
+        platform: "web",
+        imToken:'',
+        reConnectTime:0,
+        websocketOk:false,
+    }
+</script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/global.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/error.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/http.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/globalMethods.js.下载"></script>
+
+	<link rel="stylesheet" type="text/css" href="./校园招聘 - 骑士人才系统_files/base.css">
+	<link rel="stylesheet" type="text/css" href="./校园招聘 - 骑士人才系统_files/layout.css">
+	<link rel="stylesheet" type="text/css" href="./校园招聘 - 骑士人才系统_files/public.css">
+	<link rel="stylesheet" type="text/css" href="./校园招聘 - 骑士人才系统_files/campus_layout.css">
+	<link rel="stylesheet" type="text/css" href="./校园招聘 - 骑士人才系统_files/campus_public.css">
+</head>
+
+<body>
+	<div>
+		<!-- header -->
+		<div class="brw_tip">
+    <div class="t_con">
+        系统检测到您的浏览器版本过低，无法获得最佳的使用体验，建议您更换其他浏览器或 <a href="https://www.google.cn/intl/zh-CN/chrome/" target="_blank">升级您的浏览器</a>。(使用360浏览器访问请选择极速模式)
+        <div class="b_close J_bw_close">关闭</div>
+    </div>
+</div>
+<div id="headerContent"><div class="header_wrapper"><div class="header clearfix"><div class="header_left clearfix"><a href="https://demo.74cms.com/" class="left_item homeImg">网站首页</a> <a href="javascript:;" class="left_item">设为收藏</a> <a href="https://demo.74cms.com/index/shortcut/index.html" class="left_item">保存桌面</a> <a href="https://demo.74cms.com/job.html">搜职位</a></div> <div class="header_right clearfix"><!----> <!----> <div class="el-dropdown"><a href="javascript:;" class="header_login right_item el-dropdown-selfdefine" aria-haspopup="list" aria-controls="dropdown-menu-6699" role="button" tabindex="0">会员登录<i class="el-icon-arrow-down el-icon--right"></i></a> <ul class="el-dropdown-menu el-popper" id="dropdown-menu-6699" style="display: none;"><li tabindex="-1" class="el-dropdown-menu__item"><!---->求职者登录</li> <li tabindex="-1" class="el-dropdown-menu__item"><!---->招聘者登录</li></ul></div> <div class="el-dropdown"><a href="javascript:;" class="right_item el-dropdown-selfdefine" aria-haspopup="list" aria-controls="dropdown-menu-119" role="button" tabindex="0">会员注册<i class="el-icon-arrow-down el-icon--right"></i></a> <ul class="el-dropdown-menu el-popper" id="dropdown-menu-119" style="display: none;"><li tabindex="-1" class="el-dropdown-menu__item"><!---->求职者注册</li> <li tabindex="-1" class="el-dropdown-menu__item"><!---->招聘者注册</li></ul></div> <span><div role="tooltip" id="el-popover-7285" aria-hidden="true" class="el-popover el-popper" tabindex="0" style="display: none;"><!----><span class="top-qrcode-item"><span class="img"><img src="./校园招聘 - 骑士人才系统_files/index"></span> <span class="txt">触屏版</span></span> <span class="top-qrcode-item"><span class="img"><img src="./校园招聘 - 骑士人才系统_files/weixin_img.jpg"></span> <span class="txt">微信公众号</span></span> <span class="top-qrcode-item"><span class="img"><img src="./校园招聘 - 骑士人才系统_files/aead8d41e5d76bd6a201d41abb1b41d2.jpg"></span> <span class="txt">微信小程序</span></span> <span class="top-qrcode-item"><span class="img"><img src="./校园招聘 - 骑士人才系统_files/index(1)"></span> <span class="txt">App(安卓)</span></span> <span class="top-qrcode-item"><span class="img"><img src="./校园招聘 - 骑士人才系统_files/index(1)"></span> <span class="txt">App(苹果)</span></span> </div><a href="javascript:;" class="item_phone right_item phon el-popover__reference" aria-describedby="el-popover-7285" tabindex="0">手机端<i class="el-icon-arrow-down el-icon--right"></i></a></span> <a href="https://demo.74cms.com/help.html" class="right_item ">
+                    使用帮助
+                </a> <span><div role="tooltip" id="el-popover-3266" aria-hidden="true" class="el-popover el-popper" tabindex="0" style="width: 1200px; display: none;"><!----> <div class="nav_drop"><div class="dr_g"><div class="g_t">求职找工作</div> <div class="g_teg"><a href="javascript:;" class="g_it">登记简历</a> <a href="https://demo.74cms.com/job.html" class="g_it">找工作</a> <a href="https://demo.74cms.com/company.html" class="g_it">搜企业</a> <a href="https://demo.74cms.com/map.html" class="g_it">地图找工作</a> <a href="https://demo.74cms.com/job/famous/1.html" class="g_it">名企直聘</a> <a href="https://demo.74cms.com/job.html" class="g_it">最新职位</a> <a href="https://demo.74cms.com/job/listtype/emergency.html" class="g_it">紧急招聘</a> <a href="javascript:;" class="g_it">智能匹配</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">企业招人才</div> <div class="g_teg"><a href="javascript:;" class="g_it">企业入驻</a> <a href="javascript:;" class="g_it">发布职位</a> <a href="https://demo.74cms.com/resume.html" class="g_it">搜索简历</a> <a href="javascript:;" class="g_it">职位管理</a> <a href="javascript:;" class="g_it">人才推荐</a> <a href="javascript:;" class="g_it">会员服务</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">信息专栏</div> <div class="g_teg"><a href="https://demo.74cms.com/jobfair.html" class="g_it">现场招聘会</a> <a href="https://demo.74cms.com/jobfairol.html" class="g_it">网络招聘会</a> <a href="https://demo.74cms.com/campus.html" class="g_it">校园招聘</a> <a href="https://demo.74cms.com/freelance.html" class="g_it">灵活用工</a> <a href="https://demo.74cms.com/notice.html" class="g_it">网站公告</a> <a href="https://demo.74cms.com/hrtool.html" class="g_it">HR工具箱</a> <a href="https://demo.74cms.com/article.html" class="g_it">职场资讯</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">自助工具</div> <div class="g_teg"><a href="javascript:;" class="g_it">求职会员登录</a> <a href="javascript:;" class="g_it">招聘会员登录</a> <a href="javascript:;" class="g_it">忘记密码</a> <a href="javascript:;" class="g_it">账号申诉</a> <a href="https://demo.74cms.com/help.html" class="g_it">帮助中心</a> <div class="clear"></div></div></div></div></div><a href="javascript:;" class="right_item el-popover__reference" aria-describedby="el-popover-3266" tabindex="0">网站导航<i class="el-icon-arrow-down el-icon--right"></i></a></span></div></div></div> <div class="campus_nav_wrapper"><div class="nav_min w1200 clearfix"><div class="left logo"><a href="https://demo.74cms.com/campus.html" class="logo_link left"><img src="./校园招聘 - 骑士人才系统_files/logo.png" alt="" style="max-width: 170px; max-height: 70px;"></a> <span class="left logo_text" style="margin-left: 30px;">校园招聘</span></div> <ul class="right campus_nav clearfix"><li class="left campus_nav_item"><a href="https://demo.74cms.com/campus.html" class="nav_item_link item_link_active">首页</a></li> <li class="left campus_nav_item"><a href="https://demo.74cms.com/campus/job.html" class="nav_item_link ">校招职位</a></li> <li class="left campus_nav_item"><a href="https://demo.74cms.com/campus/school.html" class="nav_item_link ">院校</a></li> <li class="left campus_nav_item"><a href="https://demo.74cms.com/campus/election.html" class="nav_item_link ">双选会</a></li> <li class="left campus_nav_item"><a href="https://demo.74cms.com/campus/preach.html" class="nav_item_link ">宣讲会</a></li></ul></div></div></div>
+<script>
+    $(document).ready(function () {
+        // 判断浏览器是否支持placeholder属性
+        function isSupportPlaceholder() {
+            var input = document.createElement('input');
+            return 'placeholder' in input;
+        }
+        (function () {
+            //判断是否是IE浏览器，包括Edge浏览器
+            function IEVersion() {
+                //取得浏览器的userAgent字符串
+                var userAgent = navigator.userAgent;
+                //判断是否IE浏览器
+                var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1;
+                if (isIE) {
+                    var reIE = new RegExp("MSIE (\\d+\\.\\d+);");
+                    reIE.test(userAgent);
+                    var fIEVersion = parseFloat(RegExp["$1"]);
+                    if (fIEVersion <= 10 || !isSupportPlaceholder()) {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            window.onload = function () {
+                if (IEVersion()) {
+                    $('.brw_tip').show();
+                }
+            };
+        })();
+        $('.J_bw_close').click(function () {
+            $(this).closest('.brw_tip').remove();
+        });
+    })
+    var app = new Vue({
+        el: '#headerContent',
+        data: {
+            isLogin: false,
+            utype: 0,
+            memberUrl: '',
+            loginUsername: '',
+            preview_id: 0,
+            keyword: '',
+            searchAlias: 'joblist',
+            searchAliasCn: '找工作',
+            mobileQrcode: '',
+            wechatQrcode: '',
+            wechatMiniprogramQrcode: '',
+            androidQrcode: '',
+            iosQrcode: '',
+            subsite_open: 0,
+            subsite_domain: ''
+        },
+        created: function () {
+            this.keyword = ""
+            this.getUserInfo()
+            this.mobileQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/m/"
+            this.wechatQrcode = "https://demo.74cms.com/upload/resource/weixin_img.jpg"
+            this.wechatMiniprogramQrcode = "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg"
+            this.subsite_open = parseInt("1")
+            this.subsite_domain = "74cms.com"
+            // this.androidQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/74cms_android.apk"
+            // this.iosQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/74cms_android.apk"
+            this.androidQrcode = "https://demo.74cms.com/74cms_android.apk"
+            if (this.androidQrcode != '') {
+                this.androidQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=" + this.androidQrcode
+            }
+            this.iosQrcode = "https://demo.74cms.com/74cms_android.apk"
+            if (this.iosQrcode != '') {
+                this.iosQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=" + this.iosQrcode
+            }
+            this.cronRun()
+            // 头部搜索默认选中
+            var locationArr = location.pathname.split('/');
+            if (locationArr[1] === '' || locationArr[1] === 'job') {
+                this.searchAliasCn = '找工作'
+                this.searchAlias = 'joblist'
+            } else if (locationArr[1] === 'resume') {
+                this.searchAliasCn = '找人才'
+                this.searchAlias = 'resumelist'
+            } else if (locationArr[1] === 'company') {
+                this.searchAliasCn = '找企业'
+                this.searchAlias = 'companylist'
+            } else if (locationArr[1] === 'article') {
+                this.searchAliasCn = '找资讯'
+                this.searchAlias = 'articlelist'
+            }
+        },
+        methods: {
+            cronRun: function () {
+                httpget(qscms.apiList.cronRun)
+                    .then(function () {
+                    })
+                    .catch(function () { })
+            },
+            AddFavorite: function () {
+                var sURL = window.location
+                var sTitle = document.title
+                try {
+                    window.external.addFavorite(sURL, sTitle);
+                } catch (e) {
+                    try {
+                        window.sidebar.addPanel(sTitle, sURL, "");
+                    } catch (e) {
+                        this.$confirm('加入收藏失败，请使用Ctrl+D进行添加', '提示', {
+                            type: 'warning',
+                            showCancelButton: false
+                        }).then(function () {
+                        }).catch(function () { });
+                    }
+                }
+            },
+            getUserInfo: function () {
+                var that = this
+                httpget(qscms.apiList.userinfo).then(function (res) {
+                    if (res.data.login === true) {
+                        that.isLogin = res.data.login
+                        that.utype = res.data.userinfo.utype
+                        if (that.utype == 1) {
+                            that.memberUrl = qscms.locationList.indexCompany
+                        } else {
+                            that.memberUrl = qscms.locationList.indexPersonal
+                        }
+                        that.loginUsername = res.data.show_username
+                        that.preview_id = res.data.preview_id
+                    }
+                }).catch(function () { })
+            },
+            handlerSearch: function () {
+                var that = this
+                httpget(qscms.apiList.searchLocation, { alias: that.searchAlias, keyword: that.keyword }).then(function (res) {
+                    location.href = res.data
+                }).catch(function () { })
+            },
+            changeSearchType: function (alias, aliasCn) {
+                this.searchAlias = alias
+                this.searchAliasCn = aliasCn
+            },
+            handlerLogout: function () {
+                var that = this
+                this.$confirm('确定退出当前账号吗?', '提示', {
+                    type: 'warning'
+                }).then(function () {
+                    if (that.subsite_open === 1 && that.subsite_domain != '') {
+                        Cookies.remove('qscms_visitor', {domain: '.' + that.subsite_domain})
+                    }
+                    Cookies.remove('qscms_visitor')
+                    window.location.reload()
+                }).catch(function () { });
+            },
+            handlerLogin: function (utype) {
+                if (utype == 1) {
+                    location.href = qscms.locationList.loginCompany
+                } else {
+                    location.href = qscms.locationList.loginPersonal
+                }
+            },
+            handlerReg: function (utype) {
+                if (utype == 1) {
+                    location.href = qscms.locationList.regCompany
+                } else {
+                    location.href = qscms.locationList.regPersonal
+                }
+            },
+            handleManageClick: function (func) {
+                this[func]()
+            },
+            handlerRefreshResume: function () {
+                httppost(qscms.apiList.resumeRefresh).then(function (res) {
+                    if (parseInt(res.code) === 200) {
+                        this.$message({ type: 'success', message: res.message })
+                    } else {
+                        this.$message.error(res.message)
+                    }
+                }).catch(function () { })
+            },
+            handlerResumeIndex: function () {
+                location.href = qscms.locationList.personalResume
+            },
+            handlerResumePreview: function () {
+                var url = "https://demo.74cms.com/index/resume/show/id/_id_.html"
+                url = url.replace('_id_', this.preview_id)
+                window.open(url)
+            },
+            handlerPersonalRecommend: function () {
+                location.href = qscms.locationList.recommendJob
+            },
+            handlerPersonalService: function () {
+                location.href = qscms.locationList.personalService
+            },
+            handlerPersonalPwd: function () {
+                location.href = qscms.locationList.personalPassword
+            },
+            handlerRefreshJob: function () {
+                this.$confirm('确定刷新所有发布中的职位吗？', '系统提示', {
+                    type: 'warning'
+                })
+                    .then(function () {
+                        httppost(qscms.apiList.companyJobRefreshBatch, {}).then(function (res) {
+                            if (res.data.done === 0) {
+                                this.$confirm(res.message, '系统提示', { type: 'warning' })
+                                    .then(function () {
+                                        location.href = qscms.locationList.companyJoblist
+                                    })
+                                    .catch(function () { })
+                                return false
+                            } else {
+                                this.$message({ type: 'success', message: res.message })
+                            }
+                        }).catch(function () { })
+                    })
+                    .catch(function () { })
+            },
+            handlerAddJob: function () {
+                var that = this
+                httpget(qscms.apiList.companyCheckJobaddNum, {}).then(function (res) {
+                    if (res.data.enable_addjob_num <= 0) {
+                        that.$confirm('您当前是' +
+                            res.data.setmeal_name +
+                            '，当前可发布职位数为0，建议您立即升级套餐或将暂时不招聘的职位设为关闭！', '系统提示', {
+                            confirmButtonText: '升级套餐',
+                            type: 'warning'
+                        })
+                            .then(function () {
+                                location.href = qscms.locationList.companySetmealAdd
+                            })
+                            .catch(function () { })
+                        return false
+                    } else {
+                        location.href = qscms.locationList.companyJobAdd
+                    }
+                }).catch(function () { })
+            },
+            handlerCompanyPreview: function () {
+                var url = "https://demo.74cms.com/company/_id_.html"
+                url = url.replace('_id_', this.preview_id)
+                window.open(url)
+            },
+            handlerJobApplyList: function () {
+                location.href = qscms.locationList.companyJobApplyList
+            },
+            handlerCompanyRecommend: function () {
+                location.href = qscms.locationList.recommendResume
+            },
+            handlerCompanyService: function () {
+                location.href = qscms.locationList.companyService
+            },
+            handlerCompanyPwd: function () {
+                location.href = qscms.locationList.companyPassword
+            },
+            handlerCompanyIndex: function () {
+                location.href = qscms.locationList.indexCompany
+            },
+            handlerCompanyLogin: function () {
+                location.href = qscms.locationList.loginCompany
+            },
+            handlerPersonalLogin: function () {
+                location.href = qscms.locationList.loginPersonal
+            },
+            handlerForget: function () {
+                location.href = qscms.locationList.forget
+            },
+            handlerAppeal: function () {
+                location.href = qscms.locationList.appeal
+            },
+            handlerCompanyJoblist: function () {
+                location.href = qscms.locationList.companyJoblist
+            },
+            handlerMemberCenter: function () {
+                if (this.utype == 1) {
+                    location.href = qscms.locationList.indexCompany
+                } else {
+                    location.href = qscms.locationList.indexPersonal
+                }
+            },
+        }
+    })
+</script>
+
+		<!-- content -->
+		
+<link rel="stylesheet" type="text/css" href="./校园招聘 - 骑士人才系统_files/swiper-bundle.min.css">
+<link rel="stylesheet" type="text/css" href="./校园招聘 - 骑士人才系统_files/campus_index.css">
+  <!-- 内容 -->
+  <div id="app" class="i_con"><div class="i_con_min w1200"><div class="clearfix"><div class="left i_cat_nav"><ul class="cat_nav_list"><li class="cnl_item"><div class="cnl_item_text"><div title="生活 | 服务业" class="cnl_item_text_title">生活 | 服务业</div></div> <div class="cnl_item_pop" style="top: -10px;"><div class="cnl_item_pop_con"><div class="cnl_item_pop_title">餐饮</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/53.html" target="_blank" class="jno_item_pop_link">服务员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/54.html" target="_blank" class="jno_item_pop_link">送餐员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/55.html" target="_blank" class="jno_item_pop_link">厨师/厨师长</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/56.html" target="_blank" class="jno_item_pop_link">后厨</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/57.html" target="_blank" class="jno_item_pop_link">传菜员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/58.html" target="_blank" class="jno_item_pop_link">配菜/打荷</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/59.html" target="_blank" class="jno_item_pop_link">洗碗工</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/60.html" target="_blank" class="jno_item_pop_link">面点师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/61.html" target="_blank" class="jno_item_pop_link">茶艺师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/62.html" target="_blank" class="jno_item_pop_link">迎宾/接待</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/63.html" target="_blank" class="jno_item_pop_link">大堂经理/领班</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/64.html" target="_blank" class="jno_item_pop_link">餐饮管理</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/65.html" target="_blank" class="jno_item_pop_link">学徒</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/66.html" target="_blank" class="jno_item_pop_link">杂工</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/67.html" target="_blank" class="jno_item_pop_link">咖啡师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/11/c3/68.html" target="_blank" class="jno_item_pop_link">预订员</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">家政保洁/安保</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/1/c2/12/c3/69.html" target="_blank" class="jno_item_pop_link">保洁</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/12/c3/70.html" target="_blank" class="jno_item_pop_link">保姆</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/12/c3/71.html" target="_blank" class="jno_item_pop_link">月嫂</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/12/c3/72.html" target="_blank" class="jno_item_pop_link">育婴师/保育员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/12/c3/73.html" target="_blank" class="jno_item_pop_link">洗衣工</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/12/c3/74.html" target="_blank" class="jno_item_pop_link">钟点工</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/12/c3/75.html" target="_blank" class="jno_item_pop_link">保安</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/12/c3/76.html" target="_blank" class="jno_item_pop_link">护工</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/12/c3/77.html" target="_blank" class="jno_item_pop_link">送水工</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">美容/美发</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/78.html" target="_blank" class="jno_item_pop_link">发型师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/79.html" target="_blank" class="jno_item_pop_link">美发助理/学徒</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/80.html" target="_blank" class="jno_item_pop_link">洗头工</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/81.html" target="_blank" class="jno_item_pop_link">美容导师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/82.html" target="_blank" class="jno_item_pop_link">美容师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/83.html" target="_blank" class="jno_item_pop_link">美容助理/学徒</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/84.html" target="_blank" class="jno_item_pop_link">化妆师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/85.html" target="_blank" class="jno_item_pop_link">美甲师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/86.html" target="_blank" class="jno_item_pop_link">宠物美容</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/87.html" target="_blank" class="jno_item_pop_link">美容店长</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/88.html" target="_blank" class="jno_item_pop_link">美容/瘦身顾问</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/89.html" target="_blank" class="jno_item_pop_link">彩妆培训师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/13/c3/90.html" target="_blank" class="jno_item_pop_link">美体师</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">酒店/旅游</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/91.html" target="_blank" class="jno_item_pop_link">酒店前台</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/92.html" target="_blank" class="jno_item_pop_link">客房服务员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/93.html" target="_blank" class="jno_item_pop_link">楼面经理</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/94.html" target="_blank" class="jno_item_pop_link">行李员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/95.html" target="_blank" class="jno_item_pop_link">救生员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/96.html" target="_blank" class="jno_item_pop_link">酒店管理</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/97.html" target="_blank" class="jno_item_pop_link">订票员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/98.html" target="_blank" class="jno_item_pop_link">导游</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/99.html" target="_blank" class="jno_item_pop_link">计调</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/100.html" target="_blank" class="jno_item_pop_link">签证专员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/14/c3/101.html" target="_blank" class="jno_item_pop_link">旅游顾问</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">娱乐/休闲</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/102.html" target="_blank" class="jno_item_pop_link">酒吧服务员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/103.html" target="_blank" class="jno_item_pop_link">娱乐厅服务员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/104.html" target="_blank" class="jno_item_pop_link">礼仪/迎宾</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/105.html" target="_blank" class="jno_item_pop_link">主持人</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/106.html" target="_blank" class="jno_item_pop_link">调酒师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/107.html" target="_blank" class="jno_item_pop_link">音效师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/108.html" target="_blank" class="jno_item_pop_link">灯光师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/109.html" target="_blank" class="jno_item_pop_link">摄影师/摄像师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/110.html" target="_blank" class="jno_item_pop_link">影视/后期制作</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/111.html" target="_blank" class="jno_item_pop_link">配音员</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/15/c3/112.html" target="_blank" class="jno_item_pop_link">放映员</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">保健按摩</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/1/c2/16/c3/113.html" target="_blank" class="jno_item_pop_link">按摩师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/16/c3/114.html" target="_blank" class="jno_item_pop_link">足疗师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/16/c3/115.html" target="_blank" class="jno_item_pop_link">搓澡工</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/16/c3/116.html" target="_blank" class="jno_item_pop_link">针灸推拿</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">运动健身</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/1/c2/17/c3/117.html" target="_blank" class="jno_item_pop_link">健身教练</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/17/c3/118.html" target="_blank" class="jno_item_pop_link">瑜伽教练</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/17/c3/119.html" target="_blank" class="jno_item_pop_link">舞蹈老师</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/17/c3/120.html" target="_blank" class="jno_item_pop_link">游泳教练</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/17/c3/121.html" target="_blank" class="jno_item_pop_link">台球教练</a> <a href="https://demo.74cms.com/campus/job/c1/1/c2/17/c3/122.html" target="_blank" class="jno_item_pop_link">高尔夫球助理</a></div></div></div></li> <li class="cnl_item"><div class="cnl_item_text"><div title="人力 | 行政 | 管理" class="cnl_item_text_title">人力 | 行政 | 管理</div></div> <div class="cnl_item_pop" style="top: -54px;"><div class="cnl_item_pop_con"><div class="cnl_item_pop_title">人事/行政/后勤</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/123.html" target="_blank" class="jno_item_pop_link">文员</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/124.html" target="_blank" class="jno_item_pop_link">前台/总机/接待</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/125.html" target="_blank" class="jno_item_pop_link">人事专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/126.html" target="_blank" class="jno_item_pop_link">人事经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/127.html" target="_blank" class="jno_item_pop_link">人事总监</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/128.html" target="_blank" class="jno_item_pop_link">行政专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/129.html" target="_blank" class="jno_item_pop_link">行政经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/130.html" target="_blank" class="jno_item_pop_link">行政总监</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/131.html" target="_blank" class="jno_item_pop_link">经理助理/秘书</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/132.html" target="_blank" class="jno_item_pop_link">薪酬/绩效/员工关系</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/133.html" target="_blank" class="jno_item_pop_link">猎头顾问</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/134.html" target="_blank" class="jno_item_pop_link">后勤</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/135.html" target="_blank" class="jno_item_pop_link">培训专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/136.html" target="_blank" class="jno_item_pop_link">培训经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/137.html" target="_blank" class="jno_item_pop_link">招聘专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/18/c3/138.html" target="_blank" class="jno_item_pop_link">招聘经理/主管</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">司机</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/2/c2/19/c3/139.html" target="_blank" class="jno_item_pop_link">商务司机</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/19/c3/140.html" target="_blank" class="jno_item_pop_link">客运司机</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/19/c3/141.html" target="_blank" class="jno_item_pop_link">货运司机</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/19/c3/142.html" target="_blank" class="jno_item_pop_link">出租车司机</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/19/c3/143.html" target="_blank" class="jno_item_pop_link">班车司机</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/19/c3/144.html" target="_blank" class="jno_item_pop_link">特种车司机</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/19/c3/145.html" target="_blank" class="jno_item_pop_link">驾校教练/陪练</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">高级管理</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/2/c2/20/c3/146.html" target="_blank" class="jno_item_pop_link">CEO/总裁/总经理</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/20/c3/147.html" target="_blank" class="jno_item_pop_link">首席运营官COO</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/20/c3/148.html" target="_blank" class="jno_item_pop_link">首席财务官CFO</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/20/c3/149.html" target="_blank" class="jno_item_pop_link">首席技术官CTO</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/20/c3/150.html" target="_blank" class="jno_item_pop_link">副总裁/副总经理</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/20/c3/151.html" target="_blank" class="jno_item_pop_link">总裁助理/总经理助理</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/20/c3/152.html" target="_blank" class="jno_item_pop_link">总监</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/20/c3/153.html" target="_blank" class="jno_item_pop_link">分公司经理</a> <a href="https://demo.74cms.com/campus/job/c1/2/c2/20/c3/154.html" target="_blank" class="jno_item_pop_link">合伙人</a></div></div></div></li> <li class="cnl_item"><div class="cnl_item_text"><div title="销售 | 客服 | 采购 | 淘宝" class="cnl_item_text_title">销售 | 客服 | 采购 | 淘宝</div></div> <div class="cnl_item_pop" style="top: -98px;"><div class="cnl_item_pop_con"><div class="cnl_item_pop_title">销售</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/155.html" target="_blank" class="jno_item_pop_link">销售代表</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/156.html" target="_blank" class="jno_item_pop_link">销售助理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/157.html" target="_blank" class="jno_item_pop_link">销售经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/158.html" target="_blank" class="jno_item_pop_link">销售总监</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/159.html" target="_blank" class="jno_item_pop_link">电话销售</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/160.html" target="_blank" class="jno_item_pop_link">销售支持</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/161.html" target="_blank" class="jno_item_pop_link">汽车销售</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/162.html" target="_blank" class="jno_item_pop_link">医药代表</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/163.html" target="_blank" class="jno_item_pop_link">医疗器械销售</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/164.html" target="_blank" class="jno_item_pop_link">网络销售</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/165.html" target="_blank" class="jno_item_pop_link">区域销售</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/166.html" target="_blank" class="jno_item_pop_link">渠道专员</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/167.html" target="_blank" class="jno_item_pop_link">渠道经理/总监</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/168.html" target="_blank" class="jno_item_pop_link">客户经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/169.html" target="_blank" class="jno_item_pop_link">大客户经理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/170.html" target="_blank" class="jno_item_pop_link">团购业务员/经理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/21/c3/171.html" target="_blank" class="jno_item_pop_link">会籍顾问</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">客服</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/3/c2/22/c3/172.html" target="_blank" class="jno_item_pop_link">客服专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/22/c3/173.html" target="_blank" class="jno_item_pop_link">客服经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/22/c3/174.html" target="_blank" class="jno_item_pop_link">客服总监</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/22/c3/175.html" target="_blank" class="jno_item_pop_link">售前/售后服务</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/22/c3/176.html" target="_blank" class="jno_item_pop_link">电话客服</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/22/c3/177.html" target="_blank" class="jno_item_pop_link">客户关系管理</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">贸易/采购</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/3/c2/23/c3/178.html" target="_blank" class="jno_item_pop_link">外贸专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/23/c3/179.html" target="_blank" class="jno_item_pop_link">外贸经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/23/c3/180.html" target="_blank" class="jno_item_pop_link">采购员</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/23/c3/181.html" target="_blank" class="jno_item_pop_link">采购助理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/23/c3/182.html" target="_blank" class="jno_item_pop_link">采购经理/总监</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/23/c3/183.html" target="_blank" class="jno_item_pop_link">报关员</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/23/c3/184.html" target="_blank" class="jno_item_pop_link">商务专员/经理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/23/c3/185.html" target="_blank" class="jno_item_pop_link">买手</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">超市/百货/零售</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/186.html" target="_blank" class="jno_item_pop_link">店员/营业员</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/187.html" target="_blank" class="jno_item_pop_link">收银员</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/188.html" target="_blank" class="jno_item_pop_link">促销/导购员</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/189.html" target="_blank" class="jno_item_pop_link">理货员/陈列员</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/190.html" target="_blank" class="jno_item_pop_link">防损员/内保</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/191.html" target="_blank" class="jno_item_pop_link">店长/卖场经理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/192.html" target="_blank" class="jno_item_pop_link">招商经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/193.html" target="_blank" class="jno_item_pop_link">奢侈品业务</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/194.html" target="_blank" class="jno_item_pop_link">品类管理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/195.html" target="_blank" class="jno_item_pop_link">食品加工/处理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/24/c3/196.html" target="_blank" class="jno_item_pop_link">督导</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">淘宝职位</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/3/c2/25/c3/197.html" target="_blank" class="jno_item_pop_link">网店店长</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/25/c3/198.html" target="_blank" class="jno_item_pop_link">淘宝客服</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/25/c3/199.html" target="_blank" class="jno_item_pop_link">淘宝美工</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/25/c3/200.html" target="_blank" class="jno_item_pop_link">店铺文案编辑</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/25/c3/201.html" target="_blank" class="jno_item_pop_link">店铺推广</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/25/c3/202.html" target="_blank" class="jno_item_pop_link">活动策划</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">房产中介</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/3/c2/26/c3/203.html" target="_blank" class="jno_item_pop_link">房产经纪人</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/26/c3/204.html" target="_blank" class="jno_item_pop_link">置业顾问</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/26/c3/205.html" target="_blank" class="jno_item_pop_link">房产店长/经理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/26/c3/206.html" target="_blank" class="jno_item_pop_link">房产店员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/26/c3/207.html" target="_blank" class="jno_item_pop_link">房产客服</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/26/c3/208.html" target="_blank" class="jno_item_pop_link">房产内勤</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/26/c3/209.html" target="_blank" class="jno_item_pop_link">房产评估师</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/26/c3/210.html" target="_blank" class="jno_item_pop_link">房产开发/策划</a> <a href="https://demo.74cms.com/campus/job/c1/3/c2/26/c3/211.html" target="_blank" class="jno_item_pop_link">其他房产职位</a></div></div></div></li> <li class="cnl_item"><div class="cnl_item_text"><div title="市场 | 媒介 | 广告 | 设计" class="cnl_item_text_title">市场 | 媒介 | 广告 | 设计</div></div> <div class="cnl_item_pop" style="top: -142px;"><div class="cnl_item_pop_con"><div class="cnl_item_pop_title">市场/媒介/公关</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/212.html" target="_blank" class="jno_item_pop_link">市场专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/213.html" target="_blank" class="jno_item_pop_link">市场经理/总监</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/214.html" target="_blank" class="jno_item_pop_link">市场拓展</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/215.html" target="_blank" class="jno_item_pop_link">市场调研</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/216.html" target="_blank" class="jno_item_pop_link">市场策划</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/217.html" target="_blank" class="jno_item_pop_link">媒介专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/218.html" target="_blank" class="jno_item_pop_link">媒介经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/219.html" target="_blank" class="jno_item_pop_link">会务会展专员/经理</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/220.html" target="_blank" class="jno_item_pop_link">品牌专员/经理</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/221.html" target="_blank" class="jno_item_pop_link">公关专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/222.html" target="_blank" class="jno_item_pop_link">公关经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/27/c3/223.html" target="_blank" class="jno_item_pop_link">企划经理/主管</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">广告/会展/咨询</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/224.html" target="_blank" class="jno_item_pop_link">广告文案</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/225.html" target="_blank" class="jno_item_pop_link">创意指导/总监</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/226.html" target="_blank" class="jno_item_pop_link">广告设计/制作</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/227.html" target="_blank" class="jno_item_pop_link">广告创意</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/228.html" target="_blank" class="jno_item_pop_link">媒介策划/管理</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/229.html" target="_blank" class="jno_item_pop_link">会展策划/设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/230.html" target="_blank" class="jno_item_pop_link">婚礼策划师</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/231.html" target="_blank" class="jno_item_pop_link">咨询顾问</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/232.html" target="_blank" class="jno_item_pop_link">咨询经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/233.html" target="_blank" class="jno_item_pop_link">客户主管/专员</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/28/c3/234.html" target="_blank" class="jno_item_pop_link">企业策划</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">美术/设计/创意</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/235.html" target="_blank" class="jno_item_pop_link">美编/美术设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/236.html" target="_blank" class="jno_item_pop_link">服装设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/237.html" target="_blank" class="jno_item_pop_link">家具/家居用品设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/238.html" target="_blank" class="jno_item_pop_link">平面设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/239.html" target="_blank" class="jno_item_pop_link">美术指导</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/240.html" target="_blank" class="jno_item_pop_link">店面/陈列/展览设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/241.html" target="_blank" class="jno_item_pop_link">工艺/珠宝设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/242.html" target="_blank" class="jno_item_pop_link">多媒体/动画设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/243.html" target="_blank" class="jno_item_pop_link">产品/包装设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/244.html" target="_blank" class="jno_item_pop_link">装修装潢设计</a> <a href="https://demo.74cms.com/campus/job/c1/4/c2/29/c3/245.html" target="_blank" class="jno_item_pop_link">CAD设计/制图</a></div></div></div></li> <li class="cnl_item"><div class="cnl_item_text"><div title="生产 | 物流 | 质控 | 汽车" class="cnl_item_text_title">生产 | 物流 | 质控 | 汽车</div></div> <div class="cnl_item_pop" style="top: -186px;"><div class="cnl_item_pop_con"><div class="cnl_item_pop_title">普工/技工</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/246.html" target="_blank" class="jno_item_pop_link">普工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/247.html" target="_blank" class="jno_item_pop_link">综合维修工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/248.html" target="_blank" class="jno_item_pop_link">制冷/水暖工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/249.html" target="_blank" class="jno_item_pop_link">电工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/250.html" target="_blank" class="jno_item_pop_link">木工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/251.html" target="_blank" class="jno_item_pop_link">钳工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/252.html" target="_blank" class="jno_item_pop_link">切割/焊工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/253.html" target="_blank" class="jno_item_pop_link">钣金工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/254.html" target="_blank" class="jno_item_pop_link">油漆工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/255.html" target="_blank" class="jno_item_pop_link">缝纫工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/256.html" target="_blank" class="jno_item_pop_link">锅炉工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/257.html" target="_blank" class="jno_item_pop_link">车工/铣工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/258.html" target="_blank" class="jno_item_pop_link">铲车/叉车工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/259.html" target="_blank" class="jno_item_pop_link">铸造/注塑/模具工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/260.html" target="_blank" class="jno_item_pop_link">电梯工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/261.html" target="_blank" class="jno_item_pop_link">操作工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/262.html" target="_blank" class="jno_item_pop_link">包装工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/263.html" target="_blank" class="jno_item_pop_link">手机维修</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/264.html" target="_blank" class="jno_item_pop_link">水泥工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/265.html" target="_blank" class="jno_item_pop_link">钢筋工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/266.html" target="_blank" class="jno_item_pop_link">管道工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/267.html" target="_blank" class="jno_item_pop_link">瓦工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/268.html" target="_blank" class="jno_item_pop_link">组装工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/269.html" target="_blank" class="jno_item_pop_link">样衣工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/270.html" target="_blank" class="jno_item_pop_link">染工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/271.html" target="_blank" class="jno_item_pop_link">纺织工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/272.html" target="_blank" class="jno_item_pop_link">印花工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/30/c3/273.html" target="_blank" class="jno_item_pop_link">压熨工</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">生产管理/研发</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/274.html" target="_blank" class="jno_item_pop_link">质量管理</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/275.html" target="_blank" class="jno_item_pop_link">总工程师/副总工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/276.html" target="_blank" class="jno_item_pop_link">设备管理维护</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/277.html" target="_blank" class="jno_item_pop_link">工艺设计</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/278.html" target="_blank" class="jno_item_pop_link">车间主任</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/279.html" target="_blank" class="jno_item_pop_link">生产计划</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/280.html" target="_blank" class="jno_item_pop_link">化验/检验</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/281.html" target="_blank" class="jno_item_pop_link">厂长/副厂长</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/282.html" target="_blank" class="jno_item_pop_link">生产总监</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/283.html" target="_blank" class="jno_item_pop_link">维修工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/284.html" target="_blank" class="jno_item_pop_link">工业工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/285.html" target="_blank" class="jno_item_pop_link">材料工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/286.html" target="_blank" class="jno_item_pop_link">技术工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/31/c3/287.html" target="_blank" class="jno_item_pop_link">生产主管/组长</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">物流/仓储</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/288.html" target="_blank" class="jno_item_pop_link">物流专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/289.html" target="_blank" class="jno_item_pop_link">物流经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/290.html" target="_blank" class="jno_item_pop_link">物流总监</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/291.html" target="_blank" class="jno_item_pop_link">调度员</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/292.html" target="_blank" class="jno_item_pop_link">快递员</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/293.html" target="_blank" class="jno_item_pop_link">仓库管理员</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/294.html" target="_blank" class="jno_item_pop_link">仓库经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/295.html" target="_blank" class="jno_item_pop_link">装卸/搬运工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/296.html" target="_blank" class="jno_item_pop_link">供应链管理</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/297.html" target="_blank" class="jno_item_pop_link">单证员</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/32/c3/298.html" target="_blank" class="jno_item_pop_link">国际货运</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">服装/纺织/食品</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/5/c2/33/c3/299.html" target="_blank" class="jno_item_pop_link">服装设计师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/33/c3/300.html" target="_blank" class="jno_item_pop_link">纺织品设计师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/33/c3/301.html" target="_blank" class="jno_item_pop_link">服装打样/制版</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/33/c3/302.html" target="_blank" class="jno_item_pop_link">生产管理</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/33/c3/303.html" target="_blank" class="jno_item_pop_link">样衣工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/33/c3/304.html" target="_blank" class="jno_item_pop_link">食品/饮料研发/检验</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/33/c3/305.html" target="_blank" class="jno_item_pop_link">板房/底格出格师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/33/c3/306.html" target="_blank" class="jno_item_pop_link">电脑放码员</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/33/c3/307.html" target="_blank" class="jno_item_pop_link">纸样师/车板工</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">质控/安防</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/5/c2/34/c3/308.html" target="_blank" class="jno_item_pop_link">质量检验员/测试员</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/34/c3/309.html" target="_blank" class="jno_item_pop_link">质量管理/测试经理</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/34/c3/310.html" target="_blank" class="jno_item_pop_link">测试工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/34/c3/311.html" target="_blank" class="jno_item_pop_link">安全消防</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/34/c3/312.html" target="_blank" class="jno_item_pop_link">认证工程师/审核员</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/34/c3/313.html" target="_blank" class="jno_item_pop_link">安全管理</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">汽车制造/服务</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/314.html" target="_blank" class="jno_item_pop_link">汽车设计工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/315.html" target="_blank" class="jno_item_pop_link">装配工艺工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/316.html" target="_blank" class="jno_item_pop_link">汽车/摩托车修理</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/317.html" target="_blank" class="jno_item_pop_link">汽车机械工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/318.html" target="_blank" class="jno_item_pop_link">汽车电子工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/319.html" target="_blank" class="jno_item_pop_link">4S店管理</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/320.html" target="_blank" class="jno_item_pop_link">汽车检验/检测</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/321.html" target="_blank" class="jno_item_pop_link">汽车美容</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/322.html" target="_blank" class="jno_item_pop_link">二手车评估师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/323.html" target="_blank" class="jno_item_pop_link">发动机/总装工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/324.html" target="_blank" class="jno_item_pop_link">安全性能工程师</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/325.html" target="_blank" class="jno_item_pop_link">理赔专员/顾问</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/326.html" target="_blank" class="jno_item_pop_link">洗车工</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/327.html" target="_blank" class="jno_item_pop_link">停车管理员</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/328.html" target="_blank" class="jno_item_pop_link">加油站工作员</a> <a href="https://demo.74cms.com/campus/job/c1/5/c2/35/c3/329.html" target="_blank" class="jno_item_pop_link">轮胎工</a></div></div></div></li> <li class="cnl_item"><div class="cnl_item_text"><div title="网络 | 通信 | 电子" class="cnl_item_text_title">网络 | 通信 | 电子</div></div> <div class="cnl_item_pop" style="top: -230px;"><div class="cnl_item_pop_con"><div class="cnl_item_pop_title">计算机/互联网/通信</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/330.html" target="_blank" class="jno_item_pop_link">技术总监/经理</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/331.html" target="_blank" class="jno_item_pop_link">技术支持/维护</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/332.html" target="_blank" class="jno_item_pop_link">技术专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/333.html" target="_blank" class="jno_item_pop_link">软件工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/334.html" target="_blank" class="jno_item_pop_link">程序员</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/335.html" target="_blank" class="jno_item_pop_link">硬件工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/336.html" target="_blank" class="jno_item_pop_link">质量工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/337.html" target="_blank" class="jno_item_pop_link">测试工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/338.html" target="_blank" class="jno_item_pop_link">系统架构师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/339.html" target="_blank" class="jno_item_pop_link">数据库管理/DBA</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/340.html" target="_blank" class="jno_item_pop_link">游戏设计/开发</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/341.html" target="_blank" class="jno_item_pop_link">网页设计/制作</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/342.html" target="_blank" class="jno_item_pop_link">语音/视频/图形</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/343.html" target="_blank" class="jno_item_pop_link">项目经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/344.html" target="_blank" class="jno_item_pop_link">产品经理/专员</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/345.html" target="_blank" class="jno_item_pop_link">网站运营</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/346.html" target="_blank" class="jno_item_pop_link">网站编辑</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/347.html" target="_blank" class="jno_item_pop_link">网络管理员</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/348.html" target="_blank" class="jno_item_pop_link">网络与信息安全工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/349.html" target="_blank" class="jno_item_pop_link">实施工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/350.html" target="_blank" class="jno_item_pop_link">通信技术工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/36/c3/351.html" target="_blank" class="jno_item_pop_link">网站策划</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">电子/电气</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/352.html" target="_blank" class="jno_item_pop_link">自动化工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/353.html" target="_blank" class="jno_item_pop_link">电子/电气工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/354.html" target="_blank" class="jno_item_pop_link">电路工程师/技术员</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/355.html" target="_blank" class="jno_item_pop_link">无线电工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/356.html" target="_blank" class="jno_item_pop_link">测试/可靠性工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/357.html" target="_blank" class="jno_item_pop_link">产品工艺/规划工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/358.html" target="_blank" class="jno_item_pop_link">音频/视频工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/359.html" target="_blank" class="jno_item_pop_link">灯光/照明设计工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/360.html" target="_blank" class="jno_item_pop_link">研发工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/37/c3/361.html" target="_blank" class="jno_item_pop_link">电子/电器维修</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">机械/仪器仪表</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/6/c2/38/c3/362.html" target="_blank" class="jno_item_pop_link">机电工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/38/c3/363.html" target="_blank" class="jno_item_pop_link">机械工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/38/c3/364.html" target="_blank" class="jno_item_pop_link">研发工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/38/c3/365.html" target="_blank" class="jno_item_pop_link">测试/可靠性工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/38/c3/366.html" target="_blank" class="jno_item_pop_link">版图设计工程师</a> <a href="https://demo.74cms.com/campus/job/c1/6/c2/38/c3/367.html" target="_blank" class="jno_item_pop_link">仪器/仪表/计量</a></div></div></div></li> <li class="cnl_item"><div class="cnl_item_text"><div title="法律 | 教育 | 翻译 | 出版" class="cnl_item_text_title">法律 | 教育 | 翻译 | 出版</div></div> <div class="cnl_item_pop" style="top: -274px;"><div class="cnl_item_pop_con"><div class="cnl_item_pop_title">法律</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/7/c2/39/c3/368.html" target="_blank" class="jno_item_pop_link">律师/法律顾问</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/39/c3/369.html" target="_blank" class="jno_item_pop_link">律师助理</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/39/c3/370.html" target="_blank" class="jno_item_pop_link">法务专员/主管</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/39/c3/371.html" target="_blank" class="jno_item_pop_link">产权/专利顾问</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/39/c3/372.html" target="_blank" class="jno_item_pop_link">合规管理</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">教育培训</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/373.html" target="_blank" class="jno_item_pop_link">教师/助教</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/374.html" target="_blank" class="jno_item_pop_link">家教</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/375.html" target="_blank" class="jno_item_pop_link">幼教/早教</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/376.html" target="_blank" class="jno_item_pop_link">培训师/讲师</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/377.html" target="_blank" class="jno_item_pop_link">培训策划</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/378.html" target="_blank" class="jno_item_pop_link">培训助理</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/379.html" target="_blank" class="jno_item_pop_link">教学/教务管理</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/380.html" target="_blank" class="jno_item_pop_link">教育产品开发</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/381.html" target="_blank" class="jno_item_pop_link">学术研究/科研</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/382.html" target="_blank" class="jno_item_pop_link">招生/课程顾问</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/383.html" target="_blank" class="jno_item_pop_link">校长</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/40/c3/384.html" target="_blank" class="jno_item_pop_link">野外拓展训练师</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">翻译</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/385.html" target="_blank" class="jno_item_pop_link">英语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/386.html" target="_blank" class="jno_item_pop_link">日语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/387.html" target="_blank" class="jno_item_pop_link">韩语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/388.html" target="_blank" class="jno_item_pop_link">法语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/389.html" target="_blank" class="jno_item_pop_link">俄语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/390.html" target="_blank" class="jno_item_pop_link">德语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/391.html" target="_blank" class="jno_item_pop_link">西班牙语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/392.html" target="_blank" class="jno_item_pop_link">意大利语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/393.html" target="_blank" class="jno_item_pop_link">葡萄牙语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/394.html" target="_blank" class="jno_item_pop_link">阿拉伯语翻译</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/41/c3/395.html" target="_blank" class="jno_item_pop_link">小语种翻译</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">编辑/出版/印刷</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/7/c2/42/c3/396.html" target="_blank" class="jno_item_pop_link">总编/副总编/主编</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/42/c3/397.html" target="_blank" class="jno_item_pop_link">编辑/撰稿</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/42/c3/398.html" target="_blank" class="jno_item_pop_link">记者/采编</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/42/c3/399.html" target="_blank" class="jno_item_pop_link">出版/发行</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/42/c3/400.html" target="_blank" class="jno_item_pop_link">排版设计/制作</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/42/c3/401.html" target="_blank" class="jno_item_pop_link">印刷操作</a> <a href="https://demo.74cms.com/campus/job/c1/7/c2/42/c3/402.html" target="_blank" class="jno_item_pop_link">装订/烫金</a></div></div></div></li> <li class="cnl_item"><div class="cnl_item_text"><div title="财会 | 金融 | 保险" class="cnl_item_text_title">财会 | 金融 | 保险</div></div> <div class="cnl_item_pop" style="top: -318px;"><div class="cnl_item_pop_con"><div class="cnl_item_pop_title">财务/审计/统计</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/403.html" target="_blank" class="jno_item_pop_link">财务经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/404.html" target="_blank" class="jno_item_pop_link">财务总监</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/405.html" target="_blank" class="jno_item_pop_link">会计/会计师</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/406.html" target="_blank" class="jno_item_pop_link">财务/会计助理</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/407.html" target="_blank" class="jno_item_pop_link">出纳</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/408.html" target="_blank" class="jno_item_pop_link">审计专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/409.html" target="_blank" class="jno_item_pop_link">审计经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/410.html" target="_blank" class="jno_item_pop_link">统计员</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/411.html" target="_blank" class="jno_item_pop_link">税务专员/助理</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/412.html" target="_blank" class="jno_item_pop_link">税务经理/主管</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/413.html" target="_blank" class="jno_item_pop_link">财务分析员</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/43/c3/414.html" target="_blank" class="jno_item_pop_link">成本管理员</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">金融/银行/证券/投资</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/415.html" target="_blank" class="jno_item_pop_link">证券/期货/外汇经纪人</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/416.html" target="_blank" class="jno_item_pop_link">证券经理/总监</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/417.html" target="_blank" class="jno_item_pop_link">证券分析/金融研究</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/418.html" target="_blank" class="jno_item_pop_link">信用卡/银行卡业务</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/419.html" target="_blank" class="jno_item_pop_link">银行经理/主任</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/420.html" target="_blank" class="jno_item_pop_link">银行会计/柜员</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/421.html" target="_blank" class="jno_item_pop_link">信贷管理/资信评估</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/422.html" target="_blank" class="jno_item_pop_link">资产评估</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/423.html" target="_blank" class="jno_item_pop_link">担保/拍卖/典当</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/424.html" target="_blank" class="jno_item_pop_link">拍卖师</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/425.html" target="_blank" class="jno_item_pop_link">外汇/基金/国债经理人</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/426.html" target="_blank" class="jno_item_pop_link">投资/理财顾问</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/427.html" target="_blank" class="jno_item_pop_link">融资专员</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/428.html" target="_blank" class="jno_item_pop_link">融资经理/总监</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/429.html" target="_blank" class="jno_item_pop_link">风险管理/控制</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/44/c3/430.html" target="_blank" class="jno_item_pop_link">股票交易员</a></div></div> <div class="cnl_item_pop_con"><div class="cnl_item_pop_title">保险</div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/431.html" target="_blank" class="jno_item_pop_link">储备经理人</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/432.html" target="_blank" class="jno_item_pop_link">保险客户经理</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/433.html" target="_blank" class="jno_item_pop_link">车险专员</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/434.html" target="_blank" class="jno_item_pop_link">保险内勤</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/435.html" target="_blank" class="jno_item_pop_link">保险培训师</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/436.html" target="_blank" class="jno_item_pop_link">保险客服</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/437.html" target="_blank" class="jno_item_pop_link">保险顾问</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/438.html" target="_blank" class="jno_item_pop_link">保险经纪人</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/439.html" target="_blank" class="jno_item_pop_link">保险项目经理</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/440.html" target="_blank" class="jno_item_pop_link">保险精算师</a> <a href="https://demo.74cms.com/campus/job/c1/8/c2/45/c3/441.html" target="_blank" class="jno_item_pop_link">保险其他职位</a></div></div></div></li> <li class="cnl_item"><a href="https://demo.74cms.com/campus/job.html" target="_blank" class="cnl_item_text all_job">全部职位</a></li></ul></div> <div id="j_sw_1" class="left i_sw_con swiper-container swiper-container-initialized swiper-container-horizontal"><div class="i_sw_wrapper swiper-wrapper" style="transition: all; transform: translate3d(-1440px, 0px, 0px);"><div class="swiper-slide i_sw_item swiper-slide-duplicate swiper-slide-next swiper-slide-duplicate-prev" data-swiper-slide-index="0" style="width: 720px;"><a target="_blank" href="https://demo.74cms.com/campus.html" class="sw_link"><img src="./校园招聘 - 骑士人才系统_files/edf170545a027e4e35a82404db4da5f8.png" alt=""></a></div><div class="swiper-slide i_sw_item swiper-slide-duplicate-active swiper-slide-prev swiper-slide-duplicate-next" data-swiper-slide-index="0" style="width: 720px;"><a target="_blank" href="https://demo.74cms.com/campus.html" class="sw_link"><img src="./校园招聘 - 骑士人才系统_files/edf170545a027e4e35a82404db4da5f8.png" alt=""></a></div><div class="swiper-slide i_sw_item swiper-slide-duplicate swiper-slide-active swiper-slide-duplicate-prev" data-swiper-slide-index="0" style="width: 720px;"><a target="_blank" href="https://demo.74cms.com/campus.html" class="sw_link"><img src="./校园招聘 - 骑士人才系统_files/edf170545a027e4e35a82404db4da5f8.png" alt=""></a></div></div> <div class="swiper-pagination i_sw_page j_sw_pagination swiper-pagination-clickable swiper-pagination-bullets"><span class="swiper-pagination-bullet swiper-pagination-bullet-active" tabindex="0" role="button" aria-label="Go to slide 1"></span></div><span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div> <div class="left i_login_box"><div class="i_login"><div class="login_img_box"><img src="./校园招聘 - 骑士人才系统_files/def_login.jpg" alt="" class="img"></div> <div class="login_text">
+    Hi ! 你好
+  </div> <div class="i_btns"><a target="_blank" href="https://demo.74cms.com/member/login/personal" class="btn btn_act">登录</a> <a target="_blank" href="https://demo.74cms.com/member/reg/personal" class="btn">注册</a></div></div> <!----> <!----> <div class="i_info"><div class="i_info_text clearfix"><span class="left">校招资讯</span> <a href="https://demo.74cms.com/campus/notice.html" class="right i_info_more">更多&gt;&gt;</a></div> <ul class="i_info_list"><li class="substring list_it"><a target="_blank" href="https://demo.74cms.com/campus/notice/1.html" class="it_link">东莞巨正源科技有限公司 2021年度校园招聘</a></li></ul></div></div></div> <div class="famous_recruit"><div class="fr_title"><span>名企校招</span></div> <div class="fr_list clearfix"><div class="fr_list_item left"><div class="fr_item_img"><a class="fr_item_link"><img src="./校园招聘 - 骑士人才系统_files/043473b1112429dcceeed9269d904197.png" alt=""></a></div> <p class="fr_item_text substring"><a>111</a></p></div></div></div> <div class="pubilc_meet"><div class="i_title clearfix"><span class="i_text">校招宣讲会</span> <a href="https://demo.74cms.com/campus/school.html" class="i_more right"><span class="more_text">查看更多</span> <span class="more_icon">···</span></a></div> <div class="pm_list clearfix"><div onclick="javascript:window.open(&#39;https://demo.74cms.com/campus/school/3.html&#39;)" class="pm_list_item clearfix left  "><div class="pm_img left"><img src="https://demo.74cms.com/campus.html" alt=""></div> <div class="left pm_text"><a class="pm_com_name substring">青岛大学</a> <p class="pm_meet_text substring">该校近期有<span>0</span>场宣讲会</p></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/campus/school/2.html&#39;)" class="pm_list_item clearfix left  "><div class="pm_img left"><img src="./校园招聘 - 骑士人才系统_files/8554dbd35b676b16b689c8a69da7a8d8.png" alt=""></div> <div class="left pm_text"><a class="pm_com_name substring">清华大学</a> <p class="pm_meet_text substring">该校近期有<span>0</span>场宣讲会</p></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/campus/school/1.html&#39;)" class="pm_list_item clearfix left  "><div class="pm_img left"><img src="./校园招聘 - 骑士人才系统_files/d22ad4a75d90cfef5a7a2589f61732a0.png" alt=""></div> <div class="left pm_text"><a class="pm_com_name substring">北京大学</a> <p class="pm_meet_text substring">该校近期有<span>2</span>场宣讲会</p></div></div></div></div> <div class="school_recruit_job"><div class="i_title clearfix"><span class="i_text">校招职位</span> <a href="https://demo.74cms.com/campus/job.html" class="i_more right"><span class="more_text">查看更多</span> <span class="more_icon">···</span></a></div> <div class="srj_list clearfix"><div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/145.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">技术员</a> <span class="right job_salary substring">2K~3K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">黑马猎头</a> <span class="right com_time">2026-04-20</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/142.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">计算机总监</a> <span class="right job_salary substring">2K~3K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">浙江某某大型公司</a> <span class="right com_time">2026-04-20</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/139.html&#39;)" class="srj_list_item left no_mr  "><div class="clearfix srj_job_info"><a class="left job_name substring ">店长</a> <span class="right job_salary substring">5K~8K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">山西正力网络有限公司</a> <span class="right com_time">2026-04-20</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/138.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">厨师</a> <span class="right job_salary substring">8K~12K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">山西比邻</a> <span class="right com_time">2026-04-20</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/137.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">上单</a> <span class="right job_salary substring">3K~5K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">ig</a> <span class="right com_time">2026-04-20</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/136.html&#39;)" class="srj_list_item left no_mr  "><div class="clearfix srj_job_info"><a class="left job_name substring ">客服</a> <span class="right job_salary substring">1K~2K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">胶州市彩霞超市店</a> <span class="right com_time">2026-04-20</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/51.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">运营</a> <span class="right job_salary substring">2000以上</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">山西正力网络有限公司</a> <span class="right com_time">2026-04-13</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/134.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">销售</a> <span class="right job_salary substring">3K~5K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">河北泰铎人力资源有限公司</a> <span class="right com_time">2026-01-26</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/132.html&#39;)" class="srj_list_item left no_mr  "><div class="clearfix srj_job_info"><a class="left job_name substring ">淘宝闪购急招骑手</a> <span class="right job_salary substring">8K~12K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">支付宝</a> <span class="right com_time">2026-01-13</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/2.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">销售</a> <span class="right job_salary substring">2000以上</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">黄岛区庄记天天顺早餐店</a> <span class="right com_time">2026-01-04</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/130.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">厨师</a> <span class="right job_salary substring">3K~5K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">黄岛区庄记天天顺早餐店</a> <span class="right com_time">2025-12-31</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/126.html&#39;)" class="srj_list_item left no_mr  "><div class="clearfix srj_job_info"><a class="left job_name substring ">前端工程师</a> <span class="right job_salary substring">8K~12K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">合肥快跑</a> <span class="right com_time">2025-12-30</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/123.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">文员</a> <span class="right job_salary substring">2K~3K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">北京一二三</a> <span class="right com_time">2025-12-19</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/6.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">服装设计</a> <span class="right job_salary substring">2000以上</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">北京星洲科技有限公司</a> <span class="right com_time">2025-11-27</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/4.html&#39;)" class="srj_list_item left no_mr  "><div class="clearfix srj_job_info"><a class="left job_name substring ">运营</a> <span class="right job_salary substring">9K~9.5K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">北京星洲科技有限公司</a> <span class="right com_time">2025-11-27</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/5.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">广告文案</a> <span class="right job_salary substring">5.5K~6K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">北京星洲科技有限公司</a> <span class="right com_time">2025-11-26</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/116.html&#39;)" class="srj_list_item left   "><div class="clearfix srj_job_info"><a class="left job_name substring ">司机</a> <span class="right job_salary substring">1K~2K</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">北京天门网络科技有限公司</a> <span class="right com_time">2025-11-25</span></div></div> <div onclick="javascript:window.open(&#39;https://demo.74cms.com/job/115.html&#39;)" class="srj_list_item left no_mr  "><div class="clearfix srj_job_info"><a class="left job_name substring ">纺织厂普工</a> <span class="right job_salary substring">2000以上</span></div> <div class="clearfix srj_com_name"><a class="left com_name substring">伊犁公众多媒体信息有限责任公司</a> <span class="right com_time">2025-11-15</span></div></div></div></div> <div class="schools_two_meet"><div class="i_title clearfix"><span class="i_text">院校双选会</span> <a href="https://demo.74cms.com/campus/election.html" class="i_more right"><span class="more_text">查看更多</span> <span class="more_icon">···</span></a></div> <div class="stm_list clearfix"><div onclick="javascript:window.open(&#39;https://demo.74cms.com/campus/election/1.html&#39;)" class="stm_list_item left "><div class="meet_info_address"><img src="./校园招聘 - 骑士人才系统_files/stm_img_2.png" alt="" class="img"> <div class="stm_title_1 substring">北京大学</div> <div class="stm_title_2 substring">北京大学 2025 届毕业生春季校园双选会</div> <div class="stm_text substring"><p class="substring">举办时间：2025-04-25</p> <p class="substring">举办地址：北京市海淀区颐和园路 5 号北京大学邱德拔体育馆</p></div></div> <div class="stm_text_box"><a href="https://demo.74cms.com/campus/election/1.html" class="meet_name substring">北京大学 2025 届毕业生春季校园双选会</a> <p class="oth_text"><span class="text_1">单位：<span>12</span></span> <span class="text_2">个人：<span>12</span></span></p></div></div></div></div></div></div>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/jquery.hoverdir.js.下载"></script>
+<script type="text/javascript" src="./校园招聘 - 骑士人才系统_files/swiper-bundle.min.js.下载"></script>
+<script>
+$(document).ready(function () {
+  $(function(){
+    // 职位分类侧拉位置调整
+    var topArr = [10, 54, 98, 142, 186, 230, 274, 318];
+    $(".cnl_item_pop").each(function (index) {
+      $(this).css("top", "-" + topArr[index] + "px");
+    });
+    // 轮播图
+    var swiper_1 = new Swiper("#j_sw_1", {
+      autoplay: true,
+      loop:true,
+      pagination: {
+        el: '.j_sw_pagination',
+        clickable :true,
+      }
+    });
+    // 鼠标离开 停止轮播
+    $("#j_sw_1").mouseenter(function () {
+      swiper_1.autoplay.stop();
+    });
+    // 鼠标离开 继续轮播
+    $("#j_sw_1").mouseleave(function () {
+      swiper_1.autoplay.start();
+    });
+        
+  })
+})
+
+var vm = new Vue({
+  el:'#app',
+  data: {
+    data: [],
+    loginUtype: 0,
+    statAfterLogin: {},
+    userName: null
+  },
+  mounted: function () {
+    this.getData()
+    this.getUserInfo()
+  },
+  methods: {
+    getData :function() {
+      var _this = this
+      httppost(qscms.apiList.campusAdList,{ 
+        "alias": [
+          "QS_campus_top_slide@web",
+          "QS_campus_famous@web",
+          "QS_campus_top_slide@mobile",
+          "QS_campus_famous@mobile"
+        ]
+      }).then( function(res){
+        _this.data = res.data.items
+      }).catch( function(){})
+    },
+    campusFamousJump: function(link) {
+      if (link) {
+        window.open(link)
+      }
+    },
+    getUserInfo: function () {
+      var that = this
+      httpget(qscms.apiList.userinfo).then(function (res) {
+        if (res.data.login === true) {
+          that.userName = res.data.show_username
+          that.loginUtype = res.data.userinfo.utype
+          that.getStatAfterLogin()
+        }
+      }).catch(function () { })
+    },
+    getStatAfterLogin: function () {
+      var that = this
+      httpget(qscms.apiList.statAfterLogin).then(function (res) {
+        that.statAfterLogin = res.data
+      }).catch(function () { })
+    },
+  }
+})
+</script>
+		<!-- footer -->
+		<div id="footerContent" class="indexFooter_wrapper"><div class="indexFooter clearfix"><div class="clearfix float"><div class="float clearfix"><ul class="footer_list  float"><li class="fc">个人</li> <li><a href="javascript:;">登记简历</a></li> <li><a href="javascript:;">求职管理</a></li> <li><a href="https://demo.74cms.com/job.html">最新职位</a></li> <li><a href="https://demo.74cms.com/company.html">企业信息</a></li></ul> <ul class="footer_list float"><li class="fc">企业</li> <li><a href="javascript:;">企业入驻</a></li> <li><a href="javascript:;">发布招聘</a></li> <li><a href="javascript:;">会员服务</a></li> <li><a href="javascript:;">招聘管理</a></li></ul> <ul class="footer_list float"><li class="fc">特色</li> <li><a target="_self" href="https://demo.74cms.com/explain/1.html">网站介绍</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/2.html">产品服务</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/3.html">法律申明</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/4.html">推广合作</a></li></ul> <ul class="footer_list float"><li class="fc">帮助</li> <li><a href="https://demo.74cms.com/help/id/1.html">常见问题</a></li> <li><a href="https://demo.74cms.com/help/id/2.html">新手上路</a></li> <li><a href="https://demo.74cms.com/help/id/3.html">账号管理</a></li> <li><a href="https://demo.74cms.com/help/id/4.html">简历管理</a></li></ul></div> <div class="code_box float clearfix"><div class="float code1"><p>微信公众号</p> <div class="img"><img src="./校园招聘 - 骑士人才系统_files/weixin_img.jpg" class="codeImg"></div></div> <div class="float code2"><p>手机微信版</p> <div class="img1"><img src="./校园招聘 - 骑士人才系统_files/index" class="codeImg"></div></div></div></div> <div class="footer_contactType"><p class="contact_title">联系电话</p> <div class="contact_tel"><img src="./校园招聘 - 骑士人才系统_files/contact_icon.png"> <span>18003431191</span></div> <p class="job_time">服务时间：周一至周六 8:00-17:30</p> <p class="job_QQ">客服QQ：<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&amp;uin=00000000000&amp;site=%E5%9C%A8%E7%BA%BF%E5%AE%A2%E6%9C%8D&amp;menu=yes">00000000000</a></p></div></div> <div class="indexFooter_nav_con"><ul class="indexFooter_nav clearfix"><li><a href="https://demo.74cms.com/">网站首页</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/5.html">联系我们</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/6.html">招贤纳士</a></li></ul></div> <div class="footer_text1"><span class="address">联系地址：00省00市00路00号0大厦00楼</span></div> <div class="footer_text2"><span>
+                网站备案：
+                <a target="_blank" href="https://beian.miit.gov.cn/">
+                    icp000000000                </a></span> <span class="security">
+                公网安备：
+                <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=000000000000">
+                    晋公网安备000000000000号                </a></span></div> <div class="footer_text3"><span>Copyright © 2021 74cms.com All Right Reserved Powered by 74cmsse</span></div> <div class="right_fixed_float"><div class="rff_cell tel"><div class="rff_cell_dia"><div class="tel_line"><span class="number">13466835651</span><span>（曾柔）</span></div><div class="tel_line"><span class="number">18003431191</span><span>（梦琪）</span></div></div></div> <div class="rff_cell qq"><div class="rff_cell_dia"><a href="javascript:;" class="qq_line">QQ交谈</a><a href="javascript:;" class="qq_line">QQ交谈</a></div></div> <div class="rff_cell wx"><div class="rff_cell_dia"><div class="wx_item"><img src="./校园招聘 - 骑士人才系统_files/1f1851bf860f2c07a2268743abb8ad3a.jpg" alt="" class="img"><p class="img_name">曾柔</p></div><div class="wx_item"><img src="./校园招聘 - 骑士人才系统_files/7898f96692be3246e116093a27a7b8b7.png" alt="" class="img"><p class="img_name">梦琪</p></div></div></div> <div class="rff_cell wx qr"><div class="rff_cell_dia"><div class="wx_item"><img src="./校园招聘 - 骑士人才系统_files/weixin_img.jpg" alt="" class="img"> <p class="img_name">骑士CMS人才系统</p></div></div></div></div> <!----></div>
+<script>
+var version = "8.12.3 专业版";
+console.log('\n' + ' %c 74cmsSE v'+version+'  %c https://www.74cms.com ' + '\n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;');
+    var app = new Vue({
+        el: '#footerContent',
+        data:{
+            mobileQrcode:'',
+            backTopFlag: false,
+            scrollTop: 0,
+            mobileList:[],
+            qqList:[],
+            weixinList:[],
+        },
+        created:function(){
+            this.getServiceOl()
+            this.mobileQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/m/"
+        },
+        mounted:function () {
+            window.addEventListener('scroll', this.scrollToTop)
+        },
+        destroyed:function () {
+            window.removeEventListener('scroll', this.scrollToTop)
+        },
+        methods:{
+            wakeupQq:function(qq){
+                if(qq){
+                    window.open('http://wpa.qq.com/msgrd?v=3&uin='+qq+'&site=在线客服&menu=yes')
+                }
+            },
+            getServiceOl:function() {
+                var that = this
+                httpget(qscms.apiList.serviceOl).then(function (res) {
+                 that.mobileList = res.data.mobile
+                 that.qqList = res.data.qq
+                 that.weixinList = res.data.weixin
+                }).catch(function () { })
+            },
+            // 点击图片回到顶部方法，加计时器是为了过渡顺滑
+            backTop:function() {
+                var that = this
+                var timer = setInterval(function(){
+                var ispeed = Math.floor(-that.scrollTop / 5)
+                document.documentElement.scrollTop = document.body.scrollTop = that.scrollTop + ispeed
+                if (that.scrollTop === 0) {
+                    clearInterval(timer)
+                }
+                }, 16)
+            },
+            // 为了计算距离顶部的高度，当高度大于60显示回顶部图标，小于60则隐藏
+            scrollToTop:function() {
+                var that = this
+                that.scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+                that.backTopFlag = that.scrollTop > 60;
+            },
+            handlerResumeIndex:function(){
+                location.href = qscms.locationList.personalResume
+            },
+            handlerPersonalJobApplyList:function(){
+                location.href = qscms.locationList.personalJobApplyList
+            },
+            handlerCompanyIndex:function(){
+                location.href = qscms.locationList.indexCompany
+            },
+            handlerAddJob:function(){
+                httpget(qscms.apiList.companyCheckJobaddNum, {}).then(function(res){
+                    if (res.data.enable_addjob_num <= 0) {
+                        this.$confirm('您当前是' +
+                            res.data.setmeal_name +
+                            '，当前可发布职位数为0，建议您立即升级套餐或将暂时不招聘的职位设为关闭！','系统提示',{
+                            confirmButtonText: '升级套餐',
+                            type: 'warning'
+                        })
+                        .then(function(){
+                            location.href = qscms.locationList.companySetmealAdd
+                        })
+                        .catch(function(){})
+                        return false
+                    } else {
+                        location.href = qscms.locationList.companyJobAdd
+                    }
+                }).catch(function(){})
+            },
+            handlerCompanyService:function(){
+                location.href = qscms.locationList.companyService
+            },
+            handlerCompanyJobApplyList:function(){
+                location.href = qscms.locationList.companyJobApplyList
+            },
+        }
+    })
+</script>
+
+	</div>
+
+
+</body></html>

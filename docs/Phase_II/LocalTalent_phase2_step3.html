@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalTalent Phase-2 Step 3：求职者与企业转化闭环</title>
+  <style>
+    :root{--ink:#142033;--line:#dfe6ee;--brand:#166a5b;--soft:#e8f5f1;--paper:#fff;--bg:#f5f7f8;--danger:#9f1f2f;--danger-soft:#fff0f2;--blue:#eef5ff}
+    *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg);line-height:1.72}
+    main{max-width:1180px;margin:0 auto;padding:44px 24px 88px}h1{margin:0 0 12px;font-size:34px;line-height:1.25}h2{margin:34px 0 16px;padding-left:12px;border-left:5px solid var(--brand);font-size:24px}h3{margin:24px 0 10px;color:#29445f}
+    .card{margin:18px 0;padding:22px 26px;border:1px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:0 12px 36px rgba(20,32,51,.06)}.note{padding:14px 16px;border-radius:14px;background:var(--soft);color:var(--brand)}.danger{padding:14px 16px;border-radius:14px;background:var(--danger-soft);color:var(--danger)}
+    table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--soft)}code{padding:2px 6px;border-radius:6px;background:#edf1f5}pre{padding:16px;border-radius:14px;overflow:auto;color:#e8edf5;background:#101827}.pill{display:inline-block;margin:3px 4px 3px 0;padding:3px 10px;border-radius:999px;background:var(--blue);color:#214d7a}
+    @media(max-width:760px){main{padding:28px 14px 60px}h1{font-size:28px}table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>LocalTalent Phase-2 Step 3：求职者与企业转化闭环</h1>
+  <p class="note">统一硬边界提醒：人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</p>
+
+  <section class="card">
+    <h2>开发前必读卡</h2>
+    <ul>
+      <li><strong>文件定位</strong>：冻结公开门户到求职者中心、企业中心的转化路径、状态机、边界与验收关注点。</li>
+      <li><strong>资料来源</strong>：边界文件、两份新 MD、Step1/Step2、本地 demo、一期文档；不再引用旧版资料文件。</li>
+      <li><strong>禁止越界点</strong>：禁止公共简历库、受控找人才和联系解锁提前展开；禁止真实外部能力。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>1. Step1/Step2 继承结论</h2>
+    <p>Step1 冻结门户导航、页面域和“简历库不得照搬为公共简历库”的边界。Step2 冻结公开门户、搜索体系、SEO/Next SSR 策略和字段白名单。</p>
+    <p>Step3 只回答一个问题：公开门户中的游客，如何安全、清晰地转化为求职者或企业用户？</p>
+  </section>
+
+  <section class="card">
+    <h2>2. Step3 总目标</h2>
+    <table>
+      <tr><th>转化对象</th><th>起点</th><th>目标中心</th><th>闭环</th></tr>
+      <tr><td>求职者</td><td>首页、找工作、职位详情、招聘会、就业政策、人才服务区</td><td>求职者中心</td><td>登录/注册、简历状态确认、投递、收藏、订阅、投递与面试状态回流。</td></tr>
+      <tr><td>企业</td><td>首页、找企业、职位详情、招聘会、管理中心</td><td>企业中心</td><td>招聘者注册/登录、企业认证、职位发布、提交审核、投递池处理。</td></tr>
+      <tr><td>运营/审计</td><td>管理中心</td><td>运营后台</td><td>operator 审核和配置；auditor 只读；权限由后端强制。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>3. 求职者转化闭环</h2>
+    <pre><code>公开职位列表/详情
+  -> 未登录提示登录或注册
+  -> 求职者登录/注册
+  -> 求职者中心 overview
+  -> 简历摘要与发布状态确认
+  -> 投递职位
+  -> 投递记录/面试状态回流</code></pre>
+    <p>增强路径：职位收藏、搜索订阅或职位订阅、求职者中心查看收藏/订阅、后续站内通知提醒。</p>
+    <table>
+      <tr><th>状态</th><th>页面表达</th></tr>
+      <tr><td>未登录</td><td>展示登录/注册入口，保留返回原页面能力。</td></tr>
+      <tr><td>简历未完善</td><td>提示先完善简历，不在前端推断字段。</td></tr>
+      <tr><td>可投递/已投递</td><td>由后端确认职位在线、企业认证通过、candidate 身份和投递状态。</td></tr>
+      <tr><td>面试中/已签到</td><td>投递状态或签到摘要由后端返回。</td></tr>
+      <tr><td>已同意/已撤回/不可发布</td><td>由 overview 的发布状态返回，前端不得推断。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>4. 企业转化闭环</h2>
+    <pre><code>公开门户企业入口
+  -> 招聘者注册/登录
+  -> 企业中心
+  -> 企业认证
+  -> 认证通过
+  -> 发布职位/提交审核
+  -> 运营审核通过
+  -> 门户职位可见
+  -> 投递池处理</code></pre>
+    <table>
+      <tr><th>状态</th><th>页面表达</th></tr>
+      <tr><td>未登录</td><td>展示招聘者登录/注册入口。</td></tr>
+      <tr><td>未认证/待审核</td><td>引导认证，不允许上线职位。</td></tr>
+      <tr><td>已驳回</td><td>展示驳回原因和重新提交入口。</td></tr>
+      <tr><td>已通过</td><td>展示职位发布、职位列表、投递池入口。</td></tr>
+      <tr><td>职位在线/下线</td><td>公开可见性完全由服务端状态决定。</td></tr>
+      <tr><td>投递池空</td><td>展示空态和优化职位建议。</td></tr>
+    </table>
+    <p class="danger">企业未认证通过不得上线职位；企业不能绕过运营审核；跨企业投递池必须服务端阻断。</p>
+  </section>
+
+  <section class="card">
+    <h2>5. 管理中心身份分流</h2>
+    <table>
+      <tr><th>身份</th><th>目标页面</th><th>说明</th></tr>
+      <tr><td>candidate</td><td><code>/candidate/center</code></td><td>展示本人私有摘要、投递、签到、同意/撤回状态。</td></tr>
+      <tr><td>company</td><td><code>/company</code></td><td>展示企业认证、职位状态、投递池、导出入口。</td></tr>
+      <tr><td>operator</td><td><code>/admin</code></td><td>可执行授权范围内审核和配置。</td></tr>
+      <tr><td>auditor</td><td><code>/admin</code></td><td>只读视角，不允许写接口。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>6. 状态机与空态</h2>
+    <p><span class="pill">loading</span><span class="pill">empty</span><span class="pill">unauthorized</span><span class="pill">forbidden</span><span class="pill">error</span><span class="pill">retrying</span><span class="pill">submitted</span><span class="pill">revoked/offline</span></p>
+    <p>所有状态必须以接口返回为准。前端可以做展示兜底，但不得推断 <code>consent_status</code>、<code>publishable_flag</code>、企业认证结果、职位审核结果、投递归属或权限结果。</p>
+  </section>
+
+  <section class="card">
+    <h2>7. 字段与权限边界</h2>
+    <ul>
+      <li>公开门户继续使用 Step2 字段白名单。</li>
+      <li>candidate 只能访问本人中心和本人投递、收藏、订阅。</li>
+      <li>company 只能访问本企业职位、投递池、导出申请。</li>
+      <li>投递池不是公共简历库，不得返回未授权联系方式或简历原文。</li>
+      <li>关键写动作写 <code>audit_log</code>，敏感字段读取写 <code>field_access_log</code>。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>8. Step3 结论</h2>
+    <p>Step3 冻结了从公开门户到求职者中心、企业中心的转化闭环。</p>
+    <p>高保真门户优先补充：Step3 的转化闭环仍然有效，但实施顺序应承接 Prompt 16-21 的公开门户高保真页面；求职者投递、收藏、订阅入口应嵌入找工作和职位详情页面，但深层私有中心增强不抢在首页、列表页和人才服务区改写之前。</p>
+    <p class="danger">登录/注册与管理中心入口应参考 demo 页面形态，但真实短信、微信扫码、小程序、App 登录仍只做禁用占位。</p>
+  </section>
+</main>
+</body>
+</html>

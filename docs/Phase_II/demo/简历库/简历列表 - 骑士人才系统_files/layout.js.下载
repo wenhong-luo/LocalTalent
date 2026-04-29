@@ -1,0 +1,90 @@
+$(document).ready(function() {
+    // 登录
+    $('.utype_login').click(function() {
+        let utype = $(this).data('id')
+        if (utype == 2) {
+            location.href = qscms.locationList.loginPersonal
+        } else if (utype == 1) {
+            location.href = qscms.locationList.loginCompany
+        }
+    })
+
+    // 搜索职位类型弹出框 
+    $('#block_1').hover(function() {
+            $('#cat_nav_1').removeClass('displayNone').addClass('displayBlock')
+            $('#cat_nav_1 .jno_item_new:nth-child(1) .jno_item_pop').css('display', 'block')
+        }
+        // ,function(){
+        // 	$('#cat_nav_1').removeClass('displayBlock').addClass('displayNone')
+        // }
+    )
+    $('.jno_item_new').hover(function() {
+        $(this).find('.jno_item_pop').css('display', 'block')
+    }, function() {
+        $(this).find('.jno_item_pop').css('display', 'none')
+    })
+
+    $('#cat_nav_1').mouseleave(function() {
+        $(this).removeClass('displayBlock').addClass('displayNone')
+    })
+    
+    $('.cat_nav_2').mouseleave(function() {
+        $(this).removeClass('displayNone').addClass('displayBlock')
+    })
+
+    // 地区弹窗
+    $('#subsite_show').click(function() {
+        $('#subsite_pupop').removeClass('displayNone').addClass('displayBlock')
+    })
+    $('#close_subsite').click(function() {
+        $('#subsite_pupop').removeClass('displayBlock').addClass('displayNone')
+    })
+    
+    $('.subsite_abc .item:first-child').addClass('item_act')
+    $('.lsit_box_all .lsit_box:first-child').siblings().addClass('displayNone')
+    $('.subsite_abc .item').click(function() {
+        let index = $(this).data('index')
+        $('#lsit_box_' + index).removeClass('displayNone').addClass('displayFlex')
+            .siblings().removeClass('displayFlex').addClass('displayNone')
+        $(this).addClass('item_act').siblings().removeClass('item_act')
+        let idVal = '#lsit_box_' + index
+        setCityLeft(idVal)
+    })
+
+    //管理中心
+    $('#manage_center').click(function() {
+        if (qscms.loginUtype == 1) {
+            location.href = qscms.locationList.indexCompany
+        } else {
+            location.href = qscms.locationList.indexPersonal
+        }
+    })
+    setCityLeft('#lsit_box_ABCDE')
+    function setCityLeft(idVal){
+        const elements = document.querySelectorAll(idVal + ' .district_level2');
+        elements.forEach((item,index) => {
+           if(item){
+               let colums = (index - 1) % 5 + 1
+               const childElement = item.querySelector('.district_level3');
+               if(childElement){
+                   switch (colums) {
+                   case 1:
+                       childElement.style.left = '-120px'
+                       break;
+                   case 2:
+                       childElement.style.left = '-230px'
+                       break;
+                   case 3:
+                       childElement.style.left = '-340px'
+                       break;
+                   case 4:
+                       childElement.style.left = '-460px'
+                       break;
+                   default:
+                       break;
+                   }
+               }
+           }
+       });
+    }
+})

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalTalent Phase-2 Step 1：目标站资料读取与门户信息架构冻结</title>
+  <style>
+    :root{--ink:#142033;--muted:#5d6b7a;--line:#dfe6ee;--brand:#166a5b;--soft:#e8f5f1;--paper:#fff;--bg:#f5f7f8;--danger:#9f1f2f;--danger-soft:#fff0f2}
+    *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg);line-height:1.72}
+    main{max-width:1180px;margin:0 auto;padding:44px 24px 88px}h1{margin:0 0 12px;font-size:34px;line-height:1.25}h2{margin:34px 0 16px;padding-left:12px;border-left:5px solid var(--brand);font-size:24px}h3{margin:24px 0 10px;color:#29445f}
+    .card{margin:18px 0;padding:22px 26px;border:1px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:0 12px 36px rgba(20,32,51,.06)}.note{padding:14px 16px;border-radius:14px;background:var(--soft);color:var(--brand)}.danger{padding:14px 16px;border-radius:14px;background:var(--danger-soft);color:var(--danger)}
+    table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--soft)}code{padding:2px 6px;border-radius:6px;background:#edf1f5}pre{padding:16px;border-radius:14px;overflow:auto;color:#e8edf5;background:#101827}
+    @media(max-width:760px){main{padding:28px 14px 60px}h1{font-size:28px}table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>LocalTalent Phase-2 Step 1：目标站资料读取与门户信息架构冻结</h1>
+  <p class="note">统一硬边界提醒：人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</p>
+
+  <section class="card">
+    <h2>开发前必读卡</h2>
+    <ul>
+      <li><strong>文件定位</strong>：二期第一个 Step，只冻结产品定位、目标站结构、首批门户导航、页面域和隐私边界。</li>
+      <li><strong>实现约束</strong>：规划输入，不是开发 Prompt；不新增代码、接口或数据库迁移。</li>
+      <li><strong>禁止越界点</strong>：禁止公共简历库、公开联系方式、真实 ATS/RPA 同步和真实受控候选池同步。</li>
+      <li><strong>下游影响</strong>：为 Step2 公开门户、Step3 转化闭环、Step4 双中心能力细化提供边界。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>1. 资料来源与读取结论</h2>
+    <p>二期上游资料已切换为 <code>74cms人才网开发分析.md</code>、<code>人才网总盘点与高风险深挖评审稿.md</code>、本地 <code>docs/Phase_II/demo/</code>、一期蓝图与一期提示词。不再引用旧版资料文件。</p>
+    <p>本地 demo HTML 是目标站页面形态的事实来源；两份新 Markdown 分别提供功能取舍和风险池口径；一期文档是工程事实来源。</p>
+    <p>完整 demo 已同步到 <code>docs/Phase_II/demo</code>，共 24 个 HTML 页面；后续以 <code>LocalTalent_phase2_demo_inventory.md</code> 作为页面结构盘点和 Prompt 映射依据。</p>
+    <p>demo 中存在“简历库/搜索简历/找人才”，但 LocalTalent 必须改写为“人才服务区公开摘要 + 后续企业受控找人才”，不能做公共简历库。</p>
+  </section>
+
+  <section class="card">
+    <h2>2. 一期已完成能力基线</h2>
+    <table>
+      <tr><th>能力域</th><th>一期已完成事实</th><th>二期规划含义</th></tr>
+      <tr><td>前端架构</td><td>Next.js + React + Node SSR</td><td>二期公开门户继续沿用 Next/SSR。</td></tr>
+      <tr><td>人才服务区</td><td>只读 <code>candidate_publish_snapshot</code></td><td>只能增强筛选、SEO 和视觉，不得改成公共简历库。</td></tr>
+      <tr><td>求职者中心</td><td><code>/candidate/center</code> 与 overview</td><td>可增强简历体验，但不得前端推断同意/撤回。</td></tr>
+      <tr><td>企业/运营后台</td><td><code>/company</code> 与 <code>/admin</code></td><td>补体验，不重做权限底座。</td></tr>
+      <tr><td>导出与审计</td><td>导出审批、MinIO、审计中心</td><td>商业化或权益不得绕过审批和审计。</td></tr>
+      <tr><td>对接接口</td><td>openapi stub</td><td>不接真实 ATS/RPA 或受控候选池主库。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>3. Demo 目标站信息架构</h2>
+    <table>
+      <tr><th>频道</th><th>LocalTalent 取舍</th></tr>
+      <tr><td>首页</td><td>保留城市、搜索、核心频道入口和求职者/企业双入口。</td></tr>
+      <tr><td>找工作/名企直聘</td><td>优先规划找工作列表、职位详情、名企/认证企业推荐。</td></tr>
+      <tr><td>找企业</td><td>规划企业公开列表和企业主页，不展示联系人与审核材料。</td></tr>
+      <tr><td>简历库</td><td>公开侧改为人才服务区；企业侧受控找人才后续单独评估。</td></tr>
+      <tr><td>招聘会/校园招聘</td><td>招聘会公开展示可规划，复杂报名和校招后置。</td></tr>
+      <tr><td>更多服务</td><td>地图、视频、直播、自由职业先占位，不接真实外部能力。</td></tr>
+      <tr><td>登录注册/管理中心</td><td>保留转化入口；真实短信、微信扫码、小程序、App 先不接。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>4. LocalTalent 二期能力取舍</h2>
+    <table>
+      <tr><th>分类</th><th>能力</th></tr>
+      <tr><td>第一阶段必须做</td><td>首页、找工作、找企业、人才服务区、招聘会公开展示、就业政策/资讯/HR 工具箱、管理中心入口。</td></tr>
+      <tr><td>后续可做</td><td>名企推荐、今日招聘、网络招聘会、校园招聘、收藏/订阅、站内通知、规则推荐。</td></tr>
+      <tr><td>高风险暂缓</td><td>公共简历库、受控找人才、联系解锁、会员商业化、真实支付、真实短信/微信/App、真实地图/视频/直播、真实 ATS/RPA/受控候选池同步。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>5. 门户导航规划</h2>
+    <pre><code>首页 / 找工作 / 找企业 / 人才服务区 / 招聘会 / 就业政策 / 更多服务 / 管理中心</code></pre>
+    <p>demo 的“简历库”公开侧改名为“人才服务区”；demo 的“搜索简历/找人才”企业侧另规划为“受控找人才”，不在游客公开导航直接暴露高敏简历数据。</p>
+  </section>
+
+  <section class="card">
+    <h2>6. 页面域规划</h2>
+    <table>
+      <tr><th>页面域</th><th>边界</th></tr>
+      <tr><td>公开门户</td><td>只展示职位、企业、活动、内容和发布快照白名单。</td></tr>
+      <tr><td>求职者中心</td><td>candidate 本人私有域，服务端校验本人数据域。</td></tr>
+      <tr><td>企业中心</td><td>company 本企业私有域，未认证企业不得使用高风险人才检索能力。</td></tr>
+      <tr><td>运营后台</td><td>operator 可审核配置，auditor 只读。</td></tr>
+      <tr><td>开放接口 Stub</td><td>对接接口仅 stub，不传输原始候选人数据。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>7. Step1 结论</h2>
+    <p>Step1 冻结了目标站资料读取、一期基线回顾、首批门户导航、页面域和隐私边界。</p>
+    <p>当前补充结论：二期不再只是“频道功能清单”，而是以 <code>docs/Phase_II/demo</code> 的 24 个 HTML 页面为目标效果来源；<code>LocalTalent_phase2_demo_inventory.md/html</code> 已成为 Step1 与后续 Prompt 的桥接资料。</p>
+    <p>二期第一开发阶段调整为 <strong>高保真门户优先</strong>：先做公共门户 Shell、首页首屏、找工作、找企业、人才服务区改写、招聘会/资讯/HR 工具箱，再做更深的中心增强。</p>
+    <p class="danger">Step1 的隐私边界保持不变：demo 的“简历库/搜索简历/找人才”只能改写为人才服务区或未来受控找人才，不得成为公共简历库。</p>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalTalent Phase-2 Step 6：风险池与高风险能力准入规则</title>
+  <style>
+    :root{--ink:#142033;--line:#dfe6ee;--brand:#166a5b;--soft:#e8f5f1;--paper:#fff;--bg:#f5f7f8;--danger:#9f1f2f;--danger-soft:#fff0f2;--blue:#eef5ff;--gold:#fff7df}
+    *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg);line-height:1.72}
+    main{max-width:1180px;margin:0 auto;padding:44px 24px 88px}h1{margin:0 0 12px;font-size:34px;line-height:1.25}h2{margin:34px 0 16px;padding-left:12px;border-left:5px solid var(--brand);font-size:24px}h3{margin:24px 0 10px;color:#29445f}
+    .card{margin:18px 0;padding:22px 26px;border:1px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:0 12px 36px rgba(20,32,51,.06)}.note{padding:14px 16px;border-radius:14px;background:var(--soft);color:var(--brand)}.danger{padding:14px 16px;border-radius:14px;background:var(--danger-soft);color:var(--danger)}.warn{padding:14px 16px;border-radius:14px;background:var(--gold);color:#725300}
+    table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--soft)}code{padding:2px 6px;border-radius:6px;background:#edf1f5}.pill{display:inline-block;margin:3px 4px 3px 0;padding:3px 10px;border-radius:999px;background:var(--blue);color:#214d7a}
+    @media(max-width:760px){main{padding:28px 14px 60px}h1{font-size:28px}table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>LocalTalent Phase-2 Step 6：风险池与高风险能力准入规则</h1>
+  <p class="note">统一硬边界提醒：人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</p>
+
+  <section class="card">
+    <h2>开发前必读卡</h2>
+    <ul>
+      <li><strong>文件定位</strong>：冻结高风险能力从风险池进入开发的准入规则、评审材料、验收门槛和禁止绕行项。</li>
+      <li><strong>资料来源</strong>：边界文件、两份新 MD、Step1-Step5、本地 demo、一期文档。</li>
+      <li><strong>禁止越界点</strong>：禁止把风险池条目直接实现；禁止公共简历库；禁止真实 ATS/RPA、支付、短信、微信、小程序、App、地图、视频、直播。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>1. Step6 总目标</h2>
+    <table>
+      <tr><th>目标</th><th>说明</th></tr>
+      <tr><td>防止偷跑</td><td>高风险能力不能因为 demo 有入口、业务想要或前端能隐藏，就直接进入开发。</td></tr>
+      <tr><td>明确准入</td><td>高风险能力必须先有材料、方案、测试和验收门槛，才能进入后续 Prompt。</td></tr>
+      <tr><td>支持后续蓝图</td><td>二期蓝图可以引用本文件，把低风险功能和高风险能力分开排期。</td></tr>
+      <tr><td>保持可追溯</td><td>每个风险能力都必须能说明为什么暂缓、为什么准入、由谁负责、如何验收。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>2. 风险池状态分级</h2>
+    <table>
+      <tr><th>状态</th><th>含义</th><th>是否可开发</th></tr>
+      <tr><td><code>risk_pool</code></td><td>已识别风险，暂缓。</td><td>否。</td></tr>
+      <tr><td><code>assessment</code></td><td>正在评估业务价值、风险、合规和实现代价。</td><td>否。</td></tr>
+      <tr><td><code>design_review</code></td><td>已有方案草案，等待产品、安全、合规、技术评审。</td><td>否。</td></tr>
+      <tr><td><code>stub_only</code></td><td>只允许占位、文档、静态入口或 stub。</td><td>仅限 stub。</td></tr>
+      <tr><td><code>approved_for_prompt</code></td><td>已满足准入材料和评审要求，可进入后续 Prompt。</td><td>是，但只能按 Prompt 范围做。</td></tr>
+      <tr><td><code>rejected_or_deferred</code></td><td>已驳回或延期。</td><td>否。</td></tr>
+    </table>
+    <p class="warn">默认状态是 <code>risk_pool</code>。只有 <code>approved_for_prompt</code> 可以进入开发。</p>
+  </section>
+
+  <section class="card">
+    <h2>3. 高风险能力分组</h2>
+    <p><span class="pill">公共简历库</span><span class="pill">受控找人才</span><span class="pill">联系解锁</span><span class="pill">会员商业化/真实支付</span><span class="pill">真实短信/微信/小程序/App</span><span class="pill">真实地图/视频/直播</span><span class="pill">真实 ATS/RPA/受控候选池同步</span><span class="pill">AI/模型处理原始候选人数据</span><span class="pill">政府/运营明细看板</span></p>
+    <p>这些能力不是永远不做，而是必须先经过准入流程。没有准入材料和验收门槛时，不能进入开发。</p>
+  </section>
+
+  <section class="card">
+    <h2>4. 准入流程</h2>
+    <ol>
+      <li>登记风险池：写明风险主题、业务诉求、触发场景和涉及数据。</li>
+      <li>业务必要性评估：证明该能力是否招聘闭环必须项，是否可替代或可做 stub。</li>
+      <li>数据地图评估：列出数据来源、流向、存储、缓存、搜索、日志、导出和外部系统。</li>
+      <li>合规与安全方案：说明合法性依据、同意/撤回、字段白名单、权限和审计。</li>
+      <li>设计评审：产品、技术、安全/合规共同确认边界。</li>
+      <li>测试设计：定义字段黑名单、撤回联动、IDOR/BOLA、审计、脱敏和回滚测试。</li>
+      <li>Prompt 准入：通过评审后才能进入二期提示词中的明确 Prompt。</li>
+      <li>实施后验收：按 Prompt 验收，失败则回退到风险池。</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>5. 准入材料清单</h2>
+    <table>
+      <tr><th>材料</th><th>必填内容</th></tr>
+      <tr><td>业务目的</td><td>为什么要做，解决哪个招聘闭环问题，是否有低风险替代方案。</td></tr>
+      <tr><td>数据来源</td><td>数据从哪里来，是否来自候选人本人、企业、运营、外部系统或第三方供应商。</td></tr>
+      <tr><td>合法性依据</td><td>是否有单独告知、单独同意、合同依据、运营依据或政策依据。</td></tr>
+      <tr><td>同意/撤回方案</td><td>同意范围、版本、撤回入口、撤回后的下线、删除或隐藏联动。</td></tr>
+      <tr><td>字段白名单</td><td>允许展示、存储、导出、进入搜索的字段。</td></tr>
+      <tr><td>权限与审计</td><td>RBAC、数据域、字段级权限、audit_log、field_access_log。</td></tr>
+      <tr><td>安全测试</td><td>IDOR/BOLA、字段黑名单、脱敏、越权、幂等、重放和导出绕过测试。</td></tr>
+      <tr><td>旁路边界</td><td>缓存、搜索、日志、报表、导出、推荐、AI、外部同步是否会带出数据。</td></tr>
+      <tr><td>回滚/下线方案</td><td>出现风险时如何暂停、隐藏、撤回、删除、作废链接或停用外部能力。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>6. 关键准入门槛</h2>
+    <ul>
+      <li>公共简历库：禁止；只能改写为人才服务区发布快照公开，或企业受控找人才。</li>
+      <li>受控找人才：企业认证、候选人同意、未撤回、字段级权限、默认不展示联系方式、全链路审计。</li>
+      <li>联系解锁：必须有授权或审批依据、权益范围、有效期、访问次数和撤回后失效。</li>
+      <li>会员商业化/真实支付：必须先建立权益模型，支付供应商需安全与合规评审。</li>
+      <li>真实短信/微信/小程序/App：必须有模板、触达目的、退订、频控、隐私告知和供应商治理。</li>
+      <li>真实地图/视频/直播：必须有定位、内容审核、版权、举报、下架和供应商评审方案。</li>
+      <li>真实 ATS/RPA/受控候选池同步：必须明确数据来源合法性、最小字段、凭证安全和撤回联动。</li>
+      <li>AI/模型处理原始候选人数据：必须先字段裁剪、脱敏、最小必要、供应商审查和人工复核。</li>
+      <li>政府/运营明细看板：默认只展示聚合统计；明细必须审批、脱敏、审计。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>7. 上线前阻断规则</h2>
+    <p>以下任一条件成立，能力不得上线：</p>
+    <p><span class="pill">没有字段白名单</span><span class="pill">没有撤回联动</span><span class="pill">没有服务端权限方案</span><span class="pill">没有 IDOR/BOLA 测试</span><span class="pill">没有字段黑名单测试</span><span class="pill">没有审计日志方案</span><span class="pill">没有旁路边界</span><span class="pill">外部供应商未评审</span><span class="pill">候选人原始数据无合法性依据</span></p>
+  </section>
+
+  <section class="card">
+    <h2>8. 禁止绕行项</h2>
+    <p>不得把风险功能伪装成前端隐藏、运营备注、导出报表、搜索索引、缓存字段、调试日志、审计日志明文、外部同步、活动报名、会员权益、推荐位、AI 分析或管理员特权来提前实现。</p>
+    <p class="danger">如果某能力实质上会让未授权角色看到原始候选人数据、联系方式或敏感材料，就必须回到风险池准入流程。</p>
+  </section>
+
+  <section class="card">
+    <h2>9. 自动化验收关注点</h2>
+    <ul>
+      <li>风险能力有明确 Prompt，且 Prompt 写明允许范围和禁止事项。</li>
+      <li>公开响应字段白名单测试通过，人才服务区仍只展示发布快照。</li>
+      <li>撤回后公开展示、受控摘要、联系解锁和导出均失效或不可见。</li>
+      <li>candidate/company/operator/auditor 数据域隔离测试通过。</li>
+      <li>所有对象 ID 接口覆盖 IDOR/BOLA 阻断。</li>
+      <li>敏感字段读取写 <code>field_access_log</code>，高风险写动作写 <code>audit_log</code>。</li>
+      <li>日志、缓存、搜索、报表、导出不含未授权原始候选人数据。</li>
+      <li>对接接口仍仅 stub，除非对应 Prompt 明确完成真实接入准入。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>10. Step6 结论</h2>
+    <p>Step6 冻结了二期风险池与高风险能力准入规则。默认状态是 <code>risk_pool</code>，只有 <code>approved_for_prompt</code> 可以进入开发。没有字段白名单、撤回联动、服务端权限、审计和测试，就不得开发。</p>
+    <p>高保真门户优先补充：demo 中的地图、视频、直播、短信、微信、小程序、App、自由职业、求职登记、快速招聘联系方式、会员权益和支付仍属于风险池或占位能力。</p>
+    <p class="danger">高保真页面可以展示这些入口的视觉占位，但不得因为“像 demo”而绕过 Step6 准入。</p>
+  </section>
+</main>
+</body>
+</html>

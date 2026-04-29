@@ -1,0 +1,50 @@
+// 创建天地图实例对象
+function initTianMap() {
+  var opts = {
+    minWidth: 220, // 信息窗口宽度
+    closeOnClick: true,
+    offset: new T.Point(0, -10),
+    autoPan: true
+  }
+  var tianMap = new T.Map(mapItem.target_id) // 创建Map实例
+  var lng = parseFloat(mapItem.map_lng)
+  var lat = parseFloat(mapItem.map_lat)
+  var zoom = parseInt(mapItem.zoom)
+  var point = new T.LngLat(lng, lat) // 创建点坐标
+  tianMap.centerAndZoom(point, zoom)
+  var marker = new T.Marker(new T.LngLat(lng, lat))
+  tianMap.addOverLay(marker)
+  if (mapItem.infoWindow) {
+    var infoWindow = new T.InfoWindow(mapItem.infoWindow, opts);
+    tianMap.openInfoWindow(infoWindow,point);
+  }
+}
+
+// 创建百度地图实例对象
+function initBdMap() {
+  var opts = {
+    width: 300, // 信息窗口宽度
+    height: 80, // 信息窗口高度
+    title: "" // 信息窗口标题
+  }
+  if(mapItem.title){
+    opts.title = mapItem.title
+  }
+  var map = new BMap.Map(mapItem.target_id) // 创建Map实例
+  var lng = parseFloat(mapItem.map_lng)
+  var lat = parseFloat(mapItem.map_lat)
+  var zoom = parseInt(mapItem.zoom)
+  var point = new BMap.Point(lng, lat) // 创建点坐标
+  map.centerAndZoom(point, zoom)
+  map.disableScrollWheelZoom() //启用滚轮放大缩小
+  var marker = new BMap.Marker(new BMap.Point(lng, lat))
+  map.addOverlay(marker)
+  var top_left_control = new BMap.ScaleControl({ anchor: BMAP_ANCHOR_TOP_LEFT })
+  var top_left_navigation = new BMap.NavigationControl()
+  map.addControl(top_left_control)
+  map.addControl(top_left_navigation)
+  if (mapItem.infoWindow) {
+    var infoWindow = new BMap.InfoWindow(mapItem.infoWindow, opts)
+    map.openInfoWindow(infoWindow, point)
+  }
+}

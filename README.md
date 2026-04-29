@@ -64,8 +64,12 @@ LocalTalent 当前是地方人才服务平台一期工程。后端已按 Prompt 
 |-- infra
 |   `-- docker-compose.yml
 |-- scripts
+|   |-- demo_login_tokens
+|   |-- seed_demo_data
 |   |-- check_boundary
 |   `-- run_all
+|-- demo
+|   `-- localtalent_demo_data.sql
 `-- docs
 ```
 
@@ -110,6 +114,35 @@ npm start
 ```
 
 前端默认通过 `LOCALTALENT_API_BASE_URL=http://localhost:8080` 代理后端 API；`NEXT_PUBLIC_LOCALTALENT_SITE_URL` 用于生成 sitemap URL，默认 `http://localhost:3000`。
+
+## 演示数据与新人上手
+
+一期演示数据采用显式脚本加载，不进入 Flyway 自动迁移，不作为生产 seed。完整说明见 [docs/一期演示使用说明.md](docs/一期演示使用说明.md)。
+
+推荐本地演示流程：
+
+```bash
+docker compose -f infra/docker-compose.yml up -d
+cd backend
+./mvnw spring-boot:run
+```
+
+后端保持运行后，在新终端执行：
+
+```bash
+./scripts/seed_demo_data
+cd frontend
+npm ci
+npm run dev
+```
+
+前端保持运行后，在新终端获取登录命令：
+
+```bash
+./scripts/demo_login_tokens company
+```
+
+演示账号默认密码统一为 `LocalTalent@123456`。登录助手支持 `candidate-consented`、`candidate-revoked`、`candidate-pending`、`company`、`operator`、`auditor`，并输出可粘贴到浏览器 Console 的 `localStorage` 命令。
 
 ## 测试命令
 

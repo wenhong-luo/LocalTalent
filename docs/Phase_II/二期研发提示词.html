@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>LocalTalent 二期 Codex 投喂手册（高保真门户优先 · Prompt 15–23）</title>
+  <style>
+    body { margin:0; background:#f6f8fb; color:#1f2937; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.75; }
+    main { max-width:1180px; margin:0 auto; padding:36px 20px 72px; }
+    h1 { font-size:32px; margin:0 0 10px; }
+    .note { color:#475569; }
+    .card { background:#fff; border:1px solid #e5e7eb; border-radius:18px; padding:24px; margin:18px 0; box-shadow:0 10px 28px rgba(15,23,42,.06); }
+    .toc a { display:inline-block; margin:5px 8px 5px 0; padding:6px 10px; border-radius:999px; background:#ecfdf5; color:#047857; text-decoration:none; }
+    h2 { color:#0f766e; margin-top:0; }
+    table { width:100%; border-collapse:collapse; margin:12px 0; }
+    th,td { border:1px solid #e5e7eb; padding:10px 12px; vertical-align:top; }
+    th { background:#ecfdf5; color:#065f46; text-align:left; }
+    pre { background:#0f172a; color:#e5e7eb; border-radius:14px; padding:18px; white-space:pre-wrap; overflow:auto; }
+    code { background:#e2e8f0; padding:2px 6px; border-radius:6px; }
+    .copy-title { font-weight:700; color:#047857; margin-bottom:6px; }
+    .danger { border-left:4px solid #ef4444; background:#fff1f2; padding:10px 12px; border-radius:10px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>LocalTalent 二期 Codex 投喂手册（高保真门户优先 · Prompt 15–23）</h1>
+  <p class="note">从目录跳到当前轮次，复制“可复制投喂文本”即可。统一硬边界：人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据。</p>
+
+  <section class="card">
+    <h2>每轮开发读取顺序</h2>
+    <ol>
+      <li><code>00_PHASE_II_BOUNDARY.md</code></li>
+      <li><code>74cms人才网开发分析.md</code> 与 <code>人才网总盘点与高风险深挖评审稿.md</code></li>
+      <li><code>LocalTalent_phase2_demo_inventory.md</code> 与 <code>docs/Phase_II/demo/</code></li>
+      <li><code>LocalTalent_phase2_step1.md</code> 至 <code>step6.md</code></li>
+      <li><code>二期研发实施蓝图与任务拆解.md</code></li>
+      <li>本文当前 Prompt 卡片</li>
+    </ol>
+  </section>
+
+  <section class="card toc">
+    <h2>轮次目录</h2>
+    <a href="#p15">Prompt 15 / P2-0</a>
+    <a href="#p16">Prompt 16 / P2-1</a>
+    <a href="#p17">Prompt 17 / P2-2</a>
+    <a href="#p18">Prompt 18 / P2-3</a>
+    <a href="#p19">Prompt 19 / P2-4</a>
+    <a href="#p20">Prompt 20 / P2-5</a>
+    <a href="#p21">Prompt 21 / P2-6</a>
+    <a href="#p22">Prompt 22 / P2-7</a>
+    <a href="#p23">Prompt 23 / P2-8</a>
+    <a href="#risk">风险池专项模板</a>
+  </section>
+
+  <section class="card">
+    <h2>轮次总览</h2>
+    <table>
+      <tr><th>总序</th><th>二期序号</th><th>主题</th><th>重点</th></tr>
+      <tr><td>Prompt 15</td><td>P2-0</td><td>Demo 同步与页面盘点闸门</td><td>demo、inventory、边界脚本</td></tr>
+      <tr><td>Prompt 16</td><td>P2-1</td><td>公共门户 Shell 与全站头尾</td><td>顶部工具条、搜索头、导航、Footer</td></tr>
+      <tr><td>Prompt 17</td><td>P2-2</td><td>首页高保真首屏</td><td>分类墙、登录卡、公告 tab、广告位、推荐区</td></tr>
+      <tr><td>Prompt 18</td><td>P2-3</td><td>找工作 + 名企直聘列表页</td><td>职位筛选、职位卡片、投递/收藏入口</td></tr>
+      <tr><td>Prompt 19</td><td>P2-4</td><td>找企业与企业公开页</td><td>企业筛选、企业卡片、企业主页</td></tr>
+      <tr><td>Prompt 20</td><td>P2-5</td><td>人才服务区高保真改写简历库</td><td>发布快照白名单、简历库视觉改写</td></tr>
+      <tr><td>Prompt 21</td><td>P2-6</td><td>招聘会、就业政策、HR 工具箱与更多服务</td><td>公开内容频道、低风险占位</td></tr>
+      <tr><td>Prompt 22</td><td>P2-7</td><td>登录注册与管理中心入口体验</td><td>登录注册 UI、身份分流</td></tr>
+      <tr><td>Prompt 23</td><td>P2-8</td><td>二期高保真验收与演示收口</td><td>演示数据、DOM 验收、Runbook</td></tr>
+    </table>
+  </section>
+
+  <section class="card" id="p15"><h2>Prompt 15（P2-0）：Demo 同步与页面盘点闸门</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：二期边界、两份上游 MD、demo inventory、二期蓝图。
+- 本轮只做资料同步、盘点、边界脚本和文档入口，不做业务代码。
+
+本轮目标
+- 确认 docs/Phase_II/demo 包含桌面 demo 的 24 个 HTML 页面。
+- 完善 LocalTalent_phase2_demo_inventory.md/html。
+- 增强或新增二期规划闸门脚本。
+
+禁止事项
+- 禁止实现首页、列表页、登录页或任何业务功能。
+- 禁止新增迁移、接口、真实外部能力。
+- 禁止把 demo 的简历库做成公共简历库。
+
+输出要求（文件与命令）
+- 文档：demo inventory、二期边界、蓝图和提示词入口同步。
+- 命令：find docs/Phase_II/demo -name '*.html' | wc -l、./scripts/check_portal_snapshot_fields。
+
+验收要求（DoD，可自动化）
+- [ ] demo HTML 页面数为 24。
+- [ ] demo inventory 覆盖核心页面组。
+- [ ] 人才服务区字段脚本 PASS。
+
+最小投喂片段：
+请先阅读并严格遵守：
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_II/LocalTalent_phase2_demo_inventory.md
+- docs/Phase_II/二期研发实施蓝图与任务拆解.md
+- docs/Phase_II/二期研发提示词.md
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 15（P2-0）。
+禁止实现 Prompt 15 之外的内容。</pre></section>
+
+  <section class="card" id="p16"><h2>Prompt 16（P2-1）：公共门户 Shell 与全站头尾</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：demo inventory、Step1、Step2、二期蓝图和 demo 全部页面公共头尾。
+- 本轮只实现公共门户 Shell，不实现首页内容区、职位列表、企业列表或私有中心增强。
+
+本轮目标
+- 实现 TopUtilityBar、LogoSearchHeader、PortalMainNav、MoreServicesMenu、PortalFooter、FloatingToolBar。
+- 固定导航：首页 / 找工作 / 找企业 / 人才服务区 / 招聘会 / 就业政策 / HR 工具箱 / 更多服务 / 管理中心。
+- 搜索头支持找工作关键词入口，高级搜索和地图搜索只做占位。
+
+禁止事项
+- 禁止实现首页高保真首屏内容区。
+- 禁止真实地图、短信、微信、小程序、App 接入。
+- 禁止新增公共简历库或搜索简历入口。
+
+输出要求（文件与命令）
+- 前端：公共门户布局组件、导航组件、Footer、右侧工具条、SEO 基础。
+- 测试：导航链接、Shell 渲染、字段黑名单、外部能力占位。
+- 命令：cd frontend && npm test && npm run build、./scripts/check_portal_snapshot_fields。
+
+验收要求（DoD，可自动化）
+- [ ] 全站头尾和导航 DOM 存在。
+- [ ] “简历库”不出现在公开导航，统一为人才服务区。
+- [ ] 地图、微信、小程序、App 入口为占位或禁用态。
+
+最小投喂片段：
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 16（P2-1）。
+禁止实现 Prompt 16 之外的内容。</pre></section>
+
+  <section class="card" id="p17"><h2>Prompt 17（P2-2）：首页高保真首屏</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：demo inventory、Step2、二期蓝图和 demo 首页。
+- 本轮只实现首页首屏与公开推荐模块，不实现找工作详情、找企业详情、私有中心或真实外部能力。
+
+本轮目标
+- 实现首页结构：职位分类墙、快捷入口、登录卡片、公告/招聘会 tab、广告位、扫码 CTA、明星企业/推荐企业、热招职位。
+- 登录卡片支持求职者/企业 tab UI；真实短信验证码禁用占位。
+- 所有模块 SSR/SEO 友好，不渲染敏感字段。
+
+禁止事项
+- 禁止首页展示手机号、邮箱、简历正文、附件、证据、审核材料。
+- 禁止真实短信、微信扫码、小程序、App、地图、视频、直播。
+- 禁止将人才服务区或首页变成公共简历库。
+
+输出要求（文件与命令）
+- 前端：首页页面、分类墙、快捷入口、登录卡、公告 tab、广告位、推荐企业/职位组件。
+- 测试：首页 DOM 结构、字段黑名单、SSR/构建、占位态。
+- 命令：cd frontend && npm test && npm run build、./scripts/check_portal_snapshot_fields。
+
+验收要求（DoD，可自动化）
+- [ ] 首页 DOM 包含顶部工具条、搜索区、分类墙、登录卡、公告 tab、快捷入口、广告位、推荐企业/职位和浮动二维码占位。
+- [ ] 首页不渲染原始候选人数据字段。
+- [ ] 外部能力均为占位或禁用态。
+
+最小投喂片段：
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 17（P2-2）。
+禁止实现 Prompt 17 之外的内容。</pre></section>
+
+  <section class="card" id="p18"><h2>Prompt 18（P2-3）：找工作 + 名企直聘列表页</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：demo inventory、Step2、Step3、二期蓝图和 demo 找工作/名企直聘页。
+- 本轮只实现公开职位搜索与名企直聘列表，不实现地图找工作、付费推广或职位发布流程。
+
+本轮目标
+- 实现找工作列表、名企直聘入口和职位详情 SEO 入口。
+- 支持地区、关键词、职类、薪资、经验、行业、规模、性质、学历、更新时间、排序。
+- 职位卡片展示公开字段、认证/名企标签、投递/收藏入口、扫码求职 CTA。
+
+禁止事项
+- 禁止展示企业内部联系方式、审核材料、营业执照附件。
+- 禁止真实地图找工作、会员置顶、付费推广。
+- 禁止未审核职位或未认证企业职位公开可见。
+
+输出要求（文件与命令）
+- 前端：找工作/名企直聘页面、筛选组件、职位卡片、详情入口、SEO metadata。
+- 测试：职位可见性、筛选、字段黑名单、SEO 构建。
+
+验收要求（DoD，可自动化）
+- [ ] 仅在线职位和认证企业职位可见。
+- [ ] 筛选 query 稳定可分享。
+- [ ] 职位卡片不含企业内部联系方式。
+
+最小投喂片段：
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 18（P2-3）。
+禁止实现 Prompt 18 之外的内容。</pre></section>
+
+  <section class="card" id="p19"><h2>Prompt 19（P2-4）：找企业与企业公开页</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：demo inventory、Step2、Step3、Step4 和 demo 找企业页。
+- 本轮只实现企业公开列表和企业公开主页，不实现企业后台增强或受控找人才。
+
+本轮目标
+- 实现企业列表，支持关键词、城市、行业、性质、规模、认证标签筛选。
+- 实现企业公开主页，展示企业公开简介、认证标签、在招职位聚合。
+
+禁止事项
+- 禁止展示联系人手机号/邮箱、营业执照附件、审核材料、后台备注。
+- 禁止企业主页展示投递池、导出记录、审计记录。
+- 禁止受控找人才、联系解锁、会员特权。
+
+输出要求（文件与命令）
+- 前端：找企业列表、企业公开主页、筛选组件、SEO metadata。
+- 测试：企业字段白名单、筛选、在招职位聚合、下线职位不可见。
+
+验收要求（DoD，可自动化）
+- [ ] 企业列表和主页只展示公开字段。
+- [ ] 企业主页仅聚合该企业在线职位。
+- [ ] 无任何公共简历库或找人才能力。
+
+最小投喂片段：
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 19（P2-4）。
+禁止实现 Prompt 19 之外的内容。</pre></section>
+
+  <section class="card" id="p20"><h2>Prompt 20（P2-5）：人才服务区高保真改写简历库</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：demo inventory、Step2、Step6 和 demo 简历库页。
+- 本轮参考 demo 简历库布局，但公开侧必须改写为人才服务区。
+- 唯一公开数据源仍是 candidate_publish_snapshot。
+
+本轮目标
+- 用类似 demo 简历库的筛选、卡片、标签和分页体验增强人才服务区。
+- 只展示发布快照白名单字段。
+- 支持城市、职类、经验、更新时间、排序等低风险筛选。
+
+禁止事项
+- 禁止公共简历库。
+- 禁止返回手机号、邮箱、简历正文、附件对象 key、证据、原始 JSON、聊天记录。
+- 禁止查看简历、联系解锁、搜索简历、受控找人才。
+
+输出要求（文件与命令）
+- 前端：人才服务区列表高保真改版、筛选、空态、字段黑名单测试。
+- 测试：发布快照唯一数据源、字段黑名单、撤回不可见、SEO。
+
+验收要求（DoD，可自动化）
+- [ ] 人才服务区仍只读发布快照。
+- [ ] DOM 和响应不含任何原始候选人数据字段。
+- [ ] 撤回后不可见。
+
+最小投喂片段：
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 20（P2-5）。
+禁止实现 Prompt 20 之外的内容。</pre></section>
+
+  <section class="card" id="p21"><h2>Prompt 21（P2-6）：招聘会、就业政策、HR 工具箱与更多服务占位</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：demo inventory、Step2、Step5、Step6 和招聘会/资讯/工具箱/更多服务 demo。
+- 本轮只做公开内容频道和低风险占位，不做报名名单、展位售卖、真实地图、视频、直播、自由职业交易。
+
+本轮目标
+- 实现招聘会列表/详情公开展示。
+- 实现就业政策、职场资讯、公告、HR 工具箱公开频道。
+- 今日招聘、快速招聘、校园招聘、网络招聘会、求职登记、视频招聘、自由职业按风险分级做静态入口、禁用态或低风险列表。
+
+禁止事项
+- 禁止报名名单、参会个人明细、签到证据、联系方式公开。
+- 禁止展位售卖、会员权益、真实支付。
+- 禁止真实地图、视频、直播、短信、微信通知。
+
+输出要求（文件与命令）
+- 前端：招聘会列表/详情，政策资讯/HR 工具箱列表/详情，更多服务入口。
+- 测试：公开字段白名单、软删除/下线不可见、SEO 构建、风险入口禁用态。
+
+验收要求（DoD，可自动化）
+- [ ] 招聘会和内容频道不泄露报名名单或候选人明细。
+- [ ] 高风险更多服务入口为占位或禁用态。
+- [ ] SEO metadata 与 sitemap 覆盖新增公开频道。
+
+最小投喂片段：
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 21（P2-6）。
+禁止实现 Prompt 21 之外的内容。</pre></section>
+
+  <section class="card" id="p22"><h2>Prompt 22（P2-7）：登录注册与管理中心入口体验</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：demo inventory、Step3、Step4 和登录注册 demo。
+- 本轮只实现求职者/招聘者登录注册 UI、身份分流和无权限态；不接真实短信、微信、小程序、App。
+
+本轮目标
+- 实现求职者登录、求职者注册、招聘者登录、招聘者注册页面 UI。
+- 复用一期本地账号/JWT；手机号验证码登录为禁用或占位。
+- 登录后按 identity_type 分流到 /candidate/center、/company、/admin。
+
+禁止事项
+- 禁止真实短信发送。
+- 禁止真实微信扫码、小程序、App 登录。
+- 禁止前端绕过服务端权限。
+
+输出要求（文件与命令）
+- 前端：登录/注册页面、身份分流、无权限态、禁用占位。
+- 测试：登录表单渲染、身份分流、无权限态、外部登录禁用。
+
+验收要求（DoD，可自动化）
+- [ ] 求职者/招聘者登录注册 UI 可渲染。
+- [ ] 登录后身份分流正确。
+- [ ] 短信/微信/小程序/App 为禁用占位，不真实调用。
+
+最小投喂片段：
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 22（P2-7）。
+禁止实现 Prompt 22 之外的内容。</pre></section>
+
+  <section class="card" id="p23"><h2>Prompt 23（P2-8）：二期高保真验收与演示收口</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：全部二期文档、demo inventory、二期蓝图和 Prompt 15-22 结果。
+- 本轮只做集成验收、演示数据、Runbook、测试矩阵和总闸门，不新增业务范围。
+
+本轮目标
+- 补二期演示数据，支撑首页、找工作、找企业、人才服务区、招聘会、资讯、HR 工具箱、登录入口演示。
+- 补 DOM/视觉结构验收，确认页面接近 demo 模块结构。
+- 更新 Runbook、Testing、README 和二期验收清单。
+
+禁止事项
+- 禁止为了演示绕过权限、审批、字段级权限或审计。
+- 禁止引入真实外部能力。
+- 禁止把风险池能力升级为当前需求。
+
+输出要求（文件与命令）
+- demo 数据、使用说明、测试矩阵、Runbook、边界脚本、必要前后端回归测试。
+- 命令：./scripts/check_portal_snapshot_fields、./scripts/check_boundary、cd backend && ./mvnw test、cd frontend && npm test && npm run build。
+
+验收要求（DoD，可自动化）
+- [ ] demo 页面结构验收覆盖首页、找工作、找企业、人才服务区、招聘会/资讯/工具箱。
+- [ ] 公开字段白名单、撤回下线、IDOR、审计、SEO 全部有测试或脚本守护。
+- [ ] 新人按 Runbook 可完成二期演示。
+
+最小投喂片段：
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 23（P2-8）。
+禁止实现 Prompt 23 之外的内容。</pre></section>
+
+  <section class="card" id="risk">
+    <h2>风险池专项 Prompt 模板（非当前开发范围）</h2>
+    <p class="danger">仅当某一风险能力在 <code>LocalTalent_phase2_step6.md</code> 中从 <code>risk_pool</code> 完成准入并明确标记为 <code>approved_for_prompt</code> 后，才允许复制本模板。</p>
+    <p class="copy-title">可复制投喂文本</p>
+    <pre>本轮是风险池专项 Prompt，不属于 Prompt 15-23 主线。
+请先出示 approved_for_prompt 结论、准入材料、字段白名单、撤回联动、服务端权限、审计、测试和回滚方案。
+禁止绕过字段白名单、撤回联动、服务端权限、审计和测试。</pre>
+  </section>
+</main>
+</body>
+</html>

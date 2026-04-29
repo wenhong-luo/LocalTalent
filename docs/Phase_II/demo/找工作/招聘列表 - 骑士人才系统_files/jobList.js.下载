@@ -1,0 +1,970 @@
+$(document).ready(function() {
+    $(function() {
+        // ***** 列表请求二维码
+        var requestTimer;
+        $('.wx_qrcode').on('click',function(){
+            var job_id = $(this).data('id')
+            //var share_url = JSON.stringify($(this).data('url'))
+            // requestTimer = setTimeout(function(){
+            var post_url = $(this).data('url')
+            $('.hover_img').hide()
+            $('#show_wx_qrcode_'+job_id).find('.hover_img').show()
+            $('#wx_qrcode_'+job_id).attr('src', post_url);
+            // requestTimer = null;
+            // },500)
+        })
+        $('.wx_qrcode').on('mouseleave',function(){
+            setTimeout(function(){
+                $('.hover_img').hide()
+            },100)
+
+        })
+        // ***** 列表请求二维码
+        
+        $('.hand_in_resume').on('click', function(event) {
+            event.preventDefault();
+            id = $(this).data('id')
+            doApplyList(id)
+        });
+        function loadTencent() {
+            if (window.BMap !== undefined) {
+                return
+            }
+            var script = document.createElement('script')
+            script.type = 'text/javascript'
+            script.src = 'https://turing.captcha.qcloud.com/TCaptcha.js'
+            document.body.appendChild(script)
+        }
+
+        function loadVaptcha() {
+            if (window.BMap !== undefined) {
+                return
+            }
+            var script = document.createElement('script')
+            script.type = 'text/javascript'
+            script.src = 'https://v.vaptcha.com/v3.js'
+            document.body.appendChild(script)
+        }
+
+        if (parseInt(qscms.captcha_open) == 1) {
+            if (qscms.captcha_type == 'tencent') {
+                loadTencent()
+            } else if (qscms.captcha_type == 'vaptcha') {
+                loadVaptcha()
+            }else if(qscms.captcha_type == 'qscms'){
+                // 骑士验证码
+                qsCaptchaLoad()
+            }
+        }
+
+        // 职位点击标题变色 start
+        var isLoginLocal = localStorage.getItem('isLogin');
+        var isLogin = window.qscms.isLogin;
+        if (!isLogin == isLoginLocal) { //登录状态改变时清空缓存数据
+            localStorage.setItem('selectArr', []); //职位
+            setCookie("selectArr", JSON.stringify([]))//用来查询看过的职位
+            localStorage.setItem('selectResumeArr', []); //简历
+            localStorage.setItem('selectComArr', []); //企业
+        }
+        
+        var selectArrOnload = localStorage.getItem('selectArr') == null ||
+            localStorage.getItem('selectArr') == 'null' ||
+            localStorage.getItem('selectArr') == '' ||
+            localStorage.getItem('selectArr') == undefined || localStorage.getItem('selectArr').data == null ? [] : JSON.parse(
+                localStorage.getItem('selectArr'))
+        preResumelist()
+
+        function preResumelist() {
+            for (let j of selectArrOnload) {
+                $(".job_title").each(function() {
+                    if ($(this).data('id') == j) {
+                        $(this).addClass('job_title_active')
+                    }
+                });
+            }
+        }
+        var selectArr = selectArrOnload
+        $('.job_text').click(function(e) {
+            if (!$(this).find(".job_title").hasClass('job_title_active')) {
+                var select_id = $(this).find(".job_title").data('id')
+                selectArr.push(select_id)
+                var selectArrCookie = selectArr.length > 5 ? selectArr.slice(-5).reverse() :
+                    selectArr.reverse()
+                var selectArrStr = JSON.stringify(selectArr)
+                localStorage.setItem('selectArr', selectArrStr)
+                let newArr = selectArrCookie.join(',')
+                setCookie("selectArr", JSON.stringify(newArr))//用来查询看过的职位
+                if (!$(this).find(".job_title").hasClass('job_title_active')) {
+                    $(this).find(".job_title").addClass('job_title_active')
+                }
+            }
+        });
+        // 职位点击标题变色 end
+        $('.J_allListBox .job_list2 .duty_list li').addClass('substring9')
+        $('.J_allListBox :last-child .duty_list li').removeClass('substring9').addClass(
+            'substring2')
+    })
+})
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        keyword: keyword,
+        d1: d1,
+        d2: d2,
+        d3: d3,
+        cityLevel: cityLevel,
+        citySelectedText: '',
+        c1: c1,
+        c2: c2,
+        c3: c3,
+        categoryLevel: categoryLevel,
+        categorySelectedText: '',
+        w1: w1,
+        w2: w2,
+        wageSelectedText: '',
+        tag: tag,
+        tagSelectedText: '',
+        trade: trade,
+        tradeSelectedText: '',
+        scale: scale,
+        scaleSelectedText: '',
+        nat: nat,
+        natSelectedText: '',
+        edu: edu,
+        eduSelectedText: '',
+        exp: exp,
+        expSelectedText: '',
+        settr: settr,
+        settrSelectedText: '',
+        showSelected: false,
+        displayMethod: true,
+        showWeChatQrcode: false,
+        weChatQrcodeContent: '',
+        bind_timer: '',
+        loginUtype: 0,
+        statAfterLogin: {},
+        scan: false,
+        loginByMobile: false,
+        username: '',
+        password: '',
+        mobile: '',
+        code: '',
+        wechat_open_appid: qscms.wechat_open_appid,
+        sendSmsBtnDisabled: false,
+        sendSmsBtnText: '获取验证码',
+        sendSmsTimer: '',
+        sendSmsInterval: 60,
+        captcha_open: qscms.captcha_open,
+        captcha_type: qscms.captcha_type,
+        showPictureCaptcha: false,
+        captchaForm: {
+            code: ''
+        },
+        captchaRules: {
+            code: [{
+                required: true,
+                message: '请输入验证码',
+                trigger: 'blur'
+            }],
+        },
+        secret_str: '',
+        catpchaSrc: '',
+        pictureCaptchaCallback: '',
+        guideQrcode: '',
+        showGuide: false,
+        sendSmsLimit: false,
+        formUtype: 2,
+        regularMobile: /^13[0-9]{9}$|14[0-9]{9}$|15[0-9]{9}$|18[0-9]{9}$|17[0-9]{9}$|16[0-9]{9}$|19[0-9]{9}$/,
+        bind_timer: '',
+        scanQrcodeImg: '',
+        showBindWeixin: false,
+        jobContrastUrl: jobContrastUrl,
+        guide_open: qscms.guide_open
+    },
+    created() {
+        if (window.WxLogin === undefined) {
+            var script = document.createElement('script')
+            var head = document.getElementsByTagName('head')[0]
+            script.type = 'text/javascript'
+            script.charset = 'UTF-8'
+            script.src = 'https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js'
+            head.appendChild(script)
+        }
+        this.getUserInfo()
+    },
+    mounted: function() {
+        var listtype = getStorageValue('joblist_type');
+        if (!listtype || listtype == 'detail') {
+            this.displayMethod = true
+        } else {
+            this.displayMethod = false
+        }
+        // 已选条件展示
+        if (this.d1) {
+            this.getClassify('citycategory'); // 地区
+        }
+        if (this.c1) {
+            this.getClassify('jobcategory'); // 职位分类
+        }
+        // 薪资
+        if (this.w1 && !this.w2) {
+            // 最高薪资以上
+            this.wageSelectedText = this.w1 + '元以上';
+        } else if (this.w1 && this.w2) {
+            // 薪资区间
+            this.wageSelectedText = this.w1 + '-' + this.w2 + '元';
+        } else if (!this.w1 && this.w2) {
+            // 最低薪资以下
+            this.wageSelectedText = this.w2 + '元以下';
+        }
+        // 职位亮点
+        if (this.tag) {
+            this.getClassify('jobTag');
+            $('.so_condition .J_dropdown').eq(4).addClass('active');
+        }
+        // 行业类别
+        if (this.trade) {
+            this.getClassify('trade');
+            $('.so_condition .J_dropdown').eq(0).addClass('active');
+        }
+        // 企业规模
+        if (this.scale) {
+            this.getClassify('companyScale');
+            $('.so_condition .J_dropdown').eq(1).addClass('active');
+        }
+        // 工作性质
+        if (this.nat) {
+            this.getClassify('jobNature');
+            $('.so_condition .J_dropdown').eq(2).addClass('active');
+        }
+        // 学历要求
+        if (this.edu) {
+            this.getClassify('education');
+            $('.so_condition .J_dropdown').eq(3).addClass('active');
+        }
+        // 工作经验
+        if (this.exp) {
+            this.getClassify('experience');
+            // $('.so_condition .J_dropdown').eq(4).addClass('active');
+        }
+        // 更新时间
+        if (this.settr) {
+            this.settrSelectedText = this.settr + '天内';
+            $('.so_condition .J_dropdown').eq(5).addClass('active');
+        }
+        // 是否显示已选条件
+        if (this.keyword || this.d1 || this.c1 || this.w1 || this.w2 || this.tag || this.trade || this
+            .scale || this.nat || this.edu || this.exp || this.settr) {
+            this.showSelected = true;
+        }
+        if(this.loginUtype !=0 && !qscms.imToken){
+            initWebSocket()
+        }
+    },
+    methods: {
+        // 跳转简历诊断
+        jumpResumeDiagnosis(){
+            window.location.href = qscms.locationList.resumeDiagnosisIndex
+        },
+        tagSelect(id){
+            var tag_arr = this.tag.split('_')
+            var array = tag_arr.filter(function(item) {
+                // 返回 true 的元素会保留在新数组中
+                return item !== null && item !== undefined && item !== '';
+            });
+            // 如果已选择 则不新增
+            let pushId = id.toString()
+            if(array.indexOf(pushId) == -1){
+                array.push(id)
+            }
+            var url = array.join('_')
+            var jump_url = joblist.replace('_tag_', url)
+            window.location.href = jump_url
+        },
+        startIm: function(id) {
+            // let utype = this.loginUtype
+            // let funParam = {
+            //     jobid:id
+            // }
+            // personalIm(funParam,utype)
+            let that = this
+            let params = {
+                jobid:id ,
+            }
+            if(qscms.loginUtype !== 2){
+            let dialog_params = {
+                errorMsg: "当前操作需要登录求职者账号",
+                funParam:params,
+                funName:"startIm"
+            }
+            doLoginDialog(dialog_params, 2)
+            }else{
+            startIm(params, 2)
+            }
+            // var that = this
+            // if (parseInt(that.loginUtype) === 0) {
+            //     // 未登录
+            //     that.$confirm('当前操作需要登录求职者账号', '提示', {
+            //         type: 'warning',
+            //         confirmButtonText: '去登录'
+            //     }).then(function() {
+            //         location.href = qscms.locationList.loginPersonal + '?redirect=' + location
+            //             .href
+            //     })
+            // } else if (parseInt(that.loginUtype) !== 2) {
+            //     that.$confirm('当前操作需要登录求职者账号', '提示', {
+            //             type: 'warning',
+            //             confirmButtonText: '去登录'
+            //         }).then(function() {
+            //             location.href = qscms.locationList.loginPersonal + '?redirect=' + location
+            //                 .href
+            //         })
+            //         .catch(function() {})
+            // } else {
+            //     httppost(qscms.apiList.imStart, {
+            //             token: qscms.imToken,
+            //             jobid: id
+            //         })
+            //         .then(function(res) {
+            //             if (res.data.next == '') {
+            //                 location.href = qscms.locationList.personalIm + '?chat=' + res.data
+            //                     .chatid
+            //                 return false
+            //             }
+            //             if (res.data.next == 'disabled') {
+            //                 that.$alert(res.message, '系统提示', {
+            //                     showCancelButton: false,
+            //                     type: 'warning'
+            //                 })
+            //                 return false
+            //             }
+            //             if (res.data.next == 'complete_resume') {
+            //                 that.$alert(res.message, '系统提示', {
+            //                     showCancelButton: false,
+            //                     confirmButtonText: '去完善简历',
+            //                     type: 'warning',
+            //                     dangerouslyUseHTMLString: true,
+            //                     callback: () => {
+            //                         location.href = qscms.locationList.personalResume
+            //                         return false
+            //                     }
+            //                 })
+            //                 return false
+            //             }
+            //             if (res.data.next == 'bind_weixin') {
+            //                 that.showBindWeixin = true
+            //                 that.bind_timer = setInterval(that.loopCheckBind, 3000)
+            //                 return false
+            //             }
+            //         })
+            //         .catch(function(res) {
+            //             that.$message.error(res.message)
+            //         })
+            // }
+        },
+        bindWeixinOpened: function() {
+            var that = this
+            httpget(qscms.apiList.qrcode, {
+                    type: 'bind_weixin'
+                })
+                .then(function(res) {
+                    that.scanQrcodeImg = res.data
+                })
+                .catch(function() {})
+        },
+        handlerForget(formUtype) {
+            var url = qscms.locationList.forget
+            url = url.replace('1', formUtype)
+            location.href = url
+        },
+        registerUser() {
+            location.href = qscms.locationList.regPersonal
+        },
+        changeImg: function() {
+            var that = this
+            httpget(qscms.apiList.captchaPicture, {})
+                .then(function(res) {
+                    that.secret_str = res.data.secret_str
+                    that.catpchaSrc = res.data.src
+                })
+                .catch(function() {})
+        },
+        pictureCaptchaOpened: function() {
+            this.changeImg()
+        },
+        submitPictureCaptcha: function() {
+            var that = this
+            that.$refs.captchaForm.validate(function(valid) {
+                if (valid) {
+                    that.showPictureCaptcha = false
+                    that[that.pictureCaptchaCallback]({
+                        code: that.captchaForm.code,
+                        secret_str: that.secret_str
+                    })
+                    that.captchaForm.code = ''
+                } else {
+                    that.captchaForm.code = ''
+                    return false;
+                }
+            });
+        },
+        getUserInfo: function() {
+            var that = this
+            httpget(qscms.apiList.userinfo).then(function(res) {
+                if (res.data.login === true) {
+                    that.loginUtype = res.data.userinfo.utype
+                    that.getStatAfterLogin()
+                    that.showGuide = false
+                } else {
+                    if (that.guide_open == '1') {
+                        that.showGuide = true
+                    }
+                }
+            }).catch(function() {})
+        },
+        getStatAfterLogin: function() {
+            var that = this
+            httpget(qscms.apiList.statAfterLogin).then(function(res) {
+                that.statAfterLogin = res.data
+            }).catch(function() {})
+        },
+        handlerMemberCenter: function(utype) {
+            if (utype == 1) {
+                location.href = qscms.locationList.indexCompany
+            } else {
+                location.href = qscms.locationList.indexPersonal
+            }
+        },
+        // 发送验证码
+        sendSms: function() {
+            var that = this
+            if (that.sendSmsBtnDisabled === true) {
+                return false
+            }
+            if (!that.mobile) {
+                that.$message.error('请输入手机号')
+                return false
+            }
+            if (!that.regularMobile.test(that.mobile)) {
+                that.$message.error('手机号格式不正确')
+                return false
+            }
+            if (that.captcha_open == 1) {
+                if (that.captcha_type == 'tencent') {
+                    var captchaWindow = new TencentCaptcha(qscms.captcha_tencent_appid,
+                        function(res) {
+                            that.doSendSms(res)
+                        });
+                    captchaWindow.show()
+                } else if (that.captcha_type == 'vaptcha') {
+                    vaptcha({
+                        vid: qscms.captcha_vaptcha_vid, // 验证单元id
+                        type: "invisible", // 显示类型 隐藏式
+                        scene: 0, // 场景值 默认0
+                        offline_server: "", //离线模式服务端地址，若尚未配置离线模式，请填写任意地址即可。
+                    }).then(function(vaptchaObj) {
+                        obj = vaptchaObj; //将VAPTCHA验证实例保存到局部变量中
+                        //获取token的方式二：
+                        vaptchaObj.listen("pass", function() {
+                            that.doSendSms({
+                                code: vaptchaObj.getToken()
+                            })
+                        });
+                        //关闭验证弹窗时触发
+                        vaptchaObj.listen("close", function() {
+                            //验证弹窗关闭触发
+                        });
+                        obj.validate();
+                    });
+                }else if(that.captcha_type == "qscms"){
+                    qsCaptchaShow().then(res=>{
+                        that.doSendSms({secret_str:res})
+                    })
+                }else {
+                    that.showPictureCaptcha = true
+                    that.pictureCaptchaCallback = 'doSendSms'
+                }
+            } else {
+                that.doSendSms(null)
+            }
+        },
+        //zdq 短信验证码重复发送修改
+        doSendSms: function(captcha) {
+            var that = this
+            if (that.sendSmsLimit) {
+                return false
+            }
+            httppost(qscms.apiList.getLoginCode, {
+                mobile: that.mobile,
+                utype: that.formUtype,
+                captcha: captcha
+            }).then(function(res) {
+                that.sendSmsLimit = false
+                that.$message({
+                    type: 'success',
+                    message: '验证码发送成功'
+                })
+                that.sendSmsTimer = setInterval(function() {
+                    if (that.sendSmsInterval === 0) {
+                        that.sendSmsBtnDisabled = false
+                        that.sendSmsBtnText = '获取验证码'
+                        that.sendSmsInterval = 60
+                        clearInterval(that.sendSmsTimer)
+                    } else {
+                        that.sendSmsBtnDisabled = true
+                        that.sendSmsBtnText = '重发 ' + that.sendSmsInterval + ' 秒'
+                        that.sendSmsInterval--
+                    }
+                }, 1000)
+            }).catch(function() {
+                that.sendSmsLimit = false
+            })
+        },
+        qqLogin: function() {
+            location.href = qscms.locationList.oauthQq
+        },
+        doLogin: function() {
+            var that = this
+            if (that.loginByMobile) {
+                if (!that.mobile) {
+                    that.$message.error('请输入手机号')
+                    return false
+                }
+                if (!that.regularMobile.test(that.mobile)) {
+                    that.$message.error('手机号格式不正确')
+                    return false
+                }
+                if (!that.code) {
+                    that.$message.error('请输入验证码')
+                    return false
+                }
+                var data = {
+                    mobile: that.mobile
+                }
+                httpget(qscms.apiList.loginByCode, data).then(function(check_res) {
+                    var setShow = false
+                    if (check_res.data == 1) {
+                        setShow = true
+                    }
+                    if (setShow) {
+                        if (that.captcha_type == 'tencent') {
+                            var captchaWindow = new TencentCaptcha(
+                                qscms.captcha_tencent_appid,
+                                function(res) {
+                                    that.doRequestLoginByCode(res)
+                                });
+                            captchaWindow.show()
+                        } else if (that.captcha_type == 'vaptcha') {
+                            vaptcha({
+                                vid: qscms.captcha_vaptcha_vid, // 验证单元id
+                                type: "invisible", // 显示类型 隐藏式
+                                scene: 0, // 场景值 默认0
+                                offline_server: "", //离线模式服务端地址，若尚未配置离线模式，请填写任意地址即可。
+                            }).then(function(vaptchaObj) {
+                                obj = vaptchaObj; //将VAPTCHA验证实例保存到局部变量中
+                                //获取token的方式二：
+                                vaptchaObj.listen("pass", function() {
+                                    that.doRequestLoginByCode({
+                                        code: vaptchaObj.getToken()
+                                    })
+                                });
+                                //关闭验证弹窗时触发
+                                vaptchaObj.listen("close", function() {
+                                    //验证弹窗关闭触发
+                                });
+                                obj.validate();
+                            });
+                        }else if(that.captcha_type == "qscms"){
+                            qsCaptchaShow().then(res=>{
+                                that.doRequestLoginByCode({secret_str:res})
+                            })
+                        } else {
+                            that.showPictureCaptcha = true
+                            that.pictureCaptchaCallback = 'doRequestLoginByCode'
+                        }
+                    } else {
+                        that.doRequestLoginByCode(null)
+                    }
+                }).catch(function() {})
+
+            } else {
+                if (!that.username) {
+                    that.$message.error('请输入手机号/用户名/邮箱')
+                    return false
+                }
+                if (!that.password) {
+                    that.$message.error('请输入密码')
+                    return false
+                }
+                var data = {
+                    username: that.username
+                }
+                httpget(qscms.apiList.loginByPwd, data).then(function(check_res) {
+                    var setShow = false
+                    if (check_res.data == 1) {
+                        setShow = true
+                    }
+                    if (setShow) {
+                        if (that.captcha_type == 'tencent') {
+                            var captchaWindow = new TencentCaptcha(
+                                qscms.captcha_tencent_appid,
+                                function(res) {
+                                    that.doRequestLoginByPwd(res)
+                                });
+                            captchaWindow.show()
+                        } else if (that.captcha_type == 'vaptcha') {
+                            vaptcha({
+                                vid: qscms.captcha_vaptcha_vid, // 验证单元id
+                                type: "invisible", // 显示类型 隐藏式
+                                scene: 0, // 场景值 默认0
+                                offline_server: "", //离线模式服务端地址，若尚未配置离线模式，请填写任意地址即可。
+                            }).then(function(vaptchaObj) {
+                                obj = vaptchaObj; //将VAPTCHA验证实例保存到局部变量中
+                                //获取token的方式二：
+                                vaptchaObj.listen("pass", function() {
+                                    that.doRequestLoginByPwd({
+                                        code: vaptchaObj.getToken()
+                                    })
+                                });
+                                //关闭验证弹窗时触发
+                                vaptchaObj.listen("close", function() {
+                                    //验证弹窗关闭触发
+                                });
+                                obj.validate();
+                            });
+                        }else if(that.captcha_type == "qscms"){
+                            qsCaptchaShow().then(res=>{
+                                that.doRequestLoginByPwd({secret_str:res})
+                            })
+                        } else {
+                            that.showPictureCaptcha = true
+                            that.pictureCaptchaCallback = 'doRequestLoginByPwd'
+                        }
+                    } else {
+                        that.doRequestLoginByPwd(null)
+                    }
+                }).catch(function() {})
+            }
+        },
+        doRequestLoginByPwd: function(captcha) {
+            var that = this
+            var data = {
+                username: that.username,
+                password: that.password,
+                utype: that.formUtype,
+                captcha: captcha
+            }
+            httppost(qscms.apiList.loginByPwd, data).then(function(res) {
+                var visitor = {
+                    utype: res.data.utype,
+                    token: res.data.token,
+                    mobile: res.data.mobile,
+                    userIminfo: res.data.user_iminfo
+                }
+                if (qscms.subsite_open === 1 && qscms.subsite_domain != '') {
+                    setCookie("qscms_visitor", JSON.stringify(visitor), {
+						expires: 7,
+						domain: "." + qscms.subsite_domain
+					})
+                } else {
+                    setCookie("qscms_visitor", JSON.stringify(visitor), {
+						expires: 7,
+					})
+                }
+                window.location.reload()
+            }).catch(function() {})
+        },
+        doRequestLoginByCode: function(captcha) {
+            var that = this
+            var data = {
+                mobile: that.mobile,
+                code: that.code,
+                utype: that.formUtype,
+                captcha: captcha
+            }
+            httppost(qscms.apiList.loginByCode, data).then(function(res) {
+                var visitor = {
+                    utype: res.data.utype,
+                    token: res.data.token,
+                    mobile: res.data.mobile,
+                    userIminfo: res.data.user_iminfo
+                }
+                if (qscms.subsite_open === 1 && qscms.subsite_domain != '') {
+                    setCookie("qscms_visitor", JSON.stringify(visitor), {
+						expires: 7,
+						domain: "." + qscms.subsite_domain
+					})
+                } else {
+                    setCookie("qscms_visitor", JSON.stringify(visitor), {
+						expires: 7,
+					})
+                }
+                window.location.reload()
+            }).catch(function() {})
+        },
+        showScan: function() {
+            var that = this
+            this.scan = !this.scan
+            if (this.scan === true) {
+                let login_type = that.formUtype === 1 ? '/member/login/company' :
+                    '/member/login/personal'
+                let redirect_uri = qscms.sitedomain + login_type
+                new window.WxLogin({
+                    id: "wxlogin",
+                    appid: that.wechat_open_appid,
+                    scope: "snsapi_login",
+                    redirect_uri: redirect_uri,
+                    state: "",
+                    style: "",
+                    href: "data:text/css;base64,LmxvZ2luUGFuZWwgewoJd2lkdGg6IDIyNnB4Owp9Ci5pbXBvd2VyQm94IC5xcmNvZGUgewoJd2lkdGg6IDEyMHB4OwoJbWFyZ2luLWxlZnQ6MTBweDsKfQouaW1wb3dlckJveCAudGl0bGV7CgltYXJnaW4tbGVmdDoxMHB4Owp9Ci5pbXBvd2VyQm94IC5pbmZvIHsKCXdpZHRoOiAyMDBweDsKfQouaW1wb3dlckJveCAuc3RhdHVzIHsKCXRleHQtYWxpZ246IGNlbnRlcjsKfQouaW1wb3dlckJveCAuc3RhdHVzLnN0YXR1c19icm93c2VyewoJbWFyZ2luLWxlZnQ6IDEwcHg7Cn0="
+                });
+            }
+        },
+        doFav(jobid) {
+           var hasFav = $('#favBox' + jobid).hasClass('active')
+           id = jobid
+            if(hasFav){
+                handleFavJobCancelList(jobid)
+                }else{
+                handleFavJobList(jobid)
+            }
+        },
+        handlerListtype: function(listtype) {
+            if (listtype == 'detail') {
+                this.displayMethod = true
+            } else {
+                this.displayMethod = false
+            }
+            setStorageValue('joblist_type', listtype);
+        },
+        getClassify: function(type) {
+            var _this = this;
+            httpget(qscms.apiList.classify + '?type=' + type, {}).then(function(res) {
+                if (res.code === 200) {
+                    if (type === 'citycategory') {
+                        var cityList = res.data;
+                        if (_this.d1) {
+                            if (_this.cityLevel === 2) {
+                                // 地区为二级
+                                _this.citySelectedText = cityList.filter(function(item) {
+                                    if (parseInt(item.value) === _this.d1) {
+                                        return item
+                                    }
+                                })[0].label;
+                            }
+                            if (_this.cityLevel === 3) {
+                                // 地区为三级
+                                var levelTwoList = cityList.filter(function(item) {
+                                    if (parseInt(item.value) === _this.d1) {
+                                        return item
+                                    }
+                                })[0].children;
+                                if (_this.d3) {
+                                    var levelThreeList = levelTwoList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.d2) {
+                                            return item
+                                        }
+                                    })[0].children;
+                                    _this.citySelectedText = levelThreeList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.d3) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                } else {
+                                    _this.citySelectedText = levelTwoList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.d2) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                }
+                            }
+                        }
+                    } else if (type === 'jobcategory') {
+                        var categoryList = res.data;
+                        if (_this.c1) {
+                            if (_this.categoryLevel === 2) {
+                                // 二级
+                                _this.categorySelectedText = categoryList.filter(function(
+                                    item) {
+                                    if (parseInt(item.value) === _this.c1) {
+                                        return item
+                                    }
+                                })[0].label;
+                            }
+                            if (_this.categoryLevel === 3) {
+                                // 三级
+                                var levelTwoList = categoryList.filter(function(item) {
+                                    if (parseInt(item.value) === _this.c1) {
+                                        return item
+                                    }
+                                })[0].children;
+                                if (_this.c3) {
+                                    var levelThreeList = levelTwoList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.c2) {
+                                            return item
+                                        }
+                                    })[0].children;
+                                    _this.categorySelectedText = levelThreeList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.c3) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                } else {
+                                    _this.categorySelectedText = levelTwoList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.c2) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                }
+                            }
+                        }
+                    } else if (type === 'jobTag') {
+                        var tagList = res.data;
+                        var selectedTagList = _this.tag.split('_');
+                        var tagTextArr = [];
+                        selectedTagList.forEach(function(value) {
+                            var cuText = tagList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(value)) {
+                                    return item
+                                }
+                            })[0].name;
+                            tagTextArr.push(cuText);
+                        })
+                        _this.tagSelectedText = tagTextArr.join('+');
+                    } else if (type === 'trade') {
+                        var tradeList = res.data;
+                        _this.tradeSelectedText = tradeList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.trade)) {
+                                return item
+                            }
+                        })[0].name;
+                    } else if (type === 'companyScale') {
+                        var scaleList = res.data;
+                        _this.scaleSelectedText = scaleList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.scale)) {
+                                return item
+                            }
+                        })[0].name;
+                    } else if (type === 'jobNature') {
+                        var natureList = res.data;
+                        _this.natSelectedText = natureList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.nat)) {
+                                return item
+                            }
+                        })[0].name;
+                    } else if (type === 'education') {
+                        var eduList = res.data;
+                        _this.eduSelectedText = eduList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.edu)) {
+                                return item
+                            }
+                        })[0].name;
+                    } else if (type === 'experience') {
+                        var expList = res.data;
+                        _this.expSelectedText = expList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.exp)) {
+                                return item
+                            }
+                        })[0].name;
+                    }
+                } else {
+                    console.log(res.message);
+                }
+            }).catch(function(err) {
+                console.log(err);
+            });
+        },
+        handlerRecommend: function(jobid) {
+            var that = this
+            if (qscms.loginUtype != 2) {
+                that.$confirm('当前操作需要登录求职者账号', '提示', {
+                    type: 'warning',
+                    confirmButtonText: '去登录',
+                }).then(function() {
+                    location.href = qscms.locationList.loginPersonal + '?redirect=' +
+                        qscms.sitedomain + qscms.locationList.recommendJob;
+                }).catch(function() {});
+            } else {
+                location.href = qscms.locationList.recommendJob;
+            }
+        },
+        doContrast: function() {
+            var that = this
+            var idArr = qscms.getSelItemArr()
+            if (idArr.length == 0) {
+                that.$message.error('请选择职位');
+                return
+            }
+            idArr = arrayUnique(idArr)
+            var idStr = idArr.join(",")
+            window.open(that.jobContrastUrl + '?id=' + idStr)
+        },
+        handlerResumeStick: function() {
+            location.href = qscms.locationList.personalService
+        },
+        handlerLogin: function() {
+            location.href = qscms.locationList.loginPersonal
+        },
+        handlerReg: function() {
+            if (parseInt(qscms.closereg)=== 1) {
+                this.$message.error('网站已关闭会员注册')
+                return false
+            }
+            location.href = qscms.locationList.regPersonal
+        },
+        // 弹出微信二维码弹框
+        popupWechatQrcodeWindow: function(val) {
+            if (true === whetherPopupWeChatQrcodeWindow(val)) {
+                var that = this
+                var requestUrl = qscms.apiUrl + qscms.apiList.member_account
+                httppost(requestUrl, {})
+                    .then(res => {
+                        if (parseInt(res.data.bind_weixin) === 0) {
+                            httpget(qscms.apiList.qrcode, {
+                                    type: 'bind_weixin'
+                                })
+                                .then(function(res) {
+                                    if (res.data) {
+                                        that.scanQrcodeImg = res.data
+                                        that.showWeChatQrcode = true
+                                        that.weChatQrcodeContent = '扫码绑定公众号，求职快人一步'
+                                        whetherPopupWeChatQrcodeWindow(val, true)
+                                        that.bind_timer = setInterval(that.verifyWeChatBind,
+                                            3000);
+                                    }
+                                })
+                                .catch(function() {})
+                        }
+                    })
+                    .catch(() => {})
+            }
+        },
+        // 关闭弹窗
+        closeWeChatQrcode: function() {
+            this.showWeChatQrcode = false
+            clearInterval(this.bind_timer);
+        },
+        // 查看微信是否已绑定，绑定后自动关闭二维码
+        verifyWeChatBind() {
+            var that = this
+            httpget(qscms.apiList.imCheckBind, {})
+                .then(res => {
+                    if (res.code == 200) {
+                        if (res.data == 1) {
+                            that.showWeChatQrcode = false
+                            clearInterval(that.bind_timer);
+                            that.$message({
+                                type: 'success',
+                                message: '绑定成功'
+                            })
+                        }
+                    }
+                })
+        }
+    },
+});

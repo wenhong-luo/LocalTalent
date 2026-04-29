@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalTalent Phase-2 Step 5：运营后台与内容活动能力细化</title>
+  <style>
+    :root{--ink:#142033;--line:#dfe6ee;--brand:#166a5b;--soft:#e8f5f1;--paper:#fff;--bg:#f5f7f8;--danger:#9f1f2f;--danger-soft:#fff0f2;--blue:#eef5ff;--gold:#fff7df}
+    *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg);line-height:1.72}
+    main{max-width:1180px;margin:0 auto;padding:44px 24px 88px}h1{margin:0 0 12px;font-size:34px;line-height:1.25}h2{margin:34px 0 16px;padding-left:12px;border-left:5px solid var(--brand);font-size:24px}h3{margin:24px 0 10px;color:#29445f}
+    .card{margin:18px 0;padding:22px 26px;border:1px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:0 12px 36px rgba(20,32,51,.06)}.note{padding:14px 16px;border-radius:14px;background:var(--soft);color:var(--brand)}.danger{padding:14px 16px;border-radius:14px;background:var(--danger-soft);color:var(--danger)}.warn{padding:14px 16px;border-radius:14px;background:var(--gold);color:#725300}
+    table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--soft)}code{padding:2px 6px;border-radius:6px;background:#edf1f5}.pill{display:inline-block;margin:3px 4px 3px 0;padding:3px 10px;border-radius:999px;background:var(--blue);color:#214d7a}
+    @media(max-width:760px){main{padding:28px 14px 60px}h1{font-size:28px}table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>LocalTalent Phase-2 Step 5：运营后台与内容活动能力细化</h1>
+  <p class="note">统一硬边界提醒：人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</p>
+
+  <section class="card">
+    <h2>开发前必读卡</h2>
+    <ul>
+      <li><strong>文件定位</strong>：冻结运营后台、内容活动、招聘会展示配置、风险审核、审计中心运营视角和角色权限边界。</li>
+      <li><strong>资料来源</strong>：边界文件、两份新 MD、Step1-Step4、本地 demo、一期文档。</li>
+      <li><strong>禁止越界点</strong>：禁止受控找人才、联系解锁、会员商业化、真实支付、真实短信/微信/App、真实地图/视频/直播、真实 ATS/RPA。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>1. Step5 总目标</h2>
+    <table>
+      <tr><th>能力域</th><th>目标</th><th>冻结内容</th></tr>
+      <tr><td>运营后台</td><td>让 operator 管理审核、内容、活动、风险和审计入口。</td><td>运营 overview、审核队列、内容管理、活动/招聘会管理、风险审核、审计入口。</td></tr>
+      <tr><td>内容活动</td><td>支撑公开门户的就业政策、资讯、HR 工具箱、公告和招聘会展示。</td><td>CMS 字段白名单、软删除/下线、公开展示配置、SEO 口径。</td></tr>
+      <tr><td>权限审计</td><td>区分 operator 与 auditor。</td><td>operator 可写，auditor 只读；所有写动作留痕。</td></tr>
+    </table>
+    <p>Step5 不定义最终 API schema，不新增数据库表，不新增代码实现，只冻结运营后台页面范围、状态口径和验收边界。</p>
+  </section>
+
+  <section class="card">
+    <h2>2. 运营后台能力细化</h2>
+    <table>
+      <tr><th>模块</th><th>能力</th><th>边界</th></tr>
+      <tr><td>运营首页 overview</td><td>待审核企业、待审核职位、待审批导出、待处理内容、待处理招聘会、风险审核、最近审计摘要。</td><td>只展示运营摘要，不展示候选人联系方式或简历正文。</td></tr>
+      <tr><td>企业审核</td><td>企业公开摘要、认证状态、提交时间、驳回原因、审核人和审核时间。</td><td>不展示营业执照附件、审核材料原文、企业联系人手机号或邮箱。</td></tr>
+      <tr><td>职位审核</td><td>职位标题、企业公开名称、城市、职类、薪资展示、审核状态、公开状态、驳回原因。</td><td>未通过企业认证的职位不得上线；auditor 不得写。</td></tr>
+      <tr><td>导出审批</td><td>导出申请、申请企业、业务类型、审批状态、生成状态、下载发放状态、驳回原因。</td><td>未审批不可下载；不得绕过字段级权限导出。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>3. 内容与活动能力细化</h2>
+    <table>
+      <tr><th>能力</th><th>允许规划</th><th>禁止</th></tr>
+      <tr><td>内容管理</td><td>就业政策、职场资讯、HR 工具箱、帮助中心、公告、公开内容块、SEO 字段。</td><td>候选人手机号、邮箱、简历正文、附件对象 key、证据、营业执照附件、审核材料。</td></tr>
+      <tr><td>首页推荐位</td><td>推荐职位、企业、招聘会、资讯、HR 工具箱、公告栏。</td><td>引用未审核、已下线、已驳回或已撤回对象；付费置顶和广告售卖。</td></tr>
+      <tr><td>活动/招聘会管理</td><td>现场招聘会、网络招聘会占位、校园招聘占位、活动列表、活动详情、主办方、时间地点。</td><td>活动报名、参会名单、展位售卖、在线互动、直播间、真实地图定位。</td></tr>
+      <tr><td>招聘会公开展示</td><td>活动 ID、标题、类型、城市、地点、时间、主办方、公开简介、状态。</td><td>候选人报名名单、联系方式、签到证据、内部审核备注、非公开附件。</td></tr>
+    </table>
+    <p>内容和活动删除语义应为软删除或下线，不做物理删除。创建、更新、发布、下线、软删除必须写 <code>audit_log</code>。</p>
+  </section>
+
+  <section class="card">
+    <h2>4. 风险审核与风险池</h2>
+    <p>风险审核对象包括企业资料风险、职位内容风险、内容发布风险、活动/招聘会风险、导出申请风险、审计异常风险和对接接口异常风险。</p>
+    <p><span class="pill">受控找人才</span><span class="pill">联系解锁</span><span class="pill">会员商业化</span><span class="pill">真实支付</span><span class="pill">真实短信/微信/App</span><span class="pill">真实地图/视频/直播</span><span class="pill">真实 ATS/RPA</span><span class="pill">AI 原始数据分析</span></p>
+    <p class="warn">高风险能力只进入风险池，不自动进入开发。风险池条目至少记录风险主题、触发场景、涉及数据、当前结论、未来进入条件和需要的审计与测试。</p>
+  </section>
+
+  <section class="card">
+    <h2>5. 审计中心运营视角</h2>
+    <p>运营后台应提供审计中心入口，但审计中心保持只读查询属性。可按 trace_id、操作人、角色、业务类型、业务 ID、动作类型、时间范围和 open_api client_code 查询。</p>
+    <p>响应必须脱敏手机号、邮箱、简历正文、附件对象 key、证据、password、secret、token。operator 与 auditor 可查看审计中心；candidate/company 不能进入运营审计中心。</p>
+  </section>
+
+  <section class="card">
+    <h2>6. 角色权限边界</h2>
+    <table>
+      <tr><th>角色</th><th>允许</th><th>禁止</th></tr>
+      <tr><td>operator</td><td>审核企业、审核职位、审批导出、管理内容、管理活动、处理风险、查看审计。</td><td>绕过字段级权限、绕过导出审批、查看未授权原始候选人数据。</td></tr>
+      <tr><td>auditor</td><td>查看审核队列、查看内容活动、查看审计中心、查看风险池摘要。</td><td>任何写接口；审核、发布、下线、软删除、审批导出、调整推荐位。</td></tr>
+      <tr><td>company</td><td>查看本企业业务后台。</td><td>访问运营后台、审批导出、审核职位、查看其他企业数据。</td></tr>
+      <tr><td>candidate</td><td>查看本人求职者中心。</td><td>访问运营后台、查看企业审核材料、查看审计中心。</td></tr>
+    </table>
+    <p>前端按钮隐藏只做体验。后续实现必须用服务端权限拒绝 auditor 写操作，并返回统一错误与 trace_id。</p>
+  </section>
+
+  <section class="card">
+    <h2>7. 运营状态机</h2>
+    <p><span class="pill">loading</span><span class="pill">empty</span><span class="pill">unauthorized</span><span class="pill">forbidden</span><span class="pill">pending_review</span><span class="pill">approved</span><span class="pill">rejected</span><span class="pill">published</span><span class="pill">offline</span><span class="pill">soft_deleted</span><span class="pill">risk_pool</span></p>
+    <p>状态必须由服务端返回，前端不得用按钮显示、字段缺失或本地缓存推断审核结果。</p>
+  </section>
+
+  <section class="card">
+    <h2>8. 自动化验收关注点</h2>
+    <ul>
+      <li>operator 可执行审核、发布、下线、软删除和导出审批；auditor 写接口返回 <code>AUTHZ_403</code> 并包含 trace_id。</li>
+      <li>内容和活动删除是软删除或下线，不物理删除。</li>
+      <li>公开内容、招聘会和活动不返回手机号、邮箱、简历正文、附件对象 key、证据或审核材料。</li>
+      <li>推荐位不得引用未审核、已下线、已驳回或已撤回对象。</li>
+      <li>招聘会公开展示不包含报名名单、联系方式、签到证据或内部备注。</li>
+      <li>审核、发布、下线、软删除、风险处理和导出审批写 <code>audit_log</code>。</li>
+      <li>敏感字段读取写 <code>field_access_log</code>；审计中心响应脱敏并支持 trace_id 串联。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>9. Step5 结论</h2>
+    <p>Step5 冻结了二期运营后台与内容活动能力边界：运营后台聚焦审核、内容、活动、风险和审计入口；内容活动聚焦就业政策、资讯、HR 工具箱、公告、首页推荐位和招聘会公开展示配置。</p>
+    <p>高保真门户优先补充：运营后台能力继续保留，但二期主线会先把公开门户做成接近 demo 的完整人才网，再增强运营后台。</p>
+    <p class="danger">内容、活动、招聘会和推荐位配置必须服务于首页高保真模块、招聘会频道、资讯/HR 工具箱频道；operator/auditor 权限边界不因前端门户视觉增强而放松。</p>
+  </section>
+</main>
+</body>
+</html>

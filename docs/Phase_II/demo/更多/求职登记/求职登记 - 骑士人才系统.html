@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<!-- saved from url=(0040)https://demo.74cms.com/job/register.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<title>求职登记 - 骑士人才系统</title>
+<meta name="keywords" content="骑士人才系统">
+<meta name="description" content="骑士人才系统">
+<meta property="og:type" content="招聘求职网">
+<meta property="og:title" content="骑士人才系统">
+<meta property="og:url" content="https://demo.74cms.com/job/register.html">
+<meta property="og:site_name" content="骑士人才系统">
+<meta property="og:description" content="为求职者提供免费注册、求职指导、简历管理等服务，职位真实可靠，上骑士人才系统，找到满意工作">
+<meta name="author" content="骑士CMS">
+<meta name="copyright" content="74cms.com">
+<link rel="shortcut icon" href="https://demo.74cms.com/favicon.ico">
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/polyfill.7.11.5.min.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/vue.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/axios.min.js.下载"></script>
+<link rel="stylesheet" type="text/css" href="./求职登记 - 骑士人才系统_files/element-ui.css">
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/element-ui.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/jquery.min.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/jquery.dropdown.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/jquery.listitem.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/utils.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/js.cookie.min.js.下载"></script>
+<script>
+
+    var qscms = {
+        subsiteid: "",
+        sitedomain: "https://demo.74cms.com",
+        subsite_open: "1",
+        subsite_domain: "74cms.com",
+        sitedir: "/",
+        mobiledomain: "https://demo.74cms.com/m/",
+        memberDirname: "member",
+        apiUrl: "https://demo.74cms.com/v1_0",
+        captcha_open: "1",
+        captcha_type: "qscms",
+        captcha_tencent_appid: "",
+        captcha_vaptcha_vid: "",
+        captcha_qscms_appkey:"bcenpbhb",
+        wechat_login_open: "1",
+        wechat_open_appid: "wx124300d944a40487",
+        wechat_open: "1",
+        account_qqlogin_open: "1",
+        guide_open: "1",
+        guide_qrcode: "",
+        closereg: "0",
+        wechat_qrcode: "https://demo.74cms.com/upload/resource/weixin_img.jpg",
+        wechat_miniprogram_qrcode: "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg",
+        douyin_miniprogram_qrcode: "",
+        app_android_download_url: "https://demo.74cms.com/74cms_android.apk",
+        app_ios_download_url: "https://demo.74cms.com/74cms_android.apk",
+        map_type: "2",
+        is_open_map: "1",
+        im_open: "1",
+        im_key: "7jKedNayxc6E7SGw",
+        isLogin: false,
+        loginUtype: 0,
+        userToken: '',
+        platform: "web",
+        imToken:'',
+        reConnectTime:0,
+        websocketOk:false,
+    }
+</script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/global.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/error.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/http.js.下载"></script>
+<script type="text/javascript" src="./求职登记 - 骑士人才系统_files/globalMethods.js.下载"></script>
+
+    <link rel="stylesheet" href="./求职登记 - 骑士人才系统_files/base.css">
+    <link rel="stylesheet" href="./求职登记 - 骑士人才系统_files/jobRegister_element-ui.css">
+    <link rel="stylesheet" href="./求职登记 - 骑士人才系统_files/jobRegister_index.css">
+<link rel="stylesheet" type="text/css" href="./求职登记 - 骑士人才系统_files/slidercaptcha.css"></head>
+<body>
+<div id="app"><div class="jobHeader"><div class="jobInner"><div onclick="window.open(&#39;https://demo.74cms.com&#39;)" class="innerLeft"><img src="./求职登记 - 骑士人才系统_files/jobRegister-home.png"> <span>网站首页</span></div> <div class="innerRight">联系热线：18003431191</div></div></div> <div class="jobBottom"><div class="bottomInner"><span class="bottomLeft">为了更好的找到合适您的工作，请认真填写下面内容~</span> <div class="bottomRight"><span class="txt">关注公众号查看更多好工作~</span> <div class="bottomCode"><img slot="reference" src="./求职登记 - 骑士人才系统_files/weixin_img.jpg" style="width: 100%;"></div></div></div></div> <div class="jobForm"><img src="./求职登记 - 骑士人才系统_files/jobRegiste-title.png" class="formTitle"> <form class="el-form demo-ruleForm"><div class="el-form-item is-required"><label for="full_name" class="el-form-item__label" style="width: 120px;">姓名</label><div class="el-form-item__content" style="margin-left: 120px;"><div class="el-input"><!----><input type="text" autocomplete="off" placeholder="请输入姓名" maxlength="20" class="el-input__inner"><!----><span class="el-input__suffix"><span class="el-input__suffix-inner"><!----><!----><!----><span class="el-input__count"><span class="el-input__count-inner">
+            0/20
+          </span></span></span><!----></span><!----><!----></div><!----></div></div> <div class="el-form-item is-required"><label for="sex" class="el-form-item__label" style="width: 120px;">性别</label><div class="el-form-item__content" style="margin-left: 120px;"><div role="radiogroup" class="el-radio-group"><label role="radio" tabindex="0" class="el-radio"><span class="el-radio__input"><span class="el-radio__inner"></span><input type="radio" aria-hidden="true" tabindex="-1" class="el-radio__original" value="男"></span><span class="el-radio__label">男</span></label> <label role="radio" tabindex="-1" class="el-radio"><span class="el-radio__input"><span class="el-radio__inner"></span><input type="radio" aria-hidden="true" tabindex="-1" class="el-radio__original" value="女"></span><span class="el-radio__label">女</span></label> <label role="radio" tabindex="-1" class="el-radio"><span class="el-radio__input"><span class="el-radio__inner"></span><input type="radio" aria-hidden="true" tabindex="-1" class="el-radio__original" value="保密"></span><span class="el-radio__label">保密</span></label></div><!----></div></div> <div class="el-form-item is-required"><label for="position_type" class="el-form-item__label" style="width: 120px;">职位类型</label><div class="el-form-item__content" style="margin-left: 120px;"><div role="radiogroup" class="el-radio-group"><label role="radio" tabindex="0" class="el-radio"><span class="el-radio__input"><span class="el-radio__inner"></span><input type="radio" aria-hidden="true" tabindex="-1" class="el-radio__original" value="全职"></span><span class="el-radio__label">全职</span></label> <label role="radio" tabindex="-1" class="el-radio"><span class="el-radio__input"><span class="el-radio__inner"></span><input type="radio" aria-hidden="true" tabindex="-1" class="el-radio__original" value="兼职"></span><span class="el-radio__label">兼职</span></label> <label role="radio" tabindex="-1" class="el-radio"><span class="el-radio__input"><span class="el-radio__inner"></span><input type="radio" aria-hidden="true" tabindex="-1" class="el-radio__original" value="实习"></span><span class="el-radio__label">实习</span></label></div><!----></div></div> <div class="el-form-item is-required"><label for="contact_way" class="el-form-item__label" style="width: 120px;">联系方式</label><div class="el-form-item__content" style="margin-left: 120px;"><div class="el-input"><!----><input type="text" autocomplete="off" placeholder="请输入你的联系电话" maxlength="11" class="el-input__inner"><!----><span class="el-input__suffix"><span class="el-input__suffix-inner"><!----><!----><!----><span class="el-input__count"><span class="el-input__count-inner">
+            0/11
+          </span></span></span><!----></span><!----><!----></div><!----></div></div> <div class="el-form-item is-required" style="width: 100%;"><label for="verify_code" class="el-form-item__label" style="width: 120px;">短信验证码</label><div class="el-form-item__content" style="margin-left: 120px;"><div class="flex"><div class="log_field el-input"><!----><input type="text" autocomplete="off" placeholder="请输入验证码" class="el-input__inner"><!----><!----><!----><!----></div> <span class="get_bt" style="width: 120px;">获取验证码</span></div><!----></div></div> <div class="button"><img src="./求职登记 - 骑士人才系统_files/jobRegister-icon.png" class="buttonIcon">提交信息</div></form> <div class="el-dialog__wrapper" style="display: none;"><div role="dialog" aria-modal="true" aria-label="验证码" class="el-dialog" style="margin-top: 15vh; width: 360px;"><div class="el-dialog__header"><span class="el-dialog__title">验证码</span><button type="button" aria-label="Close" class="el-dialog__headerbtn"><i class="el-dialog__close el-icon el-icon-close"></i></button></div><!----><!----></div></div></div> <div class="jobFooter"><span>
+            找工作，招人才，就上骑士人才系统            <br>
+            未经书面授权，不得转载本网站所有招聘信息
+        </span></div></div>
+
+
+
+<script>
+    var fieldAlias = JSON.parse('{"full_name":"","sex":"","position_type":"","contact_way":"","verify_code":""}')
+    var fieldRules = []
+    var regularMobile = /^13[0-9]{9}$|14[0-9]{9}$|15[0-9]{9}$|18[0-9]{9}$|17[0-9]{9}$|16[0-9]{9}$|19[0-9]{9}$/
+    // 手机号验证方式
+    var mobileValidator = (rule, value, callback) =>{
+        if (value === '') {
+            callback(new Error('请输入'+rule.field_name));
+        }
+        if (!regularMobile.test(value)) {
+            callback(new Error(rule.field_name+'格式不正确'));
+        }
+        callback();
+    }
+    // 设置字段验证规则
+    var fieldList = JSON.parse('[{"field_id":1,"field_name":"\u59d3\u540d","field_alias":"full_name","field_type":1,"field_way":1,"field_remark":"\u8bf7\u8f93\u5165\u59d3\u540d","is_must":1,"field_length":20},{"field_id":2,"field_name":"\u6027\u522b","field_alias":"sex","field_type":2,"field_way":1,"field_remark":"","is_must":1,"field_length":0,"field_value":[{"field_id":2,"field_value":"\u7537","sort":0},{"field_id":2,"field_value":"\u5973","sort":1},{"field_id":2,"field_value":"\u4fdd\u5bc6","sort":2}]},{"field_id":7,"field_name":"\u804c\u4f4d\u7c7b\u578b","field_alias":"position_type","field_type":2,"field_way":1,"field_remark":"","is_must":1,"field_length":0,"field_value":[{"field_id":7,"field_value":"\u5168\u804c","sort":0},{"field_id":7,"field_value":"\u517c\u804c","sort":1},{"field_id":7,"field_value":"\u5b9e\u4e60","sort":2}]},{"field_id":11,"field_name":"\u8054\u7cfb\u65b9\u5f0f","field_alias":"contact_way","field_type":1,"field_way":2,"field_remark":"\u8bf7\u8f93\u5165\u4f60\u7684\u8054\u7cfb\u7535\u8bdd","is_must":1,"field_length":11}]')
+    if (fieldList.length > 0) {
+        var msg;
+        var triggerWay;
+        for (let i=0; i<fieldList.length; i++){
+            var item = fieldList[i]
+            fieldRules[item['field_alias']] = []
+            // 验证必填项
+            if (item['is_must'] == 1) {
+                var fieldType = 'string';
+                // 多选框需定义类型为数组
+                if (item['field_type'] == 3) {
+                    fieldType = 'array';
+                }
+                // 文本用 blur 其它用 change
+                msg = '请填写'+ item['field_name'];
+                triggerWay = 'blur';
+                if ($.inArray(item['field_type'], [2,3,4]) > -1) {
+                    msg = '请选择'+ item['field_name'];
+                    triggerWay = 'change';
+                }
+                fieldRules[item['field_alias']].push(
+                    { type:fieldType, required: true, field_name:item['field_name'], message: msg, trigger: triggerWay }
+                )
+            }
+            // 验证手机号
+            if (item['field_way'] == 2) {
+                fieldRules[item['field_alias']].push(
+                    {required: true, field_name:item['field_name'], validator: mobileValidator, trigger: triggerWay }
+                )
+            }
+            // 验证长度
+            if (item['field_length'] > 0) {
+                fieldRules[item['field_alias']].push(
+                    { max: item['field_length'], field_name:item['field_name'], message: '长度不能超过'+item['field_length']+'个字', trigger: triggerWay }
+                )
+            }
+        }
+    }
+    function loadTencent() {
+        if (window.BMap !== undefined) {
+            return
+        }
+        var script = document.createElement('script')
+        script.type = 'text/javascript'
+        script.src = 'https://turing.captcha.qcloud.com/TCaptcha.js'
+        document.body.appendChild(script)
+    }
+    function loadVaptcha() {
+        if (window.BMap !== undefined) {
+            return
+        }
+        var script = document.createElement('script')
+        script.type = 'text/javascript'
+        script.src = 'https://v.vaptcha.com/v3.js'
+        document.body.appendChild(script)
+    }
+    var captcha_open = parseInt("1");
+    var captcha_type = "qscms";
+    if (captcha_open == 1) {
+        if (captcha_type == 'tencent') {
+            loadTencent()
+        } else if (captcha_type == 'vaptcha') {
+            loadVaptcha()
+        }else if(captcha_type == 'qscms'){
+            // 骑士验证码
+            qsCaptchaLoad()
+        }
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                form: fieldAlias,
+                rules: fieldRules,
+                regularMobile: regularMobile,
+                sendSmsBtnDisabled: false,
+                sendSmsBtnText: '获取验证码',
+                sendSmsTimer: '',
+                sendSmsInterval: 60,
+                captcha_open:captcha_open,
+                captcha_type:captcha_type,
+                showPictureCaptcha: false,
+                secret_str: '',
+                catpchaSrc: '',
+                captchaRules: {
+                    code: [
+                        { required: true, message: '请输入验证码', trigger: 'blur' }
+                    ],
+                },
+                captchaForm: {
+                    code: ''
+                },
+                wechatQrcode: 'https://demo.74cms.com/upload/resource/weixin_img.jpg',
+                sendSmsLimit: false
+            }
+        },
+        methods: {
+            // 表单提交处理
+            onSubmit(formName) {
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        var that = this
+                        httppost(qscms.apiList.saveRegisterData, that.form).then(function (res) {
+                            that.$message({
+                                type: 'success',
+                                message: res.message
+                            })
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 3000)
+                        }).catch(function () { })
+                    }
+                })
+            },
+            //zdq 短信验证码重复发送修改
+            // 发送验证码
+            sendSms: function () {
+                var that = this
+                if (that.sendSmsBtnDisabled === true) {
+                    return false
+                }
+                if(that.form.contact_way == ''){
+                    that.$message.error('请输入' + fieldRules.contact_way[0].field_name)
+                    return false
+                }
+                if (!that.regularMobile.test(that.form.contact_way)) {
+                    that.$message.error(fieldRules.contact_way[0].field_name + '格式不正确')
+                    return false
+                }
+                if (that.captcha_open == 1) {
+                    if (that.captcha_type == 'tencent') {
+                        var captchaWindow = new TencentCaptcha('', function (res) {
+                            that.doSendSms(res)
+                        });
+                        captchaWindow.show()
+                    } else if (that.captcha_type == 'vaptcha') {
+                        vaptcha({
+                            vid: "", // 验证单元id
+                            type: "invisible", // 显示类型 隐藏式
+                            scene: 0, // 场景值 默认0
+                            offline_server: "", //离线模式服务端地址，若尚未配置离线模式，请填写任意地址即可。
+                        }).then(function (vaptchaObj) {
+                            obj = vaptchaObj; //将VAPTCHA验证实例保存到局部变量中
+                            //获取token的方式二：
+                            vaptchaObj.listen("pass", function () {
+                                that.doSendSms({ code: vaptchaObj.getToken() })
+                            });
+                            //关闭验证弹窗时触发
+                            vaptchaObj.listen("close", function () {
+                                //验证弹窗关闭触发
+                            });
+                            obj.validate();
+                        });
+                    }else if(that.captcha_type == "qscms"){
+                        qsCaptchaShow().then(res=>{
+                            that.doSendSms({secret_str:res})
+                        })
+                    } else {
+                        that.showPictureCaptcha = true
+                        that.pictureCaptchaCallback = 'doSendSms'
+                    }
+                } else {
+                    that.doSendSms(null)
+                }
+            },
+            doSendSms: function (captcha) {
+                var that = this
+                if(that.sendSmsLimit){
+                    return false
+                }
+                that.sendSmsLimit = true
+                httppost(qscms.apiList.sendsms_auth_mobile_nocheck, { mobile: that.form.contact_way, captcha: captcha }).then(function (res) {
+                    that.sendSmsLimit = false
+                    that.$message({
+                        type: 'success',
+                        message: '验证码发送成功'
+                    })
+                    that.sendSmsTimer = setInterval(function () {
+                        if (that.sendSmsInterval === 0) {
+                            that.sendSmsBtnDisabled = false
+                            that.sendSmsBtnText = '获取验证码'
+                            that.sendSmsInterval = 60
+                            clearInterval(that.sendSmsTimer)
+                        } else {
+                            that.sendSmsBtnDisabled = true
+                            that.sendSmsBtnText = '重发 ' + that.sendSmsInterval + ' 秒'
+                            that.sendSmsInterval--
+                        }
+                    }, 1000)
+                }).catch(function () {
+                    that.sendSmsLimit = false
+                })
+            },
+            changeImg: function () {
+                var that = this
+                httpget(qscms.apiList.captchaPicture, {})
+                    .then(function (res) {
+                        that.secret_str = res.data.secret_str
+                        that.catpchaSrc = res.data.src
+                    })
+                    .catch(function () { })
+            },
+            pictureCaptchaOpened: function () {
+                this.changeImg()
+            },
+            submitPictureCaptcha: function () {
+                var that = this
+                that.$refs.captchaForm.validate(function (valid) {
+                    if (valid) {
+                        that.showPictureCaptcha = false
+                        that[that.pictureCaptchaCallback]({ code: that.captchaForm.code, secret_str: that.secret_str })
+                        that.captchaForm.code = ''
+                    } else {
+                        that.captchaForm.code = ''
+                        return false;
+                    }
+                });
+            }
+        }
+    })
+</script><script type="text/javascript" src="./求职登记 - 骑士人才系统_files/slidercaptcha.js.下载"></script><script type="text/javascript" src="./求职登记 - 骑士人才系统_files/crypto-js.min.js.下载"></script>
+</body></html>

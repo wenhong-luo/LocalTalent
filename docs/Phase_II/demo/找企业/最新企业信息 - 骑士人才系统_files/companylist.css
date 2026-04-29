@@ -1,0 +1,312 @@
+.new_search_box .search_content .rt .search_district {
+    height: 44px;
+    border: none;
+    position: relative;
+}
+
+.new_search_box .search_content .rt .search_district::before {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 28px;
+    background: #E6E6E6;
+    position: absolute;
+    top: 8px;
+    right: 0;
+}
+
+.new_search_box .search_content .rt_new {
+    width: 100%;
+}
+
+.new_search_box .search_content .rt .block_22 {
+    width: 740px;
+}
+
+.left_sidebar {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    background: #F6F6F8;
+    float: initial;
+}
+
+.company_list {
+    padding: 30px 20px 16px;
+    background: #fff;
+    border-bottom: 1px solid #f3f3f3;
+    width: 288px;
+    box-sizing: border-box;
+    margin-right: 16px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.company_list .famous_icon {
+    width: 52px;
+    height: 55px;
+    background: url('../images/company/mingqi.png') left center no-repeat;
+    background-size: 100% 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.company_list:nth-child(4n) {
+    margin-right: 0;
+}
+
+.company_list:hover {
+    box-shadow: 0px 0px 7px 1px rgba(136, 136, 136, 0.22);
+}
+
+.company_list:hover .cn {
+    color: #00C48A;
+}
+
+.text_wrapper {
+    float: initial;
+    width: 100%;
+}
+
+.company_img {
+    float: initial;
+    position: relative;
+    width: 74px;
+    height: 74px;
+    margin: 0 auto;
+    border: 1px solid #F7F9FC;
+    border-radius: 10px;
+}
+
+.company_img img {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    display: block;
+    border-radius: 10px;
+}
+
+.company_text_wrapper {
+    float: initial;
+    color: #666666;
+    font-size: 12px;
+    width: 100%;
+}
+
+.company_text1 {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 19px 0 3px;
+}
+
+.company_text1 .cn {
+	font-size: 16px;
+	color: #333333;
+	float: left;
+	display: block;
+	line-height: 20px;
+	max-width:210px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.company_text1 .ic1 {
+	float: left;
+	width: 19px;
+	height: 20px;
+	background: url("../images/details_icon_1.png") 0 center no-repeat;
+	margin-left: 5px;
+}
+
+.company_text1 .ic2 {
+	float: left;
+	width: 15px;
+	height: 20px;
+	margin-left: 5px;
+	position: relative;
+}
+
+.company_text1 .ic2 img {
+	width: 15px;
+	height: 13px;
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translate(0, -50%);
+	border: 0;
+}
+
+.company_text2 {
+    padding: 0 0 10px;
+    border-bottom: 1px solid #F7F9FC;
+}
+
+.company_text2 p {
+    display: flex;
+    color: #666;
+    font-size: 12px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.company_text2 p .text {
+    display: block;
+    height: 25px;
+    line-height: 26px;
+}
+
+.company_text2 p .line {
+    display: block;
+    width: 1px;
+    height: 10px;
+    background: #999999;
+    margin: 0 6px;
+}
+
+.line3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 15px 30px 0;
+}
+
+.line3 .line3_box {}
+
+.line3 .line3_box .num {
+    text-align: center;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.line3 .line3_box .desc {
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+}
+
+.company_text1.company_text_active a {
+    color: #999999;
+}
+
+.pagination li:hover {
+    background-color: #00C48A;
+    border-color: #00C48A;
+}
+
+.pagination li.active {
+    background: #00C48A;
+    border-color: #00C48A;
+}
+
+.filter_combo .filter_line .line_item .f_item.active {
+    background-color: #F4FFFC;
+    color: #00C48A;
+}
+
+.filter_combo .filter_line .line_title.line_title_selected {
+    color: #FF4200;
+}
+
+.filter_combo .filter_line .s_tag {
+    display: block;
+    float: left;
+    font-size: 12px;
+    color: #333333;
+    height: 26px;
+    line-height: 26px;
+    padding: 0 22px 0 10px;
+    border: 1px solid #FF4200;
+    position: relative;
+    margin-right: 10px;
+    border-radius: 3px;
+    background: #FFF7EE;
+    margin-bottom: 12px !important;
+}
+
+.filter_combo .filter_line .s_tag:hover {
+    border: 1px solid #FF4200;
+}
+
+.filter_combo .filter_line .remove {
+    position: absolute;
+    height: 14px;
+    line-height: 14px;
+    background: url(../images/remove_icon_new.png) 0 1px no-repeat;
+    background-size: 13px;
+    padding-left: 18px;
+    cursor: pointer;
+    font-size: 12px;
+    right: 0;
+    top: 6px;
+    color: #FF4200;
+}
+
+.filter_combo .filter_line .remove:hover {
+    color: #FF4200;
+}
+
+.filter_combo {
+    padding: 20px 18px 20px 18px;
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+.content_box2 {
+    border-radius: 10px;
+    display: block;
+    padding-right: 0;
+    background: transparent;
+}
+
+.box2_nav {
+    border-radius: 10px;
+}
+
+.box2_nav .tab {
+    border-radius: 10px;
+}
+
+.pagination {
+    border-radius: 10px;
+}
+
+.filter_combo .filter_line .line_item .f_item.more {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding-right: 18px;
+    background: url(../images/company/bot-sj.png) right 6px no-repeat;
+    background-size: 12px 12px;
+}
+
+.filter_combo .filter_line .line_item .f_item.open {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding-right: 18px;
+    background: url(../images/company/bot-sj2.png) right 6px no-repeat;
+    background-size: 12px 12px;
+}
+
+.filter_combo .filter_line:last-child {
+    margin-bottom: 0;
+}
+
+.el-button--primary:hover {
+    background: #00AE7A !important;
+    border-color: #00AE7A !important;
+    color: #FFF;
+}
+.filter_selected{
+    padding-top: 12px !important;
+    margin-top: 20px !important;
+}

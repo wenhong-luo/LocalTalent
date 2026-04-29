@@ -1,0 +1,5 @@
+window.global = {
+  RequestTimeout: 50000,
+  RequestBaseUrl: 'https://demo.74cms.com',
+  Platform:'web'
+}

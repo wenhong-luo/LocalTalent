@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)https://demo.74cms.com/shortvideo.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="./视频招聘_files/base.css">
+    <link rel="stylesheet" type="text/css" href="./视频招聘_files/video_recruitment.css">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频招聘</title>
+</head>
+
+<body>
+<div class="video_wrapper">
+    <div class="video_header">
+        <div class="w1200 video_header_inner flex">
+            <div class="flex flexCenter cursor logo">
+                <a href="https://demo.74cms.com/">
+                    <img src="./视频招聘_files/logo.png" alt="" class="handLe_img">
+                </a>
+                <span class="inner_title">视频招聘</span>
+            </div>
+            <div class="video_back">
+                <a href="https://demo.74cms.com/">
+                    <span>返回首页</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="video_content">
+        <div class="video_left_text">
+            <div class="tab_btn clearfix ac">
+                <div class="tab_btn_item">
+                    <img class="btn_img" src="./视频招聘_files/tab_btn_1_ac.png" alt="">
+                </div>
+                <div class="tab_btn_item">
+                    <img class="btn_img" src="./视频招聘_files/tab_btn_2.png" alt="">
+                </div>
+            </div>
+            <div class="sw_text ac">
+                    <span class="ac">
+                        <!-- 招聘 -->
+                        刷视频招人才<br>汇聚海量人才精准推荐
+                    </span>
+                <span>
+                        <!-- 求职 -->
+                        好工作刷出来<br>海量高薪职位任你挑选
+                    </span>
+            </div>
+            <div class="video_code ac">
+                <div class="code_box">
+                    <div class="code_img_box">
+                        <img src="./视频招聘_files/index" alt="">
+                    </div>
+                </div>
+                <div class="code_text">
+                    微信扫一扫 <br>
+                    开启求职招聘新体验
+                </div>
+            </div>
+        </div>
+        <div class="video_right_img">
+            <img class="bg1 ac" src="./视频招聘_files/right_bg1.png" alt="">
+            <img class="bg2 ac" src="./视频招聘_files/right_bg2.png" alt="">
+        </div>
+    </div>
+    <div class="video_footer">
+        <p>找工作，招人才就上骑士人才系统</p>
+        <p>联系电话：18003431191</p>
+    </div>
+</div>
+
+
+<script src="./视频招聘_files/jquery.min.js.下载"></script>
+
+<script>
+    $(function () {
+        // 页面加载完成动画
+        $('.video_right_img .bg1').addClass('ac')
+        $('.video_right_img .bg2').addClass('ac')
+
+        $('.video_left_text .tab_btn').addClass('ac')
+        $('.video_left_text .sw_text').addClass('ac')
+        $('.video_left_text .video_code').addClass('ac')
+        // 切换
+        $('.tab_btn .tab_btn_item').click(function () {
+            $('.tab_btn .tab_btn_item').each(function (index, item) {
+                $('.video_left_text .sw_text span').eq(index).attr('class', '')
+                // $('.tab_btn .tab_btn_item').eq(index).find('.btn_img').css({ 'top': '' })
+                if (index) {
+                    $(this).find('.btn_img').attr('src', '/assets/images/video_recruitment/tab_btn_2.png')
+                } else {
+                    $(this).find('.btn_img').attr('src', '/assets/images/video_recruitment/tab_btn_1.png')
+                }
+            })
+            var index = $(this).index()
+            $('.video_left_text .sw_text span').eq(index).attr('class', 'ac')
+            if (index) {
+                $('.tab_btn .tab_btn_item').eq(index).find('.btn_img').attr('src', '/assets/images/video_recruitment/tab_btn_2_ac.png')
+                // $('.tab_btn .tab_btn_item').eq(index).find('.btn_img').css({ 'top': '-30px' })
+            } else {
+                $('.tab_btn .tab_btn_item').eq(index).find('.btn_img').attr('src', '/assets/images/video_recruitment/tab_btn_1_ac.png')
+                // $('.tab_btn .tab_btn_item').eq(index).find('.btn_img').css({ 'top': '-30px' })
+            }
+        })
+    })
+</script>
+
+</body></html>

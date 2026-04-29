@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+API_BASE_URL="${LOCALTALENT_API_BASE_URL:-http://localhost:8080}"
+PASSWORD="${LOCALTALENT_DEMO_PASSWORD:-LocalTalent@123456}"
+
+usage() {
+  cat <<'EOF'
+Usage: ./scripts/demo_login_tokens <account-key>
+
+Account keys:
+  candidate-consented
+  candidate-revoked
+  candidate-pending
+  company
+  operator
+  auditor
+
+The script calls POST /api/auth/login and prints browser console commands
+that set localStorage for the Next frontend.
+EOF
+}
+
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  usage
+  exit 0
+fi
+
+account_key="${1:-candidate-consented}"
+identity_type=""
+account=""
+target_path=""
+role_hint=""
+
+case "$account_key" in
+  candidate-consented)
+    identity_type="candidate"
+    account="demo_candidate@localtalent.test"
+    target_path="/candidate/center"
+    ;;
+  candidate-revoked)
+    identity_type="candidate"
+    account="demo_revoked@localtalent.test"
+    target_path="/candidate/center"
+    ;;
+  candidate-pending)
+    identity_type="candidate"
+    account="demo_pending@localtalent.test"
+    target_path="/candidate/center"
+    ;;
+  company)
+    identity_type="company"
+    account="demo_company@localtalent.test"
+    target_path="/company"
+    ;;
+  operator)
+    identity_type="operator"
+    account="operator"
+    target_path="/admin"
+    role_hint="operator"
+    ;;
+  auditor)
+    identity_type="operator"
+    account="auditor_demo"
+    target_path="/admin"
+    role_hint="auditor"
+    ;;
+  *)
+    echo "FAIL: unknown account key: $account_key"
+    usage
+    exit 1
+    ;;
+esac
+
+if ! command -v curl >/dev/null 2>&1; then
+  echo "FAIL: curl not found."
+  exit 1
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "FAIL: node not found. Install Node 24 LTS before running this helper."
+  exit 1
+fi
+
+request_body=$(node -e '
+const payload = {
+  identity_type: process.argv[1],
+  account: process.argv[2],
+  password: process.argv[3]
+};
+process.stdout.write(JSON.stringify(payload));
+' "$identity_type" "$account" "$PASSWORD")
+
+response=$(curl -sS \
+  -H 'Content-Type: application/json' \
+  -H "X-Trace-Id: trace-demo-login-$account_key" \
+  -X POST \
+  --data "$request_body" \
+  "$API_BASE_URL/api/auth/login")
+
+token=$(printf '%s' "$response" | node -e '
+let input = "";
+process.stdin.on("data", chunk => input += chunk);
+process.stdin.on("end", () => {
+  let payload;
+  try {
+    payload = JSON.parse(input);
+  } catch (error) {
+    console.error("FAIL: backend did not return JSON.");
+    console.error(input);
+    process.exit(2);
+  }
+  if (payload.code !== "0" || !payload.data || !payload.data.access_token) {
+    console.error("FAIL: login failed.");
+    console.error(JSON.stringify(payload, null, 2));
+    process.exit(3);
+  }
+  process.stdout.write(payload.data.access_token);
+});
+')
+
+trace_id=$(printf '%s' "$response" | node -e '
+let input = "";
+process.stdin.on("data", chunk => input += chunk);
+process.stdin.on("end", () => {
+  const payload = JSON.parse(input);
+  process.stdout.write(payload.trace_id || "");
+});
+')
+
+echo "PASS"
+cat <<EOF
+
+账号: $account_key
+登录名: $account
+identity_type: $identity_type
+trace_id: $trace_id
+
+请打开 http://localhost:3000$target_path ，在浏览器 DevTools Console 粘贴：
+
+localStorage.setItem('localtalent_access_token', '$token');
+EOF
+
+if [ -n "$role_hint" ]; then
+  echo "localStorage.setItem('localtalent_admin_role_hint', '$role_hint');"
+else
+  echo "localStorage.removeItem('localtalent_admin_role_hint');"
+fi
+
+cat <<EOF
+location.href = '$target_path';
+
+如果要退出演示账号：
+localStorage.removeItem('localtalent_access_token');
+localStorage.removeItem('localtalent_admin_role_hint');
+EOF

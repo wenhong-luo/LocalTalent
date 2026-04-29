@@ -1,0 +1,192 @@
+$(document).ready(function() {
+    $(function() {
+        var displayWordWidth = 870;
+
+        // 筛选条件显示数量控制
+        handleFilterConditionDisplay('tradeLink');
+
+        function handleFilterConditionDisplay(className) {
+            var showWidth = 0,
+                $filterLink = $('.' + className);
+            $filterLink.each(function(index, value) {
+                if (showWidth > displayWordWidth) {
+                    $(this).hide();
+                    $('[data-type=' + className + ']').show();
+                } else {
+                    $(this).addClass('sw');
+                    showWidth += value.clientWidth;
+                }
+            });
+        }
+
+        // 显示和收起更多分类
+        $('.toggleMore').click(function() {
+            var className = $(this).data('type');
+            if ($(this).hasClass('open')) {
+                $(this).removeClass('open').find('span').html('其他');
+                toggleClassify(className, true);
+            } else {
+                $(this).addClass('open').find('span').html('收起');
+                toggleClassify(className, false);
+            }
+        });
+
+        /**
+         * 显示和隐藏操作节点的公用方法
+         * @param className 节点类名
+         * @param num 可以显示的数量
+         * @param status 区分显示还是隐藏 true->需要隐藏
+         */
+        function toggleClassify(className, status) {
+            var num = $('.' + className + '.sw').length;
+            $('.' + className).each(function(index) {
+                $(this).show();
+                if (status) {
+                    if (index > (num - 1)) {
+                        $(this).hide();
+                    }
+                }
+            });
+        }
+
+        // 企业点击标题变色 start
+        var isLoginLocal = localStorage.getItem('isLogin');
+        var isLogin = window.qscms.isLogin;
+        if (!isLogin == isLoginLocal) { //登录状态改变时清空缓存数据
+            localStorage.setItem('selectArr', []); //职位
+            setCookie("selectArr", JSON.stringify([]))
+            localStorage.setItem('selectResumeArr', []); //简历
+            localStorage.setItem('selectComArr', []); //企业
+        }
+        var selectArrComOnload = localStorage.getItem('selectComArr') == null || localStorage.getItem(
+            'selectComArr') == 'null' || localStorage.getItem(
+            'selectComArr') == '' || localStorage.getItem(
+            'selectComArr') == undefined || localStorage.getItem('selectComArr').data == null ? [] : JSON.parse(
+            localStorage.getItem('selectComArr'))
+        preComlist()
+
+        function preComlist() {
+            for (let j of selectArrComOnload) {
+                $(".company_text1").each(function() {
+                    if ($(this).data('id') == j) {
+                        $(this).addClass('company_text_active')
+                    }
+                });
+            }
+        }
+        var selectComArr = selectArrComOnload
+        $('.company_text1').click(function(e) {
+            if (!$(this).hasClass('company_text_active')) {
+                var select_id = e.currentTarget.dataset.id
+                selectComArr.push(select_id)
+                var selectComArrStr = JSON.stringify(selectComArr)
+                localStorage.setItem('selectComArr', selectComArrStr)
+                if (!$(this).hasClass('company_text_active')) {
+                    $(this).addClass('company_text_active')
+                }
+            }
+        });
+        // 企业点击标题变色 end
+    })
+})
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        keyword: keyword,
+        d1: d1,
+        d2: d2,
+        d3: d3,
+        cityLevel: cityLevel,
+        citySelectedText: '',
+        nature: nature,
+        natureSelectedText: '',
+        trade: trade,
+        tradeSelectedText: '',
+        showSelected: false,
+    },
+    mounted: function() {
+        // 已选条件展示
+        if (this.d1) {
+            this.getClassify('citycategory'); // 地区
+        }
+        // 企业性质
+        if (this.nature) {
+            this.getClassify('companyNature');
+        }
+        // 行业类别
+        if (this.trade) {
+            this.getClassify('trade');
+        }
+        // 是否显示已选条件
+        if (this.keyword || this.d1 || this.nature || this.trade) {
+            this.showSelected = true;
+        }
+    },
+    methods: {
+        getClassify: function(type) {
+            var _this = this;
+            httpget(qscms.apiList.classify + '?type=' + type, {}).then(function(res) {
+                if (res.code === 200) {
+                    if (type === 'citycategory') {
+                        var cityList = res.data;
+                        if (_this.d1) {
+                            if (_this.cityLevel === 2) {
+                                // 地区为二级
+                                _this.citySelectedText = cityList.filter(function(item) {
+                                    if (parseInt(item.value) === _this.d1) {
+                                        return item;
+                                    }
+                                })[0].label;
+                            }
+                            if (_this.cityLevel === 3) {
+                                // 地区为三级
+                                var levelTwoList = cityList.filter(function(item) {
+                                    if (parseInt(item.value) === _this.d1) {
+                                        return item;
+                                    }
+                                })[0].children;
+                                if (_this.d3) {
+                                    var levelThreeList = levelTwoList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.d2) {
+                                            return item;
+                                        }
+                                    })[0].children;
+                                    _this.citySelectedText = levelThreeList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.d3) {
+                                            return item;
+                                        }
+                                    })[0].label;
+                                } else {
+                                    _this.citySelectedText = levelTwoList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.d2) {
+                                            return item;
+                                        }
+                                    })[0].label;
+                                }
+                            }
+                        }
+                    } else if (type === 'trade') {
+                        var tradeList = res.data;
+                        _this.tradeSelectedText = tradeList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.trade)) {
+                                return item;
+                            }
+                        })[0].name;
+                    } else if (type === 'companyNature') {
+                        var natureList = res.data;
+                        _this.natureSelectedText = natureList.filter(function(item) {
+                            if (parseInt(item.id) === parseInt(_this.nature)) {
+                                return item;
+                            }
+                        })[0].name;
+                    }
+                } else {
+                    console.log(res.message);
+                }
+            }).catch(function(err) {
+                console.log(err);
+            });
+        },
+    },
+});

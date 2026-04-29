@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+SQL_FILE="$ROOT_DIR/demo/localtalent_demo_data.sql"
+
+MYSQL_CONTAINER="${LOCALTALENT_DEMO_MYSQL_CONTAINER:-localtalent-mysql}"
+MYSQL_DATABASE="${LOCALTALENT_DEMO_MYSQL_DATABASE:-localtalent}"
+MYSQL_USER="${LOCALTALENT_DEMO_MYSQL_USER:-localtalent}"
+MYSQL_PASSWORD="${LOCALTALENT_DEMO_MYSQL_PASSWORD:-localtalent}"
+
+mysql_exec() {
+  docker exec -e MYSQL_PWD="$MYSQL_PASSWORD" "$MYSQL_CONTAINER" \
+    mysql --default-character-set=utf8mb4 --batch --skip-column-names -u"$MYSQL_USER" "$MYSQL_DATABASE" "$@"
+}
+
+mysql_import() {
+  docker exec -e MYSQL_PWD="$MYSQL_PASSWORD" -i "$MYSQL_CONTAINER" \
+    mysql --default-character-set=utf8mb4 -u"$MYSQL_USER" "$MYSQL_DATABASE" < "$SQL_FILE"
+}
+
+if [ ! -f "$SQL_FILE" ]; then
+  echo "FAIL: demo SQL not found: $SQL_FILE"
+  exit 1
+fi
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "FAIL: docker not found. Install Docker Desktop or Docker Engine first."
+  exit 1
+fi
+
+if ! docker ps --format '{{.Names}}' | grep -Fxq "$MYSQL_CONTAINER"; then
+  echo "FAIL: MySQL container '$MYSQL_CONTAINER' is not running."
+  echo "Run: docker compose -f infra/docker-compose.yml up -d"
+  exit 1
+fi
+
+core_table_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM information_schema.tables
+WHERE table_schema = DATABASE()
+  AND table_name IN (
+    'company',
+    'candidate_user',
+    'candidate_publish_snapshot',
+    'job_post',
+    'export_apply',
+    'admin_user',
+    'sys_role'
+  );
+")
+
+if [ "$core_table_count" != "7" ]; then
+  echo "FAIL: core tables are missing. Start the backend once so Flyway can migrate the database."
+  echo "Run: cd backend && ./mvnw spring-boot:run"
+  exit 1
+fi
+
+echo "Importing local demo data into $MYSQL_CONTAINER/$MYSQL_DATABASE ..."
+mysql_import
+
+snapshot_leak_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM candidate_publish_snapshot
+WHERE LOWER(CAST(snapshot_json AS CHAR)) REGEXP 'mobile|email|resume_body|attachment_object_key|evidence|password_hash|base_profile_json|education_json|experience_json|skills_json';
+")
+
+if [ "$snapshot_leak_count" != "0" ]; then
+  echo "FAIL: demo publish snapshot contains raw candidate data marker."
+  exit 1
+fi
+
+visible_snapshot_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM candidate_publish_snapshot
+WHERE publishable_flag = 1
+  AND consent_status = 1
+  AND status = 1
+  AND visibility_scope = 4;
+")
+
+export_id=$(mysql_exec -e "
+SELECT ea.id
+FROM export_apply ea
+JOIN company c ON c.id = ea.company_id
+WHERE c.license_no = 'LT-DEMO-COMPANY-APPROVED'
+  AND ea.biz_type = 'application_candidate_detail'
+  AND ea.approve_status = 0
+ORDER BY ea.id DESC
+LIMIT 1;
+")
+
+online_job_id=$(mysql_exec -e "
+SELECT id
+FROM job_post
+WHERE external_job_id = 'LT-DEMO-JOB-ONLINE'
+LIMIT 1;
+")
+
+echo "PASS"
+cat <<EOF
+
+演示数据已导入。
+
+演示账号（默认密码均为 LocalTalent@123456）：
+- candidate-consented: demo_candidate@localtalent.test
+- candidate-revoked:   demo_revoked@localtalent.test
+- candidate-pending:   demo_pending@localtalent.test
+- company:             demo_company@localtalent.test
+- operator:            operator
+- auditor:             auditor_demo
+
+关键页面：
+- 门户首页:               http://localhost:3000/
+- 人才服务区:             http://localhost:3000/portal/talent-service-area
+- 求职者中心:             http://localhost:3000/candidate/center
+- 企业后台:               http://localhost:3000/company
+- 运营后台:               http://localhost:3000/admin
+
+可用筛选：
+- 人才服务区 city_code=310000, category_code=software
+- 门户在线职位 job_id=$online_job_id
+- 待审批导出 export_id=$export_id
+- 审计 trace_id=trace-demo
+
+安全校验：
+- 当前公开可见发布快照数量: $visible_snapshot_count
+- 发布快照 JSON 原始候选人字段扫描: PASS
+
+下一步：
+1. 确认后端仍在运行: cd backend && ./mvnw spring-boot:run
+2. 启动前端: cd frontend && npm ci && npm run dev
+3. 获取登录 token: ./scripts/demo_login_tokens company
+EOF

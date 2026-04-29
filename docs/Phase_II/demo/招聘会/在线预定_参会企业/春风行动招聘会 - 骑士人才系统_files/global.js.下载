@@ -1,0 +1,210 @@
+qscms.apiList = {
+    getLoginCode: '/member/sendsms/login', //获取登录验证码
+    userinfo: '/home/config/userinfo', //获取用户信息,用于查询用户登录状态
+    qrcode: '/home/qrcode/index', //获取推广二维码
+    qrcodejob: '/index/job/jobHuntQrCode', //获取推广二维码(职位列表)
+    jobContact: '/home/job/getContact', //获取职位联系方式
+    jobClick: '/home/job/click', //职位点击量加1
+    jobapply: '/member/index/jobApplyAdd', //申请职位,
+    jobFavCheck: '/home/job/checkFav', //查询职位是否已被收藏
+    jobFav: '/member/index/favJobAdd', //收藏职位
+    jobFavCancel: '/member/index/favJobCancel', //取消收藏职位
+    searchLocation: '/home/index/ajaxSearchLocation', //搜索时ajax跳转
+    resumeRefresh: '/personal/resume/refresh', //刷新简历
+    companyJobRefreshBatch: '/company/job/refreshBatch', // 企业刷新职位-批量
+    companyCheckJobaddNum: '/company/job/checkJobaddNumber', // 查询可发布职位数
+    resumeContact: '/home/resume/getContact', //获取简历联系方式
+    resumeFavCheck: '/home/resume/checkFav', //获取简历是否已被收藏
+    resumeFav: '/member/index/favResumeAdd', //收藏简历
+    resumeFavCancel: '/member/index/favResumeCancel', //取消收藏简历
+    resumeClick: '/home/resume/click', //简历点击量加1
+    resumeDownload: '/member/index/downResumeAdd', //下载简历
+    jobSupplementary: '/home/job/supplementary', //职位详情补充资料
+    companySupplementary: '/home/company/supplementary', //企业详情补充资料
+    resumeSupplementary: '/home/resume/supplementary', //简历详情补充资料
+    companyAttention: '/member/index/attentionCompanyAdd', // 关注企业
+    companyAttentionCancel: '/member/index/attentionCompanyCancel', // 取消关注企业
+    companyClick: '/home/company/click', //企业点击量加1
+    companyJoblist: '/home/job/index', //获取企业在招职位列表
+    company_published_jobslist: '/company/index/joball', // 获取企业在招职位面试邀请
+    interview_add: '/member/index/interviewAdd', // 邀请面试
+    member_setmeal: '/company/service/mysetmeal', // 我的套餐
+    classify: '/home/classify/index', // 获取枚举类数据
+    articleClick: '/home/article/click', //资讯点击量加1
+    noticeClick: '/home/notice/click', //公告点击量加1
+    jobContrast: '/home/contrast/job', //职位对比
+    resumeContrast: '/home/contrast/resume', //简历对比
+    mapsearch: '/home/job/map', //地图搜索
+    loginByPwd: '/member/login/password', //账号密码登录
+    loginByCode: '/member/login/code', //验证码登录
+    agreementAndPrivacy: '/home/config/agreementAndPrivacy', //注册协议和隐私政策
+    statAfterLogin: '/member/index/statAfterLogin', //获取登录后统计信息
+    tipoff: '/member/info/tipoff', //举报
+    captchaPicture: '/home/captcha/picture', //图片验证码
+    cronRun: '/home/cron/index', //计划任务
+    jobfairRetrospect: '/home/jobfair/retrospect', //获取招聘会精彩回顾
+    jobfairRecommend: '/home/jobfair/recommend', //获取招聘会推荐企业
+    jobfairCompanylist: '/home/jobfair/comlist', //获取招聘会参会企业
+    jobfairPosition: '/home/jobfair/position', //获取招聘会展位信息
+    jobfairReserve: '/company/jobfair/reserve', //报名
+    jobfairolCompanyList: '/home/jobfairol/comlist', //获取网络招聘会参会企业
+    jobfairolJobList: '/home/jobfairol/joblist', //获取网络招聘会参会职位
+    jobfairolResList: '/home/jobfairol/resumelist', //获取网络招聘会参会个人
+    jobfairol_addlog: '/home/jobfairol/logAdd', //添加网络招聘会查看日志
+    jobfairolApply: '/home/jobfairol/apply', //报名
+    recruitmentCompanyList: '/home/recruitment/comlist', //获取今日招聘参会企业
+    secretPhone: '/member/index/secretPhone', //号码保护接口
+    campusAdList: '/home/campus/ad_list', //校园招聘广告位
+    schoolElection: '/home/campus/school_election', //院校双选会
+    schoolPreach: '/home/campus/school_preach', //院校宣讲会
+    getTypeCategory: '/home/campus/get_type_category', //院校类型
+    getLevelCategory: '/home/campus/get_level_category', //院校层次
+    getSchool: '/home/campus/get_school', //获取院校分类
+    searchCampusLocation: '/home/campus/ajaxSearchLocation', //校园招聘搜索时ajax跳转
+    freelanceContactPay: "/member/freelance/order_pay", // 查看联系方式支付
+    config: '/home/config/index', //获取网站配置信息
+    serviceOl: '/home/serviceol/index', //获取网站配置信息
+    sendsms_auth_mobile_nocheck: '/member/sendsms/authMobileNoCheck', //获取验证码
+    authMobileCheck: '/home/city_info/authMobileCheck', //验证码验证
+    get_experience: '/home/classify/index', //工作经验
+    get_tpl_list: '/home/poster/index', //生成海报
+    get_tplindexList: '/home/poster/getTplindexList', //海报索引列表
+    // 快速招聘-详情
+    fast_jobdetail: '/home/fast/fast_job_info',
+    // 快速招聘-刷新
+    fast_jobrefresh: '/home/fast/fast_job_refresh',
+    // 快速招聘-删除
+    fast_jobdelete: '/home/fast/fast_job_del',
+    // 快速招聘-发布
+    fast_jobedit: '/home/fast/fast_job_addsave',
+    fast_jobpwd: '/home/fast/fast_job_pwd',
+    // 快速求职-详情
+    fast_resumedetail: '/home/fast/fast_resume_info',
+    // 快速求职-刷新
+    fast_resumerefresh: '/home/fast/fast_resume_refresh',
+    // 快速求职-删除
+    fast_resumedelete: '/home/fast/fast_resume_del',
+    // 快速求职-发布
+    fast_resumeedit: '/home/fast/fast_resume_addsave',
+    fast_resumepwd: '/home/fast/fast_resume_pwd',
+    getRegQuickCode: '/member/sendsms/regResumeQuick', //获取快速注册简历验证码
+    regResumeQuickApply: '/member/reg/quickJobApply', //快速投递
+    regResumeQuick:'/member/reg/quickRegResume',  //快速注册简历
+    interviewAddPre: '/member/index/interviewAddPre', //面试邀请预加载数据
+    company_list_by_trade: '/home/company/listByTrade', // 企业列表
+    imGlobal: '/member/im/imWindowGlobal', //聊天初始化配置读取
+    imGetToken: '/member/im/getToken', //获取聊天token
+    imStart: '/member/im/startConversation', //发起聊天
+    imJoblist: '/member/im/joblist', //获取聊天有效职位列表
+    imChatlist: '/member/im/chatList', //获取会话列表
+    imCheckBind: '/member/im/imCheckBind', //即时通讯检查绑定状态
+    saveRegisterData: '/home/job/saveRegisterData', //保存职位登记信息
+    recruitmentTodayList: '/home/recruitment/comlist', //获取今日招聘参会企业
+    recruitmentTodayJobList: '/home/recruitment/joblist', //获取今日招聘参会企业职位
+    company_pay_direct_service: '/company/service/pay_direct_service', // 企业下订单（快捷支付）
+    liveList: '/home/live/pageList', //获取直播列表
+    member_account: '/member/account/index', // 账号管理
+    exportPdfByPhp: '/home/resume/exportPdfByPhp', // 导出PDF简历
+    resumeShow: '/home/resume/show', // 简历详情
+    jobShow: '/home/job/show', // 职位详情
+    dialog_login:'/index/ajax_dialog/login',//登录弹窗
+    dialog_resumeAdd:'/index/ajax_dialog/resumeAdd',//创建简历弹窗
+    dialog_tipoff:'/index/ajax_dialog/tipoff',//举报弹窗
+    dialog_interviewInvitation:'/index/ajax_dialog/interviewInvitation',//面试邀请
+    dialog_chooseJob:'/index/ajax_dialog/chooseJob',//选择职位
+    dialog_resumeService:'/index/ajax_dialog/resumeService',//下载简历
+    dialog_resumeDetail:'/index/resume_show/index/id/',//获取简历详情弹窗
+    dialog_sharePoster:'/index/ajax_dialog/sharePoster',//获取分享海报弹窗
+    company_testingPortrait:'/company/resume_portrait/testingPortrait',//检测画像功能
+    company_generatePortrait:'/company/resume_portrait/generatePortrait',//生成画像
+}
+
+var locationUrl = qscms.sitedir + qscms.memberDirname
+qscms.locationList = {
+    helpCenter: locationUrl + "/help",
+    indexCompany: locationUrl + "/company",
+    indexPersonal: locationUrl + "/personal",
+    loginCompany: locationUrl + "/login/company",
+    loginPersonal: locationUrl + "/login/personal",
+    regCompany: locationUrl + "/reg/company",
+    regPersonal: locationUrl + "/reg/personal",
+    reg: locationUrl + "/reg",
+    createResume: locationUrl + "/personal/resume/add_resume_step1",
+    recommendResume: locationUrl + "/company/recommend",
+    recommendJob: locationUrl + "/personal/recommend",
+    companyPassword: locationUrl + "/company/account/safety",
+    companyService: locationUrl + "/company/service/setmeal",
+    companyJobApplyList: locationUrl + "/company/resume/jobapply",
+    companyInterviewList: locationUrl + "/company/resume/interview",
+    personalJobApplyList: locationUrl + "/personal/job/jobapply",
+    personalInterviewList: locationUrl + "/personal/job/interview",
+    companyViewList: locationUrl + "/company/resume/browsing",
+    personalViewList: locationUrl + "/personal/job/viewjob",
+    companyJobAdd: locationUrl + "/company/jobadd",
+    companySetmealAdd: locationUrl + "/company/service/setmeal",
+    companyJoblist: locationUrl + "/company/joblist",
+    personalService: locationUrl + "/personal/service/stick",
+    personalPassword: locationUrl + "/personal/account/safety",
+    personalResume: locationUrl + "/personal/resume",
+    forget: locationUrl + "/forget/1",
+    appeal: locationUrl + "/appeal",
+    freelanceAddSubject: locationUrl + "/freelance/release",
+    freelanceAddResume: locationUrl + "/freelance/resume",
+    freelanceHandler: locationUrl + "/freelance",
+    wxpay: locationUrl + "/wxpay",
+    oauthQq: locationUrl + "/oauth/qq/login",
+    personalIm: locationUrl + "/personal/im",
+    companyIm: locationUrl + "/company/im",
+    companyServiceAdd: locationUrl + "/company/service/increment/add",
+    companyServiceIm: locationUrl + "/company/service/increment/add/im",
+    companyServiceDownloadResume: locationUrl + "/company/service/increment/add/resume_package",
+    companyServiceIncrement: locationUrl + "/company/service/increment",
+    personalJobapply: locationUrl + '/personal/job/jobapply', // 我的投递 - 个人会员
+    personalFavjob: locationUrl + '/personal/fav/favjob', // 我的收藏 - 个人会员
+    personalInterview: locationUrl + '/personal/job/interview', // 我的面试邀请 - 个人会员
+    companyJobapply: locationUrl + '/company/resume/jobapply', // 我的投递 - 企业会员
+    companyFavjob: locationUrl + '/company/resume/fav', // 我的收藏 - 企业会员
+    companyInterview: locationUrl + '/company/resume/interview', // 我的面试邀请 - 企业会员
+    companyInfo:locationUrl +'/company/manage/baseinfo',//基本资料-企业会员
+    resumeDiagnosisIndex:locationUrl +'/resumeDiagnosis/index',//简历诊断-
+}
+//获取列表中已选择的项目
+qscms.getSelItemArr = function() {
+    var idArr = []
+    var listArray = $('.J_allListBox .J_allList:checked');
+    $.each(listArray, function(index, val) {
+        idArr.push(val.value)
+    });
+    return idArr
+}
+
+var visitor = Cookies.get('qscms_visitor');
+if (visitor !== undefined && visitor !== null) {
+    visitor = JSON.parse(visitor)
+    qscms.userToken = visitor.token
+    qscms.isLogin = true
+    qscms.loginUtype = visitor.utype
+}
+
+
+$(document).ready(function() {
+    $('.J_allSelected').click(function() {
+        var isChecked = $(this).is(':checked');
+        var listArray = $('.J_allListBox .J_allList');
+        $.each(listArray, function(index, val) {
+            $(this).prop('checked', isChecked);
+        });
+    });
+    $('.J_allList').click(function() {
+        var isChecked = $(this).is(':checked');
+        if (isChecked) {
+            var listArray = $('.J_allListBox .J_allList');
+            var listCheckedArray = $('.J_allListBox .J_allList:checked');
+            if (listArray.length == listCheckedArray.length) {
+                $('.J_allSelected').prop('checked', isChecked);
+            };
+        } else {
+            $('.J_allSelected').prop('checked', isChecked);
+        }
+    });
+})

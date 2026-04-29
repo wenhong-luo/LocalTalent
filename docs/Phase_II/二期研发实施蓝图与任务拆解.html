@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>LocalTalent 二期研发实施蓝图与任务拆解</title>
+  <style>
+    body { margin:0; background:#f5f7fb; color:#1f2937; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.75; }
+    main { max-width:1180px; margin:0 auto; padding:36px 20px 64px; }
+    h1 { font-size:32px; margin:0 0 14px; }
+    h2 { margin-top:0; color:#0f766e; }
+    .card { background:#fff; border:1px solid #e5e7eb; border-radius:18px; padding:24px; margin:18px 0; box-shadow:0 10px 28px rgba(15,23,42,.06); }
+    table { width:100%; border-collapse:collapse; margin:12px 0; }
+    th,td { border:1px solid #e5e7eb; padding:10px 12px; vertical-align:top; }
+    th { background:#ecfdf5; color:#065f46; text-align:left; }
+    code,pre { background:#0f172a; color:#e5e7eb; border-radius:12px; padding:12px; overflow:auto; }
+    code { padding:2px 6px; }
+    .danger { border-left:4px solid #ef4444; background:#fff1f2; padding:10px 12px; border-radius:10px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>LocalTalent 二期研发实施蓝图与任务拆解（高保真门户优先版）</h1>
+
+  <section class="card">
+    <h2>执行摘要</h2>
+    <p>二期目标从“补功能”调整为“做成像 demo 一样完整的地方人才网门户”。二期前半段优先做公开门户观感、页面结构、模块密度、搜索和 SEO，再补求职者/企业/运营中心增强。</p>
+    <p class="danger">人才服务区仍只展示发布快照；demo 的简历库、地图、视频、直播、短信、微信、小程序、App、会员商业化、真实支付、ATS/RPA/受控候选池同步均不得直接照搬。</p>
+  </section>
+
+  <section class="card">
+    <h2>里程碑规划</h2>
+    <table>
+      <tr><th>里程碑</th><th>Prompt</th><th>目标</th><th>完成标志</th></tr>
+      <tr><td>P2-0</td><td>Prompt 15</td><td>Demo 同步与页面盘点闸门</td><td>24 个 HTML 页面可检索，inventory 完成。</td></tr>
+      <tr><td>P2-1</td><td>Prompt 16</td><td>公共门户 Shell 与全站头尾</td><td>头尾、导航、更多服务、右侧工具条可复用。</td></tr>
+      <tr><td>P2-2</td><td>Prompt 17</td><td>首页高保真首屏</td><td>首页包含 demo 核心 DOM 模块。</td></tr>
+      <tr><td>P2-3</td><td>Prompt 18</td><td>找工作 + 名企直聘</td><td>职位搜索、筛选、卡片、详情入口和 SEO 通过。</td></tr>
+      <tr><td>P2-4</td><td>Prompt 19</td><td>找企业与企业公开页</td><td>企业列表、企业主页和在招职位聚合通过。</td></tr>
+      <tr><td>P2-5</td><td>Prompt 20</td><td>人才服务区高保真改写简历库</td><td>发布快照白名单和字段黑名单通过。</td></tr>
+      <tr><td>P2-6</td><td>Prompt 21</td><td>招聘会/资讯/HR 工具箱与更多服务</td><td>公开内容频道与低风险占位通过。</td></tr>
+      <tr><td>P2-7</td><td>Prompt 22</td><td>登录注册与管理中心入口体验</td><td>登录注册 UI、身份分流和禁用外部登录占位通过。</td></tr>
+      <tr><td>P2-8</td><td>Prompt 23</td><td>二期高保真验收与演示收口</td><td>演示数据、Runbook、测试矩阵、总闸门完成。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>任务拆解</h2>
+    <table>
+      <tr><th>分组</th><th>关键任务</th></tr>
+      <tr><td>公共门户 Shell</td><td>TopUtilityBar、LogoSearchHeader、PortalMainNav、MoreServicesMenu、PortalFooter、FloatingToolBar。</td></tr>
+      <tr><td>首页首屏</td><td>职位分类墙、快捷入口、登录卡片、公告/招聘会 tab、广告位、明星企业/推荐企业/热招职位。</td></tr>
+      <tr><td>列表与详情</td><td>找工作、名企直聘、找企业、人才服务区、招聘会、资讯、HR 工具箱。</td></tr>
+      <tr><td>登录注册</td><td>求职者/招聘者登录注册 UI、本地账号/JWT、外部登录禁用占位、管理中心身份分流。</td></tr>
+      <tr><td>测试文档</td><td>DOM 结构测试、字段黑名单、SEO/Next SSR、边界脚本、演示数据和 Runbook。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>接口与字段边界</h2>
+    <table>
+      <tr><th>领域</th><th>允许公开</th><th>禁止公开</th></tr>
+      <tr><td>职位</td><td>标题、城市、职类、薪资、经验、学历、福利、企业公开摘要、更新时间。</td><td>联系人、审核材料、营业执照附件、内部备注。</td></tr>
+      <tr><td>企业</td><td>企业名、Logo、城市、行业、性质、规模、认证标签、公开简介、在招职位数。</td><td>联系人、营业执照附件、审核材料、后台备注。</td></tr>
+      <tr><td>人才服务区</td><td>发布快照白名单字段。</td><td>手机号、邮箱、简历正文、附件、证据、原始 JSON、聊天记录。</td></tr>
+      <tr><td>招聘会/内容</td><td>公开标题、摘要、正文、时间、地点、主办方、封面、状态。</td><td>报名名单、候选人明细、联系方式、签到证据、内部备注。</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>测试矩阵</h2>
+    <ul>
+      <li>Demo 同步：<code>find docs/Phase_II/demo -name '*.html' | wc -l</code> 应为 24。</li>
+      <li>首页结构：DOM 测试断言顶部工具条、搜索区、分类墙、登录卡、公告 tab、广告位、推荐企业/职位存在。</li>
+      <li>人才服务区：只读发布快照；撤回后不可见；<code>check_portal_snapshot_fields</code> PASS。</li>
+      <li>SEO/SSR：<code>npm run build</code>、metadata、sitemap、robots、私有页 noindex。</li>
+      <li>风险池：地图、视频、直播、短信、微信、小程序、App、支付、ATS/RPA 等仅占位或风险池。</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>
