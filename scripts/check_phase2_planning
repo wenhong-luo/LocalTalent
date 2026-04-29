@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+PHASE_II_DIR="$ROOT_DIR/docs/Phase_II"
+DEMO_DIR="$PHASE_II_DIR/demo"
+INVENTORY_MD="$PHASE_II_DIR/LocalTalent_phase2_demo_inventory.md"
+INVENTORY_HTML="$PHASE_II_DIR/LocalTalent_phase2_demo_inventory.html"
+BOUNDARY_FILE="$PHASE_II_DIR/00_PHASE_II_BOUNDARY.md"
+BLUEPRINT_FILE="$PHASE_II_DIR/二期研发实施蓝图与任务拆解.md"
+PROMPTS_FILE="$PHASE_II_DIR/二期研发提示词.md"
+
+required_files=(
+  "$BOUNDARY_FILE"
+  "$PHASE_II_DIR/74cms人才网开发分析.md"
+  "$PHASE_II_DIR/人才网总盘点与高风险深挖评审稿.md"
+  "$INVENTORY_MD"
+  "$INVENTORY_HTML"
+  "$PHASE_II_DIR/LocalTalent_phase2_step1.md"
+  "$PHASE_II_DIR/LocalTalent_phase2_step2.md"
+  "$PHASE_II_DIR/LocalTalent_phase2_step3.md"
+  "$PHASE_II_DIR/LocalTalent_phase2_step4.md"
+  "$PHASE_II_DIR/LocalTalent_phase2_step5.md"
+  "$PHASE_II_DIR/LocalTalent_phase2_step6.md"
+  "$BLUEPRINT_FILE"
+  "$PROMPTS_FILE"
+)
+
+for required_file in "${required_files[@]}"; do
+  if [ ! -f "$required_file" ]; then
+    echo "FAIL: Phase II planning required file missing: $required_file"
+    exit 1
+  fi
+done
+
+if [ ! -d "$DEMO_DIR" ]; then
+  echo "FAIL: Phase II demo directory missing: $DEMO_DIR"
+  exit 1
+fi
+
+html_count=$(find "$DEMO_DIR" -name '*.html' | wc -l | tr -d '[:space:]')
+if [ "$html_count" != "24" ]; then
+  echo "FAIL: Phase II demo HTML count must be 24, got $html_count"
+  exit 1
+fi
+
+core_page_markers=(
+  "首页"
+  "找工作"
+  "名企直聘"
+  "找企业"
+  "简历库"
+  "招聘会"
+  "就业政策"
+  "HR 工具箱"
+  "更多服务"
+  "登录注册"
+  "人才服务区"
+  "发布快照"
+)
+
+for marker in "${core_page_markers[@]}"; do
+  if ! grep -Fq "$marker" "$INVENTORY_MD"; then
+    echo "FAIL: demo inventory missing core marker: $marker"
+    exit 1
+  fi
+done
+
+boundary_markers=(
+  "高保真门户优先"
+  "Demo 同步与页面盘点闸门"
+  "人才服务区仅展示发布快照"
+  "风险池"
+  "公共简历库"
+  "原始候选人数据"
+)
+
+for marker in "${boundary_markers[@]}"; do
+  if ! grep -Fq "$marker" "$BOUNDARY_FILE"; then
+    echo "FAIL: Phase II boundary missing marker: $marker"
+    exit 1
+  fi
+done
+
+for prompt_no in 15 16 17 18 19 20 21 22 23; do
+  if ! grep -Fq "Prompt $prompt_no" "$PROMPTS_FILE"; then
+    echo "FAIL: Phase II prompts missing Prompt $prompt_no"
+    exit 1
+  fi
+done
+
+if ! grep -Fq "Demo 同步与页面盘点闸门" "$BLUEPRINT_FILE"; then
+  echo "FAIL: Phase II blueprint missing Prompt 15 demo gate title"
+  exit 1
+fi
+
+if grep -Fq "二期基线收口与文档闸门" "$BOUNDARY_FILE"; then
+  echo "FAIL: Phase II boundary still contains old Prompt 15 title"
+  exit 1
+fi
+
+echo "PASS"

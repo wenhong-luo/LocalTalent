@@ -475,11 +475,14 @@ for assertion_marker in \
   fi
 done
 
+TESTING_DOC="$ROOT_DIR/docs/Phase_I/TESTING.md"
+RUNBOOK_DOC="$ROOT_DIR/docs/Phase_I/RUNBOOK.md"
+
 prompt14_required_paths=(
   "$ROOT_DIR/.github/workflows/ci.yml"
   "$ROOT_DIR/scripts/check_portal_snapshot_fields"
-  "$ROOT_DIR/docs/RUNBOOK.md"
-  "$ROOT_DIR/docs/TESTING.md"
+  "$RUNBOOK_DOC"
+  "$TESTING_DOC"
 )
 
 for required_path in "${prompt14_required_paths[@]}"; do
@@ -518,8 +521,8 @@ for testing_marker in \
   "IdorBlock" \
   "AuditMaskingTest" \
   "OpenApiContractTest"; do
-  if ! grep -Fq "$testing_marker" "$ROOT_DIR/docs/TESTING.md"; then
-    echo "FAIL: docs/TESTING.md missing boundary mapping: $testing_marker"
+  if ! grep -Fq "$testing_marker" "$TESTING_DOC"; then
+    echo "FAIL: $TESTING_DOC missing boundary mapping: $testing_marker"
     exit 1
   fi
 done
@@ -532,8 +535,8 @@ for runbook_marker in \
   "日志脱敏" \
   "预签名" \
   "MinIO"; do
-  if ! grep -Fq "$runbook_marker" "$ROOT_DIR/docs/RUNBOOK.md"; then
-    echo "FAIL: docs/RUNBOOK.md missing runbook topic: $runbook_marker"
+  if ! grep -Fq "$runbook_marker" "$RUNBOOK_DOC"; then
+    echo "FAIL: $RUNBOOK_DOC missing runbook topic: $runbook_marker"
     exit 1
   fi
 done
