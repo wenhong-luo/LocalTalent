@@ -25,10 +25,26 @@ public class PortalJobController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "city_code", required = false) String cityCode,
             @RequestParam(value = "category_code", required = false) String categoryCode,
+            @RequestParam(value = "salary_min", required = false) Integer salaryMin,
+            @RequestParam(value = "salary_max", required = false) Integer salaryMax,
+            @RequestParam(value = "industry_code", required = false) String industryCode,
+            @RequestParam(value = "scale_code", required = false) String scaleCode,
+            @RequestParam(value = "updated_within", required = false) Integer updatedWithin,
+            @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "20") int size
     ) {
-        return ApiResponse.success(portalJobService.list(keyword, cityCode, categoryCode, page, size));
+        PortalJobSearchCriteria criteria = new PortalJobSearchCriteria(
+                keyword,
+                cityCode,
+                categoryCode,
+                salaryMin,
+                salaryMax,
+                industryCode,
+                scaleCode,
+                updatedWithin,
+                sort);
+        return ApiResponse.success(portalJobService.list(criteria, page, size));
     }
 
     @GetMapping("/{id}")

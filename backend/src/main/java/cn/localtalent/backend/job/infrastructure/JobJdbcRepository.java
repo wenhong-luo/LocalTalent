@@ -2,11 +2,13 @@ package cn.localtalent.backend.job.infrastructure;
 
 import cn.localtalent.backend.job.api.JobCreateRequest;
 import cn.localtalent.backend.job.api.JobUpdateRequest;
+import cn.localtalent.backend.job.api.PortalJobSearchCriteria;
 import cn.localtalent.backend.job.domain.JobPostRow;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -157,18 +159,18 @@ public class JobJdbcRepository {
         return count == null ? 0 : count;
     }
 
-    public List<JobPostRow> listVisible(String keyword, String cityCode, String categoryCode, int limit, int offset) {
-        QueryParts query = visibleQuery(keyword, cityCode, categoryCode, false);
+    public List<JobPostRow> listVisible(PortalJobSearchCriteria criteria, int limit, int offset) {
+        QueryParts query = visibleQuery(criteria, false);
         query.args().add(limit);
         query.args().add(offset);
         return jdbcTemplate.query(
-                query.sql() + " ORDER BY j.updated_at DESC LIMIT ? OFFSET ?",
+                query.sql() + visibleOrderBy(criteria == null ? null : criteria.sort()) + " LIMIT ? OFFSET ?",
                 (rs, rowNum) -> row(rs),
                 query.args().toArray());
     }
 
-    public long countVisible(String keyword, String cityCode, String categoryCode) {
-        QueryParts query = visibleQuery(keyword, cityCode, categoryCode, true);
+    public long countVisible(PortalJobSearchCriteria criteria) {
+        QueryParts query = visibleQuery(criteria, true);
         Integer count = jdbcTemplate.queryForObject(query.sql(), Integer.class, query.args().toArray());
         return count == null ? 0 : count;
     }
@@ -181,26 +183,61 @@ public class JobJdbcRepository {
                 jobId).stream().findFirst();
     }
 
-    private QueryParts visibleQuery(String keyword, String cityCode, String categoryCode, boolean countOnly) {
+    private QueryParts visibleQuery(PortalJobSearchCriteria criteria, boolean countOnly) {
         StringBuilder sql = new StringBuilder(countOnly ? "SELECT COUNT(*) " : baseSelect());
         if (countOnly) {
             sql.append("FROM job_post j JOIN company c ON c.id = j.company_id ");
         }
         sql.append(" WHERE j.status = 2 AND j.audit_status = 2 AND c.auth_status = 2");
         List<Object> args = new ArrayList<>();
-        if (keyword != null && !keyword.isBlank()) {
-            sql.append(" AND j.title LIKE ?");
-            args.add("%" + keyword.trim() + "%");
+        if (criteria == null) {
+            return new QueryParts(sql.toString(), args);
         }
-        if (cityCode != null && !cityCode.isBlank()) {
+        if (criteria.keyword() != null && !criteria.keyword().isBlank()) {
+            sql.append(" AND (j.title LIKE ? OR c.company_name LIKE ?)");
+            String keyword = "%" + criteria.keyword().trim() + "%";
+            args.add(keyword);
+            args.add(keyword);
+        }
+        if (criteria.cityCode() != null && !criteria.cityCode().isBlank()) {
             sql.append(" AND j.city_code = ?");
-            args.add(cityCode.trim());
+            args.add(criteria.cityCode().trim());
         }
-        if (categoryCode != null && !categoryCode.isBlank()) {
+        if (criteria.categoryCode() != null && !criteria.categoryCode().isBlank()) {
             sql.append(" AND j.category_code = ?");
-            args.add(categoryCode.trim());
+            args.add(criteria.categoryCode().trim());
+        }
+        if (criteria.salaryMin() != null) {
+            sql.append(" AND j.salary_max IS NOT NULL AND j.salary_max >= ?");
+            args.add(criteria.salaryMin());
+        }
+        if (criteria.salaryMax() != null) {
+            sql.append(" AND j.salary_min IS NOT NULL AND j.salary_min <= ?");
+            args.add(criteria.salaryMax());
+        }
+        if (criteria.industryCode() != null && !criteria.industryCode().isBlank()) {
+            sql.append(" AND c.industry_code = ?");
+            args.add(criteria.industryCode().trim());
+        }
+        if (criteria.scaleCode() != null && !criteria.scaleCode().isBlank()) {
+            sql.append(" AND c.scale_code = ?");
+            args.add(criteria.scaleCode().trim());
+        }
+        if (criteria.updatedWithin() != null) {
+            sql.append(" AND j.updated_at >= ?");
+            args.add(LocalDateTime.now().minusDays(criteria.updatedWithin()));
         }
         return new QueryParts(sql.toString(), args);
+    }
+
+    private String visibleOrderBy(String sort) {
+        if ("salary_asc".equals(sort)) {
+            return " ORDER BY j.salary_min IS NULL, j.salary_min ASC, j.updated_at DESC";
+        }
+        if ("salary_desc".equals(sort)) {
+            return " ORDER BY j.salary_max IS NULL, j.salary_max DESC, j.updated_at DESC";
+        }
+        return " ORDER BY j.updated_at DESC";
     }
 
     private String baseSelect() {

@@ -188,6 +188,61 @@ class JobVisibilityIT {
         assertThat(countAudit("trace-job-offline", "job_post", "job_offline")).isEqualTo(1);
     }
 
+    @Test
+    void portalJobSearchShouldFilterPublicVisibleCertifiedJobsOnly() throws Exception {
+        String suffix = UUID.randomUUID().toString().replace("-", "");
+        long certifiedCompanyId = insertCompany(
+                "Prompt18 认证企业 " + suffix,
+                "P18C-" + suffix.substring(0, 16),
+                2,
+                "internet",
+                "50-100",
+                "310000");
+        long uncertifiedCompanyId = insertCompany(
+                "Prompt18 未认证企业 " + suffix,
+                "P18U-" + suffix.substring(0, 16),
+                1,
+                "internet",
+                "50-100",
+                "310000");
+        long visibleJobId = insertJob(
+                certifiedCompanyId,
+                "Prompt18 Java 架构师 " + suffix,
+                "p18-software",
+                "310000",
+                20000,
+                32000,
+                2,
+                2);
+        insertJob(certifiedCompanyId, "Prompt18 待审核职位 " + suffix, "p18-software", "310000", 20000, 32000, 1, 1);
+        insertJob(certifiedCompanyId, "Prompt18 下线职位 " + suffix, "p18-software", "310000", 20000, 32000, 3, 2);
+        insertJob(uncertifiedCompanyId, "Prompt18 未认证职位 " + suffix, "p18-software", "310000", 20000, 32000, 2, 2);
+
+        HttpJsonResponse filtered = getJson(
+                ("/api/portal/jobs?keyword=%s&city_code=310000&category_code=p18-software"
+                        + "&salary_min=18000&salary_max=35000&industry_code=internet&scale_code=50-100"
+                        + "&updated_within=30&sort=salary_desc&page=1&size=10").formatted(suffix),
+                "trace-p18-portal-job-search",
+                null);
+        assertSuccess(filtered, 200, "trace-p18-portal-job-search");
+        assertThat(filtered.body().at("/data/total").asLong()).isEqualTo(1);
+        assertThat(filtered.body().at("/data/job_list/0/job_id").asLong()).isEqualTo(visibleJobId);
+
+        HttpJsonResponse salaryMismatch = getJson(
+                "/api/portal/jobs?keyword=%s&salary_min=40000&page=1&size=10".formatted(suffix),
+                "trace-p18-portal-salary-filter",
+                null);
+        assertSuccess(salaryMismatch, 200, "trace-p18-portal-salary-filter");
+        assertThat(salaryMismatch.body().at("/data/total").asLong()).isZero();
+
+        HttpJsonResponse industryMismatch = getJson(
+                "/api/portal/jobs?keyword=%s&industry_code=manufacturing&page=1&size=10".formatted(suffix),
+                "trace-p18-portal-industry-filter",
+                null);
+        assertSuccess(industryMismatch, 200, "trace-p18-portal-industry-filter");
+        assertThat(industryMismatch.body().at("/data/total").asLong()).isZero();
+    }
+
     private Account registerAndLoginCompany() throws Exception {
         String suffix = UUID.randomUUID().toString().replace("-", "");
         String email = "job-visible-company-" + suffix + "@example.com";
@@ -313,6 +368,60 @@ class JobVisibilityIT {
                 traceId,
                 bizType,
                 actionType);
+    }
+
+    private long insertCompany(
+            String companyName,
+            String licenseNo,
+            int authStatus,
+            String industryCode,
+            String scaleCode,
+            String cityCode) {
+        jdbcTemplate.update(
+                "INSERT INTO company "
+                        + "(company_name, license_no, industry_code, scale_code, city_code, auth_status) "
+                        + "VALUES (?, ?, ?, ?, ?, ?)",
+                companyName,
+                licenseNo,
+                industryCode,
+                scaleCode,
+                cityCode,
+                authStatus);
+        Long id = jdbcTemplate.queryForObject(
+                "SELECT id FROM company WHERE license_no = ?",
+                Long.class,
+                licenseNo);
+        return id == null ? 0 : id;
+    }
+
+    private long insertJob(
+            long companyId,
+            String title,
+            String categoryCode,
+            String cityCode,
+            int salaryMin,
+            int salaryMax,
+            int status,
+            int auditStatus) {
+        jdbcTemplate.update(
+                "INSERT INTO job_post "
+                        + "(company_id, source_type, title, category_code, city_code, salary_min, salary_max, "
+                        + "job_desc, status, audit_status, published_at, status_changed_at) "
+                        + "VALUES (?, 1, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+                companyId,
+                title,
+                categoryCode,
+                cityCode,
+                salaryMin,
+                salaryMax,
+                "Prompt18 public search fixture.",
+                status,
+                auditStatus);
+        Long id = jdbcTemplate.queryForObject(
+                "SELECT id FROM job_post WHERE title = ?",
+                Long.class,
+                title);
+        return id == null ? 0 : id;
     }
 
     private record Account(long userId, long companyId, String licenseNo, String token) {
