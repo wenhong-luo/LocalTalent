@@ -79,10 +79,12 @@ class MigrationTest {
         assertColumnsAbsent(jdbcTemplate, "candidate_publish_snapshot", List.of("mobile", "email", "password_hash"));
         assertColumnsAbsent(jdbcTemplate, "candidate_user", List.of("snapshot_json"));
         assertColumnsExist(jdbcTemplate, "company", List.of(
+                "nature_code",
                 "auth_reject_reason",
                 "auth_review_user_id",
                 "auth_review_time",
                 "auth_submit_time"));
+        assertIndexesExist(jdbcTemplate, "company", List.of("idx_company_portal_search"));
         assertColumnsExist(jdbcTemplate, "job_post", List.of(
                 "review_memo",
                 "reject_reason",

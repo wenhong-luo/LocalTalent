@@ -4,6 +4,8 @@ export function GET(): Response {
   const generatedAt = new Date().toISOString();
   const urls = [
     { loc: `${siteUrl}/`, priority: '0.8', changefreq: 'weekly' },
+    { loc: `${siteUrl}/jobs`, priority: '0.8', changefreq: 'daily' },
+    { loc: `${siteUrl}/companies`, priority: '0.8', changefreq: 'daily' },
     { loc: `${siteUrl}/portal/talent-service-area`, priority: '0.9', changefreq: 'daily' }
   ];
   const body = [

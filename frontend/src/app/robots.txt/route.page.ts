@@ -5,6 +5,8 @@ export function GET(): Response {
     [
       'User-agent: *',
       'Allow: /',
+      'Allow: /jobs',
+      'Allow: /companies',
       'Allow: /portal/talent-service-area',
       `Sitemap: ${siteUrl}/sitemap.xml`,
       ''

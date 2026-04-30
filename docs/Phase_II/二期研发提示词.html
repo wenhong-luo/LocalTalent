@@ -62,6 +62,11 @@
         <td>完成 <code>/jobs</code> 找工作列表、<code>/jobs/[id]</code> 最小职位详情入口、公开职位筛选增强和名企直聘列表体验。</td>
         <td>后端仍强制仅返回在线职位和认证企业职位；经验、学历、企业性质等暂为稳定 query/占位筛选；不做真实地图、付费推广、职位发布、真实投递或收藏。</td>
       </tr>
+      <tr>
+        <td>Prompt 19（P2-4）</td>
+        <td>完成 <code>/companies</code> 找企业列表、<code>/companies/[id]</code> 企业公开主页、<code>GET /api/portal/companies</code> 与详情只读接口，并新增 <code>company.nature_code</code> 公开筛选字段。</td>
+        <td>公开层只展示已认证企业公开字段；企业主页只聚合该企业在线且审核通过职位；不展示联系人、手机号/邮箱、营业执照附件、审核材料、后台备注；不做受控找人才、联系解锁或会员特权。</td>
+      </tr>
     </table>
     <p class="note">后续纪律：每完成一轮 Phase II Prompt，都必须同步更新本节和 Markdown，写清楚“做到了什么、没有做什么、下一轮从哪里继续”。</p>
   </section>
