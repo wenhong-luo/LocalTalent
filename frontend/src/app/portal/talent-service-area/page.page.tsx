@@ -27,6 +27,10 @@ function buildQuery(searchParams: SearchParams): TalentSnapshotQuery {
   return {
     city_code: firstParam(searchParams.city_code),
     category_code: firstParam(searchParams.category_code),
+    experience_min: firstParam(searchParams.experience_min),
+    experience_max: firstParam(searchParams.experience_max),
+    updated_within: firstParam(searchParams.updated_within),
+    sort: firstParam(searchParams.sort),
     page: toPositiveInt(firstParam(searchParams.page), 1),
     size: toPositiveInt(firstParam(searchParams.size), 12)
   };

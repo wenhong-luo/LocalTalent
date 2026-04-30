@@ -168,6 +168,10 @@ public class CandidateJdbcRepository {
     public PortalSnapshotRows findVisibleSnapshots(
             String cityCode,
             String categoryCode,
+            Integer experienceMin,
+            Integer experienceMax,
+            Integer updatedWithinDays,
+            String sort,
             int page,
             int size
     ) {
@@ -176,6 +180,9 @@ public class CandidateJdbcRepository {
         List<Object> args = new ArrayList<>();
         addColumnFilter(where, args, "city_code", cityCode);
         addColumnFilter(where, args, "category_code", categoryCode);
+        addMinimumFilter(where, args, "experience_years", experienceMin);
+        addMaximumFilter(where, args, "experience_years", experienceMax);
+        addUpdatedWithinFilter(where, args, updatedWithinDays);
 
         Long total = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM candidate_publish_snapshot" + where,
@@ -190,7 +197,8 @@ public class CandidateJdbcRepository {
                         + "DATE_FORMAT(updated_at, '%Y-%m-%dT%H:%i:%s') AS updated_at_text "
                         + "FROM candidate_publish_snapshot"
                         + where
-                        + " ORDER BY updated_at DESC, id DESC LIMIT ? OFFSET ?",
+                        + orderBy(sort)
+                        + " LIMIT ? OFFSET ?",
                 (rs, rowNum) -> new PortalSnapshotRow(
                         rs.getLong("id"),
                         rs.getString("snapshot_json"),
@@ -198,6 +206,38 @@ public class CandidateJdbcRepository {
                 pageArgs.toArray());
 
         return new PortalSnapshotRows(rows, total == null ? 0 : total);
+    }
+
+    private void addMinimumFilter(StringBuilder where, List<Object> args, String columnName, Integer value) {
+        if (value == null) {
+            return;
+        }
+        where.append(" AND ").append(columnName).append(" >= ?");
+        args.add(value);
+    }
+
+    private void addMaximumFilter(StringBuilder where, List<Object> args, String columnName, Integer value) {
+        if (value == null) {
+            return;
+        }
+        where.append(" AND ").append(columnName).append(" <= ?");
+        args.add(value);
+    }
+
+    private void addUpdatedWithinFilter(StringBuilder where, List<Object> args, Integer days) {
+        if (days == null) {
+            return;
+        }
+        where.append(" AND updated_at >= TIMESTAMPADD(DAY, ?, CURRENT_TIMESTAMP)");
+        args.add(-days);
+    }
+
+    private String orderBy(String sort) {
+        return switch (sort) {
+            case "experience_desc" -> " ORDER BY experience_years DESC, updated_at DESC, id DESC";
+            case "experience_asc" -> " ORDER BY experience_years ASC, updated_at DESC, id DESC";
+            default -> " ORDER BY updated_at DESC, id DESC";
+        };
     }
 
     private void addColumnFilter(StringBuilder where, List<Object> args, String columnName, String value) {

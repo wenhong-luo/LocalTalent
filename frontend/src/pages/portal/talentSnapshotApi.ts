@@ -20,6 +20,10 @@ export type TalentSnapshotPage = {
 export type TalentSnapshotQuery = {
   city_code?: string;
   category_code?: string;
+  experience_min?: string | number;
+  experience_max?: string | number;
+  updated_within?: string;
+  sort?: string;
   page?: number;
   size?: number;
 };
@@ -75,16 +79,22 @@ function toPage(raw: unknown): TalentSnapshotPage {
 function queryString(query: TalentSnapshotQuery): string {
   const params = new URLSearchParams();
 
-  if (query.city_code) {
-    params.set('city_code', query.city_code);
-  }
+  const entries: Record<string, string | number | undefined> = {
+    city_code: query.city_code,
+    category_code: query.category_code,
+    experience_min: query.experience_min,
+    experience_max: query.experience_max,
+    updated_within: query.updated_within,
+    sort: query.sort,
+    page: query.page ?? 1,
+    size: query.size ?? 12
+  };
 
-  if (query.category_code) {
-    params.set('category_code', query.category_code);
+  for (const [key, value] of Object.entries(entries)) {
+    if (typeof value !== 'undefined' && String(value).trim() !== '') {
+      params.set(key, String(value));
+    }
   }
-
-  params.set('page', String(query.page ?? 1));
-  params.set('size', String(query.size ?? 12));
 
   return params.toString();
 }

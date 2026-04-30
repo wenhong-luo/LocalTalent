@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class PortalTalentSnapshotService {
 
     private static final int MAX_PAGE_SIZE = 100;
+    private static final List<Integer> ALLOWED_UPDATED_WITHIN_DAYS = List.of(3, 7, 30);
 
     private final CandidateJdbcRepository candidateRepository;
     private final ObjectMapper objectMapper;
@@ -25,10 +26,27 @@ public class PortalTalentSnapshotService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public PortalTalentSnapshotPageResponse list(String cityCode, String categoryCode, int page, int size) {
+    public PortalTalentSnapshotPageResponse list(
+            String cityCode,
+            String categoryCode,
+            Integer experienceMin,
+            Integer experienceMax,
+            String updatedWithin,
+            String sort,
+            int page,
+            int size
+    ) {
         int safePage = page < 1 ? 1 : page;
         int safeSize = size < 1 ? 20 : Math.min(size, MAX_PAGE_SIZE);
-        PortalSnapshotRows rows = candidateRepository.findVisibleSnapshots(cityCode, categoryCode, safePage, safeSize);
+        PortalSnapshotRows rows = candidateRepository.findVisibleSnapshots(
+                cityCode,
+                categoryCode,
+                nonNegative(experienceMin),
+                nonNegative(experienceMax),
+                allowedUpdatedWithin(updatedWithin),
+                allowedSort(sort),
+                safePage,
+                safeSize);
         List<PortalTalentSnapshotItemResponse> snapshots = rows.rows()
                 .stream()
                 .map(this::toResponse)
@@ -81,5 +99,31 @@ public class PortalTalentSnapshotService {
             }
         }
         return null;
+    }
+
+    private Integer nonNegative(Integer value) {
+        if (value == null || value < 0) {
+            return null;
+        }
+        return value;
+    }
+
+    private Integer allowedUpdatedWithin(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            int parsed = Integer.parseInt(value.trim());
+            return ALLOWED_UPDATED_WITHIN_DAYS.contains(parsed) ? parsed : null;
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private String allowedSort(String sort) {
+        if ("experience_desc".equals(sort) || "experience_asc".equals(sort)) {
+            return sort;
+        }
+        return "updated_desc";
     }
 }

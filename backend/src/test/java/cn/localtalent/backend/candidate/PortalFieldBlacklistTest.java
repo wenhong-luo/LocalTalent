@@ -10,6 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -92,13 +93,58 @@ class PortalFieldBlacklistTest {
                 .doesNotContain("raw@example.com");
     }
 
+    @Test
+    void portalShouldFilterVisibleSnapshotsByLowRiskPublicColumnsOnly() throws Exception {
+        long candidateId = insertCandidate();
+        long targetSnapshotId = insertSnapshot(
+                candidateId,
+                "李*",
+                "310000",
+                "software",
+                "目标公开技能",
+                6,
+                1,
+                1,
+                1);
+        insertSnapshot(candidateId, "低*", "310000", "software", "经验不足", 2, 1, 1, 1);
+        insertSnapshot(candidateId, "高*", "310000", "software", "经验过高", 8, 1, 1, 1);
+        insertSnapshot(candidateId, "旧*", "310000", "software", "旧快照", 6, 1, 1, 20);
+        insertSnapshot(candidateId, "城*", "110000", "software", "城市不匹配", 6, 1, 1, 1);
+        insertSnapshot(candidateId, "下*", "310000", "software", "下线不可见", 6, 0, 1, 1);
+        insertSnapshot(candidateId, "撤*", "310000", "software", "不可发布不可见", 6, 1, 0, 1);
+
+        HttpJsonResponse response = getJson(
+                "/api/portal/talent-snapshots"
+                        + "?city_code=310000"
+                        + "&category_code=software"
+                        + "&experience_min=5"
+                        + "&experience_max=7"
+                        + "&updated_within=7"
+                        + "&sort=experience_desc"
+                        + "&page=1"
+                        + "&size=10",
+                "trace-portal-filter");
+
+        assertThat(response.status()).isEqualTo(200);
+        assertThat(response.body().at("/code").asText()).isEqualTo("0");
+        assertThat(response.body().at("/data/total").asLong()).isEqualTo(1);
+        assertThat(response.body().at("/data/snapshot_list/0/snapshot_id").asLong()).isEqualTo(targetSnapshotId);
+        assertThat(response.body().at("/data/snapshot_list/0/skills_summary").asText()).isEqualTo("目标公开技能");
+        assertThat(response.body().toString())
+                .doesNotContain("下线不可见")
+                .doesNotContain("不可发布不可见")
+                .doesNotContain("城市不匹配")
+                .doesNotContain("旧快照");
+    }
+
     private long insertCandidate() {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(
                     "INSERT INTO candidate_user (email, password_hash, real_name, status) "
-                            + "VALUES ('portal-blacklist@example.com', '$2a$10$placeholder', '测试候选人', 1)",
+                            + "VALUES (?, '$2a$10$placeholder', '测试候选人', 1)",
                     Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, "portal-blacklist-" + UUID.randomUUID() + "@example.com");
             return statement;
         }, keyHolder);
         Number key = keyHolder.getKey();
@@ -140,6 +186,49 @@ class PortalFieldBlacklistTest {
         Number key = keyHolder.getKey();
         assertThat(key).isNotNull();
         return key.longValue();
+    }
+
+    private long insertSnapshot(
+            long candidateId,
+            String displayNameMasked,
+            String cityCode,
+            String categoryCode,
+            String skillsSummary,
+            int experienceYears,
+            int status,
+            int publishableFlag,
+            int daysAgo
+    ) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO candidate_publish_snapshot "
+                            + "(candidate_id, source_type, legal_basis, consent_status, publishable_flag, "
+                            + "consent_version, visibility_scope, snapshot_json, sync_version, status) "
+                            + "VALUES (?, 1, 'consent', 1, ?, 'v-filter', 4, ?, 1, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            statement.setLong(1, candidateId);
+            statement.setInt(2, publishableFlag);
+            statement.setString(3, """
+                    {
+                      "display_name_masked": "%s",
+                      "city_code": "%s",
+                      "category_code": "%s",
+                      "skills_summary": "%s",
+                      "experience_years": %d
+                    }
+                    """.formatted(displayNameMasked, cityCode, categoryCode, skillsSummary, experienceYears));
+            statement.setInt(4, status);
+            return statement;
+        }, keyHolder);
+        Number key = keyHolder.getKey();
+        assertThat(key).isNotNull();
+        long snapshotId = key.longValue();
+        jdbcTemplate.update(
+                "UPDATE candidate_publish_snapshot SET updated_at = TIMESTAMPADD(DAY, ?, CURRENT_TIMESTAMP) WHERE id = ?",
+                -daysAgo,
+                snapshotId);
+        return snapshotId;
     }
 
     private HttpJsonResponse getJson(String path, String traceId) throws Exception {
