@@ -6,7 +6,14 @@ export function GET(): Response {
     { loc: `${siteUrl}/`, priority: '0.8', changefreq: 'weekly' },
     { loc: `${siteUrl}/jobs`, priority: '0.8', changefreq: 'daily' },
     { loc: `${siteUrl}/companies`, priority: '0.8', changefreq: 'daily' },
-    { loc: `${siteUrl}/portal/talent-service-area`, priority: '0.9', changefreq: 'daily' }
+    { loc: `${siteUrl}/portal/talent-service-area`, priority: '0.9', changefreq: 'daily' },
+    { loc: `${siteUrl}/job-fairs`, priority: '0.7', changefreq: 'weekly' },
+    { loc: `${siteUrl}/articles/policies`, priority: '0.7', changefreq: 'weekly' },
+    { loc: `${siteUrl}/articles/news`, priority: '0.6', changefreq: 'weekly' },
+    { loc: `${siteUrl}/articles/notices`, priority: '0.6', changefreq: 'weekly' },
+    { loc: `${siteUrl}/hr-tools`, priority: '0.6', changefreq: 'weekly' },
+    { loc: `${siteUrl}/help`, priority: '0.5', changefreq: 'monthly' },
+    { loc: `${siteUrl}/more-services`, priority: '0.5', changefreq: 'monthly' }
   ];
   const body = [
     '<?xml version="1.0" encoding="UTF-8"?>',

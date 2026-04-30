@@ -20,9 +20,9 @@ export const mainNavLinks: PortalLink[] = [
 
 export const lowRiskServiceLinks: PortalLink[] = [
   { label: '今日招聘', href: '/jobs?sort=today' },
-  { label: '快速招聘', href: '/jobs?category=general-worker' },
-  { label: '网络招聘会', href: '/job-fairs?type=online' },
-  { label: '校园招聘', href: '/job-fairs?type=campus' },
+  { label: '快速招聘', href: '/jobs?category_code=general-worker' },
+  { label: '网络招聘会', href: '/job-fairs?type_code=online' },
+  { label: '校园招聘', href: '/job-fairs?type_code=campus' },
   { label: '帮助中心', href: '/help' }
 ];
 

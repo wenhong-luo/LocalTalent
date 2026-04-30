@@ -72,6 +72,11 @@
         <td>完成人才服务区高保真改写：<code>/portal/talent-service-area</code> 采用 demo 简历库式筛选、卡片、标签、分页和风险提示布局；<code>GET /api/portal/talent-snapshots</code> 增加经验范围、更新时间、排序等低风险发布快照筛选。</td>
         <td>唯一公开数据源仍是 <code>candidate_publish_snapshot</code>；公开响应和 DOM 只展示发布快照白名单字段；不出现公共简历库、查看简历、联系解锁、搜索简历、受控找人才或原始候选人数据。</td>
       </tr>
+      <tr>
+        <td>Prompt 21（P2-6）</td>
+        <td>完成招聘会、就业政策、职场资讯、公告、HR 工具箱、帮助中心和更多服务公开频道；新增 <code>GET /api/portal/job-fairs</code>、<code>GET /api/portal/contents</code> 公开只读接口，并补 <code>/job-fairs</code>、<code>/articles/*</code>、<code>/hr-tools</code>、<code>/help</code>、<code>/more-services</code> 页面。</td>
+        <td>公开频道只读 <code>cms_content</code> 与 <code>activity_event</code> 的 <code>status=1</code> 内容；不公开报名名单、参会个人明细、签到证据、联系方式、审核材料或后台备注；地图、视频、直播、自由职业、求职登记、短信/微信通知仍为禁用占位或风险池。</td>
+      </tr>
     </table>
     <p class="note">后续纪律：每完成一轮 Phase II Prompt，都必须同步更新本节和 Markdown，写清楚“做到了什么、没有做什么、下一轮从哪里继续”。</p>
   </section>

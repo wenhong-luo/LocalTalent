@@ -1,0 +1,38 @@
+package cn.localtalent.backend.portal.api;
+
+import cn.localtalent.backend.authz.PublicEndpoint;
+import cn.localtalent.backend.common.api.ApiResponse;
+import cn.localtalent.backend.portal.application.PortalContentEventService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/portal/job-fairs")
+public class PortalEventController {
+
+    private final PortalContentEventService service;
+
+    public PortalEventController(PortalContentEventService service) {
+        this.service = service;
+    }
+
+    @GetMapping
+    @PublicEndpoint
+    public ApiResponse<PortalEventPageResponse> list(
+            @RequestParam(value = "type_code", required = false) String typeCode,
+            @RequestParam(value = "city_code", required = false) String cityCode,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size
+    ) {
+        return ApiResponse.success(service.listEvents(typeCode, cityCode, page, size));
+    }
+
+    @GetMapping("/{id}")
+    @PublicEndpoint
+    public ApiResponse<PortalEventResponse> get(@PathVariable long id) {
+        return ApiResponse.success(service.getEvent(id));
+    }
+}

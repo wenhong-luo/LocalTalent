@@ -12,6 +12,9 @@ export function MoreServicesMenu() {
         <section>
           <h3 className={styles.moreGroupTitle}>求职找工作</h3>
           <div className={styles.moreList}>
+            <Link className={styles.moreLink} href="/more-services">
+              全部更多服务
+            </Link>
             {lowRiskServiceLinks.map((item) => (
               <Link key={item.label} className={styles.moreLink} href={item.href}>
                 {item.label}
