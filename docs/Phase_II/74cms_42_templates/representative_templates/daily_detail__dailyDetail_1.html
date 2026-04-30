@@ -1,0 +1,181 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<title>测试 - 骑士人才系统</title>
+<meta name="keywords" content="骑士人才系统">
+<meta name="description" content="骑士人才系统">
+<meta property="og:type" content="招聘求职网">
+<meta property="og:title" content="骑士人才系统">
+<meta property="og:url" content="https://demo.74cms.com/dailyDetail/1.html">
+<meta property="og:site_name" content="骑士人才系统">
+<meta property="og:description" content="为求职者提供免费注册、求职指导、简历管理等服务，职位真实可靠，上骑士人才系统，找到满意工作">
+<meta name="author" content="骑士CMS">
+<meta name="copyright" content="74cms.com">
+<link rel="shortcut icon" href="/favicon.ico">
+<script type="text/javascript" src="/assets/js/polyfill.7.11.5.min.js"></script>
+<script type="text/javascript" src="/assets/js/vue.js"></script>
+<script type="text/javascript" src="/assets/js/axios.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/assets/css/element-ui.css">
+<script type="text/javascript" src="/assets/js/element-ui.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.dropdown.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.listitem.js"></script>
+<script type="text/javascript" src="/assets/js/utils.js"></script>
+<script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
+<script>
+
+    var qscms = {
+        subsiteid: "",
+        sitedomain: "https://demo.74cms.com",
+        subsite_open: "1",
+        subsite_domain: "74cms.com",
+        sitedir: "/",
+        mobiledomain: "https://demo.74cms.com/m/",
+        memberDirname: "member",
+        apiUrl: "https://demo.74cms.com/v1_0",
+        captcha_open: "1",
+        captcha_type: "qscms",
+        captcha_tencent_appid: "",
+        captcha_vaptcha_vid: "",
+        captcha_qscms_appkey:"bcenpbhb",
+        wechat_login_open: "1",
+        wechat_open_appid: "wx124300d944a40487",
+        wechat_open: "1",
+        account_qqlogin_open: "1",
+        guide_open: "1",
+        guide_qrcode: "",
+        closereg: "0",
+        wechat_qrcode: "https://demo.74cms.com/upload/resource/weixin_img.jpg",
+        wechat_miniprogram_qrcode: "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg",
+        douyin_miniprogram_qrcode: "",
+        app_android_download_url: "https://demo.74cms.com/74cms_android.apk",
+        app_ios_download_url: "https://demo.74cms.com/74cms_android.apk",
+        map_type: "2",
+        is_open_map: "1",
+        im_open: "1",
+        im_key: "7jKedNayxc6E7SGw",
+        isLogin: false,
+        loginUtype: 0,
+        userToken: '',
+        platform: "web",
+        imToken:'',
+        reConnectTime:0,
+        websocketOk:false,
+    }
+</script>
+<script type="text/javascript" src="/assets/js/global.js"></script>
+<script type="text/javascript" src="/assets/js/error.js"></script>
+<script type="text/javascript" src="/assets/js/http.js"></script>
+<script type="text/javascript" src="/assets/js/globalMethods.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/layout.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/public.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/pecruitment.css">
+    <script type="text/javascript" src="/assets/js/pecruitment.js"></script>
+    <script type="text/javascript" src="/assets/js/element-ui-index.js"></script>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+</head>
+<body>
+<div id="app" class="todayBg"><div class="todayHead"><div class="todayTitle" style="background: url(&quot;https://demo.74cms.com/upload/recruitmentToday/1/1/1_logo.jpg&quot;) center center / auto 100% no-repeat;"><span class="sitename">骑士人才系统</span></div> <div class="searchBox"><div class="searchLeft"><div class="searchInput el-input el-input-group el-input-group--prepend"><div class="el-input-group__prepend"><div class="el-select"><!----><div class="el-input el-input--suffix"><!----><input type="text" readonly="readonly" autocomplete="off" placeholder="请选择" class="el-input__inner"><!----><span class="el-input__suffix"><span class="el-input__suffix-inner"><i class="el-select__caret el-input__icon el-icon-arrow-up"></i><!----><!----><!----><!----><!----></span><!----></span><!----><!----></div><div class="el-select-dropdown el-popper" style="display: none; min-width: 106px;"><div class="el-scrollbar" style=""><div class="el-select-dropdown__wrap el-scrollbar__wrap" style="margin-bottom: -8px; margin-right: -8px;"><ul class="el-scrollbar__view el-select-dropdown__list"><!----><li class="el-select-dropdown__item selected"><span>职位名称</span></li> <li class="el-select-dropdown__item"><span>企业名称</span></li></ul></div><div class="el-scrollbar__bar is-horizontal"><div class="el-scrollbar__thumb" style="transform: translateX(0%);"></div></div><div class="el-scrollbar__bar is-vertical"><div class="el-scrollbar__thumb" style="transform: translateY(0%);"></div></div></div><!----></div></div></div><input type="text" autocomplete="off" placeholder="请输入关键字" class="el-input__inner"><!----><!----><!----><!----></div></div> <span class="searchBut">搜索</span></div> <div class="todayTitleImg"><img src="/assets/images/recruitment/sjdt.png" alt=""></div> <div class="tabBox"><div class="tab"><span class="num">1</span> <span>参会企业</span></div> <div class="tab"><span class="num">3</span> <span>可投职位</span></div> <div class="tab"><span class="num">87</span> <span>浏览次数</span></div> <div class="tab"><span class="num">6</span> <span>招聘人数</span></div></div></div> <div class="todayTitleImg"><img src="/assets/images/recruitment/chqy.png" alt=""></div> <div class="dailyOut"><div><div infinite-scroll-disabled="disabled" class="dailyBox" style="overflow: auto;"><div class="dailyCard"><div class="cardHead"><div class="logo"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg" alt=""></div> <div class="info"><div class="infoCon"><div class="name"><a href="https://demo.74cms.com/company/12.html">山西正力网络有限公司</a></div> <span>互联网/电子商务 <span>|</span> 200～500人</span></div></div></div> <div class="hr"><img src="/assets/images/recruitment/hr.png" alt=""></div> <div style="height: 202px; overflow: hidden; margin-top: -5px;"><div class="cardList"><div class="listTitle"><span class="word"><a href="https://demo.74cms.com/job/140.html">设计师</a></span> <div class="listTag">
+                                    石家庄 长安区 | 3年 | 不限学历
+                                </div></div> <span class="pay">5K~8K</span></div><div class="cardList"><div class="listTitle"><span class="word"><a href="https://demo.74cms.com/job/139.html">店长</a></span> <div class="listTag">
+                                    北京市 朝阳 | 无经验 | 不限学历
+                                </div></div> <span class="pay">5K~8K</span></div><div class="cardList"><div class="listTitle"><span class="word"><a href="https://demo.74cms.com/job/51.html">运营</a></span> <div class="listTag">
+                                    石家庄 长安区 | 无经验 | 不限学历
+                                </div></div> <span class="pay">2000以上</span></div></div> <div class="sum">该企业有<span>3</span>个在招职位，<a href="https://demo.74cms.com/company/12.html">点击查看</a></div></div></div> <div class="tip"><!----> <span>没有更多了</span></div></div></div> <div class="footer">找工作，招人才，就上骑士人才系统<br>未经书面授权，不得转载本网站所有招聘信息
+        <br> <span>
+                    客服电话：18003431191
+        </span></div></div>
+<script>
+    function GetRequest() {
+        var url = location.search;
+        var theRequest = new Object();
+        if (url.indexOf("?") != -1) {
+            var str = url.substr(1);
+            strs = str.split("&");
+            for(var i = 0; i < strs.length; i ++) {
+                theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+    var row = GetRequest()
+    var app = new Vue({
+        el:"#app",
+        data(){
+            return{
+                list:[],
+                params:{
+                    page:1,
+                    pagesize:15,
+                    recruitment_today_id: "1"
+                },
+                searchForm:{
+                    keyword:"",
+                    type:1
+                },
+                total:0,
+                loading:false,
+                data:{},
+                company_url:"https://demo.74cms.com/company/_id.html",
+                job_url:"https://demo.74cms.com/job/_id.html",
+            }
+        },
+        created:function(){
+            this.init()
+            console.log(this.$route)
+        },
+        computed: {
+            noMore () {
+                return this.list.length >= this.total
+            },
+            disabled () {
+                return this.loading || this.noMore
+            }
+        },
+        methods:{
+            init(){
+                httpget(qscms.apiList.recruitmentCompanyList,{...this.params,...this.searchForm}).then((res) => {
+                    console.log(res)
+                    const { code,data } = res;
+                    if (code == "200"){
+                        this.list.push(...data.items)
+                        console.log(this.list)
+                        this.total = data.total
+                        this.loading = false
+                    }
+                }).catch(() => {})
+            },
+            searchClick(){
+                this.params.page = 1;
+                this.list = []
+                this.init()
+            },
+            load(){
+                this.loading = true
+                if (this.list.length == 0){
+                    this.loading = false
+                    return
+                } else if (this.list.length >= this.total) {
+                    this.loading = false
+                    return
+                }else {
+                    this.params.page++
+                    this.init()
+                }
+            },
+            companyUrl:function(id){
+                return this.company_url.replace('_id',id)
+            },
+            jobUrl:function(id){
+                return this.job_url.replace('_id',id)
+            },
+        }
+    })
+</script>
+
+
+</body></html>

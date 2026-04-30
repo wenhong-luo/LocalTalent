@@ -46,6 +46,12 @@ type ContentChannelPageProps = {
 
 type JobFairListPageProps = {
   initialState: EventChannelInitialState;
+  topic?: {
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+    badge?: string;
+  };
 };
 
 type DetailProps = {
@@ -194,17 +200,19 @@ export function ContentChannelPage({ config, initialState }: ContentChannelPageP
   );
 }
 
-export function JobFairListPage({ initialState }: JobFairListPageProps) {
+export function JobFairListPage({ initialState, topic }: JobFairListPageProps) {
   const events = initialState.page?.event_list ?? [];
   return (
     <main className={styles.page}>
       <section className={styles.hero} aria-label="招聘会频道首屏">
         <div>
-          <p className={styles.eyebrow}>LocalTalent Job Fairs</p>
-          <h1 className={styles.title}>招聘会公开展示</h1>
-          <p className={styles.subtitle}>展示现场招聘会、网络招聘会和校园招聘公开信息。报名名单、参会个人明细、签到证据均不公开。</p>
+          <p className={styles.eyebrow}>{topic?.eyebrow ?? 'LocalTalent Job Fairs'}</p>
+          <h1 className={styles.title}>{topic?.title ?? '招聘会公开展示'}</h1>
+          <p className={styles.subtitle}>
+            {topic?.description ?? '展示现场招聘会、网络招聘会和校园招聘公开信息。报名名单、参会个人明细、签到证据均不公开。'}
+          </p>
         </div>
-        <div className={styles.heroBadge}>招聘会公开频道</div>
+        <div className={styles.heroBadge}>{topic?.badge ?? '招聘会公开频道'}</div>
       </section>
 
       <form className={`${styles.card} ${styles.filters}`} action="/job-fairs" method="get" aria-label="招聘会筛选">

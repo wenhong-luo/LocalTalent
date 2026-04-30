@@ -17,17 +17,19 @@
 1. `docs/Phase_II/00_PHASE_II_BOUNDARY.md`。
 2. `docs/Phase_II/74cms人才网开发分析.md`。
 3. `docs/Phase_II/人才网总盘点与高风险深挖评审稿.md`。
-4. `docs/Phase_II/LocalTalent_phase2_demo_inventory.md`。
-5. `docs/Phase_II/LocalTalent_phase2_step1.md`。
-6. `docs/Phase_II/LocalTalent_phase2_step2.md`。
-7. `docs/Phase_II/LocalTalent_phase2_step3.md`。
-8. `docs/Phase_II/LocalTalent_phase2_step4.md`。
-9. `docs/Phase_II/LocalTalent_phase2_step5.md`。
-10. `docs/Phase_II/LocalTalent_phase2_step6.md`。
-11. `docs/Phase_II/二期研发实施蓝图与任务拆解.md`。
-12. `docs/Phase_II/二期研发提示词.md`。
-13. 后续新增的 Phase II Prompt 交付与验收文档。
-14. 一期回顾资料：`docs/Phase_II/一期研发实施蓝图与任务拆解.md`、`docs/Phase_II/一期研发提示词.md`。
+4. `docs/Phase_II/74cms_42模板开发分析报告.md`。
+5. `docs/Phase_II/74cms_42_templates/`。
+6. `docs/Phase_II/LocalTalent_phase2_demo_inventory.md`。
+7. `docs/Phase_II/LocalTalent_phase2_step1.md`。
+8. `docs/Phase_II/LocalTalent_phase2_step2.md`。
+9. `docs/Phase_II/LocalTalent_phase2_step3.md`。
+10. `docs/Phase_II/LocalTalent_phase2_step4.md`。
+11. `docs/Phase_II/LocalTalent_phase2_step5.md`。
+12. `docs/Phase_II/LocalTalent_phase2_step6.md`。
+13. `docs/Phase_II/二期研发实施蓝图与任务拆解.md`。
+14. `docs/Phase_II/二期研发提示词.md`。
+15. 后续新增的 Phase II Prompt 交付与验收文档。
+16. 一期回顾资料：`docs/Phase_II/一期研发实施蓝图与任务拆解.md`、`docs/Phase_II/一期研发提示词.md`。
 
 当前二期规划状态：
 
@@ -36,6 +38,8 @@
 | `00_PHASE_II_BOUNDARY.md` | 当前文件 | 二期红线、权限、隐私、外部能力和研发纪律总约束。 |
 | `74cms人才网开发分析.md` | 已完成 | 目标站效果、频道结构、功能取舍与高风险能力暂缓清单。 |
 | `人才网总盘点与高风险深挖评审稿.md` | 已完成 | 风险分级、风险池、上线前置问题和“不急着做”的治理口径。 |
+| `74cms_42模板开发分析报告.md` | 已归档到 Phase II | 42 个代表模板的模板级收口、开发优先级和组件抽象依据。 |
+| `74cms_42_templates/` | 已归档到 Phase II | 42 个代表 HTML 模板、模板清单和 Codex 使用说明。 |
 | `LocalTalent_phase2_demo_inventory.md/html` | 已完成 | 24 个 demo HTML 页面盘点、首页高保真模块、列表频道、风险改写规则和 Prompt 映射。 |
 | `LocalTalent_phase2_step1.md/html` | 已完成 | 目标站资料读取、一期基线回顾、首批门户导航、页面域和隐私边界冻结。 |
 | `LocalTalent_phase2_step2.md/html` | 已完成 | 门户公开页面、搜索体系、SEO/Next SSR 策略和公开字段白名单冻结。 |
@@ -44,7 +48,7 @@
 | `LocalTalent_phase2_step5.md/html` | 已完成 | 运营后台、内容活动、招聘会展示配置、风险审核、审计中心运营视角和角色权限边界冻结。 |
 | `LocalTalent_phase2_step6.md/html` | 已完成 | 风险池、高风险能力准入规则、评审材料、上线阻断和禁止绕行项冻结。 |
 | `二期研发实施蓝图与任务拆解.md/html` | 已完成（高保真门户优先版） | 二期实施路线、demo 页面落地里程碑、接口字段边界、测试矩阵和后续 Prompt 拆解建议。 |
-| `二期研发提示词.md/html` | 已完成（高保真门户优先可执行版） | 二期 Prompt 15-23 双编号可复制投喂卡片、风险池专项模板和逐轮验收规则。 |
+| `二期研发提示词.md/html` | 已完成（高保真门户优先可执行版） | 二期 Prompt 15-24 双编号可复制投喂卡片、风险池专项模板和逐轮验收规则。 |
 
 ## 2. 权威资料源变更
 
@@ -54,6 +58,8 @@
 
 - `docs/Phase_II/74cms人才网开发分析.md`。
 - `docs/Phase_II/人才网总盘点与高风险深挖评审稿.md`。
+- `docs/Phase_II/74cms_42模板开发分析报告.md`。
+- `docs/Phase_II/74cms_42_templates/`，包含 42 个代表 HTML 模板。
 - `docs/Phase_II/demo/` 本地目标站 HTML 页面，已同步完整 24 个 HTML 页面。
 - `docs/Phase_II/LocalTalent_phase2_demo_inventory.md` 页面盘点与 Prompt 映射。
 - `docs/Phase_II/一期研发实施蓝图与任务拆解.md`。
@@ -66,6 +72,7 @@
 - `LocalTalent_phase2_demo_inventory.md` 是 demo 页面结构到 LocalTalent Prompt 的桥接文档。
 - `74cms人才网开发分析.md` 用于识别目标站能力、LocalTalent 改写规则和功能取舍。
 - `人才网总盘点与高风险深挖评审稿.md` 用于识别风险分级、风险池和上线前置清单。
+- `74cms_42模板开发分析报告.md` 与 `74cms_42_templates/` 用于识别 42 个代表模板、低风险 P1 公开频道补齐点和模板级组件抽象方向。
 - 一期 Markdown 是工程事实来源，后续规划不得重复实现已经完成的底座。
 
 ## 3. 一期完成基线
@@ -256,7 +263,7 @@ Step6 已冻结：
 
 提示词已冻结：
 
-- 双编号：延续一期总序 `Prompt 15-23`，同时标注二期内部序号 `P2-0` 至 `P2-8`。
+- 双编号：延续一期总序 `Prompt 15-24`，其中 Prompt 15-23 为二期主线，Prompt 24 为进入三期前的低风险公开频道补充。
 - Prompt 15：Demo 同步与页面盘点闸门。
 - Prompt 16：公共门户 Shell 与全站头尾。
 - Prompt 17：首页高保真首屏。
@@ -266,6 +273,7 @@ Step6 已冻结：
 - Prompt 21：招聘会、就业政策、HR 工具箱与更多服务。
 - Prompt 22：登录注册与管理中心入口体验。
 - Prompt 23：二期高保真验收与演示收口。
+- Prompt 24：P1 公开频道模板补齐与风险占位校准。
 - 风险池专项 Prompt 只能在 Step6 标记为 `approved_for_prompt` 后复制使用，不属于当前默认开发范围。
 
 当前开发进度：
@@ -279,11 +287,12 @@ Step6 已冻结：
 - Prompt 21（P2-6）：已完成招聘会、就业政策、HR 工具箱与更多服务公开频道。
 - Prompt 22（P2-7）：已完成登录注册与管理中心入口体验。
 - Prompt 23（P2-8）：已完成二期高保真验收与演示收口。
+- Prompt 24（P2-S1）：已完成进入三期前的 P1 公开频道模板补齐与风险占位校准。
 
 当前状态：
 
 ```text
-Prompt 15-23 已完成，二期主线已收口。
+Prompt 15-23 已完成，二期主线已收口；Prompt 24 低风险补充页已完成。
 ```
 
 除非后续明确需要补额外文档或开启新阶段，否则不再继续扩写 Step 文档，也不得把风险池能力顺手混入已收口主线。高风险能力仍必须先走 Step6 准入规则。

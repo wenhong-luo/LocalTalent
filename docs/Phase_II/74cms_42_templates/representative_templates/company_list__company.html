@@ -1,0 +1,1165 @@
+<html><head>
+	<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<title>最新企业信息 - 骑士人才系统</title>
+<meta name="keywords" content="最新企业信息,骑士人才系统">
+<meta name="description" content="最新企业信息,骑士人才系统">
+<meta property="og:type" content="招聘求职网">
+<meta property="og:title" content="骑士人才系统">
+<meta property="og:url" content="https://demo.74cms.com/company.html">
+<meta property="og:site_name" content="骑士人才系统">
+<meta property="og:description" content="为求职者提供免费注册、求职指导、简历管理等服务，职位真实可靠，上骑士人才系统，找到满意工作">
+<meta name="author" content="骑士CMS">
+<meta name="copyright" content="74cms.com">
+<link rel="shortcut icon" href="/favicon.ico">
+<script type="text/javascript" src="/assets/js/polyfill.7.11.5.min.js"></script>
+<script type="text/javascript" src="/assets/js/vue.js"></script>
+<script type="text/javascript" src="/assets/js/axios.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/assets/css/element-ui.css">
+<script type="text/javascript" src="/assets/js/element-ui.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.dropdown.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.listitem.js"></script>
+<script type="text/javascript" src="/assets/js/utils.js"></script>
+<script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
+<script>
+
+    var qscms = {
+        subsiteid: "",
+        sitedomain: "https://demo.74cms.com",
+        subsite_open: "1",
+        subsite_domain: "74cms.com",
+        sitedir: "/",
+        mobiledomain: "https://demo.74cms.com/m/",
+        memberDirname: "member",
+        apiUrl: "https://demo.74cms.com/v1_0",
+        captcha_open: "1",
+        captcha_type: "qscms",
+        captcha_tencent_appid: "",
+        captcha_vaptcha_vid: "",
+        captcha_qscms_appkey:"bcenpbhb",
+        wechat_login_open: "1",
+        wechat_open_appid: "wx124300d944a40487",
+        wechat_open: "1",
+        account_qqlogin_open: "1",
+        guide_open: "1",
+        guide_qrcode: "",
+        closereg: "0",
+        wechat_qrcode: "https://demo.74cms.com/upload/resource/weixin_img.jpg",
+        wechat_miniprogram_qrcode: "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg",
+        douyin_miniprogram_qrcode: "",
+        app_android_download_url: "https://demo.74cms.com/74cms_android.apk",
+        app_ios_download_url: "https://demo.74cms.com/74cms_android.apk",
+        map_type: "2",
+        is_open_map: "1",
+        im_open: "1",
+        im_key: "7jKedNayxc6E7SGw",
+        isLogin: false,
+        loginUtype: 0,
+        userToken: '',
+        platform: "web",
+        imToken:'',
+        reConnectTime:0,
+        websocketOk:false,
+    }
+</script>
+<script type="text/javascript" src="/assets/js/global.js"></script>
+<script type="text/javascript" src="/assets/js/error.js"></script>
+<script type="text/javascript" src="/assets/js/http.js"></script>
+<script type="text/javascript" src="/assets/js/globalMethods.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="/assets/css/base.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/layout2.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/public.css">
+	<script type="text/javascript" src="/assets/js/common.js"></script>
+	<script type="text/javascript" src="/assets/js/layout.js"></script>
+</head>
+
+<body>
+	<div>
+		<!-- header -->
+		<div class="brw_tip">
+    <div class="t_con">
+        系统检测到您的浏览器版本过低，无法获得最佳的使用体验，建议您更换其他浏览器或 <a href="https://www.google.cn/intl/zh-CN/chrome/" target="_blank">升级您的浏览器</a>。(使用360浏览器访问请选择极速模式)
+        <div class="b_close J_bw_close">关闭</div>
+    </div>
+</div>
+<div id="appNewHeader"><div id="header_box" class="new_header_box"><div class="top_header"><div class="top_box center_box"><div class="top_nav_lf"><div class="subsite_btn left"><a class="current_city">总站</a> <span class="switch_city">[切换城市]</span></div> <!----> <div class="welcome_text">骑士人才系统欢迎您！电话：18003431191</div></div> <div class="rt"><a href="javascript:;" class="item login_a">
+                        会员登录
+                        <span class="bot_triangle"></span> <div class="login_popup"><p data-id="2" class="utype_login">求职者登录</p> <p data-id="1" class="utype_login">招聘者登录</p></div></a> <!----> <!----> <a href="javascript:;" class="item login_a">会员注册 <span class="bot_triangle"></span> <div class="login_popup"><p class="utype_register">求职者注册</p> <p class="utype_register">招聘者注册</p></div></a> <a href="" class="item login_mobile">手机端 <span class="bot_triangle"></span> <div class="login_popup erweima_popup"><span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/m/"></span> <span class="txt">触屏版</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/upload/resource/weixin_img.jpg"></span> <span class="txt">微信公众号</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg"></span> <span class="txt">微信小程序</span></span> <!----> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/74cms_android.apk"></span> <span class="txt">App(安卓)</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/74cms_android.apk"></span> <span class="txt">App(苹果)</span></span></div></a> <a href="https://demo.74cms.com/help.html" class="item">使用帮助</a> <div class="item site_navigation">网站导航
+                        <div class="nav_drop"><div class="dr_g"><div class="g_t">求职找工作</div> <div class="g_teg"><a href="javascript:;" class="g_it">登记简历</a> <a href="https://demo.74cms.com/job.html" class="g_it">找工作</a> <a href="https://demo.74cms.com/company.html" class="g_it">搜企业</a> <a href="https://demo.74cms.com/map.html" class="g_it">地图找工作</a> <a href="https://demo.74cms.com/job/famous/1.html" class="g_it">名企直聘</a> <a href="https://demo.74cms.com/job.html" class="g_it">最新职位</a> <a href="https://demo.74cms.com/job/listtype/emergency.html" class="g_it">紧急招聘</a> <a href="javascript:;" class="g_it">智能匹配</a> <a href="https://demo.74cms.com/fast/job.html" class="g_it">快速招聘</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">企业招人才</div> <div class="g_teg"><a href="javascript:;" class="g_it">企业入驻</a> <a href="javascript:;" class="g_it">发布职位</a> <a href="https://demo.74cms.com/resume.html" class="g_it">搜索简历</a> <a href="javascript:;" class="g_it">职位管理</a> <a href="javascript:;" class="g_it">人才推荐</a> <a href="javascript:;" class="g_it">会员服务</a> <a href="https://demo.74cms.com/fast/resume.html" class="g_it">快速求职</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">信息专栏</div> <div class="g_teg"><a href="https://demo.74cms.com/jobfair.html" class="g_it">现场招聘会</a> <a href="https://demo.74cms.com/jobfairol.html" class="g_it">网络招聘会</a> <a href="https://demo.74cms.com/campus.html" class="g_it">校园招聘</a> <a href="https://demo.74cms.com/freelance.html" class="g_it">自由职业</a> <a href="https://demo.74cms.com/notice.html" class="g_it">网站公告</a> <a href="https://demo.74cms.com/hrtool.html" class="g_it">HR工具箱</a> <a href="https://demo.74cms.com/article.html" class="g_it">职场资讯</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">自助工具</div> <div class="g_teg"><a href="javascript:;" class="g_it">求职会员登录</a> <a href="javascript:;" class="g_it">招聘会员登录</a> <a href="javascript:;" class="g_it">忘记密码</a> <a href="javascript:;" class="g_it">账号申诉</a> <a href="https://demo.74cms.com/help.html" class="g_it">帮助中心</a> <div class="clear"></div></div></div></div></div></div></div></div> <div class="new_nav_list"><div class="nav_box center_box"><div class="lf"><a href="https://demo.74cms.com/" class="new_logo"><img src="https://demo.74cms.com/upload/resource/logo.png" alt=""></a> <ul class="nav_list"><li class="nav_item "><a href="https://demo.74cms.com/">首页</a></li> <li class="nav_item "><a href="https://demo.74cms.com/job.html" target="_self">找工作</a></li> <li class="nav_item nav_item_act"><a href="https://demo.74cms.com/company.html" target="_self">找企业</a></li> <li class="nav_item "><a href="https://demo.74cms.com/resume.html" target="_self">简历库</a></li> <li class="nav_item "><a href="https://demo.74cms.com/job/famous/1" target="_self">名企直聘</a></li> <li class="nav_item "><a href="https://demo.74cms.com/jobfair.html" target="_self">招聘会</a></li> <li class="nav_item "><a href="https://demo.74cms.com/article.html" target="_self">就业政策</a></li> <li class="nav_item "><a href="https://demo.74cms.com/hrtool.html" target="_self">HR工具箱</a></li> <li class="nav_item nav_item_more"><a href="" class="more_service">更多服务 <span class="bot_triangle_black"></span></a> <ul class="nav_hover"><li><a href="https://demo.74cms.com/map.html" target="_self" class="item2">地图找工作</a></li> <li><a href="https://demo.74cms.com/help.html" target="_self" class="item2">帮助中心</a></li> <li><a href="https://demo.74cms.com/jobfairol.html" target="_self" class="item2">网络招聘会</a></li> <li><a href="https://demo.74cms.com/campus.html" target="_self" class="item2">校园招聘</a></li> <li><a href="https://demo.74cms.com/freelance.html" target="_self" class="item2">自由职业</a></li> <li><a href="https://demo.74cms.com/fast/job.html" target="_self" class="item2">快速招聘</a></li> <li><a href="https://demo.74cms.com/fast/resume.html" target="_self" class="item2">快速求职</a></li> <li><a href="https://demo.74cms.com/job/register.html" target="_self" class="item2">求职登记</a></li> <li><a href="https://demo.74cms.com/dailyList.html" target="_self" class="item2">今日招聘</a></li> <li><a href="https://demo.74cms.com/shortvideo.html" target="_self" class="item2">视频招聘</a></li> <li><a href="https://demo.74cms.com/index/live/index.html" target="_self" class="item2">直播招聘</a></li></ul></li></ul></div> <div id="manage_center" class="rt"><a href="javascript:;" class="manage_center">管理中心</a></div></div></div> <div id="new_search_box" class="new_search_box "><div class="search_content"><div class="rt rt_new"><div id="subsite_show" class="lf show_district_wapper show_district_wapper_com"><div class="el-cascader" width="200"><div class="el-input el-input--suffix"><!----><input type="text" readonly="readonly" autocomplete="off" placeholder="地区" class="el-input__inner"><!----><span class="el-input__suffix"><span class="el-input__suffix-inner"><i class="el-input__icon el-icon-arrow-down"></i><!----><!----><!----><!----></span><!----></span><!----><!----></div><!----><div class="el-popper el-cascader__dropdown" style="display: none;"><div class="el-cascader-panel"><div class="el-scrollbar el-cascader-menu" role="menu" id="cascader-menu-5605-0"><div class="el-cascader-menu__wrap el-scrollbar__wrap" style="margin-bottom: -8px; margin-right: -8px;"><ul class="el-scrollbar__view el-cascader-menu__list"><li role="menuitem" id="cascader-menu-5605-0-0" tabindex="-1" class="el-cascader-node"><span class="el-cascader-node__label">不限</span></li><li role="menuitem" id="cascader-menu-5605-0-1" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">北京</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-2" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">天津</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-3" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">河北</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-4" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">山西</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-5" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">内蒙</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-6" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">辽宁</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-7" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">吉林</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-8" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">黑龙江</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-9" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">上海</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-10" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">江苏</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-11" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">浙江</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-12" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">安徽</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-13" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">福建</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-14" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">江西</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-15" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">山东</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-16" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">河南</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-17" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">湖北</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-18" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">湖南</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-19" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">广东</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-20" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">广西</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-21" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">海南</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-22" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">重庆</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-23" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">四川</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-24" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">贵州</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-25" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">云南</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-26" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">西藏</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-27" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">陕西</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-28" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">甘肃</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-29" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">青海</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-30" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">宁夏</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-31" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">新疆</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-32" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">台湾</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-33" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">香港</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-34" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">澳门</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-5605-0-35" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-5605-0"><span class="el-cascader-node__label">海外</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><svg class="el-cascader-menu__hover-zone"></svg></ul></div><div class="el-scrollbar__bar is-horizontal"><div class="el-scrollbar__thumb" style="transform: translateX(0%);"></div></div><div class="el-scrollbar__bar is-vertical"><div class="el-scrollbar__thumb" style="transform: translateY(0%);"></div></div></div></div><!----></div></div></div> <input type="text" placeholder="请输入关键词搜索" class="block_2 block_22"> <a href="https://demo.74cms.com/map.html" class="block_3">地图</a> <div class="block_4">搜索</div></div></div></div> <!----> <div class="filter_box filter_box_head" style="display: none;"><div class="filter_list filter_combo"><div class="filter_line so_condition_head last"><div class="f_select first J_dropdown"><span title="企业性质" class="s_text">
+                            企业性质
+                        </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/company.html">不限</a></li> <li><a href="https://demo.74cms.com/company/nature/46.html">国企</a></li> <li><a href="https://demo.74cms.com/company/nature/47.html">民营</a></li> <li><a href="https://demo.74cms.com/company/nature/48.html">合资</a></li> <li><a href="https://demo.74cms.com/company/nature/49.html">外商独资</a></li> <li><a href="https://demo.74cms.com/company/nature/50.html">股份制企业</a></li> <li><a href="https://demo.74cms.com/company/nature/51.html">上市公司</a></li> <li><a href="https://demo.74cms.com/company/nature/52.html">国家机关</a></li> <li><a href="https://demo.74cms.com/company/nature/53.html">事业单位</a></li> <li><a href="https://demo.74cms.com/company/nature/54.html">其它</a></li></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="行业类别" class="s_text">
+                            行业类别
+                        </span> <div class="dropdowbox_searchtrade J_dropdown_menu"><div class="dropdow_inner_searchtrade"><ul class="nav_box"><li><a href="https://demo.74cms.com/company/trade/1.html">计算机软件/硬件</a></li> <li><a href="https://demo.74cms.com/company/trade/2.html">计算机系统/维修</a></li> <li><a href="https://demo.74cms.com/company/trade/3.html">通信(设备/运营/服务)</a></li> <li><a href="https://demo.74cms.com/company/trade/4.html">互联网/电子商务</a></li> <li><a href="https://demo.74cms.com/company/trade/5.html">网络游戏</a></li> <li><a href="https://demo.74cms.com/company/trade/6.html">电子/半导体/集成电路</a></li> <li><a href="https://demo.74cms.com/company/trade/7.html">仪器仪表/工业自动化</a></li> <li><a href="https://demo.74cms.com/company/trade/8.html">会计/审计</a></li> <li><a href="https://demo.74cms.com/company/trade/9.html">金融(投资/证券</a></li> <li><a href="https://demo.74cms.com/company/trade/10.html">金融(银行/保险)</a></li> <li><a href="https://demo.74cms.com/company/trade/11.html">贸易/进出口</a></li> <li><a href="https://demo.74cms.com/company/trade/12.html">批发/零售</a></li> <li><a href="https://demo.74cms.com/company/trade/13.html">消费品(食/饮/烟酒)</a></li> <li><a href="https://demo.74cms.com/company/trade/14.html">服装/纺织/皮革</a></li> <li><a href="https://demo.74cms.com/company/trade/15.html">家具/家电/工艺品/玩具</a></li> <li><a href="https://demo.74cms.com/company/trade/16.html">办公用品及设备</a></li> <li><a href="https://demo.74cms.com/company/trade/17.html">机械/设备/重工</a></li> <li><a href="https://demo.74cms.com/company/trade/18.html">汽车/摩托车/零配件</a></li> <li><a href="https://demo.74cms.com/company/trade/19.html">制药/生物工程</a></li> <li><a href="https://demo.74cms.com/company/trade/20.html">医疗/美容/保健/卫生</a></li> <li><a href="https://demo.74cms.com/company/trade/21.html">医疗设备/器械</a></li> <li><a href="https://demo.74cms.com/company/trade/22.html">广告/市场推广</a></li> <li><a href="https://demo.74cms.com/company/trade/23.html">会展/博览</a></li> <li><a href="https://demo.74cms.com/company/trade/24.html">影视/媒体/艺术/出版</a></li> <li><a href="https://demo.74cms.com/company/trade/25.html">印刷/包装/造纸</a></li> <li><a href="https://demo.74cms.com/company/trade/26.html">房地产开发</a></li> <li><a href="https://demo.74cms.com/company/trade/27.html">建筑与工程</a></li> <li><a href="https://demo.74cms.com/company/trade/28.html">家居/室内设计/装潢</a></li> <li><a href="https://demo.74cms.com/company/trade/29.html">物业管理/商业中心</a></li> <li><a href="https://demo.74cms.com/company/trade/30.html">中介服务/家政服务</a></li> <li><a href="https://demo.74cms.com/company/trade/31.html">专业服务/财会/法律</a></li> <li><a href="https://demo.74cms.com/company/trade/32.html">检测/认证</a></li> <li><a href="https://demo.74cms.com/company/trade/33.html">教育/培训</a></li> <li><a href="https://demo.74cms.com/company/trade/34.html">学术/科研</a></li> <li><a href="https://demo.74cms.com/company/trade/35.html">餐饮/娱乐/休闲</a></li> <li><a href="https://demo.74cms.com/company/trade/36.html">酒店/旅游</a></li> <li><a href="https://demo.74cms.com/company/trade/37.html">交通/运输/物流</a></li> <li><a href="https://demo.74cms.com/company/trade/38.html">航天/航空</a></li> <li><a href="https://demo.74cms.com/company/trade/39.html">能源(石油/化工/矿产)</a></li> <li><a href="https://demo.74cms.com/company/trade/40.html">能源(采掘/冶炼/原材料)</a></li> <li><a href="https://demo.74cms.com/company/trade/41.html">电力/水利/新能源</a></li> <li><a href="https://demo.74cms.com/company/trade/42.html">政府部门/事业单位</a></li> <li><a href="https://demo.74cms.com/company/trade/43.html">非盈利机构/行业协会</a></li> <li><a href="https://demo.74cms.com/company/trade/44.html">农业/渔业/林业/牧业</a></li> <li><a href="https://demo.74cms.com/company/trade/45.html">其他行业</a></li> <li><a href="https://demo.74cms.com/company/trade/294.html">低空经济</a></li> <div class="clear"></div></ul></div></div> <div class="clear"></div></div> <div class="clear"></div></div></div></div> <!----></div> <div class="rt_nav_box"><ul class="rt_nav_ul"><li class="rt_nav_li"><a href="javascript:;" class="icon icon1"><span>我的投递</span></a></li> <li class="rt_nav_li"><a href="javascript:;" class="icon icon2"><span>我的消息</span></a></li> <li class="rt_nav_li"><a href="javascript:;" class="icon icon3"><span>我的收藏</span></a></li> <li class="rt_nav_li"><a href="javascript:;" class="icon icon4"><span>面试邀请</span></a></li></ul> <ul class="rt_nav_ul rt_nav_ul_bot"><li class="rt_nav_li"><a class="rt_nav_resume_diagnosis_wrapper"><div class="rt_nav_resume_diagnosis"><div style="">诊断</div></div> <span>简历诊断</span></a></li> <li class="rt_nav_li"><span><div role="tooltip" id="el-popover-1480" aria-hidden="true" class="el-popover el-popper" tabindex="0" style="display: none;"><!----><div class="wx_qrcode"><p class="img_name">骑士CMS人才系统</p> <p class="img_name img_name_dsc">找工作，聘人才 更轻松</p> <img src="https://demo.74cms.com/upload/resource/weixin_img.jpg" alt="" class="img"></div> </div><a href="javascript:;" class="icon icon5 el-popover__reference" aria-describedby="el-popover-1480" tabindex="0"><span>公众号</span></a></span></li> <li class="rt_nav_li"><span><div role="tooltip" id="el-popover-8042" aria-hidden="true" class="el-popover el-popper" tabindex="0" style="display: none;"><!----><div class="customer_box"><div class="customer_item"><img src="https://demo.74cms.com/upload/files/20250326/1f1851bf860f2c07a2268743abb8ad3a.jpg" alt="" class="customer_qr_code"> <ul class="customer_info"><li class="customer_li customer_li1">
+                                    曾柔
+                                </li> <li class="customer_li customer_li2"><a href="tel:13466835651">13466835651</a></li> <li class="customer_li customer_li3"><a href="javaScript:;">QQ交谈</a></li></ul></div><div class="customer_item"><img src="https://demo.74cms.com/upload/files/20250508/7898f96692be3246e116093a27a7b8b7.png" alt="" class="customer_qr_code"> <ul class="customer_info"><li class="customer_li customer_li1">
+                                    梦琪
+                                </li> <li class="customer_li customer_li2"><a href="tel:18003431191">18003431191</a></li> <li class="customer_li customer_li3"><a href="javaScript:;">QQ交谈</a></li></ul></div></div> </div><a href="javascript:;" class="icon icon6 el-popover__reference" aria-describedby="el-popover-8042" tabindex="0"><span>我的客服</span></a></span></li></ul> <a id="scroll-to-top" href="javascript:;" class="to_top"></a></div> <div class="subsite_pupop" style="display: none;"><div class="subsite_box"><span class="close_icon"></span> <div class="subsite_title"><div class="text_1">选择城市</div> <div class="text_2">切换城市分站，让我们为您提供更准确的信息</div></div> <hr> <div class="subsite_list"><div class="current_site">当前选择城市：<a class="site_link">总站</a></div> <div class="lsit_box clearfix"><span class="item active_item">总站</span> <span class="item">太原站</span><span class="item">测试分站</span><span class="item">北京站</span></div></div></div></div></div>
+<script type="text/javascript">
+    function isJSON(str) {
+        if (typeof str === "string") {
+            try {
+                var obj = JSON.parse(str);
+                if (typeof obj === "object" && obj) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (e) {
+                return false;
+            }
+        }
+    }
+
+    $(document).ready(function() {
+    	// 判断浏览器是否支持placeholder属性
+    	function isSupportPlaceholder() {
+    		var input = document.createElement('input');
+    		return 'placeholder' in input;
+    	}
+    	(function() {
+    		//判断是否是IE浏览器，包括Edge浏览器
+    		function IEVersion() {
+    			//取得浏览器的userAgent字符串
+    			var userAgent = navigator.userAgent;
+    			//判断是否IE浏览器
+    			var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1;
+    			if (isIE) {
+    				var reIE = new RegExp("MSIE (\\d+\\.\\d+);");
+    				reIE.test(userAgent);
+    				var fIEVersion = parseFloat(RegExp["$1"]);
+    				if (fIEVersion <= 10 || !isSupportPlaceholder()) {
+    					return true;
+    				}
+    			} else {
+    				return false;
+    			}
+    		}
+    		window.onload = function() {
+    			if (IEVersion()) {
+    				$('.brw_tip').show();
+                    $('#appNewHeader').css({
+                        'paddingTop': '244px'
+                    })
+                    $('.new_header_box').css({
+                        'top': '46px'
+                    })
+                    $('.rt_nav_box').css({
+                        'height': 'calc(100% - 81px)',
+                        'top': '81px',
+                    })
+    			}
+    		};
+    	})();
+    	$('.J_bw_close').click(function() {
+    		$(this).closest('.brw_tip').remove();
+            $('#appNewHeader').css({
+                'paddingTop': '198px'
+            })
+            $('.new_header_box').css({
+                'top': '0'
+            })
+            $('.rt_nav_box').css({
+                'height': 'calc(100% - 35px)',
+                'top': '35px',
+            })
+    	});
+        let resume_diagnosis_text_timer
+        resume_diagnosis_text_timer = setInterval(() => {
+            var resume_diagnosis_text = $('.rt_nav_resume_diagnosis div').text() == '简历' ? '诊断' : '简历';
+            // 淡出效果
+            $('.rt_nav_resume_diagnosis div').fadeOut(200, function() {
+                $(this).text(resume_diagnosis_text);
+                // 淡入效果
+                $(this).fadeIn(200);
+            });
+        }, 1500);
+        $(window).on('unload', function() {
+            clearInterval(resume_diagnosis_text_timer); // 清除定时器
+        });
+    })
+
+    var page_name = "company"
+    var district_level = "1"
+    var category_level = "0"
+
+    var app = new Vue({
+        el: '#appNewHeader',
+        data: {
+            isLogin: false,
+            utype: 0,
+            memberUrl: '',
+            loginUsername: '',
+            preview_id: 0,
+            imUnreaded: false,
+            imToken: '',
+            mobileQrcode: '',
+            wechatQrcode: '',
+            wechatMiniprogramQrcode: '',
+            douyin_miniprogram_qrcode: '',
+            androidQrcode: '',
+            iosQrcode: '',
+            keyword: '', //搜索关键字
+            page_name: "company",
+            searchAlias: 'joblist',
+            current_subsiteid: 0,
+            subsite_open: 0,
+            subsite_sel: 0,
+            subsite_list: [],
+            sitedomain: '',
+            subsite_domain: '',
+            customerList: [],
+            d1: parseInt(''),
+            d2: parseInt(''),
+            d3: parseInt(''),
+            cityLevel: parseInt(district_level),
+            citySelectedText: '地区',
+            c1: parseInt(''),
+            c2: parseInt(''),
+            c3: parseInt(''),
+            categoryLevel: parseInt(category_level),
+            categorySelectedText: '职位类型',
+            trade: '',
+            tradeSelectedText: '',
+            scale: '',
+            scaleSelectedText: '',
+            nat: '',//工作性质
+            natSelectedText: '',
+            nature: '',//企业性质
+            natureSelectedText: '',
+            edu: '',
+            eduSelectedText: '',
+            exp: '',
+            expSelectedText: '',
+            settr: '',
+            settrSelectedText: '',
+            w1: parseInt(''),
+            w2: parseInt(''),
+            wageSelectedText: '',
+            sex: '',
+            sexSelectedText: '',
+            a1: '',
+            a2: '',
+            ageSelectedText: '',
+            tag: '',
+            tagSelectedText: '',
+            major: '',
+            majorSelectedText: '',
+            // 地区选择
+            district_value:[],
+            district_options:[],
+        },
+        created: function() {
+            this.getDistrictOptions()
+            this.getUserInfo()
+            this.getServiceOl()
+            this.keyword = ""
+            this.mobileQrcode = qscms.apiUrl + qscms.apiList.qrcode +
+                "?type=normal&url=https://demo.74cms.com/m/"
+            this.wechatQrcode = "https://demo.74cms.com/upload/resource/weixin_img.jpg"
+            this.wechatMiniprogramQrcode = "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg"
+            this.douyin_miniprogram_qrcode = ""
+            this.androidQrcode = "https://demo.74cms.com/74cms_android.apk"
+            if (this.androidQrcode != '') {
+                this.androidQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=" + this
+                    .androidQrcode
+            }
+            this.iosQrcode = "https://demo.74cms.com/74cms_android.apk"
+            if (this.iosQrcode != '') {
+                this.iosQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=" + this.iosQrcode
+            }
+            this.cronRun()
+            this.current_subsiteid = parseInt(qscms.subsiteid)
+            this.subsite_open = parseInt("1")
+            this.sitedomain = "https://demo.74cms.com"
+            this.subsite_domain = "74cms.com"
+            this.searchAlias = this.page_name != 'resume' && this.page_name != 'company' ? 'joblist' : this
+                .page_name == 'resume' ?
+                'resumelist' : 'companylist'
+            this.getConfig()
+        },
+        mounted: function() {
+            if (this.d1) {
+                this.district_value.push(this.d1)
+                if(this.d2){
+                    this.district_value.push(this.d2)
+                }
+                if(this.d3){
+                    this.district_value.push(this.d3)
+                }
+            }
+            if (this.c1) {
+                this.getClassify('jobcategory'); // 职位分类
+            }
+            // 薪资
+            if (this.w1 && !this.w2 && this.searchAlias == 'joblist') {
+                // 最高薪资以上
+                this.wageSelectedText = this.w1 + '元以上';
+                $('.so_condition_head .J_dropdown').eq(0).addClass('active');
+            } else if (this.w1 && this.w2 && this.searchAlias == 'joblist') {
+                // 薪资区间
+                this.wageSelectedText = this.w1 + '-' + this.w2 + '元';
+                $('.so_condition_head .J_dropdown').eq(0).addClass('active');
+            } else if (!this.w1 && this.w2 && this.searchAlias == 'joblist') {
+                // 最低薪资以下
+                this.wageSelectedText = this.w2 + '元以下';
+                $('.so_condition_head .J_dropdown').eq(0).addClass('active');
+            }
+            // 简历列表头部薪资
+            if (this.w1 && !this.w2 && this.searchAlias == 'resumelist') {
+                // 最高薪资以上
+                this.wageSelectedText = this.w1 + '元以上';
+                $('.so_condition_resume .J_dropdown').eq(8).addClass('active');
+            } else if (this.w1 && this.w2 && this.searchAlias == 'resumelist') {
+                // 薪资区间
+                this.wageSelectedText = this.w1 + '-' + this.w2 + '元';
+                $('.so_condition_resume .J_dropdown').eq(8).addClass('active');
+            } else if (!this.w1 && this.w2 && this.searchAlias == 'resumelist') {
+                // 最低薪资以下
+                this.wageSelectedText = this.w2 + '元以下';
+                $('.so_condition_resume .J_dropdown').eq(8).addClass('active');
+            }
+            // 工作经验
+            if (this.exp && this.searchAlias == 'joblist') {
+                this.getClassify('experience');
+                $('.so_condition_head .J_dropdown').eq(1).addClass('active');
+            }
+            if (this.exp && this.searchAlias == 'resumelist') {
+                this.getClassify('experience');
+                $('.so_condition_resume .J_dropdown').eq(1).addClass('active');
+            }
+            // 行业类别
+            if (this.trade && this.searchAlias == 'joblist') {
+                this.getClassify('trade');
+                $('.so_condition_head .J_dropdown').eq(2).addClass('active');
+            }
+            if (this.trade && this.searchAlias == 'companylist') {
+                this.getClassify('trade');
+                $('.so_condition_head .J_dropdown').eq(1).addClass('active');
+            }
+            if (this.trade && this.searchAlias == 'resumelist') {
+                this.getClassify('trade');
+                $('.so_condition_resume .J_dropdown').eq(5).addClass('active');
+            }
+            // 企业规模
+            if (this.scale) {
+                this.getClassify('companyScale');
+                $('.so_condition_head .J_dropdown').eq(3).addClass('active');
+            }
+            // 工作性质
+            if (this.nat && this.searchAlias == 'joblist') {
+                this.getClassify('jobNature');
+                $('.so_condition_head .J_dropdown').eq(4).addClass('active');
+            }
+            if (this.nat && this.searchAlias == 'resumelist') {
+                this.getClassify('resumeNature');
+                $('.so_condition_resume .J_dropdown').eq(7).addClass('active');
+            }
+            // 学历要求
+            if (this.edu && this.searchAlias == 'joblist') {
+                this.getClassify('education');
+                $('.so_condition_head .J_dropdown').eq(5).addClass('active');
+            }
+            if(this.edu && this.searchAlias == 'resumelist'){
+                this.getClassify('education');
+                $('.so_condition_resume .J_dropdown').eq(0).addClass('active');
+            }
+            // 更新时间
+            if (this.settr && this.searchAlias == 'joblist') {
+                this.settrSelectedText = this.settr + '天内';
+                $('.so_condition_head .J_dropdown').eq(6).addClass('active');
+            }
+            if (this.settr && this.searchAlias == 'resumelist') {
+                this.settrSelectedText = this.settr + '天内';
+                $('.so_condition_resume .J_dropdown').eq(9).addClass('active');
+            }
+            // 企业性质
+            if (this.nature) {
+                this.getClassify('companyNature');
+                $('.so_condition_head .J_dropdown').eq(0).addClass('active');
+            }
+            // 性别
+            if (this.sex) {
+                this.sexSelectedText = parseInt(this.sex) === 1 ? '男' : '女';
+                $('.so_condition_resume .J_dropdown').eq(2).addClass('active');
+            }
+            // 年龄
+            if (this.a1 && !this.a2) {
+                // 最大年龄以上
+                this.ageSelectedText = this.a1 + '岁以上';
+                $('.so_condition_resume .J_dropdown').eq(3).addClass('active');
+            } else if (this.a1 && this.a2) {
+                // 年龄区间
+                this.ageSelectedText = this.a1 + '-' + this.a2 + '岁';
+                $('.so_condition_resume .J_dropdown').eq(3).addClass('active');
+            } else if (!this.a1 && this.a2) {
+                // 最小年龄以下
+                this.ageSelectedText = this.a2 + '岁以下';
+                $('.so_condition_resume .J_dropdown').eq(3).addClass('active');
+            }
+            // 简历标签
+            if (this.tag) {
+                this.getClassify('resumeTag');
+                $('.so_condition_resume .J_dropdown').eq(4).addClass('active');
+            }
+            // 专业
+            if (this.major) {
+                this.getClassify('major');
+                $('.so_condition_resume .J_dropdown').eq(6).addClass('active');
+            }
+        },
+        methods: {
+            // 跳转简历诊断
+            jumpResumeDiagnosis(){
+                window.location.href = qscms.locationList.resumeDiagnosisIndex
+            },
+            // 回填地区
+            recoverDistrict:function(valueArr,arr){
+                valueArr.forEach(value=>{
+                    arr.forEach(item2=>{
+                        if(item2.children && item2.children.length>0 && value == item2.children[0].value && !this.d2){
+                            this.district_value.push(value)
+                        }
+                        if(item2.children && item2.children.length>0){
+                            item2.children.forEach(item3=>{
+                                if(item3.children && item3.children.length>0 && value == item3.children[0].value && !this.d3){
+                                    this.district_value.push(value)
+                                }
+                            })
+                        }
+                    })
+                })
+            },
+            // 地区选择
+            handleChangeDistrict:function(value){
+                let currentPath = window.location.pathname.replace(/\.html$/, '')
+                // 移除 d1 参数及其对应的值
+                currentPath = currentPath.replace(/\/d1\/[^/]+/, "");
+                 // 移除 d2 参数及其对应的值
+                currentPath = currentPath.replace(/\/d2\/[^/]+/, "");
+                // 移除 d3 参数及其对应的值
+                currentPath = currentPath.replace(/\/d3\/[^/]+/, "");
+                if(value.length == 1 && value[0]){
+                    currentPath += "/d1/" + value[0];
+                }
+                if(value.length == 2){
+                    if(value[0] == value[1]){
+                        currentPath += "/d1/" + value[0]
+                    }else{
+                        currentPath += "/d1/" + value[0] + "/d2/" + value[1];
+                    }
+                }
+                if(value.length == 3){
+                    if(value[1] == value[2]){
+                        currentPath += "/d1/" + value[0] + "/d2/" + value[1];
+                    }else{
+                        currentPath += "/d1/" + value[0] + "/d2/" + value[1] + "/d3/" + value[2];
+                    }
+                }
+                location.href = currentPath + '.html'
+            },
+            // 处理地区数据
+            getDistrictOptions:function(){
+                var that = this
+                httpget(qscms.apiList.classify + '?type=citycategory' ).then(res=>{
+                    res.data.unshift({label:'不限',value:''})
+                    res.data.forEach(item1=>{
+                        if(item1.children && item1.children.length == 0){
+                            delete item1.children
+                        }
+                        if(item1.children && item1.children.length>0){
+                            item1.children.unshift({
+                                label:'全' + item1.label,
+                                value:item1.value,
+                            })
+                            item1.children.forEach(item2=>{
+                                if(item2.children && item2.children.length == 0){
+                                    delete item2.children
+                                }
+                                if(item2.children && item2.children.length>0){
+                                    item2.children.unshift({
+                                        label:'全' + item2.label,
+                                        value:item2.value
+                                    })
+                                }
+                            })
+                        }
+                    })
+                    this.district_options = res.data
+                    this.recoverDistrict(this.district_value,this.district_options)
+                })
+            },
+            getClassify: function(type) {
+                var _this = this;
+                httpget(qscms.apiList.classify + '?type=' + type, {}).then(function(res) {
+                    if (res.code === 200) {
+                        if (type === 'citycategory') {
+                            var cityList = res.data;
+                            if (_this.d1) {
+                                if (_this.cityLevel === 2) {
+                                    // 地区为二级
+                                    _this.citySelectedText = cityList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.d1) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                }
+                                if (_this.cityLevel === 3) {
+                                    // 地区为三级
+                                    var levelTwoList = cityList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.d1) {
+                                            return item
+                                        }
+                                    })[0].children;
+                                    if (_this.d3) {
+                                        var levelThreeList = levelTwoList.filter(function(item) {
+                                            if (parseInt(item.value) === _this.d2) {
+                                                return item
+                                            }
+                                        })[0].children;
+                                        _this.citySelectedText = levelThreeList.filter(function(
+                                            item) {
+                                            if (parseInt(item.value) === _this.d3) {
+                                                return item
+                                            }
+                                        })[0].label;
+                                    } else {
+                                        _this.citySelectedText = levelTwoList.filter(function(
+                                            item) {
+                                            if (parseInt(item.value) === _this.d2) {
+                                                return item
+                                            }
+                                        })[0].label;
+                                    }
+                                }
+                            }
+                        } else if (type === 'jobcategory') {
+                            var categoryList = res.data;
+                            if (_this.c1) {
+                                if (_this.categoryLevel === 2) {
+                                    // 二级
+                                    _this.categorySelectedText = categoryList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.c1) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                }
+                                if (_this.categoryLevel === 3) {
+                                    // 三级
+                                    var levelTwoList = categoryList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.c1) {
+                                            return item
+                                        }
+                                    })[0].children;
+                                    if (_this.c3) {
+                                        var levelThreeList = levelTwoList.filter(function(item) {
+                                            if (parseInt(item.value) === _this.c2) {
+                                                return item
+                                            }
+                                        })[0].children;
+                                        _this.categorySelectedText = levelThreeList.filter(function(
+                                            item) {
+                                            if (parseInt(item.value) === _this.c3) {
+                                                return item
+                                            }
+                                        })[0].label;
+                                    } else {
+                                        _this.categorySelectedText = levelTwoList.filter(function(
+                                            item) {
+                                            if (parseInt(item.value) === _this.c2) {
+                                                return item
+                                            }
+                                        })[0].label;
+                                    }
+                                }
+                            }
+                        } else if (type === 'jobTag') {
+                            var tagList = res.data;
+                            var selectedTagList = _this.tag.split('_');
+                            var tagTextArr = [];
+                            selectedTagList.forEach(function(value) {
+                                var cuText = tagList.filter(function(item) {
+                                    if (parseInt(item.id) === parseInt(value)) {
+                                        return item
+                                    }
+                                })[0].name;
+                                tagTextArr.push(cuText);
+                            })
+                            _this.tagSelectedText = tagTextArr.join('+');
+                        } else if (type === 'trade') {
+                            var tradeList = res.data;
+                            _this.tradeSelectedText = tradeList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.trade)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'companyScale') {
+                            var scaleList = res.data;
+                            _this.scaleSelectedText = scaleList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.scale)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'jobNature') {
+                            var natureList = res.data;
+                            _this.natSelectedText = natureList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.nat)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'education') {
+                            var eduList = res.data;
+                            _this.eduSelectedText = eduList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.edu)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'experience') {
+                            var expList = res.data;
+                            _this.expSelectedText = expList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.exp)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'companyNature') {
+							var natureList = res.data;
+							_this.natureSelectedText = natureList.filter(function(item) {
+								if (parseInt(item.id) === parseInt(_this.nature)) {
+									return item;
+								}
+							})[0].name;
+						} else if (type === 'resumeTag') {
+                            var tagList = res.data;
+                            var selectedTagList = _this.tag.split('_');
+                            var tagTextArr = [];
+                            selectedTagList.forEach(function(value) {
+                                var cuText = tagList.filter(function(item) {
+                                    if (parseInt(item.id) === parseInt(value)) {
+                                        return item
+                                    }
+                                })[0].name;
+                                tagTextArr.push(cuText);
+                            })
+                            _this.tagSelectedText = tagTextArr.join('+');
+                        } else if (type === 'major') {
+                            var majorList = res.data;
+                            majorList.forEach(function(value) {
+                                value.children.filter(function(item) {
+                                    if (parseInt(item.value) === parseInt(_this
+                                            .major)) {
+                                        _this.majorSelectedText = item.label
+                                    }
+                                });
+                            })
+                        } else if (type === 'resumeNature') {
+                            var natureList = res.data;
+                            _this.natSelectedText = natureList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.nat)) {
+                                    return item
+                                }
+                            })[0].name;
+                        }
+                    } else {
+                        console.log(res.message);
+                    }
+                }).catch(function(err) {
+                    console.log(err);
+                });
+            },
+            jumpPage(val) {
+                let url_list = qscms.locationList
+                if (qscms.isLogin) {
+                    switch (val) {
+                        case 'apply':
+                            location.href = qscms.loginUtype == 1 ? url_list.companyJobapply : url_list
+                                .personalJobapply
+                            break;
+                        case 'im':
+                            location.href = qscms.loginUtype == 1 ? url_list.companyIm : url_list.personalIm
+                            break;
+                        case 'fav':
+                            location.href = qscms.loginUtype == 1 ? url_list.companyFavjob : url_list
+                                .personalFavjob
+                            break;
+                        case 'invite':
+                            location.href = qscms.loginUtype == 1 ? url_list.companyInterview : url_list
+                                .personalInterview
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    location.href = url_list.loginPersonal
+                }
+            },
+            wakeupQq: function(qq) {
+                if (qq) {
+                    window.open('http://wpa.qq.com/msgrd?v=3&uin=' + qq + '&site=在线客服&menu=yes')
+                }
+            },
+            getServiceOl: function() {
+                var that = this
+                httpget(qscms.apiList.serviceOl).then(function(res) {
+                    that.customerList = res.data.items
+                }).catch(function() {})
+            },
+            setSubsite: function(subsiteid, url = '') {
+                if (this.subsite_open === 1 && this.subsite_domain != '') {
+                    Cookies.set('qscms_subsiteid', subsiteid, {
+                        domain: '.' + this.subsite_domain
+                    })
+                } else {
+                    Cookies.set('qscms_subsiteid', subsiteid, )
+                }
+                location.replace(url);
+            },
+            getConfig: function() {
+                var that = this
+                httpget(qscms.apiList.config)
+                    .then(function(res) {
+                        that.subsite_list = res.data.subsite_list
+                    })
+                    .catch(function() {})
+            },
+            cronRun: function() {
+                httpget(qscms.apiList.cronRun)
+                    .then(function() {})
+                    .catch(function() {})
+            },
+            registerUser(utype) {
+                if (parseInt("0") === 1) {
+                    this.$message.error('网站已关闭会员注册')
+                    return false
+                }
+                if (utype == 1) {
+                    location.href = qscms.locationList.regCompany
+                } else {
+                    location.href = qscms.locationList.regPersonal
+                }
+            },
+            handlerSearch: function() {
+                var that = this
+                var params = {
+                    alias: that.searchAlias,
+                    keyword: that.keyword
+                }
+                httpget(qscms.apiList.searchLocation, params).then(function(res) {
+                    location.href = res.data
+                }).catch(function() {})
+            },
+            handlerLogout: function() {
+                var that = this
+                this.$confirm('确定退出当前账号吗?', '提示', {
+                    type: 'warning'
+                }).then(function() {
+                    if (that.subsite_open === 1 && that.subsite_domain != '') {
+                        Cookies.remove('qscms_visitor', {
+                            domain: '.' + that.subsite_domain
+                        })
+                    }
+                    Cookies.remove('qscms_visitor')
+                    window.location.reload()
+                }).catch(function() {});
+            },
+            handlerMemberCenter: function() {
+                if (this.utype == 1) {
+                    location.href = qscms.locationList.indexCompany
+                } else {
+                    location.href = qscms.locationList.indexPersonal
+                }
+            },
+            locationTo: function() {
+                if (this.utype == 1) {
+                    location.href = qscms.locationList.companyIm
+                } else {
+                    location.href = qscms.locationList.personalIm
+                }
+            },
+            getUserInfo: function() {
+                var that = this
+                httpget(qscms.apiList.userinfo).then(function(res) {
+                    if (res.data.login === true) {
+                        that.isLogin = res.data.login
+                        that.utype = res.data.userinfo.utype
+                        if (that.utype == 1) {
+                            that.memberUrl = qscms.locationList.indexCompany
+                        } else {
+                            that.memberUrl = qscms.locationList.indexPersonal
+                        }
+                        that.loginUsername = res.data.show_username
+                        that.preview_id = res.data.preview_id
+                        that.imWindowGlobal()
+                    }
+                }).catch(function() {})
+            },
+            imWindowGlobal: function() {
+                var that = this
+                httpget(qscms.apiList.imGlobal, {})
+                    .then(function(res) {
+                        if (res.code == 200) {
+                            //检测通过
+                            if (res.data.next == '') {
+                                that.initWebSocket()
+                            }
+                        } else {
+                            console.log(res.message)
+                        }
+                    })
+                    .catch(() => {});
+            },
+            initWebSocket: function() {
+                var that = this
+                httpget(qscms.apiList.imGetToken, {})
+                    .then(function(res) {
+                        if (res.data != '') {
+                            qscms.imToken = res.data
+                            window.ws = new WebSocket('wss://imserv.v2.74cms.com');
+                            window.ws.onopen = that.websocketonopen;
+                            window.ws.onmessage = that.websocketonmessage;
+                            window.ws.onerror = that.websocketonerror;
+                            window.ws.onclose = that.websocketclose;
+                        }
+
+                    }).catch(() => {})
+            },
+            websocketonopen: function() {
+                var that = this
+                var msgObj = {
+                    controller: "Connect",
+                    action: "index",
+                    args: {
+                        token: qscms.imToken
+                    }
+                };
+                var msgStr = JSON.stringify(msgObj);
+                window.ws.send(msgStr);
+                that.getImUnreaded()
+            },
+            websocketonerror: function() {
+                console.log('client：连接websocket失败，请刷新页面重试')
+            },
+            websocketonmessage: function(e) {
+                var that = this
+                if (isJSON(e.data)) {
+                    var data = JSON.parse(e.data);
+                    if (data.error === undefined) {
+                        that.imUnreaded = true
+                    }
+                } else {
+                    console.log('client：' + e.data);
+                }
+            },
+            websocketclose: function() {
+                console.log("client：关闭连接");
+            },
+            getImUnreaded: function() {
+                var that = this
+                httppost(qscms.apiList.imChatlist, {
+                        token: qscms.imToken
+                    })
+                    .then(function(res) {
+                        for (var i = 0; i < res.data.items.length; i++) {
+                            if (res.data.items[i].new > 0) {
+                                that.imUnreaded = true
+                            }
+                        }
+
+                    })
+                    .catch(function() {})
+            },
+            handlerCompanyIndex: function() {
+                location.href = qscms.locationList.indexCompany
+            },
+            handlerResumeIndex: function() {
+                location.href = qscms.locationList.personalResume
+            },
+            handlerPersonalRecommend: function() {
+                location.href = qscms.locationList.recommendJob
+            },
+            handlerAddJob() {
+                var that = this
+                httpget(qscms.apiList.companyCheckJobaddNum, {}).then(function(res) {
+                    if (res.data.enable_addjob_num <= 0) {
+                        that.$confirm('您当前是' +
+                                res.data.setmeal_name +
+                                '，当前可发布职位数为0，建议您立即升级套餐或将暂时不招聘的职位设为关闭！', '系统提示', {
+                                    confirmButtonText: '升级套餐',
+                                    type: 'warning'
+                                })
+                            .then(function() {
+                                location.href = qscms.locationList.companySetmealAdd
+                            })
+                            .catch(function() {})
+                        return false
+                    } else {
+                        location.href = qscms.locationList.companyJobAdd
+                    }
+                }).catch(function() {})
+            },
+            handlerCompanyJoblist() {
+                location.href = qscms.locationList.companyJoblist
+            },
+            handlerCompanyRecommend() {
+                location.href = qscms.locationList.recommendResume
+            },
+            handlerCompanyService() {
+                location.href = qscms.locationList.companyService
+            },
+            handlerPersonalLogin() {
+                location.href = qscms.locationList.loginPersonal
+            },
+            handlerCompanyLogin() {
+                location.href = qscms.locationList.loginCompany
+            },
+            handlerForget() {
+                location.href = qscms.locationList.forget
+            },
+            handlerAppeal() {
+                location.href = qscms.locationList.appeal
+            },
+            // 地区选择
+            choseDistrict(val) {
+                console.log(val, '====')
+                // $('#district_text').text(val)
+                $('#subsite_pupop').removeClass('displayBlock').addClass('displayNone')
+            }
+        }
+    })
+
+    $(function() {
+    	// 头部下拉广告位
+    	var showPopup = false
+    	var current = new Date()
+    	var expire_time = localStorage.getItem('index_popup_expire_time')
+        console.log(current.getTime() > new Date(expire_time))
+    	if (expire_time === undefined || !expire_time || current.getTime() > new Date(expire_time)) {
+    		showPopup = true
+    		expire_time = new Date(new Date(new Date().toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000 - 1)
+    		localStorage.setItem('index_popup_expire_time', expire_time)
+    	}
+    	var header_source_time = 6;
+    	var header_time = null;
+    	var distinguish_source = true;
+
+    	if ($(".down_source")[0]) {
+    		down_source();
+    	} else {
+    		if ($(".popup_source")[0] && showPopup === true) {
+    			$('<div>').attr({
+    				'class': 'mantle_box'
+    			}).appendTo('body')
+    			$(".popup_source").show();
+    			popup_source();
+    		}
+    	}
+
+    	function down_source() {
+    		$(".source_box .img_link").animate({
+    			height: "500px"
+    		});
+    		$(".source_box").animate({
+    			height: "500px"
+    		});
+    		$(".down_source .source_btn").html(header_source_time);
+    		header_time = setInterval(function() {
+    			header_source_time--;
+    			$(".down_source .source_btn").html(header_source_time);
+    			if (header_source_time == 0) {
+    				$(".source_box .img_link").animate({
+    					height: "0px"
+    				});
+    				$(".source_box").animate({
+    					height: "0px"
+    				});
+    				$(".down_source .source_btn").html("重播");
+    				header_source_time = 6;
+    				$(".source_btn").attr({
+    					disabled: false
+    				});
+    				clearInterval(header_time);
+    				if ($(".popup_source")[0] && showPopup === true) {
+    					if (distinguish_source) {
+    						$('<div>').attr({
+    							'class': 'mantle_box'
+    						}).appendTo('body')
+    						$(".popup_source").show();
+    						$(".source_btn").attr({
+    							disabled: false
+    						});
+    						popup_source();
+    					}
+    				}
+    			}
+    		}, 1000);
+    	}
+    	// 重播点击事件
+    	$(".down_source .source_btn").click(function() {
+    		distinguish_source = false;
+    		$(this).attr({
+    			disabled: true
+    		});
+    		down_source();
+    	});
+    	// 关闭按钮
+    	$(".down_source .source_box .img_link .close").click(function(event) {
+    		var e = window.event || event;
+    		e.preventDefault();
+    		distinguish_source = false;
+    		$(".source_box .img_link").animate({
+    			height: "0px"
+    		});
+    		$(".source_box").animate({
+    			height: "0px"
+    		});
+    		header_source_time = 6;
+    		$(".down_source .source_btn").html("重播");
+    		clearInterval(header_time);
+    		$(".source_btn").attr({
+    			disabled: false
+    		});
+    		if (distinguish_source && showPopup === true) {
+    			$(".popup_source").show();
+    			popup_source();
+    		}
+    	});
+
+    	// 弹窗广告位
+    	var popup_time = null;
+
+    	function popup_source() {
+    		popup_time = setTimeout(function() {
+    			$('.mantle_box').hide()
+    			$(".popup_source").hide();
+    		}, 6000);
+    	}
+    	// 关闭
+    	$(".popup_close").click(function() {
+    		$(".popup_source").hide();
+    		$('.mantle_box').hide()
+    		clearTimeout(popup_time);
+    	});
+    })
+</script>
+
+		<!-- content -->
+		
+<link rel="stylesheet" type="text/css" href="/assets/css/companylist.css">
+<div id="app" class="content_wrapper2"><div class="content"><div class="filter_combo"><div class="filter_line"><div class="line_title">企业性质：</div> <div class="line_item"><a href="https://demo.74cms.com/company.html" class="f_item active">不限</a> <a href="https://demo.74cms.com/company/nature/46.html" class="f_item ">国企</a> <a href="https://demo.74cms.com/company/nature/47.html" class="f_item ">民营</a> <a href="https://demo.74cms.com/company/nature/48.html" class="f_item ">合资</a> <a href="https://demo.74cms.com/company/nature/49.html" class="f_item ">外商独资</a> <a href="https://demo.74cms.com/company/nature/50.html" class="f_item ">股份制企业</a> <a href="https://demo.74cms.com/company/nature/51.html" class="f_item ">上市公司</a> <a href="https://demo.74cms.com/company/nature/52.html" class="f_item ">国家机关</a> <a href="https://demo.74cms.com/company/nature/53.html" class="f_item ">事业单位</a> <a href="https://demo.74cms.com/company/nature/54.html" class="f_item ">其它</a> <div class="clear"></div></div> <div class="clear"></div></div> <div class="filter_line"><div class="line_title">行业类别：</div> <div class="line_item"><a href="https://demo.74cms.com/company.html" class="f_item active">不限</a> <span><a href="https://demo.74cms.com/company/trade/1.html" class="f_item tradeLink sw">计算机软件/硬件</a> <a href="https://demo.74cms.com/company/trade/2.html" class="f_item tradeLink sw">计算机系统/维修</a> <a href="https://demo.74cms.com/company/trade/3.html" class="f_item tradeLink sw">通信(设备/运营/服务)</a> <a href="https://demo.74cms.com/company/trade/4.html" class="f_item tradeLink sw">互联网/电子商务</a> <a href="https://demo.74cms.com/company/trade/5.html" class="f_item tradeLink sw">网络游戏</a> <a href="https://demo.74cms.com/company/trade/6.html" class="f_item tradeLink sw">电子/半导体/集成电路</a> <a href="https://demo.74cms.com/company/trade/7.html" class="f_item tradeLink sw">仪器仪表/工业自动化</a> <a href="https://demo.74cms.com/company/trade/8.html" class="f_item tradeLink sw">会计/审计</a> <a href="https://demo.74cms.com/company/trade/9.html" class="f_item tradeLink " style="display: none;">金融(投资/证券</a> <a href="https://demo.74cms.com/company/trade/10.html" class="f_item tradeLink " style="display: none;">金融(银行/保险)</a> <a href="https://demo.74cms.com/company/trade/11.html" class="f_item tradeLink " style="display: none;">贸易/进出口</a> <a href="https://demo.74cms.com/company/trade/12.html" class="f_item tradeLink " style="display: none;">批发/零售</a> <a href="https://demo.74cms.com/company/trade/13.html" class="f_item tradeLink " style="display: none;">消费品(食/饮/烟酒)</a> <a href="https://demo.74cms.com/company/trade/14.html" class="f_item tradeLink " style="display: none;">服装/纺织/皮革</a> <a href="https://demo.74cms.com/company/trade/15.html" class="f_item tradeLink " style="display: none;">家具/家电/工艺品/玩具</a> <a href="https://demo.74cms.com/company/trade/16.html" class="f_item tradeLink " style="display: none;">办公用品及设备</a> <a href="https://demo.74cms.com/company/trade/17.html" class="f_item tradeLink " style="display: none;">机械/设备/重工</a> <a href="https://demo.74cms.com/company/trade/18.html" class="f_item tradeLink " style="display: none;">汽车/摩托车/零配件</a> <a href="https://demo.74cms.com/company/trade/19.html" class="f_item tradeLink " style="display: none;">制药/生物工程</a> <a href="https://demo.74cms.com/company/trade/20.html" class="f_item tradeLink " style="display: none;">医疗/美容/保健/卫生</a> <a href="https://demo.74cms.com/company/trade/21.html" class="f_item tradeLink " style="display: none;">医疗设备/器械</a> <a href="https://demo.74cms.com/company/trade/22.html" class="f_item tradeLink " style="display: none;">广告/市场推广</a> <a href="https://demo.74cms.com/company/trade/23.html" class="f_item tradeLink " style="display: none;">会展/博览</a> <a href="https://demo.74cms.com/company/trade/24.html" class="f_item tradeLink " style="display: none;">影视/媒体/艺术/出版</a> <a href="https://demo.74cms.com/company/trade/25.html" class="f_item tradeLink " style="display: none;">印刷/包装/造纸</a> <a href="https://demo.74cms.com/company/trade/26.html" class="f_item tradeLink " style="display: none;">房地产开发</a> <a href="https://demo.74cms.com/company/trade/27.html" class="f_item tradeLink " style="display: none;">建筑与工程</a> <a href="https://demo.74cms.com/company/trade/28.html" class="f_item tradeLink " style="display: none;">家居/室内设计/装潢</a> <a href="https://demo.74cms.com/company/trade/29.html" class="f_item tradeLink " style="display: none;">物业管理/商业中心</a> <a href="https://demo.74cms.com/company/trade/30.html" class="f_item tradeLink " style="display: none;">中介服务/家政服务</a> <a href="https://demo.74cms.com/company/trade/31.html" class="f_item tradeLink " style="display: none;">专业服务/财会/法律</a> <a href="https://demo.74cms.com/company/trade/32.html" class="f_item tradeLink " style="display: none;">检测/认证</a> <a href="https://demo.74cms.com/company/trade/33.html" class="f_item tradeLink " style="display: none;">教育/培训</a> <a href="https://demo.74cms.com/company/trade/34.html" class="f_item tradeLink " style="display: none;">学术/科研</a> <a href="https://demo.74cms.com/company/trade/35.html" class="f_item tradeLink " style="display: none;">餐饮/娱乐/休闲</a> <a href="https://demo.74cms.com/company/trade/36.html" class="f_item tradeLink " style="display: none;">酒店/旅游</a> <a href="https://demo.74cms.com/company/trade/37.html" class="f_item tradeLink " style="display: none;">交通/运输/物流</a> <a href="https://demo.74cms.com/company/trade/38.html" class="f_item tradeLink " style="display: none;">航天/航空</a> <a href="https://demo.74cms.com/company/trade/39.html" class="f_item tradeLink " style="display: none;">能源(石油/化工/矿产)</a> <a href="https://demo.74cms.com/company/trade/40.html" class="f_item tradeLink " style="display: none;">能源(采掘/冶炼/原材料)</a> <a href="https://demo.74cms.com/company/trade/41.html" class="f_item tradeLink " style="display: none;">电力/水利/新能源</a> <a href="https://demo.74cms.com/company/trade/42.html" class="f_item tradeLink " style="display: none;">政府部门/事业单位</a> <a href="https://demo.74cms.com/company/trade/43.html" class="f_item tradeLink " style="display: none;">非盈利机构/行业协会</a> <a href="https://demo.74cms.com/company/trade/44.html" class="f_item tradeLink " style="display: none;">农业/渔业/林业/牧业</a> <a href="https://demo.74cms.com/company/trade/45.html" class="f_item tradeLink " style="display: none;">其他行业</a> <a href="https://demo.74cms.com/company/trade/294.html" class="f_item tradeLink " style="display: none;">低空经济</a></span> <a href="javascript:;" data-type="tradeLink" class="f_item more toggleMore" style=""><span>其他</span></a> <div class="clear"></div></div> <div class="clear"></div></div> <!----></div> <div class="content_box2 clearfix"><div class="left_sidebar"><a href="https://demo.74cms.com/company/164.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg"></div> <div class="company_text_wrapper"><div data-id="164" class="company_text1 substring clearfix"><div class="cn">黑马猎头</div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">中介服务/家政服务</span> <span class="line"></span> <span class="text substring">10～50人</span></p></div> <div class="line3"><div class="line3_box"><p class="num">2</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">34</p> <p class="desc">企业热度</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/163.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://qiniuyun.tywangcai.com/2026-03-21-69be49a2c4ed6.png?imageMogr2/auto-orient/quality/75"></div> <div class="company_text_wrapper"><div data-id="163" class="company_text1 substring clearfix"><div class="cn">云南花穆澜科技有限公司</div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">农业/渔业/林业/牧业</span> <span class="line"></span> <span class="text substring">10～50人</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/162.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://qiniuyun.tywangcai.com/2026-03-11-69b121876ce70.jpg"></div> <div class="company_text_wrapper"><div data-id="162" class="company_text1 substring clearfix"><div class="cn">眉山市欣梦文化传媒有限公司</div> <div class="ic1"></div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">影视/媒体/艺术/出版</span> <span class="line"></span> <span class="text substring">10～50人</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/161.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg"></div> <div class="company_text_wrapper"><div data-id="161" class="company_text1 substring clearfix"><div class="cn">浙江某某大型公司</div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">计算机系统/维修</span> <span class="line"></span> <span class="text substring">50～200人</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/160.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg"></div> <div class="company_text_wrapper"><div data-id="160" class="company_text1 substring clearfix"><div class="cn">哈哈哈</div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">计算机软件/硬件</span> <span class="line"></span> <span class="text substring">10人以下</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/155.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg"></div> <div class="company_text_wrapper"><div data-id="155" class="company_text1 substring clearfix"><div class="cn">山西比邻</div></div> <div class="company_text2"><p><span class="text substring">国企</span> <span class="line"></span> <span class="text substring">计算机软件/硬件</span> <span class="line"></span> <span class="text substring">10人以下</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/152.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg"></div> <div class="company_text_wrapper"><div data-id="152" class="company_text1 substring clearfix"><div class="cn">安徽简职企业服务有限公司</div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">计算机软件/硬件</span> <span class="line"></span> <span class="text substring">10人以下</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/151.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg"></div> <div class="company_text_wrapper"><div data-id="151" class="company_text1 substring clearfix"><div class="cn">支付宝</div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">计算机软件/硬件</span> <span class="line"></span> <span class="text substring">10～50人</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/148.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://qiniuyun.tywangcai.com/2026-01-08-695f484de1897.jpg"></div> <div class="company_text_wrapper"><div data-id="148" class="company_text1 substring clearfix"><div class="cn">河北泰铎人力资源有限公司</div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">中介服务/家政服务</span> <span class="line"></span> <span class="text substring">10～50人</span></p></div> <div class="line3"><div class="line3_box"><p class="num">2</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/146.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg"></div> <div class="company_text_wrapper"><div data-id="146" class="company_text1 substring clearfix"><div class="cn">浩天网络</div> <div class="ic1"></div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">计算机软件/硬件</span> <span class="line"></span> <span class="text substring">10～50人</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/145.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg"></div> <div class="company_text_wrapper"><div data-id="145" class="company_text1 substring clearfix"><div class="cn">青岛万诺</div> <div class="ic1"></div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">互联网/电子商务</span> <span class="line"></span> <span class="text substring">50～200人</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a> <a href="https://demo.74cms.com/company/141.html" target="_blank" class="company_list clearfix"><div class="text_wrapper clearfix"><div class="company_img"><img src="https://demo.74cms.com/upload/resource/empty_logo.jpg"></div> <div class="company_text_wrapper"><div data-id="141" class="company_text1 substring clearfix"><div class="cn">ig</div></div> <div class="company_text2"><p><span class="text substring">民营</span> <span class="line"></span> <span class="text substring">网络游戏</span> <span class="line"></span> <span class="text substring">10人以下</span></p></div> <div class="line3"><div class="line3_box"><p class="num">1</p> <p class="desc">在招职位</p></div> <div class="line3_box"><p class="num">100%</p> <p class="desc">简历查看率</p></div></div></div></div></a></div> <div class="pager_box"><ul class="pagination"><li class="disabled"><span>上一页</span></li> <li class="active"><span>1</span></li><li><a href="/company.html?page=2">2</a></li><li><a href="/company.html?page=3">3</a></li><li><a href="/company.html?page=4">4</a></li><li><a href="/company.html?page=5">5</a></li><li><a href="/company.html?page=6">6</a></li><li><a href="/company.html?page=7">7</a></li> <li><a href="/company.html?page=2">下一页</a></li></ul></div></div></div></div>
+<script>
+    var cityLevel = parseInt('1');
+    var keyword = '';
+    var d1 = parseInt('');
+    var d2 = parseInt('');
+    var d3 = parseInt('');
+    var nature = '';
+    var trade = '';
+</script>
+<script type="text/javascript" src="/assets/js/company/companyList.js"></script>
+
+		<!-- footer -->
+		<div id="footerContent" class="indexFooter_wrapper"><div class="indexFooter clearfix"><div class="clearfix float"><div class="float clearfix"><ul class="footer_list  float"><li class="fc">个人</li> <li><a href="javascript:;">登记简历</a></li> <li><a href="javascript:;">求职管理</a></li> <li><a href="https://demo.74cms.com/job.html">最新职位</a></li> <li><a href="https://demo.74cms.com/company.html">企业信息</a></li></ul> <ul class="footer_list float"><li class="fc">企业</li> <li><a href="javascript:;">企业入驻</a></li> <li><a href="javascript:;">发布招聘</a></li> <li><a href="javascript:;">会员服务</a></li> <li><a href="javascript:;">招聘管理</a></li></ul> <ul class="footer_list float"><li class="fc">特色</li> <li><a target="_self" href="https://demo.74cms.com/explain/1.html">网站介绍</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/2.html">产品服务</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/3.html">法律申明</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/4.html">推广合作</a></li></ul> <ul class="footer_list float"><li class="fc">帮助</li> <li><a href="https://demo.74cms.com/help/id/1.html">常见问题</a></li> <li><a href="https://demo.74cms.com/help/id/2.html">新手上路</a></li> <li><a href="https://demo.74cms.com/help/id/3.html">账号管理</a></li> <li><a href="https://demo.74cms.com/help/id/4.html">简历管理</a></li></ul></div> <div class="code_box float clearfix"><div class="float code1"><p>微信公众号</p> <div class="img"><img src="https://demo.74cms.com/upload/resource/weixin_img.jpg" class="codeImg"></div></div> <div class="float code2"><p>手机微信版</p> <div class="img1"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/m/" class="codeImg"></div></div></div></div> <div class="footer_contactType"><p class="contact_title">联系电话</p> <div class="contact_tel"><img src="/assets/images/contact_icon.png"> <span>18003431191</span></div> <p class="job_time">服务时间：周一至周六 8:00-17:30</p> <p class="job_QQ">客服QQ：<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&amp;uin=00000000000&amp;site=在线客服&amp;menu=yes">00000000000</a></p></div></div> <div class="indexFooter_nav_con"><ul class="indexFooter_nav clearfix"><li><a href="https://demo.74cms.com/">网站首页</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/5.html">联系我们</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/6.html">招贤纳士</a></li></ul></div> <div class="footer_text1"><span class="address">联系地址：00省00市00路00号0大厦00楼</span></div> <div class="footer_text2"><span>
+                网站备案：
+                <a target="_blank" href="https://beian.miit.gov.cn/">
+                    icp000000000                </a></span> <span class="security">
+                公网安备：
+                <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=000000000000">
+                    晋公网安备000000000000号                </a></span></div> <div class="footer_text3"><span>Copyright © 2021 74cms.com All Right Reserved Powered by 74cmsse</span></div></div>
+<script>
+var version = "8.12.3 专业版";
+console.log('\n' + ' %c 74cmsSE v'+version+'  %c https://www.74cms.com ' + '\n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;');
+    var app = new Vue({
+        el: '#footerContent',
+        data:{
+            mobileQrcode:'',
+            backTopFlag: false,
+            scrollTop: 0,
+            mobileList:[],
+            qqList:[],
+            weixinList:[],
+        },
+        created:function(){
+            this.getServiceOl()
+            this.mobileQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/m/"
+        },
+        mounted:function () {
+            window.addEventListener('scroll', this.scrollToTop)
+        },
+        destroyed:function () {
+            window.removeEventListener('scroll', this.scrollToTop)
+        },
+        methods:{
+            wakeupQq:function(qq){
+                if(qq){
+                    window.open('http://wpa.qq.com/msgrd?v=3&uin='+qq+'&site=在线客服&menu=yes')
+                }
+            },
+            getServiceOl:function() {
+                var that = this
+                httpget(qscms.apiList.serviceOl).then(function (res) {
+                 that.mobileList = res.data.mobile
+                 that.qqList = res.data.qq
+                 that.weixinList = res.data.weixin
+                }).catch(function () { })
+            },
+            // 点击图片回到顶部方法，加计时器是为了过渡顺滑
+            backTop:function() {
+                var that = this
+                var timer = setInterval(function(){
+                var ispeed = Math.floor(-that.scrollTop / 5)
+                document.documentElement.scrollTop = document.body.scrollTop = that.scrollTop + ispeed
+                if (that.scrollTop === 0) {
+                    clearInterval(timer)
+                }
+                }, 16)
+            },
+            // 为了计算距离顶部的高度，当高度大于60显示回顶部图标，小于60则隐藏
+            scrollToTop:function() {
+                var that = this
+                that.scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+                that.backTopFlag = that.scrollTop > 60;
+            },
+            handlerResumeIndex:function(){
+                location.href = qscms.locationList.personalResume
+            },
+            handlerPersonalJobApplyList:function(){
+                location.href = qscms.locationList.personalJobApplyList
+            },
+            handlerCompanyIndex:function(){
+                location.href = qscms.locationList.indexCompany
+            },
+            handlerAddJob:function(){
+                httpget(qscms.apiList.companyCheckJobaddNum, {}).then(function(res){
+                    if (res.data.enable_addjob_num <= 0) {
+                        this.$confirm('您当前是' +
+                            res.data.setmeal_name +
+                            '，当前可发布职位数为0，建议您立即升级套餐或将暂时不招聘的职位设为关闭！','系统提示',{
+                            confirmButtonText: '升级套餐',
+                            type: 'warning'
+                        })
+                        .then(function(){
+                            location.href = qscms.locationList.companySetmealAdd
+                        })
+                        .catch(function(){})
+                        return false
+                    } else {
+                        location.href = qscms.locationList.companyJobAdd
+                    }
+                }).catch(function(){})
+            },
+            handlerCompanyService:function(){
+                location.href = qscms.locationList.companyService
+            },
+            handlerCompanyJobApplyList:function(){
+                location.href = qscms.locationList.companyJobApplyList
+            },
+        }
+    })
+</script>
+
+	</div>
+
+
+</body></html>

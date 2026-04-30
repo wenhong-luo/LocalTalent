@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>LocalTalent 二期 Codex 投喂手册（高保真门户优先 · Prompt 15–23）</title>
+  <title>LocalTalent 二期 Codex 投喂手册（高保真门户优先 · Prompt 15–24）</title>
   <style>
     body { margin:0; background:#f6f8fb; color:#1f2937; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.75; }
     main { max-width:1180px; margin:0 auto; padding:36px 20px 72px; }
@@ -22,7 +22,7 @@
 </head>
 <body>
 <main>
-  <h1>LocalTalent 二期 Codex 投喂手册（高保真门户优先 · Prompt 15–23）</h1>
+  <h1>LocalTalent 二期 Codex 投喂手册（高保真门户优先 · Prompt 15–24）</h1>
   <p class="note">从目录跳到当前轮次，复制“可复制投喂文本”即可。统一硬边界：人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据。</p>
 
   <section class="card">
@@ -87,8 +87,13 @@
         <td>完成二期高保真验收与演示收口：新增 <code>demo/localtalent_phase2_demo_data.sql</code>、<code>scripts/seed_phase2_demo_data</code>、<code>scripts/check_phase2_demo_acceptance</code>、二期演示说明、Runbook、Testing、验收清单，并将二期总闸门接入 <code>scripts/run_all</code>。</td>
         <td>二期主线 Prompt 15-23 已收口；演示数据只显式导入、不进入 Flyway；不新增业务接口或迁移；高风险能力仍必须先走 Step6 准入规则。</td>
       </tr>
+      <tr>
+        <td>Prompt 24（P2-S1）</td>
+        <td>完成进入三期前的 P1 公开频道补充：新增名企直聘、急聘/快速招聘、今日招聘、网络招聘会、校园招聘、校园职位、校园宣讲/双选会、公开说明列表/详情等稳定路由，并更新 sitemap、更多服务入口、测试和二期闸门。</td>
+        <td>本轮只补公开 wrapper 和低风险入口；复用现有公开接口，不新增迁移或写接口；报名名单、公共简历库、地图、视频、直播、支付、联系解锁、真实短信/微信/小程序/App 仍为禁用占位或风险池。</td>
+      </tr>
     </table>
-    <p class="note">后续纪律：每完成一轮 Phase II Prompt，都必须同步更新本节和 Markdown，写清楚“做到了什么、没有做什么、下一轮从哪里继续”。当前二期主线 Prompt 15-23 已收口；后续如要启动风险池专项或三期规划，必须另起边界与提示词，不得顺手混入已收口主线。</p>
+    <p class="note">后续纪律：每完成一轮 Phase II Prompt，都必须同步更新本节和 Markdown，写清楚“做到了什么、没有做什么、下一轮从哪里继续”。当前二期主线 Prompt 15-23 已收口，Prompt 24 低风险补充页已完成；后续如要启动风险池专项或三期规划，必须另起边界与提示词，不得顺手混入已收口主线。</p>
   </section>
 
   <section class="card toc">
@@ -102,6 +107,7 @@
     <a href="#p21">Prompt 21 / P2-6</a>
     <a href="#p22">Prompt 22 / P2-7</a>
     <a href="#p23">Prompt 23 / P2-8</a>
+    <a href="#p24">Prompt 24 / P2-S1</a>
     <a href="#risk">风险池专项模板</a>
   </section>
 
@@ -118,6 +124,7 @@
       <tr><td>Prompt 21</td><td>P2-6</td><td>招聘会、就业政策、HR 工具箱与更多服务</td><td>公开内容频道、低风险占位</td></tr>
       <tr><td>Prompt 22</td><td>P2-7</td><td>登录注册与管理中心入口体验</td><td>登录注册 UI、身份分流</td></tr>
       <tr><td>Prompt 23</td><td>P2-8</td><td>二期高保真验收与演示收口</td><td>演示数据、DOM 验收、Runbook</td></tr>
+      <tr><td>Prompt 24</td><td>P2-S1</td><td>P1 公开频道模板补齐与风险占位校准</td><td>名企直聘、急聘、今日招聘、网络招聘会、校园招聘、公开说明</td></tr>
     </table>
   </section>
 
@@ -371,11 +378,41 @@
 本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 23（P2-8）。
 禁止实现 Prompt 23 之外的内容。</pre></section>
 
+  <section class="card" id="p24"><h2>Prompt 24（P2-S1）：P1 公开频道模板补齐与风险占位校准</h2><p class="copy-title">可复制投喂文本</p><pre>主控说明
+- Codex 必读：docs/Phase_II/74cms_42模板开发分析报告.md、docs/Phase_II/74cms_42_templates/、二期 demo inventory、二期蓝图和 Prompt 15-23 结果。
+- 本轮只补 42 模板中的低风险 P1 公开频道稳定路由，不新增业务闭环、后端写接口、迁移或真实外部能力。
+
+本轮目标
+- 补齐 /jobs/famous、/jobs/emergency、/daily-jobs、/job-fairs/online、/job-fairs/campus、/campus、/campus/jobs、/campus/elections、/explain、/explain/[id] 等公开入口。
+- 复用现有 PortalShell、职位列表、招聘会列表、内容详情和公开 API。
+- 更新 sitemap、更多服务入口、二期演示说明和验收脚本，让 P1 公开频道在进入三期前具备稳定路由。
+
+禁止事项
+- 禁止实现公共简历库、搜索简历、查看简历、联系解锁或受控找人才。
+- 禁止实现报名名单、参会个人明细、签到证据、展位售卖、会员支付。
+- 禁止接入真实地图、视频、直播、短信、微信、小程序、App、ATS/RPA 或受控候选池同步。
+- 禁止新增数据库迁移或生产写接口。
+
+输出要求（文件与命令）
+- 前端：低风险公开频道 wrapper、校园招聘聚合页、公开说明详情、sitemap 和更多服务入口。
+- 文档/脚本：二期提示词完成记录、二期演示说明、check_phase2_demo_acceptance 和 check_phase2_planning 最小同步。
+- 命令：cd frontend && npm test && npm run build、./scripts/check_portal_snapshot_fields、./scripts/check_boundary、./scripts/check_phase2_planning、./scripts/check_phase2_demo_acceptance。
+
+验收要求（DoD，可自动化）
+- [ ] P1 公开频道稳定路由可渲染，并进入 sitemap。
+- [ ] 字段黑名单继续通过，不泄露手机号、邮箱、简历正文、附件、证据、报名名单、签到证据、审核材料。
+- [ ] 高风险入口保持禁用或风险池文案，不存在真实外链或真实调用。
+- [ ] 不新增后端迁移、写接口或真实外部能力。
+
+最小投喂片段：
+本轮只执行 docs/Phase_II/二期研发提示词.md 中的 Prompt 24（P2-S1）。
+禁止实现 Prompt 24 之外的内容。</pre></section>
+
   <section class="card" id="risk">
     <h2>风险池专项 Prompt 模板（非当前开发范围）</h2>
     <p class="danger">仅当某一风险能力在 <code>LocalTalent_phase2_step6.md</code> 中从 <code>risk_pool</code> 完成准入并明确标记为 <code>approved_for_prompt</code> 后，才允许复制本模板。</p>
     <p class="copy-title">可复制投喂文本</p>
-    <pre>本轮是风险池专项 Prompt，不属于 Prompt 15-23 主线。
+    <pre>本轮是风险池专项 Prompt，不属于 Prompt 15-24 当前范围。
 请先出示 approved_for_prompt 结论、准入材料、字段白名单、撤回联动、服务端权限、审计、测试和回滚方案。
 禁止绕过字段白名单、撤回联动、服务端权限、审计和测试。</pre>
   </section>

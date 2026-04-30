@@ -19,6 +19,7 @@ required_files=(
   "$ROOT_DIR/frontend/src/pages/portal/companies/CompanySearchPage.test.tsx"
   "$ROOT_DIR/frontend/src/pages/portal/TalentServiceArea.test.tsx"
   "$ROOT_DIR/frontend/src/pages/portal/content/PortalContentChannels.test.tsx"
+  "$ROOT_DIR/frontend/src/pages/portal/content/Phase2SupplementRoutes.test.tsx"
   "$ROOT_DIR/frontend/src/pages/auth/AuthPages.test.tsx"
 )
 
@@ -44,11 +45,19 @@ route_files=(
   "$ROOT_DIR/frontend/src/app/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/jobs/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/jobs/[id]/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/jobs/famous/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/jobs/emergency/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/daily-jobs/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/companies/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/companies/[id]/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/portal/talent-service-area/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/job-fairs/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/job-fairs/[id]/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/job-fairs/online/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/job-fairs/campus/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/campus/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/campus/jobs/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/campus/elections/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/articles/policies/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/articles/news/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/articles/notices/page.page.tsx"
@@ -56,6 +65,8 @@ route_files=(
   "$ROOT_DIR/frontend/src/app/hr-tools/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/hr-tools/[id]/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/help/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/explain/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/explain/[id]/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/more-services/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/auth/login/page.page.tsx"
   "$ROOT_DIR/frontend/src/app/auth/register/page.page.tsx"
@@ -70,13 +81,20 @@ done
 
 sitemap_markers=(
   "/jobs"
+  "/jobs/famous"
+  "/jobs/emergency"
+  "/daily-jobs"
   "/companies"
   "/portal/talent-service-area"
   "/job-fairs"
+  "/job-fairs/online"
+  "/job-fairs/campus"
+  "/campus"
   "/articles/policies"
   "/articles/news"
   "/hr-tools"
   "/help"
+  "/explain"
   "/more-services"
 )
 
@@ -113,7 +131,9 @@ done
 
 prompt_markers=(
   "Prompt 23（P2-8）"
+  "Prompt 24（P2-S1）"
   "二期主线 Prompt 15-23 已收口"
+  "Prompt 24 低风险补充页已完成"
   "scripts/seed_phase2_demo_data"
   "scripts/check_phase2_demo_acceptance"
 )

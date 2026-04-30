@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 二期演示使用说明</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #5f6b7a;
+      --line: #dfe6f0;
+      --brand: #0f766e;
+      --brand-2: #1d4ed8;
+      --brand-soft: #dff7f2;
+      --warn-soft: #fff7ed;
+      --code-bg: #111827;
+      --code-ink: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 0%, rgba(15, 118, 110, 0.14), transparent 30%),
+        radial-gradient(circle at 82% 4%, rgba(29, 78, 216, 0.10), transparent 28%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 44%, #eef3f8 100%);
+      line-height: 1.72;
+    }
+    header { padding: 56px 24px 28px; background: linear-gradient(135deg, #073b3a 0%, #0f766e 52%, #1d4ed8 100%); color: white; }
+    .hero { max-width: 1120px; margin: 0 auto; }
+    .eyebrow { margin: 0 0 10px; letter-spacing: .08em; opacity: .82; font-size: 14px; }
+    h1 { margin: 0; font-size: clamp(32px, 5vw, 54px); line-height: 1.12; }
+    .subtitle { max-width: 860px; margin: 18px 0 0; color: rgba(255,255,255,.87); font-size: 17px; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 24px; padding: 0; list-style: none; }
+    .summary li { padding: 13px 15px; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.1); border-radius: 14px; backdrop-filter: blur(6px); }
+    .layout { max-width: 1120px; margin: 0 auto; padding: 28px 24px 64px; display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 24px; }
+    nav { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.9); box-shadow: 0 16px 40px rgba(31,41,55,.07); }
+    nav strong { display: block; margin-bottom: 10px; color: var(--brand); }
+    nav a { display: block; padding: 6px 0; color: var(--muted); text-decoration: none; font-size: 14px; }
+    nav a:hover { color: var(--brand); }
+    .toc-level-3 { padding-left: 14px; font-size: 13px; }
+    main { min-width: 0; }
+    .intro, section.card { margin: 0 0 18px; padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: 0 18px 44px rgba(31,41,55,.06); }
+    h2 { margin: 0 0 14px; color: #0f3f3c; font-size: 24px; }
+    h3 { margin: 22px 0 10px; color: #1f4f4b; font-size: 19px; }
+    p { margin: 10px 0; }
+    ul { margin: 10px 0 14px; padding-left: 1.25rem; }
+    li { margin: 5px 0; }
+    code { padding: 2px 6px; border-radius: 7px; background: var(--brand-soft); color: #075e57; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; }
+    pre { overflow-x: auto; padding: 16px; border-radius: 16px; background: var(--code-bg); color: var(--code-ink); line-height: 1.55; }
+    pre code { padding: 0; background: transparent; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0 18px; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); font-size: 14px; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: #eef8f6; color: #0f4f49; }
+    tr:last-child td { border-bottom: 0; }
+    section.card:nth-of-type(14) { border-color: #fed7aa; background: linear-gradient(180deg, #fff 0%, var(--warn-soft) 100%); }
+    footer { max-width: 1120px; margin: 0 auto; padding: 0 24px 40px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } nav { position: static; max-height: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <p class="eyebrow">PHASE II DEMO GUIDE</p>
+      <h1>LocalTalent 二期演示使用说明</h1>
+      <p class="subtitle">给第一次接手项目的新同事看的二期本地演示指南：按步骤拉起依赖、导入演示数据、启动 Next 高保真门户，并走完公开门户与一期后台能力回看。</p>
+      <ul class="summary"><li>本地依赖：MySQL、Redis、MinIO</li><li>核心路径：首页、找工作、找企业、人才服务区、招聘会、资讯、HR 工具箱</li><li>演示方式：显式导入二期 demo 数据 + 登录页或登录助手</li><li>安全边界：发布快照白名单、高风险能力占位或风险池</li></ul>
+    </div>
+  </header>
+  <div class="layout">
+    <nav aria-label="目录">
+      <strong>目录</strong>
+      <a class="toc-level-2" href="#一演示边界">一、演示边界</a>
+<a class="toc-level-2" href="#二你现在可以看到什么">二、你现在可以看到什么</a>
+<a class="toc-level-2" href="#三本地环境检查">三、本地环境检查</a>
+<a class="toc-level-2" href="#四启动依赖服务">四、启动依赖服务</a>
+<a class="toc-level-2" href="#五启动后端">五、启动后端</a>
+<a class="toc-level-2" href="#六导入二期演示数据">六、导入二期演示数据</a>
+<a class="toc-level-2" href="#七启动前端">七、启动前端</a>
+<a class="toc-level-2" href="#八演示账号">八、演示账号</a>
+<a class="toc-level-2" href="#九登录方式">九、登录方式</a>
+<a class="toc-level-2" href="#十推荐演示路径">十、推荐演示路径</a>
+<a class="toc-level-3" href="#1.-首页高保真门户">1. 首页高保真门户</a>
+<a class="toc-level-3" href="#2.-找工作和职位详情">2. 找工作和职位详情</a>
+<a class="toc-level-3" href="#3.-找企业和企业公开页">3. 找企业和企业公开页</a>
+<a class="toc-level-3" href="#4.-人才服务区">4. 人才服务区</a>
+<a class="toc-level-3" href="#5.-招聘会与内容频道">5. 招聘会与内容频道</a>
+<a class="toc-level-3" href="#6.-更多服务">6. 更多服务</a>
+<a class="toc-level-3" href="#7.-登录注册入口">7. 登录注册入口</a>
+<a class="toc-level-3" href="#8.-一期后台与审计能力回看">8. 一期后台与审计能力回看</a>
+<a class="toc-level-2" href="#十一minio-和导出怎么看">十一、MinIO 和导出怎么看</a>
+<a class="toc-level-2" href="#十二常用验证命令">十二、常用验证命令</a>
+<a class="toc-level-2" href="#十三常见问题">十三、常见问题</a>
+<a class="toc-level-3" href="#seedphase2demodata-提示核心表缺失"><code>seed_phase2_demo_data</code> 提示核心表缺失</a>
+<a class="toc-level-3" href="#seedphase2demodata-提示-v0012/v0013-字段缺失"><code>seed_phase2_demo_data</code> 提示 V0012/V0013 字段缺失</a>
+<a class="toc-level-3" href="#页面列表为空">页面列表为空</a>
+<a class="toc-level-3" href="#登录失败">登录失败</a>
+<a class="toc-level-3" href="#前端页面显示无权限">前端页面显示无权限</a>
+<a class="toc-level-3" href="#人才服务区没有数据">人才服务区没有数据</a>
+<a class="toc-level-3" href="#npm-run-build-后-frontend/next-env.d.ts-变更"><code>npm run build</code> 后 <code>frontend/next-env.d.ts</code> 变更</a>
+<a class="toc-level-3" href="#minio-控制台进不去">MinIO 控制台进不去</a>
+<a class="toc-level-2" href="#十四当前限制">十四、当前限制</a>
+<a class="toc-level-2" href="#十五一句话理解二期">十五、一句话理解二期</a>
+    </nav>
+    <main>
+      <p>本文面向第一次接手 LocalTalent 的新同事。照着做，你可以在本地看到二期高保真门户：<code>首页 / 找工作 / 找企业 / 人才服务区 / 招聘会 / 就业政策 / 职场资讯 / HR 工具箱 / 帮助中心 / 更多服务 / 登录注册入口</code>。</p>
+<p>二期不是重做一期底座，而是在一期合规、安全、审计与 Next/SSR 基础上，把公开门户做得更像一个完整地方人才网。</p>
+<section class="card" id="一演示边界"><h2>一、演示边界</h2>
+<ul>
+<li>二期演示数据只用于本地开发和验收，不是生产初始化数据。</li>
+<li>演示数据通过 <code>scripts/seed_phase2_demo_data</code> 显式导入，不进入 Flyway，不影响 CI 空库迁移。</li>
+<li>人才服务区仍只展示 <code>candidate_publish_snapshot</code> 发布快照白名单字段，不展示手机号、邮箱、简历正文、附件、证据或原始 JSON。</li>
+<li>公开门户不做公共简历库，不提供“搜索简历 / 查看简历 / 联系解锁 / 受控找人才”能力。</li>
+<li>对接接口仍为 stub，不连接 ATS/RPA、受控候选池或外部主库。</li>
+<li>地图、视频、直播、短信、微信、小程序、App、支付、会员商业化均为占位或风险池，不接真实外部能力。</li>
+<li>企业公开页只展示公开字段和在线职位，不展示联系人、营业执照附件、审核材料、后台备注、投递池、导出记录或审计记录。</li>
+</ul>
+</section>
+<section class="card" id="二你现在可以看到什么"><h2>二、你现在可以看到什么</h2>
+<ul>
+<li>高保真门户首页：顶部工具条、Logo 搜索区、主导航、职位分类墙、快捷入口、登录卡、公告/招聘会 tab、广告位、扫码 CTA、推荐企业、热招职位。</li>
+<li>找工作：公开职位搜索、筛选 query、职位卡片、名企直聘入口、职位详情 SEO 入口、投递/收藏占位；二期补充了名企直聘、急聘、今日招聘独立入口。</li>
+<li>找企业：认证企业列表、企业公开主页、公开简介、认证标签、在招职位聚合。</li>
+<li>人才服务区：参考 demo 简历库布局，但只展示发布快照卡片、低风险筛选、分页和风险提示。</li>
+<li>招聘会与内容频道：招聘会列表/详情、网络招聘会、校园招聘、校园职位、校园宣讲/双选会、就业政策、职场资讯、公告、HR 工具箱、帮助中心。</li>
+<li>更多服务：今日招聘、快速招聘、校园招聘、网络招聘会等低风险入口；地图、视频、直播、自由职业、求职登记等高风险入口为禁用或风险池说明。</li>
+<li>登录注册入口：求职者/招聘者登录注册 UI；短信、微信、小程序、App 登录均为禁用占位。</li>
+<li>P1 公开频道补充：<code>/jobs/famous</code>、<code>/jobs/emergency</code>、<code>/daily-jobs</code>、<code>/job-fairs/online</code>、<code>/job-fairs/campus</code>、<code>/campus</code>、<code>/campus/jobs</code>、<code>/campus/elections</code>、<code>/explain</code>、<code>/explain/[id]</code> 均为稳定公开入口。</li>
+<li>一期能力仍可演示：求职者中心、企业后台、运营后台、导出审批、审计 trace、对接 stub。</li>
+</ul>
+</section>
+<section class="card" id="三本地环境检查"><h2>三、本地环境检查</h2>
+<p>建议版本：</p>
+<ul>
+<li>Docker Desktop 或 Docker Engine</li>
+<li>JDK 21</li>
+<li>Node 24 LTS</li>
+<li>npm</li>
+</ul>
+<p>检查命令：</p>
+<pre><code class="language-bash">docker --version
+java -version
+node -v
+npm -v</code></pre>
+<p>如果 Docker 不可用，先打开 Docker Desktop。后端测试、本地 MySQL、Redis 和 MinIO 都依赖 Docker。</p>
+</section>
+<section class="card" id="四启动依赖服务"><h2>四、启动依赖服务</h2>
+<p>在仓库根目录执行：</p>
+<pre><code class="language-bash">docker compose -f infra/docker-compose.yml up -d</code></pre>
+<p>这会启动三类本地依赖：</p>
+<ul>
+<li>MySQL：业务数据库，默认容器名 <code>localtalent-mysql</code>。</li>
+<li>Redis：本地缓存占位，默认容器名 <code>localtalent-redis</code>。</li>
+<li>MinIO：本地对象存储，用于一期导出文件与短期预签名下载演示，端口 <code>9000/9001</code>。</li>
+</ul>
+<p>健康检查：</p>
+<pre><code class="language-bash">docker exec localtalent-redis redis-cli ping
+docker exec -e MYSQL_PWD=localtalent localtalent-mysql mysql -ulocaltalent localtalent -e &quot;SELECT 1;&quot;
+curl http://127.0.0.1:9000/minio/health/live</code></pre>
+</section>
+<section class="card" id="五启动后端"><h2>五、启动后端</h2>
+<p>打开一个终端：</p>
+<pre><code class="language-bash">cd backend
+./mvnw spring-boot:run</code></pre>
+<p>第一次启动时，Flyway 会自动创建表并执行基础 seed。看到应用启动完成后，在另一个终端验证：</p>
+<pre><code class="language-bash">curl http://127.0.0.1:8080/health</code></pre>
+<p>也可以用打包方式启动：</p>
+<pre><code class="language-bash">cd backend
+./mvnw clean package
+java -jar target/backend-0.1.0-SNAPSHOT.jar</code></pre>
+</section>
+<section class="card" id="六导入二期演示数据"><h2>六、导入二期演示数据</h2>
+<p>后端至少启动过一次并完成 Flyway 迁移后，在仓库根目录执行：</p>
+<pre><code class="language-bash">./scripts/seed_phase2_demo_data</code></pre>
+<p>脚本会做这些事：</p>
+<ul>
+<li>检查 <code>localtalent-mysql</code> 容器是否在运行。</li>
+<li>检查核心表和二期字段是否存在，避免 Flyway 尚未迁移时导入。</li>
+<li>导入 <code>demo/localtalent_phase2_demo_data.sql</code>。</li>
+<li>校验发布快照 JSON 不包含 <code>mobile/email/resume_body/attachment_object_key/evidence/password_hash/base_profile_json/education_json/experience_json/skills_json</code>。</li>
+<li>输出 <code>PASS</code>、二期演示账号、核心页面 URL、公开职位/企业/招聘会/内容数量和安全校验结果。</li>
+</ul>
+<p>如果要恢复一个干净演示环境：</p>
+<pre><code class="language-bash">docker compose -f infra/docker-compose.yml down -v
+docker compose -f infra/docker-compose.yml up -d
+cd backend &amp;&amp; ./mvnw spring-boot:run
+./scripts/seed_phase2_demo_data</code></pre>
+<p><code>down -v</code> 会删除本地 Docker volume，请只在开发演示环境使用。</p>
+</section>
+<section class="card" id="七启动前端"><h2>七、启动前端</h2>
+<p>打开另一个终端：</p>
+<pre><code class="language-bash">cd frontend
+npm ci
+npm run dev</code></pre>
+<p>默认访问：</p>
+<ul>
+<li>前端：<code>http://localhost:3000</code></li>
+<li>后端：<code>http://localhost:8080</code></li>
+</ul>
+<p>Next 服务端渲染默认通过 <code>LOCALTALENT_API_BASE_URL=http://localhost:8080</code> 访问后端。二期公开页面使用 Next/SSR，方便 SEO 和首屏展示。</p>
+</section>
+<section class="card" id="八演示账号"><h2>八、演示账号</h2>
+<p>默认密码统一为：</p>
+<pre><code class="language-text">LocalTalent@123456</code></pre>
+<table><tbody>
+<tr><th>脚本参数</th><th>登录名</th><th>身份</th><th>用途</th></tr>
+<tr><td><code>p2-candidate</code></td><td><code>p2_candidate@localtalent.test</code></td><td>candidate</td><td>二期已同意候选人，可看求职者中心</td></tr>
+<tr><td><code>p2-revoked</code></td><td><code>p2_revoked@localtalent.test</code></td><td>candidate</td><td>验证撤回后人才服务区不可见</td></tr>
+<tr><td><code>p2-pending</code></td><td><code>p2_pending@localtalent.test</code></td><td>candidate</td><td>验证不可发布状态</td></tr>
+<tr><td><code>p2-company</code></td><td><code>p2_company@localtalent.test</code></td><td>company</td><td>企业后台演示账号</td></tr>
+<tr><td><code>operator</code></td><td><code>operator</code></td><td>operator</td><td>运营写操作账号</td></tr>
+<tr><td><code>auditor</code></td><td><code>auditor_demo</code></td><td>operator 身份 + auditor 角色</td><td>运营后台只读演示账号</td></tr>
+</tbody></table>
+<p>SQL 中只保存 BCrypt hash，不保存明文密码。默认 operator 仍只用于本地开发和演示。</p>
+</section>
+<section class="card" id="九登录方式"><h2>九、登录方式</h2>
+<p>二期已经有 <code>/auth/login</code> 和 <code>/auth/register</code> 页面，可以直接用浏览器登录：</p>
+<pre><code class="language-text">http://localhost:3000/auth/login
+http://localhost:3000/auth/register</code></pre>
+<p>也可以用登录助手获取 token 并写入浏览器 <code>localStorage</code>。示例：二期企业账号。</p>
+<pre><code class="language-bash">./scripts/demo_login_tokens p2-company</code></pre>
+<p>脚本会输出类似下面的浏览器 Console 命令：</p>
+<pre><code class="language-js">localStorage.setItem(&#x27;localtalent_access_token&#x27;, &#x27;...&#x27;);
+localStorage.removeItem(&#x27;localtalent_admin_role_hint&#x27;);
+location.href = &#x27;/company&#x27;;</code></pre>
+<p>打开浏览器 DevTools Console，粘贴执行即可进入对应页面。</p>
+<p>常用登录助手：</p>
+<pre><code class="language-bash">./scripts/demo_login_tokens p2-candidate
+./scripts/demo_login_tokens p2-revoked
+./scripts/demo_login_tokens p2-pending
+./scripts/demo_login_tokens p2-company
+./scripts/demo_login_tokens operator
+./scripts/demo_login_tokens auditor</code></pre>
+<p>退出登录：</p>
+<pre><code class="language-js">localStorage.removeItem(&#x27;localtalent_access_token&#x27;);
+localStorage.removeItem(&#x27;localtalent_admin_role_hint&#x27;);</code></pre>
+</section>
+<section class="card" id="十推荐演示路径"><h2>十、推荐演示路径</h2>
+<h3 id="1.-首页高保真门户">1. 首页高保真门户</h3>
+<p>访问：</p>
+<pre><code class="language-text">http://localhost:3000/</code></pre>
+<p>你应该能看到：</p>
+<ul>
+<li>顶部工具条和会员入口。</li>
+<li>Logo 搜索区，搜索入口默认指向找工作。</li>
+<li>主导航：<code>首页 / 找工作 / 找企业 / 人才服务区 / 招聘会 / 就业政策 / HR 工具箱 / 更多服务 / 管理中心</code>。</li>
+<li>职位分类墙、快捷入口、求职者/企业登录卡、公告/招聘会 tab、广告位、扫码 CTA、推荐企业和热招职位。</li>
+<li>右侧浮动工具条与二维码占位。</li>
+</ul>
+<p>注意：地图搜索、微信扫码、小程序、App、视频、直播只作为占位，不接真实外部能力。</p>
+<h3 id="2.-找工作和职位详情">2. 找工作和职位详情</h3>
+<p>访问：</p>
+<pre><code class="language-text">http://localhost:3000/jobs?city_code=310000&amp;category_code=software</code></pre>
+<p>你应该能看到：</p>
+<ul>
+<li>稳定 query 筛选栏。</li>
+<li>职位卡片、名企直聘入口、认证/名企标签。</li>
+<li>投递/收藏入口占位。</li>
+<li>扫码求职 CTA。</li>
+</ul>
+<p>二期补充后的专题入口：</p>
+<pre><code class="language-text">http://localhost:3000/jobs/famous
+http://localhost:3000/jobs/emergency
+http://localhost:3000/daily-jobs</code></pre>
+<p>这些页面只复用公开职位列表能力，不接付费置顶、会员推广、真实地图或外部招聘服务。</p>
+<p>再打开脚本输出的职位详情地址，例如：</p>
+<pre><code class="language-text">http://localhost:3000/jobs/&lt;二期职位ID&gt;</code></pre>
+<p>职位公开页只展示职位标题、企业公开名、城市、职类、薪资展示、经验、学历、描述、更新时间等公开字段。</p>
+<p>不会展示企业联系人手机号、邮箱、审核材料、营业执照附件、后台备注。</p>
+<h3 id="3.-找企业和企业公开页">3. 找企业和企业公开页</h3>
+<p>访问：</p>
+<pre><code class="language-text">http://localhost:3000/companies?city_code=310000&amp;industry_code=internet</code></pre>
+<p>你应该能看到：</p>
+<ul>
+<li>认证企业列表。</li>
+<li>企业公开字段、认证标签、在招职位数。</li>
+<li>企业详情入口。</li>
+</ul>
+<p>再打开脚本输出的企业公开页地址，例如：</p>
+<pre><code class="language-text">http://localhost:3000/companies/&lt;二期企业ID&gt;</code></pre>
+<p>企业公开页只聚合该企业在线且审核通过的职位。不会展示投递池、导出记录、审计记录、联系人、营业执照附件或审核材料。</p>
+<h3 id="4.-人才服务区">4. 人才服务区</h3>
+<p>访问：</p>
+<pre><code class="language-text">http://localhost:3000/portal/talent-service-area?city_code=310000&amp;category_code=software</code></pre>
+<p>这里参考 demo 简历库布局，但 LocalTalent 公开侧只叫“人才服务区”，唯一公开数据源仍是 <code>candidate_publish_snapshot</code>。</p>
+<p>快照白名单字段只有：</p>
+<ul>
+<li><code>snapshot_id</code></li>
+<li><code>display_name_masked</code></li>
+<li><code>city_code</code></li>
+<li><code>category_code</code></li>
+<li><code>skills_summary</code></li>
+<li><code>experience_years</code></li>
+<li><code>updated_at</code></li>
+</ul>
+<p>不会展示手机号、邮箱、简历正文、附件对象 key、证据、原始 JSON、聊天记录，也不会提供“查看简历 / 联系解锁 / 搜索简历 / 受控找人才”能力。</p>
+<p>验证撤回不可见：</p>
+<pre><code class="language-bash">./scripts/demo_login_tokens p2-revoked</code></pre>
+<p>撤回候选人应在求职者中心显示撤回状态，人才服务区不可见。</p>
+<h3 id="5.-招聘会与内容频道">5. 招聘会与内容频道</h3>
+<p>访问：</p>
+<pre><code class="language-text">http://localhost:3000/job-fairs
+http://localhost:3000/job-fairs/online
+http://localhost:3000/job-fairs/campus
+http://localhost:3000/campus
+http://localhost:3000/campus/jobs
+http://localhost:3000/campus/elections
+http://localhost:3000/articles/policies
+http://localhost:3000/articles/news
+http://localhost:3000/articles/notices
+http://localhost:3000/hr-tools
+http://localhost:3000/help
+http://localhost:3000/explain</code></pre>
+<p>你应该能看到：</p>
+<ul>
+<li>招聘会列表/详情。</li>
+<li>网络招聘会、校园招聘、校园职位和校园宣讲/双选会稳定入口。</li>
+<li>就业政策、职场资讯、公告、HR 工具箱、帮助中心。</li>
+<li>公开标题、摘要、时间、地点、状态、主办方和安全正文。</li>
+</ul>
+<p>不会展示报名名单、参会个人明细、签到证据、联系方式、候选人原始数据或后台备注。</p>
+<h3 id="6.-更多服务">6. 更多服务</h3>
+<p>访问：</p>
+<pre><code class="language-text">http://localhost:3000/more-services</code></pre>
+<p>低风险入口可以作为公开导航展示，例如今日招聘、快速招聘、校园招聘、网络招聘会、就业政策、HR 工具箱、帮助中心。</p>
+<p>高风险入口必须是禁用或风险池说明，例如地图找工作、视频招聘、直播招聘、自由职业、求职登记、短信/微信通知、真实支付、会员商业化。</p>
+<h3 id="7.-登录注册入口">7. 登录注册入口</h3>
+<p>访问：</p>
+<pre><code class="language-text">http://localhost:3000/auth/login
+http://localhost:3000/auth/register</code></pre>
+<p>你应该能看到：</p>
+<ul>
+<li>求职者/招聘者登录 tab。</li>
+<li>求职者/招聘者注册 tab。</li>
+<li>本地账号/JWT 登录。</li>
+<li>登录后按后端返回的 <code>identity_type</code> 分流：candidate 到 <code>/candidate/center</code>，company 到 <code>/company</code>，operator 到 <code>/admin</code>。</li>
+</ul>
+<p>手机号验证码、微信扫码、小程序、App 登录均为禁用占位，不会真实调用外部服务。</p>
+<h3 id="8.-一期后台与审计能力回看">8. 一期后台与审计能力回看</h3>
+<p>二期主要是门户高保真增强，但一期后台仍可演示：</p>
+<ul>
+<li><code>/candidate/center</code>：求职者中心。</li>
+<li><code>/company</code>：企业后台。</li>
+<li><code>/admin</code>：运营后台。</li>
+<li>审计 trace：演示数据中包含 <code>trace-p2-demo</code> 和 <code>trace-p2-demo-retry</code> 摘要样例。</li>
+</ul>
+<p>可以用 operator 登录后进入运营后台查看入口；也可以运行后端测试和审计接口验证 trace 串联。</p>
+</section>
+<section class="card" id="十一minio-和导出怎么看"><h2>十一、MinIO 和导出怎么看</h2>
+<p>二期公开门户本身不新增导出能力，但一期导出审批仍可用。MinIO 用于本地导出文件存储和短期预签名下载链接。</p>
+<p>MinIO 控制台：</p>
+<pre><code class="language-text">http://localhost:9001</code></pre>
+<p>默认本地账号密码以 <code>infra/docker-compose.yml</code> 为准。导出文件所在 bucket 通常为 <code>export</code>。</p>
+<p>演示边界：</p>
+<ul>
+<li>未审批导出不可下载。</li>
+<li>审批通过后后端异步生成 CSV。</li>
+<li>下载 URL 是短期预签名链接。</li>
+<li>导出字段仍受字段级权限控制。</li>
+<li>导出申请、审批、生成和下载发放都要有审计记录。</li>
+</ul>
+</section>
+<section class="card" id="十二常用验证命令"><h2>十二、常用验证命令</h2>
+<p>二期规划与演示闸门：</p>
+<pre><code class="language-bash">./scripts/check_phase2_planning
+./scripts/check_phase2_demo_acceptance</code></pre>
+<p>人才服务区字段边界：</p>
+<pre><code class="language-bash">./scripts/check_portal_snapshot_fields</code></pre>
+<p>一期/二期总边界：</p>
+<pre><code class="language-bash">./scripts/check_boundary</code></pre>
+<p>后端与前端测试：</p>
+<pre><code class="language-bash">cd backend &amp;&amp; ./mvnw test
+cd frontend &amp;&amp; npm test &amp;&amp; npm run build</code></pre>
+<p>总闸门：</p>
+<pre><code class="language-bash">./scripts/run_all</code></pre>
+<p>如果只想做二期演示数据验证：</p>
+<pre><code class="language-bash">./scripts/seed_phase2_demo_data</code></pre>
+</section>
+<section class="card" id="十三常见问题"><h2>十三、常见问题</h2>
+<h3 id="seedphase2demodata-提示核心表缺失"><code>seed_phase2_demo_data</code> 提示核心表缺失</h3>
+<p>先启动后端，让 Flyway 完成迁移：</p>
+<pre><code class="language-bash">cd backend
+./mvnw spring-boot:run</code></pre>
+<p>然后重新执行：</p>
+<pre><code class="language-bash">./scripts/seed_phase2_demo_data</code></pre>
+<h3 id="seedphase2demodata-提示-v0012/v0013-字段缺失"><code>seed_phase2_demo_data</code> 提示 V0012/V0013 字段缺失</h3>
+<p>说明数据库不是当前二期版本。建议在本地演示环境重建 volume：</p>
+<pre><code class="language-bash">docker compose -f infra/docker-compose.yml down -v
+docker compose -f infra/docker-compose.yml up -d
+cd backend &amp;&amp; ./mvnw spring-boot:run
+./scripts/seed_phase2_demo_data</code></pre>
+<h3 id="页面列表为空">页面列表为空</h3>
+<p>确认三件事：</p>
+<ul>
+<li>后端仍在运行。</li>
+<li>已执行 <code>./scripts/seed_phase2_demo_data</code>。</li>
+<li>前端服务端渲染能访问 <code>http://localhost:8080</code>。</li>
+</ul>
+<h3 id="登录失败">登录失败</h3>
+<p>确认使用默认密码：</p>
+<pre><code class="language-text">LocalTalent@123456</code></pre>
+<p>如果仍失败，查看响应体和页面上的 <code>trace_id</code>，再按 trace 查后端日志。</p>
+<h3 id="前端页面显示无权限">前端页面显示无权限</h3>
+<p>浏览器 Console 清空旧 token 后重新登录：</p>
+<pre><code class="language-js">localStorage.removeItem(&#x27;localtalent_access_token&#x27;);
+localStorage.removeItem(&#x27;localtalent_admin_role_hint&#x27;);</code></pre>
+<p>再访问 <code>/auth/login</code> 或使用：</p>
+<pre><code class="language-bash">./scripts/demo_login_tokens p2-company</code></pre>
+<h3 id="人才服务区没有数据">人才服务区没有数据</h3>
+<p>确认筛选条件：</p>
+<pre><code class="language-text">city_code=310000
+category_code=software</code></pre>
+<p>再重新导入演示数据：</p>
+<pre><code class="language-bash">./scripts/seed_phase2_demo_data</code></pre>
+<h3 id="npm-run-build-后-frontend/next-env.d.ts-变更"><code>npm run build</code> 后 <code>frontend/next-env.d.ts</code> 变更</h3>
+<p>这是 Next 构建生成噪音。若它不是你本轮需要提交的内容，只恢复该文件，不做功能改动。</p>
+<h3 id="minio-控制台进不去">MinIO 控制台进不去</h3>
+<p>先确认容器还在：</p>
+<pre><code class="language-bash">docker compose -f infra/docker-compose.yml ps</code></pre>
+<p>再确认健康检查：</p>
+<pre><code class="language-bash">curl http://127.0.0.1:9000/minio/health/live</code></pre>
+</section>
+<section class="card" id="十四当前限制"><h2>十四、当前限制</h2>
+<ul>
+<li>二期公开门户是高保真结构和本地演示数据，不是生产上线方案。</li>
+<li>二期演示数据不是生产 seed，不进入 Flyway。</li>
+<li>首页、职位、企业、招聘会、资讯等部分演示内容为本地公开演示数据。</li>
+<li>地图找工作、视频招聘、直播招聘、真实短信、真实微信、小程序、App、真实支付、会员商业化、自由职业交易仍是占位或风险池。</li>
+<li>人才服务区不是公共简历库，不提供联系方式、不提供查看原始简历、不提供联系解锁。</li>
+<li>受控找人才、联系解锁、会员商业化、真实 ATS/RPA/受控候选池同步必须先走二期 Step6 风险准入规则，不能直接开发。</li>
+<li>二期未做像素级截图比对，验收以 DOM 结构、字段黑名单、SEO 构建、脚本闸门和 Runbook 可操作性为准。</li>
+</ul>
+</section>
+<section class="card" id="十五一句话理解二期"><h2>十五、一句话理解二期</h2>
+<p>二期把一期的合规底座包装成更像完整地方人才网的公开门户：页面更丰富、入口更完整、搜索和频道更像 demo，但隐私边界仍不变，人才服务区只展示发布快照，高风险能力只占位或进入风险池。</p>
+</section>
+    </main>
+  </div>
+  <footer>LocalTalent Phase II Demo Guide. 本 HTML 由二期演示说明 Markdown 同步生成；若 Markdown 后续更新，请同步更新本文件。</footer>
+</body>
+</html>

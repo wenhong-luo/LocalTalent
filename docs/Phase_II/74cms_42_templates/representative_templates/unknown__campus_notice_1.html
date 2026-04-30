@@ -1,0 +1,515 @@
+<html><head>
+	<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<title>东莞巨正源科技有限公司 2021年度校园招聘 - 骑士人才系统</title>
+<meta name="keywords" content="东莞巨正源科技有限公司 2021年度校园招聘,骑士人才系统">
+<meta name="description" content="东莞巨正源科技有限公司 2021年度校园招聘,骑士人才系统">
+<meta property="og:type" content="招聘求职网">
+<meta property="og:title" content="骑士人才系统">
+<meta property="og:url" content="https://demo.74cms.com/campus/notice/1.html">
+<meta property="og:site_name" content="骑士人才系统">
+<meta property="og:description" content="为求职者提供免费注册、求职指导、简历管理等服务，职位真实可靠，上骑士人才系统，找到满意工作">
+<meta name="author" content="骑士CMS">
+<meta name="copyright" content="74cms.com">
+<link rel="shortcut icon" href="/favicon.ico">
+<script type="text/javascript" src="/assets/js/polyfill.7.11.5.min.js"></script>
+<script type="text/javascript" src="/assets/js/vue.js"></script>
+<script type="text/javascript" src="/assets/js/axios.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/assets/css/element-ui.css">
+<script type="text/javascript" src="/assets/js/element-ui.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.dropdown.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.listitem.js"></script>
+<script type="text/javascript" src="/assets/js/utils.js"></script>
+<script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
+<script>
+
+    var qscms = {
+        subsiteid: "",
+        sitedomain: "https://demo.74cms.com",
+        subsite_open: "1",
+        subsite_domain: "74cms.com",
+        sitedir: "/",
+        mobiledomain: "https://demo.74cms.com/m/",
+        memberDirname: "member",
+        apiUrl: "https://demo.74cms.com/v1_0",
+        captcha_open: "1",
+        captcha_type: "qscms",
+        captcha_tencent_appid: "",
+        captcha_vaptcha_vid: "",
+        captcha_qscms_appkey:"bcenpbhb",
+        wechat_login_open: "1",
+        wechat_open_appid: "wx124300d944a40487",
+        wechat_open: "1",
+        account_qqlogin_open: "1",
+        guide_open: "1",
+        guide_qrcode: "",
+        closereg: "0",
+        wechat_qrcode: "https://demo.74cms.com/upload/resource/weixin_img.jpg",
+        wechat_miniprogram_qrcode: "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg",
+        douyin_miniprogram_qrcode: "",
+        app_android_download_url: "https://demo.74cms.com/74cms_android.apk",
+        app_ios_download_url: "https://demo.74cms.com/74cms_android.apk",
+        map_type: "2",
+        is_open_map: "1",
+        im_open: "1",
+        im_key: "7jKedNayxc6E7SGw",
+        isLogin: false,
+        loginUtype: 0,
+        userToken: '',
+        platform: "web",
+        imToken:'',
+        reConnectTime:0,
+        websocketOk:false,
+    }
+</script>
+<script type="text/javascript" src="/assets/js/global.js"></script>
+<script type="text/javascript" src="/assets/js/error.js"></script>
+<script type="text/javascript" src="/assets/js/http.js"></script>
+<script type="text/javascript" src="/assets/js/globalMethods.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="/assets/css/base.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/layout.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/campus/campus_layout.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/campus/campus_public.css">
+</head>
+
+<body>
+	<div>
+		<!-- header -->
+		<div class="brw_tip">
+    <div class="t_con">
+        系统检测到您的浏览器版本过低，无法获得最佳的使用体验，建议您更换其他浏览器或 <a href="https://www.google.cn/intl/zh-CN/chrome/" target="_blank">升级您的浏览器</a>。(使用360浏览器访问请选择极速模式)
+        <div class="b_close J_bw_close">关闭</div>
+    </div>
+</div>
+<div id="headerContent"><div class="header_wrapper"><div class="header clearfix"><div class="header_left clearfix"><a href="https://demo.74cms.com/" class="left_item homeImg">网站首页</a> <a href="javascript:;" class="left_item">设为收藏</a> <a href="https://demo.74cms.com/index/shortcut/index.html" class="left_item">保存桌面</a> <a href="https://demo.74cms.com/job.html">搜职位</a></div> <div class="header_right clearfix"><!----> <!----> <div class="el-dropdown"><a href="javascript:;" class="header_login right_item el-dropdown-selfdefine" aria-haspopup="list" aria-controls="dropdown-menu-2974" role="button" tabindex="0">会员登录<i class="el-icon-arrow-down el-icon--right"></i></a> <ul class="el-dropdown-menu el-popper" id="dropdown-menu-2974" style="display: none;"><li tabindex="-1" class="el-dropdown-menu__item"><!---->求职者登录</li> <li tabindex="-1" class="el-dropdown-menu__item"><!---->招聘者登录</li></ul></div> <div class="el-dropdown"><a href="javascript:;" class="right_item el-dropdown-selfdefine" aria-haspopup="list" aria-controls="dropdown-menu-9180" role="button" tabindex="0">会员注册<i class="el-icon-arrow-down el-icon--right"></i></a> <ul class="el-dropdown-menu el-popper" id="dropdown-menu-9180" style="display: none;"><li tabindex="-1" class="el-dropdown-menu__item"><!---->求职者注册</li> <li tabindex="-1" class="el-dropdown-menu__item"><!---->招聘者注册</li></ul></div> <span><div role="tooltip" id="el-popover-3837" aria-hidden="true" class="el-popover el-popper" tabindex="0" style="display: none;"><!----><span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/m/"></span> <span class="txt">触屏版</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/upload/resource/weixin_img.jpg"></span> <span class="txt">微信公众号</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg"></span> <span class="txt">微信小程序</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/74cms_android.apk"></span> <span class="txt">App(安卓)</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/74cms_android.apk"></span> <span class="txt">App(苹果)</span></span> </div><a href="javascript:;" class="item_phone right_item phon el-popover__reference" aria-describedby="el-popover-3837" tabindex="0">手机端<i class="el-icon-arrow-down el-icon--right"></i></a></span> <a href="https://demo.74cms.com/help.html" class="right_item ">
+                    使用帮助
+                </a> <span><div role="tooltip" id="el-popover-3518" aria-hidden="true" class="el-popover el-popper" tabindex="0" style="width: 1200px; display: none;"><!----> <div class="nav_drop"><div class="dr_g"><div class="g_t">求职找工作</div> <div class="g_teg"><a href="javascript:;" class="g_it">登记简历</a> <a href="https://demo.74cms.com/job.html" class="g_it">找工作</a> <a href="https://demo.74cms.com/company.html" class="g_it">搜企业</a> <a href="https://demo.74cms.com/map.html" class="g_it">地图找工作</a> <a href="https://demo.74cms.com/job/famous/1.html" class="g_it">名企直聘</a> <a href="https://demo.74cms.com/job.html" class="g_it">最新职位</a> <a href="https://demo.74cms.com/job/listtype/emergency.html" class="g_it">紧急招聘</a> <a href="javascript:;" class="g_it">智能匹配</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">企业招人才</div> <div class="g_teg"><a href="javascript:;" class="g_it">企业入驻</a> <a href="javascript:;" class="g_it">发布职位</a> <a href="https://demo.74cms.com/resume.html" class="g_it">搜索简历</a> <a href="javascript:;" class="g_it">职位管理</a> <a href="javascript:;" class="g_it">人才推荐</a> <a href="javascript:;" class="g_it">会员服务</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">信息专栏</div> <div class="g_teg"><a href="https://demo.74cms.com/jobfair.html" class="g_it">现场招聘会</a> <a href="https://demo.74cms.com/jobfairol.html" class="g_it">网络招聘会</a> <a href="https://demo.74cms.com/campus.html" class="g_it">校园招聘</a> <a href="https://demo.74cms.com/freelance.html" class="g_it">灵活用工</a> <a href="https://demo.74cms.com/notice.html" class="g_it">网站公告</a> <a href="https://demo.74cms.com/hrtool.html" class="g_it">HR工具箱</a> <a href="https://demo.74cms.com/article.html" class="g_it">职场资讯</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">自助工具</div> <div class="g_teg"><a href="javascript:;" class="g_it">求职会员登录</a> <a href="javascript:;" class="g_it">招聘会员登录</a> <a href="javascript:;" class="g_it">忘记密码</a> <a href="javascript:;" class="g_it">账号申诉</a> <a href="https://demo.74cms.com/help.html" class="g_it">帮助中心</a> <div class="clear"></div></div></div></div></div><a href="javascript:;" class="right_item el-popover__reference" aria-describedby="el-popover-3518" tabindex="0">网站导航<i class="el-icon-arrow-down el-icon--right"></i></a></span></div></div></div> <div class="campus_nav_wrapper"><div class="nav_min w1200 clearfix"><div class="left logo"><a href="https://demo.74cms.com/campus.html" class="logo_link left"><img src="https://demo.74cms.com/upload/resource/logo.png" alt="" style="max-width: 170px; max-height: 70px;"></a> <span class="left logo_text" style="margin-left: 30px;">校园招聘</span></div> <ul class="right campus_nav clearfix"><li class="left campus_nav_item"><a href="https://demo.74cms.com/campus.html" class="nav_item_link item_link_active">首页</a></li> <li class="left campus_nav_item"><a href="https://demo.74cms.com/campus/job.html" class="nav_item_link ">校招职位</a></li> <li class="left campus_nav_item"><a href="https://demo.74cms.com/campus/school.html" class="nav_item_link ">院校</a></li> <li class="left campus_nav_item"><a href="https://demo.74cms.com/campus/election.html" class="nav_item_link ">双选会</a></li> <li class="left campus_nav_item"><a href="https://demo.74cms.com/campus/preach.html" class="nav_item_link ">宣讲会</a></li></ul></div></div></div>
+<script>
+    $(document).ready(function () {
+        // 判断浏览器是否支持placeholder属性
+        function isSupportPlaceholder() {
+            var input = document.createElement('input');
+            return 'placeholder' in input;
+        }
+        (function () {
+            //判断是否是IE浏览器，包括Edge浏览器
+            function IEVersion() {
+                //取得浏览器的userAgent字符串
+                var userAgent = navigator.userAgent;
+                //判断是否IE浏览器
+                var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1;
+                if (isIE) {
+                    var reIE = new RegExp("MSIE (\\d+\\.\\d+);");
+                    reIE.test(userAgent);
+                    var fIEVersion = parseFloat(RegExp["$1"]);
+                    if (fIEVersion <= 10 || !isSupportPlaceholder()) {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            window.onload = function () {
+                if (IEVersion()) {
+                    $('.brw_tip').show();
+                }
+            };
+        })();
+        $('.J_bw_close').click(function () {
+            $(this).closest('.brw_tip').remove();
+        });
+    })
+    var app = new Vue({
+        el: '#headerContent',
+        data: {
+            isLogin: false,
+            utype: 0,
+            memberUrl: '',
+            loginUsername: '',
+            preview_id: 0,
+            keyword: '',
+            searchAlias: 'joblist',
+            searchAliasCn: '找工作',
+            mobileQrcode: '',
+            wechatQrcode: '',
+            wechatMiniprogramQrcode: '',
+            androidQrcode: '',
+            iosQrcode: '',
+            subsite_open: 0,
+            subsite_domain: ''
+        },
+        created: function () {
+            this.keyword = ""
+            this.getUserInfo()
+            this.mobileQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/m/"
+            this.wechatQrcode = "https://demo.74cms.com/upload/resource/weixin_img.jpg"
+            this.wechatMiniprogramQrcode = "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg"
+            this.subsite_open = parseInt("1")
+            this.subsite_domain = "74cms.com"
+            // this.androidQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/74cms_android.apk"
+            // this.iosQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/74cms_android.apk"
+            this.androidQrcode = "https://demo.74cms.com/74cms_android.apk"
+            if (this.androidQrcode != '') {
+                this.androidQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=" + this.androidQrcode
+            }
+            this.iosQrcode = "https://demo.74cms.com/74cms_android.apk"
+            if (this.iosQrcode != '') {
+                this.iosQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=" + this.iosQrcode
+            }
+            this.cronRun()
+            // 头部搜索默认选中
+            var locationArr = location.pathname.split('/');
+            if (locationArr[1] === '' || locationArr[1] === 'job') {
+                this.searchAliasCn = '找工作'
+                this.searchAlias = 'joblist'
+            } else if (locationArr[1] === 'resume') {
+                this.searchAliasCn = '找人才'
+                this.searchAlias = 'resumelist'
+            } else if (locationArr[1] === 'company') {
+                this.searchAliasCn = '找企业'
+                this.searchAlias = 'companylist'
+            } else if (locationArr[1] === 'article') {
+                this.searchAliasCn = '找资讯'
+                this.searchAlias = 'articlelist'
+            }
+        },
+        methods: {
+            cronRun: function () {
+                httpget(qscms.apiList.cronRun)
+                    .then(function () {
+                    })
+                    .catch(function () { })
+            },
+            AddFavorite: function () {
+                var sURL = window.location
+                var sTitle = document.title
+                try {
+                    window.external.addFavorite(sURL, sTitle);
+                } catch (e) {
+                    try {
+                        window.sidebar.addPanel(sTitle, sURL, "");
+                    } catch (e) {
+                        this.$confirm('加入收藏失败，请使用Ctrl+D进行添加', '提示', {
+                            type: 'warning',
+                            showCancelButton: false
+                        }).then(function () {
+                        }).catch(function () { });
+                    }
+                }
+            },
+            getUserInfo: function () {
+                var that = this
+                httpget(qscms.apiList.userinfo).then(function (res) {
+                    if (res.data.login === true) {
+                        that.isLogin = res.data.login
+                        that.utype = res.data.userinfo.utype
+                        if (that.utype == 1) {
+                            that.memberUrl = qscms.locationList.indexCompany
+                        } else {
+                            that.memberUrl = qscms.locationList.indexPersonal
+                        }
+                        that.loginUsername = res.data.show_username
+                        that.preview_id = res.data.preview_id
+                    }
+                }).catch(function () { })
+            },
+            handlerSearch: function () {
+                var that = this
+                httpget(qscms.apiList.searchLocation, { alias: that.searchAlias, keyword: that.keyword }).then(function (res) {
+                    location.href = res.data
+                }).catch(function () { })
+            },
+            changeSearchType: function (alias, aliasCn) {
+                this.searchAlias = alias
+                this.searchAliasCn = aliasCn
+            },
+            handlerLogout: function () {
+                var that = this
+                this.$confirm('确定退出当前账号吗?', '提示', {
+                    type: 'warning'
+                }).then(function () {
+                    if (that.subsite_open === 1 && that.subsite_domain != '') {
+                        Cookies.remove('qscms_visitor', {domain: '.' + that.subsite_domain})
+                    }
+                    Cookies.remove('qscms_visitor')
+                    window.location.reload()
+                }).catch(function () { });
+            },
+            handlerLogin: function (utype) {
+                if (utype == 1) {
+                    location.href = qscms.locationList.loginCompany
+                } else {
+                    location.href = qscms.locationList.loginPersonal
+                }
+            },
+            handlerReg: function (utype) {
+                if (utype == 1) {
+                    location.href = qscms.locationList.regCompany
+                } else {
+                    location.href = qscms.locationList.regPersonal
+                }
+            },
+            handleManageClick: function (func) {
+                this[func]()
+            },
+            handlerRefreshResume: function () {
+                httppost(qscms.apiList.resumeRefresh).then(function (res) {
+                    if (parseInt(res.code) === 200) {
+                        this.$message({ type: 'success', message: res.message })
+                    } else {
+                        this.$message.error(res.message)
+                    }
+                }).catch(function () { })
+            },
+            handlerResumeIndex: function () {
+                location.href = qscms.locationList.personalResume
+            },
+            handlerResumePreview: function () {
+                var url = "https://demo.74cms.com/index/resume/show/id/_id_.html"
+                url = url.replace('_id_', this.preview_id)
+                window.open(url)
+            },
+            handlerPersonalRecommend: function () {
+                location.href = qscms.locationList.recommendJob
+            },
+            handlerPersonalService: function () {
+                location.href = qscms.locationList.personalService
+            },
+            handlerPersonalPwd: function () {
+                location.href = qscms.locationList.personalPassword
+            },
+            handlerRefreshJob: function () {
+                this.$confirm('确定刷新所有发布中的职位吗？', '系统提示', {
+                    type: 'warning'
+                })
+                    .then(function () {
+                        httppost(qscms.apiList.companyJobRefreshBatch, {}).then(function (res) {
+                            if (res.data.done === 0) {
+                                this.$confirm(res.message, '系统提示', { type: 'warning' })
+                                    .then(function () {
+                                        location.href = qscms.locationList.companyJoblist
+                                    })
+                                    .catch(function () { })
+                                return false
+                            } else {
+                                this.$message({ type: 'success', message: res.message })
+                            }
+                        }).catch(function () { })
+                    })
+                    .catch(function () { })
+            },
+            handlerAddJob: function () {
+                var that = this
+                httpget(qscms.apiList.companyCheckJobaddNum, {}).then(function (res) {
+                    if (res.data.enable_addjob_num <= 0) {
+                        that.$confirm('您当前是' +
+                            res.data.setmeal_name +
+                            '，当前可发布职位数为0，建议您立即升级套餐或将暂时不招聘的职位设为关闭！', '系统提示', {
+                            confirmButtonText: '升级套餐',
+                            type: 'warning'
+                        })
+                            .then(function () {
+                                location.href = qscms.locationList.companySetmealAdd
+                            })
+                            .catch(function () { })
+                        return false
+                    } else {
+                        location.href = qscms.locationList.companyJobAdd
+                    }
+                }).catch(function () { })
+            },
+            handlerCompanyPreview: function () {
+                var url = "https://demo.74cms.com/company/_id_.html"
+                url = url.replace('_id_', this.preview_id)
+                window.open(url)
+            },
+            handlerJobApplyList: function () {
+                location.href = qscms.locationList.companyJobApplyList
+            },
+            handlerCompanyRecommend: function () {
+                location.href = qscms.locationList.recommendResume
+            },
+            handlerCompanyService: function () {
+                location.href = qscms.locationList.companyService
+            },
+            handlerCompanyPwd: function () {
+                location.href = qscms.locationList.companyPassword
+            },
+            handlerCompanyIndex: function () {
+                location.href = qscms.locationList.indexCompany
+            },
+            handlerCompanyLogin: function () {
+                location.href = qscms.locationList.loginCompany
+            },
+            handlerPersonalLogin: function () {
+                location.href = qscms.locationList.loginPersonal
+            },
+            handlerForget: function () {
+                location.href = qscms.locationList.forget
+            },
+            handlerAppeal: function () {
+                location.href = qscms.locationList.appeal
+            },
+            handlerCompanyJoblist: function () {
+                location.href = qscms.locationList.companyJoblist
+            },
+            handlerMemberCenter: function () {
+                if (this.utype == 1) {
+                    location.href = qscms.locationList.indexCompany
+                } else {
+                    location.href = qscms.locationList.indexPersonal
+                }
+            },
+        }
+    })
+</script>
+
+		<!-- content -->
+		
+<link rel="stylesheet" type="text/css" href="/assets/css/campus/campus_noticeshow.css">
+<div class="s_content">
+  <div class="w1200 con_min">
+    <div class="details_title">
+      <h2>东莞巨正源科技有限公司 2021年度校园招聘</h2>
+      <div class="clearfix time">
+        <div class="left l_text">
+          网络申请起止时间：<span class="text_color"><span>2025-04-16</span> — <span>2025-05-14</span></span>
+        </div>
+        <div class="left r_text j_share">
+          分享
+          <div class="share_box">
+            <div class="share_code">
+              <div class="share_img">
+                <img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/m/campus/notice/1" alt="">
+              </div>
+              <p class="code_tip">请用微信扫一扫</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="details_con editor-content-view">
+      <p>一、公司简介</p><p>东莞巨正源科技有限公司（下称“公司”）是巨正源股份有限公司（新三板挂牌、简称“巨正源”、股票代码“831200”）的全资子公司。巨正源是省属大型国有企业广东省广物控股集团有限公司（营业收入约1000亿元）的控股企业。公司是混合所有制企业，同时兼有国企和民企的双重优势。</p><p>公司正在投资建设120万吨/年丙烷脱氢制高性能聚烯项目，该项目已被列为东莞市重大项目和广东省重点项目。项目分两期建设，其中一期占地近700亩，总投资近50亿元，2019年8月29日PDH装置投产，项目一期第一阶段全线打通，2019年9月26日，实现量产。一期项目主要包括：1套60万吨/年丙烷脱氢装置、2套30万吨/年聚丙烯装置、1套2000吨/年氢气提纯装置、丙烷低温储存系统，以及与生产配套的各种辅助设施。</p><p>二期项目计划于2022年建成投产。根据公司的发展战略，将原规划的1套60万吨/年装置调整为3套各90万吨/年装置。二期项目建成后将年产270万吨高性能聚乙烯、聚丙烯和15～20万吨氢气。二期项目计划投资200亿元，在3～5年内分阶段建成。</p><p>一、二期项目全部建成后，公司将拥有330万吨/年聚丙烯、聚乙烯产能，成为国内高分子材料行业的龙头企业，同时成为氢能源的骨干企业。此外，公司还在积极推动与国内高分子材料研发、改性和生产企业的战略合作，在周边区域联合打造具有强大竞争力的上下游一体化高分子材料产业园。</p><p>东莞市经济发达，是南中国重要的交通枢纽和外贸口岸，拥有“世界工厂”、“国际花园城市”和“全国文明城市”的美誉。东莞地处珠江口东岸，地理位置得天独厚，位于粤港澳大湾区的核心区域，是中国经济版图的重点发展区域。公司所在地东莞市沙田镇立沙岛交通极为便利，广深沿江高速在立沙岛设有进出口，高铁虎门站和即将投用的轻轨望洪交通枢纽站与立沙岛为邻，广州、佛山、珠海、深圳、惠州等城市均在以公司为中心的1小时生活圈内。</p><p>东莞是你工作、生活和安家的好地方。公司崇尚企业与员工共成长，共同分享企业发展成果的理念，公司目前正处于高速发展阶段，是有志之士事业和人生的最好舞台。</p><p>欢迎广大莘莘学子加入我们的行列，共创幸福美好未来！</p><p>二、招聘岗位</p><p>岗位</p><p>招聘</p><p>人数</p><p>招聘要求</p><p>学历</p><p>专业及其他要求</p><p>PP储备工程师</p><p>15</p><p>本科</p><p>石油化工、化学工程与工艺、化工类专业</p><p>PDH储备工程师</p><p>15</p><p>本科</p><p>石油化工、化学工程与工艺、化工类专业</p><p>公用工程</p><p>15</p><p>本科</p><p>石油化工、化学工程与工艺、化工类专业</p><p>储运</p><p>5</p><p>本科</p><p>油气储运工程、化学工程与工艺专业</p><p>国际业务采购工程师</p><p>2</p><p>本科</p><p>英语专业</p><p>设备储备工程师</p><p>10</p><p>本科</p><p>过程装备与控制工程</p><p>电气储备工程师</p><p>10</p><p>本科</p><p>发配电、电气自动化、机电一体化</p><p>客户经理助理</p><p>2</p><p>本科</p><p>营销管理、进出口贸易或高分子化工专业</p><p>文秘</p><p>2</p><p>本科</p><p>汉语言文学、文秘</p><p>人力资源</p><p>2</p><p>本科</p><p>人力资源</p><p>行政管理</p><p>2</p><p>本科</p><p>工商企业管理</p><p>PP实习生</p><p>40</p><p>专科</p><p>石油化工专业为主</p><p>PDH实习生</p><p>70</p><p>专科</p><p>石油化工、化学工程与工艺、化工类专业</p><p>公用工程实习生</p><p>20</p><p>专科</p><p>给排水、石油化工、化学工程与工艺、化工类专业</p><p>储运实习生</p><p>12</p><p>专科</p><p>油气储运工程、化学工程与工艺专业</p><p>水质实习生</p><p>5</p><p>专科</p><p>工业分析与检验、石油化工生产技术类专业</p><p>PP制样实习生</p><p>5</p><p>专科</p><p>工业分析与检验、石油化工生产技术类专业</p><p>PP成品实习生</p><p>5</p><p>专科</p><p>工业分析与检验、石油化工生产技术类专业</p><p>光谱、油品实习生</p><p>5</p><p>专科</p><p>工业分析与检验、石油化工生产技术类专业</p><p>色谱实习生</p><p>3</p><p>专科</p><p>工业分析与检验、石油化工生产技术类专业</p><p>包装实习生</p><p>15</p><p>专科</p><p>电自动化、自动化控制专业</p><p>仓库发货实习生</p><p>15</p><p>专科</p><p>电自动化、自动化控制专业</p><p>成品车间实习生</p><p>10</p><p>专科</p><p>电自动化、自动化控制专业</p><p>维修实习生</p><p>11</p><p>专科</p><p>电自动化、自动化控制专业</p><p>仪表工</p><p>12</p><p>专科</p><p>电气自动化、化工仪表自动化</p><p>运行电工</p><p>8</p><p>专科</p><p>发配电、电气自动化、机电一体化</p><p>设备维修工</p><p>20</p><p>专科</p><p>过程装备与控制工程</p><p>合计</p><p>336</p><p>培养方向：</p><p>1、东莞巨正源科技有限公司储备工程师</p><p>2、东莞巨正源科技有限公司生产操作人员，优秀人员可提拔为管理人员或工程技术人员。</p><p>招聘要求：</p><p>1、大专、高职院校毕业，18岁以上。</p><p>2、身心健康，品学兼优，积极主动，责任心强，吃苦耐劳，学习能力强，有团队协作精神。</p><p>3、能够接受倒班工作制，三班两倒或四班三倒。</p><p>三、招聘流程</p><p>1、现场面试，并提供以下资料：</p><p>1）学校成绩单（盖学校公章）复印件1份；</p><p>2）英语等级证书、计算机等级证书复印件1份；</p><p>3）在校期间表现的其他材料的复印件；</p><p>2、与应聘者进一步沟通确认（或专业面试）。</p><p>3、公司发放录用通知书并签订三方协议。</p><p>四、薪酬福利待遇</p><p>薪酬：</p><p>本科：&nbsp;&nbsp;全年综合收入：8—12万/年</p><p>专科：&nbsp;&nbsp;全年综合收入：8—10万/年</p><p>福利：</p><p>1、五险一金；</p><p>2、免费员工宿舍(2人/间)；</p><p>3、免费上下班车；</p><p>4、免费工作餐（早、中、晚）；</p><p>5、按国家相关法律法规实施年休假、婚假、产假、法定节假日等有薪假期；</p><p>6、每年递增工龄工资，根据工作表现考核，逐级提升工资；</p><p>7、年末绩效考评成绩优秀者发放绩效奖金；</p><p>8、中秋国庆、春节等节日慰问金；</p><p>9、组织同月生日员工庆生活动；</p><p>10、组织员工外出拓展、培训；</p><p>11、年终文艺晚会、抽奖活动；</p><p>12、每年职业健康体检；</p><p>13、每年6-10月发放高温补贴（200元/月）；</p><p>14、严格按照规定配备优质劳保用品；</p><p>15、经常组织篮球、羽毛球、乒乓球等活动；</p><p>16、人才津贴；</p><p>17、住房补贴；</p><p>18、购房贷款。</p><p>五、联系方式</p><p>公司地址：东莞市沙田镇虎门港立沙岛石化基地</p><p>公司招聘邮箱：zhaopin@jzyjt.cn</p><p>联系电话：0769-81710610-8303</p><p>附件</p><p>举办场地信息</p><p>举办日期2021-05-12&nbsp;&nbsp;&nbsp;&nbsp;14：30-16：00</p><p>场地名称校本部&nbsp;&nbsp;&nbsp;&nbsp;五教101教室</p><p>详细地址五教101教室</p>    </div>
+  </div>
+</div>
+<div class="guider">
+  <div class="w1200 guider_min clearfix">
+    <img src="/assets/images/campus/guider_bg.png" alt="" class="guider_img left">
+    <a class="guider_btn left">申请职位</a>
+  </div>
+</div>
+
+<script>
+  var shareQrcode = ''
+  var share_img = 'https://demo.74cms.com/m/campus/notice/1'
+  shareQrcode =  qscms.apiUrl + qscms.apiList.qrcode + '?type=normal&url=' + share_img
+  $('.share_code img').attr('src', shareQrcode)
+</script>
+		<!-- footer -->
+		<div id="footerContent" class="indexFooter_wrapper"><div class="indexFooter clearfix"><div class="clearfix float"><div class="float clearfix"><ul class="footer_list  float"><li class="fc">个人</li> <li><a href="javascript:;">登记简历</a></li> <li><a href="javascript:;">求职管理</a></li> <li><a href="https://demo.74cms.com/job.html">最新职位</a></li> <li><a href="https://demo.74cms.com/company.html">企业信息</a></li></ul> <ul class="footer_list float"><li class="fc">企业</li> <li><a href="javascript:;">企业入驻</a></li> <li><a href="javascript:;">发布招聘</a></li> <li><a href="javascript:;">会员服务</a></li> <li><a href="javascript:;">招聘管理</a></li></ul> <ul class="footer_list float"><li class="fc">特色</li> <li><a target="_self" href="https://demo.74cms.com/explain/1.html">网站介绍</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/2.html">产品服务</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/3.html">法律申明</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/4.html">推广合作</a></li></ul> <ul class="footer_list float"><li class="fc">帮助</li> <li><a href="https://demo.74cms.com/help/id/1.html">常见问题</a></li> <li><a href="https://demo.74cms.com/help/id/2.html">新手上路</a></li> <li><a href="https://demo.74cms.com/help/id/3.html">账号管理</a></li> <li><a href="https://demo.74cms.com/help/id/4.html">简历管理</a></li></ul></div> <div class="code_box float clearfix"><div class="float code1"><p>微信公众号</p> <div class="img"><img src="https://demo.74cms.com/upload/resource/weixin_img.jpg" class="codeImg"></div></div> <div class="float code2"><p>手机微信版</p> <div class="img1"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/m/" class="codeImg"></div></div></div></div> <div class="footer_contactType"><p class="contact_title">联系电话</p> <div class="contact_tel"><img src="/assets/images/contact_icon.png"> <span>18003431191</span></div> <p class="job_time">服务时间：周一至周六 8:00-17:30</p> <p class="job_QQ">客服QQ：<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&amp;uin=00000000000&amp;site=在线客服&amp;menu=yes">00000000000</a></p></div></div> <div class="indexFooter_nav_con"><ul class="indexFooter_nav clearfix"><li><a href="https://demo.74cms.com/">网站首页</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/5.html">联系我们</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/6.html">招贤纳士</a></li></ul></div> <div class="footer_text1"><span class="address">联系地址：00省00市00路00号0大厦00楼</span></div> <div class="footer_text2"><span>
+                网站备案：
+                <a target="_blank" href="https://beian.miit.gov.cn/">
+                    icp000000000                </a></span> <span class="security">
+                公网安备：
+                <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=000000000000">
+                    晋公网安备000000000000号                </a></span></div> <div class="footer_text3"><span>Copyright © 2021 74cms.com All Right Reserved Powered by 74cmsse</span></div> <div class="right_fixed_float"><div class="rff_cell tel"><div class="rff_cell_dia"><div class="tel_line"><span class="number">13466835651</span><span>（曾柔）</span></div><div class="tel_line"><span class="number">18003431191</span><span>（梦琪）</span></div></div></div> <div class="rff_cell qq"><div class="rff_cell_dia"><a href="javascript:;" class="qq_line">QQ交谈</a><a href="javascript:;" class="qq_line">QQ交谈</a></div></div> <div class="rff_cell wx"><div class="rff_cell_dia"><div class="wx_item"><img src="https://demo.74cms.com/upload/files/20250326/1f1851bf860f2c07a2268743abb8ad3a.jpg" alt="" class="img"><p class="img_name">曾柔</p></div><div class="wx_item"><img src="https://demo.74cms.com/upload/files/20250508/7898f96692be3246e116093a27a7b8b7.png" alt="" class="img"><p class="img_name">梦琪</p></div></div></div> <div class="rff_cell wx qr"><div class="rff_cell_dia"><div class="wx_item"><img src="https://demo.74cms.com/upload/resource/weixin_img.jpg" alt="" class="img"> <p class="img_name">骑士CMS人才系统</p></div></div></div></div> <!----></div>
+<script>
+var version = "8.12.3 专业版";
+console.log('\n' + ' %c 74cmsSE v'+version+'  %c https://www.74cms.com ' + '\n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;');
+    var app = new Vue({
+        el: '#footerContent',
+        data:{
+            mobileQrcode:'',
+            backTopFlag: false,
+            scrollTop: 0,
+            mobileList:[],
+            qqList:[],
+            weixinList:[],
+        },
+        created:function(){
+            this.getServiceOl()
+            this.mobileQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/m/"
+        },
+        mounted:function () {
+            window.addEventListener('scroll', this.scrollToTop)
+        },
+        destroyed:function () {
+            window.removeEventListener('scroll', this.scrollToTop)
+        },
+        methods:{
+            wakeupQq:function(qq){
+                if(qq){
+                    window.open('http://wpa.qq.com/msgrd?v=3&uin='+qq+'&site=在线客服&menu=yes')
+                }
+            },
+            getServiceOl:function() {
+                var that = this
+                httpget(qscms.apiList.serviceOl).then(function (res) {
+                 that.mobileList = res.data.mobile
+                 that.qqList = res.data.qq
+                 that.weixinList = res.data.weixin
+                }).catch(function () { })
+            },
+            // 点击图片回到顶部方法，加计时器是为了过渡顺滑
+            backTop:function() {
+                var that = this
+                var timer = setInterval(function(){
+                var ispeed = Math.floor(-that.scrollTop / 5)
+                document.documentElement.scrollTop = document.body.scrollTop = that.scrollTop + ispeed
+                if (that.scrollTop === 0) {
+                    clearInterval(timer)
+                }
+                }, 16)
+            },
+            // 为了计算距离顶部的高度，当高度大于60显示回顶部图标，小于60则隐藏
+            scrollToTop:function() {
+                var that = this
+                that.scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+                that.backTopFlag = that.scrollTop > 60;
+            },
+            handlerResumeIndex:function(){
+                location.href = qscms.locationList.personalResume
+            },
+            handlerPersonalJobApplyList:function(){
+                location.href = qscms.locationList.personalJobApplyList
+            },
+            handlerCompanyIndex:function(){
+                location.href = qscms.locationList.indexCompany
+            },
+            handlerAddJob:function(){
+                httpget(qscms.apiList.companyCheckJobaddNum, {}).then(function(res){
+                    if (res.data.enable_addjob_num <= 0) {
+                        this.$confirm('您当前是' +
+                            res.data.setmeal_name +
+                            '，当前可发布职位数为0，建议您立即升级套餐或将暂时不招聘的职位设为关闭！','系统提示',{
+                            confirmButtonText: '升级套餐',
+                            type: 'warning'
+                        })
+                        .then(function(){
+                            location.href = qscms.locationList.companySetmealAdd
+                        })
+                        .catch(function(){})
+                        return false
+                    } else {
+                        location.href = qscms.locationList.companyJobAdd
+                    }
+                }).catch(function(){})
+            },
+            handlerCompanyService:function(){
+                location.href = qscms.locationList.companyService
+            },
+            handlerCompanyJobApplyList:function(){
+                location.href = qscms.locationList.companyJobApplyList
+            },
+        }
+    })
+</script>
+
+	</div>
+
+
+</body></html>

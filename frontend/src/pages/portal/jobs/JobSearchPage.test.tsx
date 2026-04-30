@@ -67,7 +67,7 @@ describe('JobSearchPage', () => {
     expect(screen.getAllByLabelText('扫码求职 CTA').length).toBeGreaterThan(0);
 
     expect(screen.getByRole('link', { name: '全部职位' })).toHaveAttribute('href', '/jobs');
-    expect(screen.getByRole('link', { name: '名企直聘' })).toHaveAttribute('href', '/jobs?famous=1');
+    expect(screen.getByRole('link', { name: '名企直聘' })).toHaveAttribute('href', '/jobs/famous');
     expect(screen.getByLabelText('关键词')).toHaveValue('Java');
     expect(screen.getByLabelText('地区')).toHaveValue('310000');
     expect(screen.getByLabelText('职类')).toHaveValue('software');

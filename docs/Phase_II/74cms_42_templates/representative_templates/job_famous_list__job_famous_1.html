@@ -1,0 +1,1211 @@
+<html><head>
+	<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<title>招聘列表 - 骑士人才系统</title>
+<meta name="keywords" content="招聘列表,骑士人才系统">
+<meta name="description" content="招聘列表,骑士人才系统">
+<meta property="og:type" content="招聘求职网">
+<meta property="og:title" content="骑士人才系统">
+<meta property="og:url" content="https://demo.74cms.com/job/famous/1">
+<meta property="og:site_name" content="骑士人才系统">
+<meta property="og:description" content="为求职者提供免费注册、求职指导、简历管理等服务，职位真实可靠，上骑士人才系统，找到满意工作">
+<meta name="author" content="骑士CMS">
+<meta name="copyright" content="74cms.com">
+<link rel="shortcut icon" href="/favicon.ico">
+<script type="text/javascript" src="/assets/js/polyfill.7.11.5.min.js"></script>
+<script type="text/javascript" src="/assets/js/vue.js"></script>
+<script type="text/javascript" src="/assets/js/axios.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/assets/css/element-ui.css">
+<script type="text/javascript" src="/assets/js/element-ui.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.dropdown.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.listitem.js"></script>
+<script type="text/javascript" src="/assets/js/utils.js"></script>
+<script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
+<script>
+
+    var qscms = {
+        subsiteid: "",
+        sitedomain: "https://demo.74cms.com",
+        subsite_open: "1",
+        subsite_domain: "74cms.com",
+        sitedir: "/",
+        mobiledomain: "https://demo.74cms.com/m/",
+        memberDirname: "member",
+        apiUrl: "https://demo.74cms.com/v1_0",
+        captcha_open: "1",
+        captcha_type: "qscms",
+        captcha_tencent_appid: "",
+        captcha_vaptcha_vid: "",
+        captcha_qscms_appkey:"bcenpbhb",
+        wechat_login_open: "1",
+        wechat_open_appid: "wx124300d944a40487",
+        wechat_open: "1",
+        account_qqlogin_open: "1",
+        guide_open: "1",
+        guide_qrcode: "",
+        closereg: "0",
+        wechat_qrcode: "https://demo.74cms.com/upload/resource/weixin_img.jpg",
+        wechat_miniprogram_qrcode: "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg",
+        douyin_miniprogram_qrcode: "",
+        app_android_download_url: "https://demo.74cms.com/74cms_android.apk",
+        app_ios_download_url: "https://demo.74cms.com/74cms_android.apk",
+        map_type: "2",
+        is_open_map: "1",
+        im_open: "1",
+        im_key: "7jKedNayxc6E7SGw",
+        isLogin: false,
+        loginUtype: 0,
+        userToken: '',
+        platform: "web",
+        imToken:'',
+        reConnectTime:0,
+        websocketOk:false,
+    }
+</script>
+<script type="text/javascript" src="/assets/js/global.js"></script>
+<script type="text/javascript" src="/assets/js/error.js"></script>
+<script type="text/javascript" src="/assets/js/http.js"></script>
+<script type="text/javascript" src="/assets/js/globalMethods.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="/assets/css/base.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/layout2.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/public.css">
+	<script type="text/javascript" src="/assets/js/common.js"></script>
+	<script type="text/javascript" src="/assets/js/layout.js"></script>
+<script type="text/javascript" charset="UTF-8" src="https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script><link rel="stylesheet" type="text/css" href="https://cloud.zhitoo.cn/static/captcha/css/slidercaptcha.css"></head>
+
+<body>
+	<div>
+		<!-- header -->
+		<div class="brw_tip">
+    <div class="t_con">
+        系统检测到您的浏览器版本过低，无法获得最佳的使用体验，建议您更换其他浏览器或 <a href="https://www.google.cn/intl/zh-CN/chrome/" target="_blank">升级您的浏览器</a>。(使用360浏览器访问请选择极速模式)
+        <div class="b_close J_bw_close">关闭</div>
+    </div>
+</div>
+<div id="appNewHeader"><div id="header_box" class="new_header_box"><div class="top_header"><div class="top_box center_box"><div class="top_nav_lf"><div class="subsite_btn left"><a class="current_city">总站</a> <span class="switch_city">[切换城市]</span></div> <!----> <div class="welcome_text">骑士人才系统欢迎您！电话：18003431191</div></div> <div class="rt"><a href="javascript:;" class="item login_a">
+                        会员登录
+                        <span class="bot_triangle"></span> <div class="login_popup"><p data-id="2" class="utype_login">求职者登录</p> <p data-id="1" class="utype_login">招聘者登录</p></div></a> <!----> <!----> <a href="javascript:;" class="item login_a">会员注册 <span class="bot_triangle"></span> <div class="login_popup"><p class="utype_register">求职者注册</p> <p class="utype_register">招聘者注册</p></div></a> <a href="" class="item login_mobile">手机端 <span class="bot_triangle"></span> <div class="login_popup erweima_popup"><span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/m/"></span> <span class="txt">触屏版</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/upload/resource/weixin_img.jpg"></span> <span class="txt">微信公众号</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg"></span> <span class="txt">微信小程序</span></span> <!----> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/74cms_android.apk"></span> <span class="txt">App(安卓)</span></span> <span class="top-qrcode-item"><span class="img"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/74cms_android.apk"></span> <span class="txt">App(苹果)</span></span></div></a> <a href="https://demo.74cms.com/help.html" class="item">使用帮助</a> <div class="item site_navigation">网站导航
+                        <div class="nav_drop"><div class="dr_g"><div class="g_t">求职找工作</div> <div class="g_teg"><a href="javascript:;" class="g_it">登记简历</a> <a href="https://demo.74cms.com/job.html" class="g_it">找工作</a> <a href="https://demo.74cms.com/company.html" class="g_it">搜企业</a> <a href="https://demo.74cms.com/map.html" class="g_it">地图找工作</a> <a href="https://demo.74cms.com/job/famous/1.html" class="g_it">名企直聘</a> <a href="https://demo.74cms.com/job.html" class="g_it">最新职位</a> <a href="https://demo.74cms.com/job/listtype/emergency.html" class="g_it">紧急招聘</a> <a href="javascript:;" class="g_it">智能匹配</a> <a href="https://demo.74cms.com/fast/job.html" class="g_it">快速招聘</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">企业招人才</div> <div class="g_teg"><a href="javascript:;" class="g_it">企业入驻</a> <a href="javascript:;" class="g_it">发布职位</a> <a href="https://demo.74cms.com/resume.html" class="g_it">搜索简历</a> <a href="javascript:;" class="g_it">职位管理</a> <a href="javascript:;" class="g_it">人才推荐</a> <a href="javascript:;" class="g_it">会员服务</a> <a href="https://demo.74cms.com/fast/resume.html" class="g_it">快速求职</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">信息专栏</div> <div class="g_teg"><a href="https://demo.74cms.com/jobfair.html" class="g_it">现场招聘会</a> <a href="https://demo.74cms.com/jobfairol.html" class="g_it">网络招聘会</a> <a href="https://demo.74cms.com/campus.html" class="g_it">校园招聘</a> <a href="https://demo.74cms.com/freelance.html" class="g_it">自由职业</a> <a href="https://demo.74cms.com/notice.html" class="g_it">网站公告</a> <a href="https://demo.74cms.com/hrtool.html" class="g_it">HR工具箱</a> <a href="https://demo.74cms.com/article.html" class="g_it">职场资讯</a> <div class="clear"></div></div></div> <div class="dr_g"><div class="g_t">自助工具</div> <div class="g_teg"><a href="javascript:;" class="g_it">求职会员登录</a> <a href="javascript:;" class="g_it">招聘会员登录</a> <a href="javascript:;" class="g_it">忘记密码</a> <a href="javascript:;" class="g_it">账号申诉</a> <a href="https://demo.74cms.com/help.html" class="g_it">帮助中心</a> <div class="clear"></div></div></div></div></div></div></div></div> <div class="new_nav_list"><div class="nav_box center_box"><div class="lf"><a href="https://demo.74cms.com/" class="new_logo"><img src="https://demo.74cms.com/upload/resource/logo.png" alt=""></a> <ul class="nav_list"><li class="nav_item "><a href="https://demo.74cms.com/">首页</a></li> <li class="nav_item nav_item_act"><a href="https://demo.74cms.com/job.html" target="_self">找工作</a></li> <li class="nav_item "><a href="https://demo.74cms.com/company.html" target="_self">找企业</a></li> <li class="nav_item "><a href="https://demo.74cms.com/resume.html" target="_self">简历库</a></li> <li class="nav_item "><a href="https://demo.74cms.com/job/famous/1" target="_self">名企直聘</a></li> <li class="nav_item "><a href="https://demo.74cms.com/jobfair.html" target="_self">招聘会</a></li> <li class="nav_item "><a href="https://demo.74cms.com/article.html" target="_self">就业政策</a></li> <li class="nav_item "><a href="https://demo.74cms.com/hrtool.html" target="_self">HR工具箱</a></li> <li class="nav_item nav_item_more"><a href="" class="more_service">更多服务 <span class="bot_triangle_black"></span></a> <ul class="nav_hover"><li><a href="https://demo.74cms.com/map.html" target="_self" class="item2">地图找工作</a></li> <li><a href="https://demo.74cms.com/help.html" target="_self" class="item2">帮助中心</a></li> <li><a href="https://demo.74cms.com/jobfairol.html" target="_self" class="item2">网络招聘会</a></li> <li><a href="https://demo.74cms.com/campus.html" target="_self" class="item2">校园招聘</a></li> <li><a href="https://demo.74cms.com/freelance.html" target="_self" class="item2">自由职业</a></li> <li><a href="https://demo.74cms.com/fast/job.html" target="_self" class="item2">快速招聘</a></li> <li><a href="https://demo.74cms.com/fast/resume.html" target="_self" class="item2">快速求职</a></li> <li><a href="https://demo.74cms.com/job/register.html" target="_self" class="item2">求职登记</a></li> <li><a href="https://demo.74cms.com/dailyList.html" target="_self" class="item2">今日招聘</a></li> <li><a href="https://demo.74cms.com/shortvideo.html" target="_self" class="item2">视频招聘</a></li> <li><a href="https://demo.74cms.com/index/live/index.html" target="_self" class="item2">直播招聘</a></li></ul></li></ul></div> <div id="manage_center" class="rt"><a href="javascript:;" class="manage_center">管理中心</a></div></div></div> <div id="new_search_box" class="new_search_box "><div class="search_content"><div class="lf show_district_wapper"><div class="el-cascader" width="200"><div class="el-input el-input--suffix"><!----><input type="text" readonly="readonly" autocomplete="off" placeholder="地区" class="el-input__inner"><!----><span class="el-input__suffix"><span class="el-input__suffix-inner"><i class="el-input__icon el-icon-arrow-down"></i><!----><!----><!----><!----></span><!----></span><!----><!----></div><!----><div class="el-popper el-cascader__dropdown" style="display: none;"><div class="el-cascader-panel"><div class="el-scrollbar el-cascader-menu" role="menu" id="cascader-menu-888-0"><div class="el-cascader-menu__wrap el-scrollbar__wrap" style="margin-bottom: -8px; margin-right: -8px;"><ul class="el-scrollbar__view el-cascader-menu__list"><li role="menuitem" id="cascader-menu-888-0-0" tabindex="-1" class="el-cascader-node"><span class="el-cascader-node__label">不限</span></li><li role="menuitem" id="cascader-menu-888-0-1" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">北京</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-2" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">天津</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-3" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">河北</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-4" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">山西</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-5" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">内蒙</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-6" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">辽宁</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-7" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">吉林</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-8" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">黑龙江</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-9" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">上海</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-10" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">江苏</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-11" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">浙江</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-12" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">安徽</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-13" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">福建</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-14" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">江西</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-15" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">山东</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-16" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">河南</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-17" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">湖北</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-18" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">湖南</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-19" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">广东</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-20" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">广西</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-21" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">海南</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-22" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">重庆</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-23" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">四川</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-24" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">贵州</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-25" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">云南</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-26" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">西藏</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-27" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">陕西</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-28" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">甘肃</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-29" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">青海</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-30" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">宁夏</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-31" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">新疆</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-32" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">台湾</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-33" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">香港</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-34" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">澳门</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><li role="menuitem" id="cascader-menu-888-0-35" tabindex="-1" class="el-cascader-node" aria-haspopup="true" aria-owns="cascader-menu-888-0"><span class="el-cascader-node__label">海外</span><i class="el-icon-arrow-right el-cascader-node__postfix"></i></li><svg class="el-cascader-menu__hover-zone"></svg></ul></div><div class="el-scrollbar__bar is-horizontal"><div class="el-scrollbar__thumb" style="transform: translateX(0%);"></div></div><div class="el-scrollbar__bar is-vertical"><div class="el-scrollbar__thumb" style="transform: translateY(0%);"></div></div></div></div><!----></div></div></div> <div class="rt "><span hide-delay="10"><div role="tooltip" id="el-popover-8503" aria-hidden="true" class="el-popover el-popper" tabindex="0" style="display: none;"><!----><div id="cat_nav_1" class="cat_nav_new cat_nav_2"><div class="job_nav_ol"><li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/1.html">生活 | 服务业</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">生活 | 服务业</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11.html">餐饮</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/53.html" target="_blank" class="jno_item_pop_href">服务员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/54.html" target="_blank" class="jno_item_pop_href">送餐员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/55.html" target="_blank" class="jno_item_pop_href">厨师/厨师长</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/56.html" target="_blank" class="jno_item_pop_href">后厨</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/57.html" target="_blank" class="jno_item_pop_href">传菜员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/58.html" target="_blank" class="jno_item_pop_href">配菜/打荷</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/59.html" target="_blank" class="jno_item_pop_href">洗碗工</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/60.html" target="_blank" class="jno_item_pop_href">面点师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/61.html" target="_blank" class="jno_item_pop_href">茶艺师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/62.html" target="_blank" class="jno_item_pop_href">迎宾/接待</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/63.html" target="_blank" class="jno_item_pop_href">大堂经理/领班</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/64.html" target="_blank" class="jno_item_pop_href">餐饮管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/65.html" target="_blank" class="jno_item_pop_href">学徒</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/66.html" target="_blank" class="jno_item_pop_href">杂工</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/67.html" target="_blank" class="jno_item_pop_href">咖啡师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/11/c3/68.html" target="_blank" class="jno_item_pop_href">预订员</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12.html">家政保洁/安保</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12/c3/69.html" target="_blank" class="jno_item_pop_href">保洁</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12/c3/70.html" target="_blank" class="jno_item_pop_href">保姆</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12/c3/71.html" target="_blank" class="jno_item_pop_href">月嫂</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12/c3/72.html" target="_blank" class="jno_item_pop_href">育婴师/保育员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12/c3/73.html" target="_blank" class="jno_item_pop_href">洗衣工</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12/c3/74.html" target="_blank" class="jno_item_pop_href">钟点工</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12/c3/75.html" target="_blank" class="jno_item_pop_href">保安</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12/c3/76.html" target="_blank" class="jno_item_pop_href">护工</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/12/c3/77.html" target="_blank" class="jno_item_pop_href">送水工</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13.html">美容/美发</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/78.html" target="_blank" class="jno_item_pop_href">发型师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/79.html" target="_blank" class="jno_item_pop_href">美发助理/学徒</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/80.html" target="_blank" class="jno_item_pop_href">洗头工</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/81.html" target="_blank" class="jno_item_pop_href">美容导师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/82.html" target="_blank" class="jno_item_pop_href">美容师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/83.html" target="_blank" class="jno_item_pop_href">美容助理/学徒</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/84.html" target="_blank" class="jno_item_pop_href">化妆师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/85.html" target="_blank" class="jno_item_pop_href">美甲师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/86.html" target="_blank" class="jno_item_pop_href">宠物美容</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/87.html" target="_blank" class="jno_item_pop_href">美容店长</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/88.html" target="_blank" class="jno_item_pop_href">美容/瘦身顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/89.html" target="_blank" class="jno_item_pop_href">彩妆培训师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/13/c3/90.html" target="_blank" class="jno_item_pop_href">美体师</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14.html">酒店/旅游</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/91.html" target="_blank" class="jno_item_pop_href">酒店前台</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/92.html" target="_blank" class="jno_item_pop_href">客房服务员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/93.html" target="_blank" class="jno_item_pop_href">楼面经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/94.html" target="_blank" class="jno_item_pop_href">行李员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/95.html" target="_blank" class="jno_item_pop_href">救生员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/96.html" target="_blank" class="jno_item_pop_href">酒店管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/97.html" target="_blank" class="jno_item_pop_href">订票员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/98.html" target="_blank" class="jno_item_pop_href">导游</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/99.html" target="_blank" class="jno_item_pop_href">计调</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/100.html" target="_blank" class="jno_item_pop_href">签证专员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/14/c3/101.html" target="_blank" class="jno_item_pop_href">旅游顾问</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15.html">娱乐/休闲</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/102.html" target="_blank" class="jno_item_pop_href">酒吧服务员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/103.html" target="_blank" class="jno_item_pop_href">娱乐厅服务员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/104.html" target="_blank" class="jno_item_pop_href">礼仪/迎宾</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/105.html" target="_blank" class="jno_item_pop_href">主持人</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/106.html" target="_blank" class="jno_item_pop_href">调酒师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/107.html" target="_blank" class="jno_item_pop_href">音效师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/108.html" target="_blank" class="jno_item_pop_href">灯光师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/109.html" target="_blank" class="jno_item_pop_href">摄影师/摄像师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/110.html" target="_blank" class="jno_item_pop_href">影视/后期制作</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/111.html" target="_blank" class="jno_item_pop_href">配音员</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/15/c3/112.html" target="_blank" class="jno_item_pop_href">放映员</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/16.html">保健按摩</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/16/c3/113.html" target="_blank" class="jno_item_pop_href">按摩师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/16/c3/114.html" target="_blank" class="jno_item_pop_href">足疗师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/16/c3/115.html" target="_blank" class="jno_item_pop_href">搓澡工</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/16/c3/116.html" target="_blank" class="jno_item_pop_href">针灸推拿</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/17.html">运动健身</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/1/c2/17/c3/117.html" target="_blank" class="jno_item_pop_href">健身教练</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/17/c3/118.html" target="_blank" class="jno_item_pop_href">瑜伽教练</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/17/c3/119.html" target="_blank" class="jno_item_pop_href">舞蹈老师</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/17/c3/120.html" target="_blank" class="jno_item_pop_href">游泳教练</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/17/c3/121.html" target="_blank" class="jno_item_pop_href">台球教练</a> <a href="https://demo.74cms.com/job/famous/1/c1/1/c2/17/c3/122.html" target="_blank" class="jno_item_pop_href">高尔夫球助理</a></div></div></div></li> <li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/2.html">人力 | 行政 | 管理</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">人力 | 行政 | 管理</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18.html">人事/行政/后勤</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/123.html" target="_blank" class="jno_item_pop_href">文员</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/124.html" target="_blank" class="jno_item_pop_href">前台/总机/接待</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/125.html" target="_blank" class="jno_item_pop_href">人事专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/126.html" target="_blank" class="jno_item_pop_href">人事经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/127.html" target="_blank" class="jno_item_pop_href">人事总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/128.html" target="_blank" class="jno_item_pop_href">行政专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/129.html" target="_blank" class="jno_item_pop_href">行政经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/130.html" target="_blank" class="jno_item_pop_href">行政总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/131.html" target="_blank" class="jno_item_pop_href">经理助理/秘书</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/132.html" target="_blank" class="jno_item_pop_href">薪酬/绩效/员工关系</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/133.html" target="_blank" class="jno_item_pop_href">猎头顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/134.html" target="_blank" class="jno_item_pop_href">后勤</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/135.html" target="_blank" class="jno_item_pop_href">培训专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/136.html" target="_blank" class="jno_item_pop_href">培训经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/137.html" target="_blank" class="jno_item_pop_href">招聘专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/18/c3/138.html" target="_blank" class="jno_item_pop_href">招聘经理/主管</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/2/c2/19.html">司机</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/2/c2/19/c3/139.html" target="_blank" class="jno_item_pop_href">商务司机</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/19/c3/140.html" target="_blank" class="jno_item_pop_href">客运司机</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/19/c3/141.html" target="_blank" class="jno_item_pop_href">货运司机</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/19/c3/142.html" target="_blank" class="jno_item_pop_href">出租车司机</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/19/c3/143.html" target="_blank" class="jno_item_pop_href">班车司机</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/19/c3/144.html" target="_blank" class="jno_item_pop_href">特种车司机</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/19/c3/145.html" target="_blank" class="jno_item_pop_href">驾校教练/陪练</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20.html">高级管理</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20/c3/146.html" target="_blank" class="jno_item_pop_href">CEO/总裁/总经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20/c3/147.html" target="_blank" class="jno_item_pop_href">首席运营官COO</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20/c3/148.html" target="_blank" class="jno_item_pop_href">首席财务官CFO</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20/c3/149.html" target="_blank" class="jno_item_pop_href">首席技术官CTO</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20/c3/150.html" target="_blank" class="jno_item_pop_href">副总裁/副总经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20/c3/151.html" target="_blank" class="jno_item_pop_href">总裁助理/总经理助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20/c3/152.html" target="_blank" class="jno_item_pop_href">总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20/c3/153.html" target="_blank" class="jno_item_pop_href">分公司经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/2/c2/20/c3/154.html" target="_blank" class="jno_item_pop_href">合伙人</a></div></div></div></li> <li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/3.html">销售 | 客服 | 采购 | 淘宝</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">销售 | 客服 | 采购 | 淘宝</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21.html">销售</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/155.html" target="_blank" class="jno_item_pop_href">销售代表</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/156.html" target="_blank" class="jno_item_pop_href">销售助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/157.html" target="_blank" class="jno_item_pop_href">销售经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/158.html" target="_blank" class="jno_item_pop_href">销售总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/159.html" target="_blank" class="jno_item_pop_href">电话销售</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/160.html" target="_blank" class="jno_item_pop_href">销售支持</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/161.html" target="_blank" class="jno_item_pop_href">汽车销售</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/162.html" target="_blank" class="jno_item_pop_href">医药代表</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/163.html" target="_blank" class="jno_item_pop_href">医疗器械销售</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/164.html" target="_blank" class="jno_item_pop_href">网络销售</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/165.html" target="_blank" class="jno_item_pop_href">区域销售</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/166.html" target="_blank" class="jno_item_pop_href">渠道专员</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/167.html" target="_blank" class="jno_item_pop_href">渠道经理/总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/168.html" target="_blank" class="jno_item_pop_href">客户经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/169.html" target="_blank" class="jno_item_pop_href">大客户经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/170.html" target="_blank" class="jno_item_pop_href">团购业务员/经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/21/c3/171.html" target="_blank" class="jno_item_pop_href">会籍顾问</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/22.html">客服</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/22/c3/172.html" target="_blank" class="jno_item_pop_href">客服专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/22/c3/173.html" target="_blank" class="jno_item_pop_href">客服经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/22/c3/174.html" target="_blank" class="jno_item_pop_href">客服总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/22/c3/175.html" target="_blank" class="jno_item_pop_href">售前/售后服务</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/22/c3/176.html" target="_blank" class="jno_item_pop_href">电话客服</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/22/c3/177.html" target="_blank" class="jno_item_pop_href">客户关系管理</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/23.html">贸易/采购</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/23/c3/178.html" target="_blank" class="jno_item_pop_href">外贸专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/23/c3/179.html" target="_blank" class="jno_item_pop_href">外贸经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/23/c3/180.html" target="_blank" class="jno_item_pop_href">采购员</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/23/c3/181.html" target="_blank" class="jno_item_pop_href">采购助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/23/c3/182.html" target="_blank" class="jno_item_pop_href">采购经理/总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/23/c3/183.html" target="_blank" class="jno_item_pop_href">报关员</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/23/c3/184.html" target="_blank" class="jno_item_pop_href">商务专员/经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/23/c3/185.html" target="_blank" class="jno_item_pop_href">买手</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24.html">超市/百货/零售</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/186.html" target="_blank" class="jno_item_pop_href">店员/营业员</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/187.html" target="_blank" class="jno_item_pop_href">收银员</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/188.html" target="_blank" class="jno_item_pop_href">促销/导购员</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/189.html" target="_blank" class="jno_item_pop_href">理货员/陈列员</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/190.html" target="_blank" class="jno_item_pop_href">防损员/内保</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/191.html" target="_blank" class="jno_item_pop_href">店长/卖场经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/192.html" target="_blank" class="jno_item_pop_href">招商经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/193.html" target="_blank" class="jno_item_pop_href">奢侈品业务</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/194.html" target="_blank" class="jno_item_pop_href">品类管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/195.html" target="_blank" class="jno_item_pop_href">食品加工/处理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/24/c3/196.html" target="_blank" class="jno_item_pop_href">督导</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/25.html">淘宝职位</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/25/c3/197.html" target="_blank" class="jno_item_pop_href">网店店长</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/25/c3/198.html" target="_blank" class="jno_item_pop_href">淘宝客服</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/25/c3/199.html" target="_blank" class="jno_item_pop_href">淘宝美工</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/25/c3/200.html" target="_blank" class="jno_item_pop_href">店铺文案编辑</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/25/c3/201.html" target="_blank" class="jno_item_pop_href">店铺推广</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/25/c3/202.html" target="_blank" class="jno_item_pop_href">活动策划</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26.html">房产中介</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26/c3/203.html" target="_blank" class="jno_item_pop_href">房产经纪人</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26/c3/204.html" target="_blank" class="jno_item_pop_href">置业顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26/c3/205.html" target="_blank" class="jno_item_pop_href">房产店长/经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26/c3/206.html" target="_blank" class="jno_item_pop_href">房产店员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26/c3/207.html" target="_blank" class="jno_item_pop_href">房产客服</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26/c3/208.html" target="_blank" class="jno_item_pop_href">房产内勤</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26/c3/209.html" target="_blank" class="jno_item_pop_href">房产评估师</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26/c3/210.html" target="_blank" class="jno_item_pop_href">房产开发/策划</a> <a href="https://demo.74cms.com/job/famous/1/c1/3/c2/26/c3/211.html" target="_blank" class="jno_item_pop_href">其他房产职位</a></div></div></div></li> <li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/4.html">市场 | 媒介 | 广告 | 设计</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">市场 | 媒介 | 广告 | 设计</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27.html">市场/媒介/公关</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/212.html" target="_blank" class="jno_item_pop_href">市场专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/213.html" target="_blank" class="jno_item_pop_href">市场经理/总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/214.html" target="_blank" class="jno_item_pop_href">市场拓展</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/215.html" target="_blank" class="jno_item_pop_href">市场调研</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/216.html" target="_blank" class="jno_item_pop_href">市场策划</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/217.html" target="_blank" class="jno_item_pop_href">媒介专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/218.html" target="_blank" class="jno_item_pop_href">媒介经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/219.html" target="_blank" class="jno_item_pop_href">会务会展专员/经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/220.html" target="_blank" class="jno_item_pop_href">品牌专员/经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/221.html" target="_blank" class="jno_item_pop_href">公关专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/222.html" target="_blank" class="jno_item_pop_href">公关经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/27/c3/223.html" target="_blank" class="jno_item_pop_href">企划经理/主管</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28.html">广告/会展/咨询</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/224.html" target="_blank" class="jno_item_pop_href">广告文案</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/225.html" target="_blank" class="jno_item_pop_href">创意指导/总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/226.html" target="_blank" class="jno_item_pop_href">广告设计/制作</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/227.html" target="_blank" class="jno_item_pop_href">广告创意</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/228.html" target="_blank" class="jno_item_pop_href">媒介策划/管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/229.html" target="_blank" class="jno_item_pop_href">会展策划/设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/230.html" target="_blank" class="jno_item_pop_href">婚礼策划师</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/231.html" target="_blank" class="jno_item_pop_href">咨询顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/232.html" target="_blank" class="jno_item_pop_href">咨询经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/233.html" target="_blank" class="jno_item_pop_href">客户主管/专员</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/28/c3/234.html" target="_blank" class="jno_item_pop_href">企业策划</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29.html">美术/设计/创意</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/235.html" target="_blank" class="jno_item_pop_href">美编/美术设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/236.html" target="_blank" class="jno_item_pop_href">服装设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/237.html" target="_blank" class="jno_item_pop_href">家具/家居用品设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/238.html" target="_blank" class="jno_item_pop_href">平面设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/239.html" target="_blank" class="jno_item_pop_href">美术指导</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/240.html" target="_blank" class="jno_item_pop_href">店面/陈列/展览设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/241.html" target="_blank" class="jno_item_pop_href">工艺/珠宝设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/242.html" target="_blank" class="jno_item_pop_href">多媒体/动画设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/243.html" target="_blank" class="jno_item_pop_href">产品/包装设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/244.html" target="_blank" class="jno_item_pop_href">装修装潢设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/4/c2/29/c3/245.html" target="_blank" class="jno_item_pop_href">CAD设计/制图</a></div></div></div></li> <li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/5.html">生产 | 物流 | 质控 | 汽车</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">生产 | 物流 | 质控 | 汽车</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30.html">普工/技工</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/246.html" target="_blank" class="jno_item_pop_href">普工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/247.html" target="_blank" class="jno_item_pop_href">综合维修工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/248.html" target="_blank" class="jno_item_pop_href">制冷/水暖工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/249.html" target="_blank" class="jno_item_pop_href">电工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/250.html" target="_blank" class="jno_item_pop_href">木工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/251.html" target="_blank" class="jno_item_pop_href">钳工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/252.html" target="_blank" class="jno_item_pop_href">切割/焊工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/253.html" target="_blank" class="jno_item_pop_href">钣金工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/254.html" target="_blank" class="jno_item_pop_href">油漆工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/255.html" target="_blank" class="jno_item_pop_href">缝纫工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/256.html" target="_blank" class="jno_item_pop_href">锅炉工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/257.html" target="_blank" class="jno_item_pop_href">车工/铣工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/258.html" target="_blank" class="jno_item_pop_href">铲车/叉车工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/259.html" target="_blank" class="jno_item_pop_href">铸造/注塑/模具工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/260.html" target="_blank" class="jno_item_pop_href">电梯工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/261.html" target="_blank" class="jno_item_pop_href">操作工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/262.html" target="_blank" class="jno_item_pop_href">包装工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/263.html" target="_blank" class="jno_item_pop_href">手机维修</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/264.html" target="_blank" class="jno_item_pop_href">水泥工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/265.html" target="_blank" class="jno_item_pop_href">钢筋工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/266.html" target="_blank" class="jno_item_pop_href">管道工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/267.html" target="_blank" class="jno_item_pop_href">瓦工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/268.html" target="_blank" class="jno_item_pop_href">组装工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/269.html" target="_blank" class="jno_item_pop_href">样衣工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/270.html" target="_blank" class="jno_item_pop_href">染工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/271.html" target="_blank" class="jno_item_pop_href">纺织工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/272.html" target="_blank" class="jno_item_pop_href">印花工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/30/c3/273.html" target="_blank" class="jno_item_pop_href">压熨工</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31.html">生产管理/研发</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/274.html" target="_blank" class="jno_item_pop_href">质量管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/275.html" target="_blank" class="jno_item_pop_href">总工程师/副总工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/276.html" target="_blank" class="jno_item_pop_href">设备管理维护</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/277.html" target="_blank" class="jno_item_pop_href">工艺设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/278.html" target="_blank" class="jno_item_pop_href">车间主任</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/279.html" target="_blank" class="jno_item_pop_href">生产计划</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/280.html" target="_blank" class="jno_item_pop_href">化验/检验</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/281.html" target="_blank" class="jno_item_pop_href">厂长/副厂长</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/282.html" target="_blank" class="jno_item_pop_href">生产总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/283.html" target="_blank" class="jno_item_pop_href">维修工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/284.html" target="_blank" class="jno_item_pop_href">工业工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/285.html" target="_blank" class="jno_item_pop_href">材料工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/286.html" target="_blank" class="jno_item_pop_href">技术工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/31/c3/287.html" target="_blank" class="jno_item_pop_href">生产主管/组长</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32.html">物流/仓储</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/288.html" target="_blank" class="jno_item_pop_href">物流专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/289.html" target="_blank" class="jno_item_pop_href">物流经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/290.html" target="_blank" class="jno_item_pop_href">物流总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/291.html" target="_blank" class="jno_item_pop_href">调度员</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/292.html" target="_blank" class="jno_item_pop_href">快递员</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/293.html" target="_blank" class="jno_item_pop_href">仓库管理员</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/294.html" target="_blank" class="jno_item_pop_href">仓库经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/295.html" target="_blank" class="jno_item_pop_href">装卸/搬运工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/296.html" target="_blank" class="jno_item_pop_href">供应链管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/297.html" target="_blank" class="jno_item_pop_href">单证员</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/32/c3/298.html" target="_blank" class="jno_item_pop_href">国际货运</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33.html">服装/纺织/食品</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33/c3/299.html" target="_blank" class="jno_item_pop_href">服装设计师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33/c3/300.html" target="_blank" class="jno_item_pop_href">纺织品设计师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33/c3/301.html" target="_blank" class="jno_item_pop_href">服装打样/制版</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33/c3/302.html" target="_blank" class="jno_item_pop_href">生产管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33/c3/303.html" target="_blank" class="jno_item_pop_href">样衣工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33/c3/304.html" target="_blank" class="jno_item_pop_href">食品/饮料研发/检验</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33/c3/305.html" target="_blank" class="jno_item_pop_href">板房/底格出格师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33/c3/306.html" target="_blank" class="jno_item_pop_href">电脑放码员</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/33/c3/307.html" target="_blank" class="jno_item_pop_href">纸样师/车板工</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/34.html">质控/安防</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/34/c3/308.html" target="_blank" class="jno_item_pop_href">质量检验员/测试员</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/34/c3/309.html" target="_blank" class="jno_item_pop_href">质量管理/测试经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/34/c3/310.html" target="_blank" class="jno_item_pop_href">测试工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/34/c3/311.html" target="_blank" class="jno_item_pop_href">安全消防</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/34/c3/312.html" target="_blank" class="jno_item_pop_href">认证工程师/审核员</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/34/c3/313.html" target="_blank" class="jno_item_pop_href">安全管理</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35.html">汽车制造/服务</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/314.html" target="_blank" class="jno_item_pop_href">汽车设计工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/315.html" target="_blank" class="jno_item_pop_href">装配工艺工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/316.html" target="_blank" class="jno_item_pop_href">汽车/摩托车修理</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/317.html" target="_blank" class="jno_item_pop_href">汽车机械工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/318.html" target="_blank" class="jno_item_pop_href">汽车电子工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/319.html" target="_blank" class="jno_item_pop_href">4S店管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/320.html" target="_blank" class="jno_item_pop_href">汽车检验/检测</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/321.html" target="_blank" class="jno_item_pop_href">汽车美容</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/322.html" target="_blank" class="jno_item_pop_href">二手车评估师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/323.html" target="_blank" class="jno_item_pop_href">发动机/总装工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/324.html" target="_blank" class="jno_item_pop_href">安全性能工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/325.html" target="_blank" class="jno_item_pop_href">理赔专员/顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/326.html" target="_blank" class="jno_item_pop_href">洗车工</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/327.html" target="_blank" class="jno_item_pop_href">停车管理员</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/328.html" target="_blank" class="jno_item_pop_href">加油站工作员</a> <a href="https://demo.74cms.com/job/famous/1/c1/5/c2/35/c3/329.html" target="_blank" class="jno_item_pop_href">轮胎工</a></div></div></div></li> <li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/6.html">网络 | 通信 | 电子</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">网络 | 通信 | 电子</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36.html">计算机/互联网/通信</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/330.html" target="_blank" class="jno_item_pop_href">技术总监/经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/331.html" target="_blank" class="jno_item_pop_href">技术支持/维护</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/332.html" target="_blank" class="jno_item_pop_href">技术专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/333.html" target="_blank" class="jno_item_pop_href">软件工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/334.html" target="_blank" class="jno_item_pop_href">程序员</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/335.html" target="_blank" class="jno_item_pop_href">硬件工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/336.html" target="_blank" class="jno_item_pop_href">质量工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/337.html" target="_blank" class="jno_item_pop_href">测试工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/338.html" target="_blank" class="jno_item_pop_href">系统架构师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/339.html" target="_blank" class="jno_item_pop_href">数据库管理/DBA</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/340.html" target="_blank" class="jno_item_pop_href">游戏设计/开发</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/341.html" target="_blank" class="jno_item_pop_href">网页设计/制作</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/342.html" target="_blank" class="jno_item_pop_href">语音/视频/图形</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/343.html" target="_blank" class="jno_item_pop_href">项目经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/344.html" target="_blank" class="jno_item_pop_href">产品经理/专员</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/345.html" target="_blank" class="jno_item_pop_href">网站运营</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/346.html" target="_blank" class="jno_item_pop_href">网站编辑</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/347.html" target="_blank" class="jno_item_pop_href">网络管理员</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/348.html" target="_blank" class="jno_item_pop_href">网络与信息安全工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/349.html" target="_blank" class="jno_item_pop_href">实施工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/350.html" target="_blank" class="jno_item_pop_href">通信技术工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/36/c3/351.html" target="_blank" class="jno_item_pop_href">网站策划</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37.html">电子/电气</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/352.html" target="_blank" class="jno_item_pop_href">自动化工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/353.html" target="_blank" class="jno_item_pop_href">电子/电气工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/354.html" target="_blank" class="jno_item_pop_href">电路工程师/技术员</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/355.html" target="_blank" class="jno_item_pop_href">无线电工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/356.html" target="_blank" class="jno_item_pop_href">测试/可靠性工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/357.html" target="_blank" class="jno_item_pop_href">产品工艺/规划工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/358.html" target="_blank" class="jno_item_pop_href">音频/视频工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/359.html" target="_blank" class="jno_item_pop_href">灯光/照明设计工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/360.html" target="_blank" class="jno_item_pop_href">研发工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/37/c3/361.html" target="_blank" class="jno_item_pop_href">电子/电器维修</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/6/c2/38.html">机械/仪器仪表</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/6/c2/38/c3/362.html" target="_blank" class="jno_item_pop_href">机电工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/38/c3/363.html" target="_blank" class="jno_item_pop_href">机械工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/38/c3/364.html" target="_blank" class="jno_item_pop_href">研发工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/38/c3/365.html" target="_blank" class="jno_item_pop_href">测试/可靠性工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/38/c3/366.html" target="_blank" class="jno_item_pop_href">版图设计工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/6/c2/38/c3/367.html" target="_blank" class="jno_item_pop_href">仪器/仪表/计量</a></div></div></div></li> <li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/7.html">法律 | 教育 | 翻译 | 出版</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">法律 | 教育 | 翻译 | 出版</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/7/c2/39.html">法律</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/7/c2/39/c3/368.html" target="_blank" class="jno_item_pop_href">律师/法律顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/39/c3/369.html" target="_blank" class="jno_item_pop_href">律师助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/39/c3/370.html" target="_blank" class="jno_item_pop_href">法务专员/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/39/c3/371.html" target="_blank" class="jno_item_pop_href">产权/专利顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/39/c3/372.html" target="_blank" class="jno_item_pop_href">合规管理</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40.html">教育培训</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/373.html" target="_blank" class="jno_item_pop_href">教师/助教</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/374.html" target="_blank" class="jno_item_pop_href">家教</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/375.html" target="_blank" class="jno_item_pop_href">幼教/早教</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/376.html" target="_blank" class="jno_item_pop_href">培训师/讲师</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/377.html" target="_blank" class="jno_item_pop_href">培训策划</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/378.html" target="_blank" class="jno_item_pop_href">培训助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/379.html" target="_blank" class="jno_item_pop_href">教学/教务管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/380.html" target="_blank" class="jno_item_pop_href">教育产品开发</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/381.html" target="_blank" class="jno_item_pop_href">学术研究/科研</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/382.html" target="_blank" class="jno_item_pop_href">招生/课程顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/383.html" target="_blank" class="jno_item_pop_href">校长</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/40/c3/384.html" target="_blank" class="jno_item_pop_href">野外拓展训练师</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41.html">翻译</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/385.html" target="_blank" class="jno_item_pop_href">英语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/386.html" target="_blank" class="jno_item_pop_href">日语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/387.html" target="_blank" class="jno_item_pop_href">韩语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/388.html" target="_blank" class="jno_item_pop_href">法语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/389.html" target="_blank" class="jno_item_pop_href">俄语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/390.html" target="_blank" class="jno_item_pop_href">德语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/391.html" target="_blank" class="jno_item_pop_href">西班牙语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/392.html" target="_blank" class="jno_item_pop_href">意大利语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/393.html" target="_blank" class="jno_item_pop_href">葡萄牙语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/394.html" target="_blank" class="jno_item_pop_href">阿拉伯语翻译</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/41/c3/395.html" target="_blank" class="jno_item_pop_href">小语种翻译</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/7/c2/42.html">编辑/出版/印刷</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/7/c2/42/c3/396.html" target="_blank" class="jno_item_pop_href">总编/副总编/主编</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/42/c3/397.html" target="_blank" class="jno_item_pop_href">编辑/撰稿</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/42/c3/398.html" target="_blank" class="jno_item_pop_href">记者/采编</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/42/c3/399.html" target="_blank" class="jno_item_pop_href">出版/发行</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/42/c3/400.html" target="_blank" class="jno_item_pop_href">排版设计/制作</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/42/c3/401.html" target="_blank" class="jno_item_pop_href">印刷操作</a> <a href="https://demo.74cms.com/job/famous/1/c1/7/c2/42/c3/402.html" target="_blank" class="jno_item_pop_href">装订/烫金</a></div></div></div></li> <li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/8.html">财会 | 金融 | 保险</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">财会 | 金融 | 保险</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43.html">财务/审计/统计</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/403.html" target="_blank" class="jno_item_pop_href">财务经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/404.html" target="_blank" class="jno_item_pop_href">财务总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/405.html" target="_blank" class="jno_item_pop_href">会计/会计师</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/406.html" target="_blank" class="jno_item_pop_href">财务/会计助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/407.html" target="_blank" class="jno_item_pop_href">出纳</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/408.html" target="_blank" class="jno_item_pop_href">审计专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/409.html" target="_blank" class="jno_item_pop_href">审计经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/410.html" target="_blank" class="jno_item_pop_href">统计员</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/411.html" target="_blank" class="jno_item_pop_href">税务专员/助理</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/412.html" target="_blank" class="jno_item_pop_href">税务经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/413.html" target="_blank" class="jno_item_pop_href">财务分析员</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/43/c3/414.html" target="_blank" class="jno_item_pop_href">成本管理员</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44.html">金融/银行/证券/投资</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/415.html" target="_blank" class="jno_item_pop_href">证券/期货/外汇经纪人</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/416.html" target="_blank" class="jno_item_pop_href">证券经理/总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/417.html" target="_blank" class="jno_item_pop_href">证券分析/金融研究</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/418.html" target="_blank" class="jno_item_pop_href">信用卡/银行卡业务</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/419.html" target="_blank" class="jno_item_pop_href">银行经理/主任</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/420.html" target="_blank" class="jno_item_pop_href">银行会计/柜员</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/421.html" target="_blank" class="jno_item_pop_href">信贷管理/资信评估</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/422.html" target="_blank" class="jno_item_pop_href">资产评估</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/423.html" target="_blank" class="jno_item_pop_href">担保/拍卖/典当</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/424.html" target="_blank" class="jno_item_pop_href">拍卖师</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/425.html" target="_blank" class="jno_item_pop_href">外汇/基金/国债经理人</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/426.html" target="_blank" class="jno_item_pop_href">投资/理财顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/427.html" target="_blank" class="jno_item_pop_href">融资专员</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/428.html" target="_blank" class="jno_item_pop_href">融资经理/总监</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/429.html" target="_blank" class="jno_item_pop_href">风险管理/控制</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/44/c3/430.html" target="_blank" class="jno_item_pop_href">股票交易员</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45.html">保险</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/431.html" target="_blank" class="jno_item_pop_href">储备经理人</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/432.html" target="_blank" class="jno_item_pop_href">保险客户经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/433.html" target="_blank" class="jno_item_pop_href">车险专员</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/434.html" target="_blank" class="jno_item_pop_href">保险内勤</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/435.html" target="_blank" class="jno_item_pop_href">保险培训师</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/436.html" target="_blank" class="jno_item_pop_href">保险客服</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/437.html" target="_blank" class="jno_item_pop_href">保险顾问</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/438.html" target="_blank" class="jno_item_pop_href">保险经纪人</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/439.html" target="_blank" class="jno_item_pop_href">保险项目经理</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/440.html" target="_blank" class="jno_item_pop_href">保险精算师</a> <a href="https://demo.74cms.com/job/famous/1/c1/8/c2/45/c3/441.html" target="_blank" class="jno_item_pop_href">保险其他职位</a></div></div></div></li> <li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/9.html">医疗 | 制药 | 环保</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">医疗 | 制药 | 环保</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46.html">医院/医疗/护理</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/442.html" target="_blank" class="jno_item_pop_href">医生</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/443.html" target="_blank" class="jno_item_pop_href">保健医生</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/444.html" target="_blank" class="jno_item_pop_href">心理医生</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/445.html" target="_blank" class="jno_item_pop_href">护士/护理</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/446.html" target="_blank" class="jno_item_pop_href">护理主任/护士长</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/447.html" target="_blank" class="jno_item_pop_href">导医</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/448.html" target="_blank" class="jno_item_pop_href">药剂师</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/449.html" target="_blank" class="jno_item_pop_href">理疗师</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/450.html" target="_blank" class="jno_item_pop_href">医药质检</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/451.html" target="_blank" class="jno_item_pop_href">医疗管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/452.html" target="_blank" class="jno_item_pop_href">美容整形师</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/453.html" target="_blank" class="jno_item_pop_href">验光师</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/454.html" target="_blank" class="jno_item_pop_href">营养师</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/46/c3/455.html" target="_blank" class="jno_item_pop_href">宠物护理/兽医</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/9/c2/47.html">制药/生物工程</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/9/c2/47/c3/456.html" target="_blank" class="jno_item_pop_href">医药研发/生产/注册</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/47/c3/457.html" target="_blank" class="jno_item_pop_href">临床研究/协调</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/47/c3/458.html" target="_blank" class="jno_item_pop_href">生物工程/生物制药</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/47/c3/459.html" target="_blank" class="jno_item_pop_href">医疗器械研发/维修</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48.html">环保</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48/c3/460.html" target="_blank" class="jno_item_pop_href">污水处理工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48/c3/461.html" target="_blank" class="jno_item_pop_href">环境工程技术</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48/c3/462.html" target="_blank" class="jno_item_pop_href">环境管理/保护</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48/c3/463.html" target="_blank" class="jno_item_pop_href">环保技术</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48/c3/464.html" target="_blank" class="jno_item_pop_href">EHS管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48/c3/465.html" target="_blank" class="jno_item_pop_href">环保工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48/c3/466.html" target="_blank" class="jno_item_pop_href">环保检测</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48/c3/467.html" target="_blank" class="jno_item_pop_href">水质检测员</a> <a href="https://demo.74cms.com/job/famous/1/c1/9/c2/48/c3/468.html" target="_blank" class="jno_item_pop_href">环境绿化</a></div></div></div></li> <li class="jno_item_new"><div class="jno_item_text"><a href="https://demo.74cms.com/job/famous/1/c1/10.html">建筑 | 物业 | 农林牧渔 | 其他</a> <div class="rtIcon"></div></div> <div class="jno_item_pop "><div class="jno_level_title">建筑 | 物业 | 农林牧渔 | 其他</div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49.html">建筑</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/469.html" target="_blank" class="jno_item_pop_href">工程项目管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/470.html" target="_blank" class="jno_item_pop_href">工程监理</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/471.html" target="_blank" class="jno_item_pop_href">建筑工程师/总工</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/472.html" target="_blank" class="jno_item_pop_href">土木/土建工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/473.html" target="_blank" class="jno_item_pop_href">造价师/预算师</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/474.html" target="_blank" class="jno_item_pop_href">幕墙工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/475.html" target="_blank" class="jno_item_pop_href">安防工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/476.html" target="_blank" class="jno_item_pop_href">安全管理/安全员</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/477.html" target="_blank" class="jno_item_pop_href">道路桥梁技术</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/478.html" target="_blank" class="jno_item_pop_href">给排水/制冷/暖通</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/479.html" target="_blank" class="jno_item_pop_href">测绘/测量</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/480.html" target="_blank" class="jno_item_pop_href">园林/景观设计</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/481.html" target="_blank" class="jno_item_pop_href">资料员</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/482.html" target="_blank" class="jno_item_pop_href">市政工程师</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/49/c3/483.html" target="_blank" class="jno_item_pop_href">综合布线/弱电</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/10/c2/50.html">物业管理</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/10/c2/50/c3/484.html" target="_blank" class="jno_item_pop_href">物业管理员</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/50/c3/485.html" target="_blank" class="jno_item_pop_href">物业维修</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/50/c3/486.html" target="_blank" class="jno_item_pop_href">物业经理/主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/50/c3/487.html" target="_blank" class="jno_item_pop_href">合共管理</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/50/c3/488.html" target="_blank" class="jno_item_pop_href">招商经理/主管</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/10/c2/51.html">农/林/牧/渔业</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/10/c2/51/c3/489.html" target="_blank" class="jno_item_pop_href">饲料业务</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/51/c3/490.html" target="_blank" class="jno_item_pop_href">养殖人员</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/51/c3/491.html" target="_blank" class="jno_item_pop_href">农艺师/花艺师</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/51/c3/492.html" target="_blank" class="jno_item_pop_href">畜牧师</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/51/c3/493.html" target="_blank" class="jno_item_pop_href">场长</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/51/c3/494.html" target="_blank" class="jno_item_pop_href">养殖部主管</a> <a href="https://demo.74cms.com/job/famous/1/c1/10/c2/51/c3/495.html" target="_blank" class="jno_item_pop_href">动物营养/饲料研发</a></div></div> <div class="jno_item_pop_container" style="width: 100%;"><div class="jno_item_pop_title"><a href="https://demo.74cms.com/job/famous/1/c1/10/c2/52.html">其他招聘信息</a></div> <div class="jno_item_pop_list"><a href="https://demo.74cms.com/job/famous/1/c1/10/c2/52/c3/496.html" target="_blank" class="jno_item_pop_href">其他职位</a></div></div></div></li></div></div> </div><div id="block_1" class="block_1 el-popover__reference" aria-describedby="el-popover-8503" tabindex="0"><span class="text substring">职位类型</span><span class="bot_triangle_black"></span></div></span> <input type="text" placeholder="请输入关键词搜索" class="block_2 "> <a href="https://demo.74cms.com/map.html" class="block_3">地图</a> <div class="block_4">搜索</div></div></div></div> <div class="filter_box filter_box_head" style="display: none;"><div class="filter_list filter_combo"><div class="filter_line so_condition_head last"><div class="f_select first J_dropdown"><span title="职位薪资" class="s_text">
+                            职位薪资
+                        </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/w2/1000.html">1000元以下</a></li> <li><a href="https://demo.74cms.com/job/famous/1/w1/1000/w2/2000.html">1000-2000元</a></li> <li><a href="https://demo.74cms.com/job/famous/1/w1/2000/w2/3000.html">2000-3000元</a></li> <li><a href="https://demo.74cms.com/job/famous/1/w1/3000/w2/5000.html">3000-5000元</a></li> <li><a href="https://demo.74cms.com/job/famous/1/w1/5000/w2/8000.html">5000-8000元</a></li> <li><a href="https://demo.74cms.com/job/famous/1/w1/8000/w2/12000.html">8000-12000元</a></li> <li><a href="https://demo.74cms.com/job/famous/1/w1/12000/w2/15000.html">12000-15000元</a></li> <li><a href="https://demo.74cms.com/job/famous/1/w1/15000.html">15000元以上</a></li></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="工作经验" class="s_text">
+                            工作经验
+                        </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/exp/1.html">应届生</a></li> <li><a href="https://demo.74cms.com/job/famous/1/exp/2.html">1年</a></li> <li><a href="https://demo.74cms.com/job/famous/1/exp/3.html">2年</a></li> <li><a href="https://demo.74cms.com/job/famous/1/exp/4.html">3年</a></li> <li><a href="https://demo.74cms.com/job/famous/1/exp/5.html">3-5年</a></li> <li><a href="https://demo.74cms.com/job/famous/1/exp/6.html">5-10年</a></li> <li><a href="https://demo.74cms.com/job/famous/1/exp/7.html">10年以上</a></li></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="行业类别" class="s_text">
+                            行业类别
+                        </span> <div class="dropdowbox_searchtrade J_dropdown_menu"><div class="dropdow_inner_searchtrade"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1/trade/1.html">计算机软件/硬件</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/2.html">计算机系统/维修</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/3.html">通信(设备/运营/服务)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/4.html">互联网/电子商务</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/5.html">网络游戏</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/6.html">电子/半导体/集成电路</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/7.html">仪器仪表/工业自动化</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/8.html">会计/审计</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/9.html">金融(投资/证券</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/10.html">金融(银行/保险)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/11.html">贸易/进出口</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/12.html">批发/零售</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/13.html">消费品(食/饮/烟酒)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/14.html">服装/纺织/皮革</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/15.html">家具/家电/工艺品/玩具</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/16.html">办公用品及设备</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/17.html">机械/设备/重工</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/18.html">汽车/摩托车/零配件</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/19.html">制药/生物工程</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/20.html">医疗/美容/保健/卫生</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/21.html">医疗设备/器械</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/22.html">广告/市场推广</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/23.html">会展/博览</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/24.html">影视/媒体/艺术/出版</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/25.html">印刷/包装/造纸</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/26.html">房地产开发</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/27.html">建筑与工程</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/28.html">家居/室内设计/装潢</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/29.html">物业管理/商业中心</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/30.html">中介服务/家政服务</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/31.html">专业服务/财会/法律</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/32.html">检测/认证</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/33.html">教育/培训</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/34.html">学术/科研</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/35.html">餐饮/娱乐/休闲</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/36.html">酒店/旅游</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/37.html">交通/运输/物流</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/38.html">航天/航空</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/39.html">能源(石油/化工/矿产)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/40.html">能源(采掘/冶炼/原材料)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/41.html">电力/水利/新能源</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/42.html">政府部门/事业单位</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/43.html">非盈利机构/行业协会</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/44.html">农业/渔业/林业/牧业</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/45.html">其他行业</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/294.html">低空经济</a></li> <div class="clear"></div></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="企业规模" class="s_text">
+                            企业规模
+                        </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/80.html">10人以下</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/81.html">10～50人</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/82.html">50～200人</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/83.html">200～500人</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/84.html">500～1000人</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/85.html">1000人以上</a></li></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="工作性质" class="s_text">
+                            工作性质
+                        </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/nat/1.html">全职</a></li> <li><a href="https://demo.74cms.com/job/famous/1/nat/2.html">实习</a></li></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="学历要求" class="s_text">
+                            学历要求
+                        </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/1.html">初中</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/2.html">高中</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/3.html">中技</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/4.html">中专</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/5.html">大专</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/6.html">本科</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/7.html">硕士</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/8.html">博士</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/9.html">博后</a></li></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="更新时间" class="s_text">
+                            更新时间
+                        </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/settr/3.html">3天内</a></li> <li><a href="https://demo.74cms.com/job/famous/1/settr/7.html">7天内</a></li> <li><a href="https://demo.74cms.com/job/famous/1/settr/15.html">15天内</a></li> <li><a href="https://demo.74cms.com/job/famous/1/settr/30.html">30天内</a></li></ul></div></div> <div class="clear"></div></div> <div class="clear"></div></div></div></div> <!----> <!----></div> <div class="rt_nav_box"><ul class="rt_nav_ul"><li class="rt_nav_li"><a href="javascript:;" class="icon icon1"><span>我的投递</span></a></li> <li class="rt_nav_li"><a href="javascript:;" class="icon icon2"><span>我的消息</span></a></li> <li class="rt_nav_li"><a href="javascript:;" class="icon icon3"><span>我的收藏</span></a></li> <li class="rt_nav_li"><a href="javascript:;" class="icon icon4"><span>面试邀请</span></a></li></ul> <ul class="rt_nav_ul rt_nav_ul_bot"><li class="rt_nav_li"><a class="rt_nav_resume_diagnosis_wrapper"><div class="rt_nav_resume_diagnosis"><div style="">诊断</div></div> <span>简历诊断</span></a></li> <li class="rt_nav_li"><span><div role="tooltip" id="el-popover-8583" aria-hidden="true" class="el-popover el-popper" tabindex="0" style="display: none;"><!----><div class="wx_qrcode"><p class="img_name">骑士CMS人才系统</p> <p class="img_name img_name_dsc">找工作，聘人才 更轻松</p> <img src="https://demo.74cms.com/upload/resource/weixin_img.jpg" alt="" class="img"></div> </div><a href="javascript:;" class="icon icon5 el-popover__reference" aria-describedby="el-popover-8583" tabindex="0"><span>公众号</span></a></span></li> <li class="rt_nav_li"><span><div role="tooltip" id="el-popover-8283" aria-hidden="true" class="el-popover el-popper" tabindex="0" style="display: none;"><!----><div class="customer_box"><div class="customer_item"><img src="https://demo.74cms.com/upload/files/20250326/1f1851bf860f2c07a2268743abb8ad3a.jpg" alt="" class="customer_qr_code"> <ul class="customer_info"><li class="customer_li customer_li1">
+                                    曾柔
+                                </li> <li class="customer_li customer_li2"><a href="tel:13466835651">13466835651</a></li> <li class="customer_li customer_li3"><a href="javaScript:;">QQ交谈</a></li></ul></div><div class="customer_item"><img src="https://demo.74cms.com/upload/files/20250508/7898f96692be3246e116093a27a7b8b7.png" alt="" class="customer_qr_code"> <ul class="customer_info"><li class="customer_li customer_li1">
+                                    梦琪
+                                </li> <li class="customer_li customer_li2"><a href="tel:18003431191">18003431191</a></li> <li class="customer_li customer_li3"><a href="javaScript:;">QQ交谈</a></li></ul></div></div> </div><a href="javascript:;" class="icon icon6 el-popover__reference" aria-describedby="el-popover-8283" tabindex="0"><span>我的客服</span></a></span></li></ul> <a id="scroll-to-top" href="javascript:;" class="to_top"></a></div> <div class="subsite_pupop" style="display: none;"><div class="subsite_box"><span class="close_icon"></span> <div class="subsite_title"><div class="text_1">选择城市</div> <div class="text_2">切换城市分站，让我们为您提供更准确的信息</div></div> <hr> <div class="subsite_list"><div class="current_site">当前选择城市：<a class="site_link">总站</a></div> <div class="lsit_box clearfix"><span class="item active_item">总站</span> <span class="item">太原站</span><span class="item">测试分站</span><span class="item">北京站</span></div></div></div></div></div>
+<script type="text/javascript">
+    function isJSON(str) {
+        if (typeof str === "string") {
+            try {
+                var obj = JSON.parse(str);
+                if (typeof obj === "object" && obj) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (e) {
+                return false;
+            }
+        }
+    }
+
+    $(document).ready(function() {
+    	// 判断浏览器是否支持placeholder属性
+    	function isSupportPlaceholder() {
+    		var input = document.createElement('input');
+    		return 'placeholder' in input;
+    	}
+    	(function() {
+    		//判断是否是IE浏览器，包括Edge浏览器
+    		function IEVersion() {
+    			//取得浏览器的userAgent字符串
+    			var userAgent = navigator.userAgent;
+    			//判断是否IE浏览器
+    			var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1;
+    			if (isIE) {
+    				var reIE = new RegExp("MSIE (\\d+\\.\\d+);");
+    				reIE.test(userAgent);
+    				var fIEVersion = parseFloat(RegExp["$1"]);
+    				if (fIEVersion <= 10 || !isSupportPlaceholder()) {
+    					return true;
+    				}
+    			} else {
+    				return false;
+    			}
+    		}
+    		window.onload = function() {
+    			if (IEVersion()) {
+    				$('.brw_tip').show();
+                    $('#appNewHeader').css({
+                        'paddingTop': '244px'
+                    })
+                    $('.new_header_box').css({
+                        'top': '46px'
+                    })
+                    $('.rt_nav_box').css({
+                        'height': 'calc(100% - 81px)',
+                        'top': '81px',
+                    })
+    			}
+    		};
+    	})();
+    	$('.J_bw_close').click(function() {
+    		$(this).closest('.brw_tip').remove();
+            $('#appNewHeader').css({
+                'paddingTop': '198px'
+            })
+            $('.new_header_box').css({
+                'top': '0'
+            })
+            $('.rt_nav_box').css({
+                'height': 'calc(100% - 35px)',
+                'top': '35px',
+            })
+    	});
+        let resume_diagnosis_text_timer
+        resume_diagnosis_text_timer = setInterval(() => {
+            var resume_diagnosis_text = $('.rt_nav_resume_diagnosis div').text() == '简历' ? '诊断' : '简历';
+            // 淡出效果
+            $('.rt_nav_resume_diagnosis div').fadeOut(200, function() {
+                $(this).text(resume_diagnosis_text);
+                // 淡入效果
+                $(this).fadeIn(200);
+            });
+        }, 1500);
+        $(window).on('unload', function() {
+            clearInterval(resume_diagnosis_text_timer); // 清除定时器
+        });
+    })
+
+    var page_name = "job"
+    var district_level = "1"
+    var category_level = "1"
+
+    var app = new Vue({
+        el: '#appNewHeader',
+        data: {
+            isLogin: false,
+            utype: 0,
+            memberUrl: '',
+            loginUsername: '',
+            preview_id: 0,
+            imUnreaded: false,
+            imToken: '',
+            mobileQrcode: '',
+            wechatQrcode: '',
+            wechatMiniprogramQrcode: '',
+            douyin_miniprogram_qrcode: '',
+            androidQrcode: '',
+            iosQrcode: '',
+            keyword: '', //搜索关键字
+            page_name: "job",
+            searchAlias: 'joblist',
+            current_subsiteid: 0,
+            subsite_open: 0,
+            subsite_sel: 0,
+            subsite_list: [],
+            sitedomain: '',
+            subsite_domain: '',
+            customerList: [],
+            d1: parseInt(''),
+            d2: parseInt(''),
+            d3: parseInt(''),
+            cityLevel: parseInt(district_level),
+            citySelectedText: '地区',
+            c1: parseInt(''),
+            c2: parseInt(''),
+            c3: parseInt(''),
+            categoryLevel: parseInt(category_level),
+            categorySelectedText: '职位类型',
+            trade: '',
+            tradeSelectedText: '',
+            scale: '',
+            scaleSelectedText: '',
+            nat: '',//工作性质
+            natSelectedText: '',
+            nature: '',//企业性质
+            natureSelectedText: '',
+            edu: '',
+            eduSelectedText: '',
+            exp: '',
+            expSelectedText: '',
+            settr: '',
+            settrSelectedText: '',
+            w1: parseInt(''),
+            w2: parseInt(''),
+            wageSelectedText: '',
+            sex: '',
+            sexSelectedText: '',
+            a1: '',
+            a2: '',
+            ageSelectedText: '',
+            tag: '',
+            tagSelectedText: '',
+            major: '',
+            majorSelectedText: '',
+            // 地区选择
+            district_value:[],
+            district_options:[],
+        },
+        created: function() {
+            this.getDistrictOptions()
+            this.getUserInfo()
+            this.getServiceOl()
+            this.keyword = ""
+            this.mobileQrcode = qscms.apiUrl + qscms.apiList.qrcode +
+                "?type=normal&url=https://demo.74cms.com/m/"
+            this.wechatQrcode = "https://demo.74cms.com/upload/resource/weixin_img.jpg"
+            this.wechatMiniprogramQrcode = "https://demo.74cms.com/upload/files/20250331/aead8d41e5d76bd6a201d41abb1b41d2.jpg"
+            this.douyin_miniprogram_qrcode = ""
+            this.androidQrcode = "https://demo.74cms.com/74cms_android.apk"
+            if (this.androidQrcode != '') {
+                this.androidQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=" + this
+                    .androidQrcode
+            }
+            this.iosQrcode = "https://demo.74cms.com/74cms_android.apk"
+            if (this.iosQrcode != '') {
+                this.iosQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=" + this.iosQrcode
+            }
+            this.cronRun()
+            this.current_subsiteid = parseInt(qscms.subsiteid)
+            this.subsite_open = parseInt("1")
+            this.sitedomain = "https://demo.74cms.com"
+            this.subsite_domain = "74cms.com"
+            this.searchAlias = this.page_name != 'resume' && this.page_name != 'company' ? 'joblist' : this
+                .page_name == 'resume' ?
+                'resumelist' : 'companylist'
+            this.getConfig()
+        },
+        mounted: function() {
+            if (this.d1) {
+                this.district_value.push(this.d1)
+                if(this.d2){
+                    this.district_value.push(this.d2)
+                }
+                if(this.d3){
+                    this.district_value.push(this.d3)
+                }
+            }
+            if (this.c1) {
+                this.getClassify('jobcategory'); // 职位分类
+            }
+            // 薪资
+            if (this.w1 && !this.w2 && this.searchAlias == 'joblist') {
+                // 最高薪资以上
+                this.wageSelectedText = this.w1 + '元以上';
+                $('.so_condition_head .J_dropdown').eq(0).addClass('active');
+            } else if (this.w1 && this.w2 && this.searchAlias == 'joblist') {
+                // 薪资区间
+                this.wageSelectedText = this.w1 + '-' + this.w2 + '元';
+                $('.so_condition_head .J_dropdown').eq(0).addClass('active');
+            } else if (!this.w1 && this.w2 && this.searchAlias == 'joblist') {
+                // 最低薪资以下
+                this.wageSelectedText = this.w2 + '元以下';
+                $('.so_condition_head .J_dropdown').eq(0).addClass('active');
+            }
+            // 简历列表头部薪资
+            if (this.w1 && !this.w2 && this.searchAlias == 'resumelist') {
+                // 最高薪资以上
+                this.wageSelectedText = this.w1 + '元以上';
+                $('.so_condition_resume .J_dropdown').eq(8).addClass('active');
+            } else if (this.w1 && this.w2 && this.searchAlias == 'resumelist') {
+                // 薪资区间
+                this.wageSelectedText = this.w1 + '-' + this.w2 + '元';
+                $('.so_condition_resume .J_dropdown').eq(8).addClass('active');
+            } else if (!this.w1 && this.w2 && this.searchAlias == 'resumelist') {
+                // 最低薪资以下
+                this.wageSelectedText = this.w2 + '元以下';
+                $('.so_condition_resume .J_dropdown').eq(8).addClass('active');
+            }
+            // 工作经验
+            if (this.exp && this.searchAlias == 'joblist') {
+                this.getClassify('experience');
+                $('.so_condition_head .J_dropdown').eq(1).addClass('active');
+            }
+            if (this.exp && this.searchAlias == 'resumelist') {
+                this.getClassify('experience');
+                $('.so_condition_resume .J_dropdown').eq(1).addClass('active');
+            }
+            // 行业类别
+            if (this.trade && this.searchAlias == 'joblist') {
+                this.getClassify('trade');
+                $('.so_condition_head .J_dropdown').eq(2).addClass('active');
+            }
+            if (this.trade && this.searchAlias == 'companylist') {
+                this.getClassify('trade');
+                $('.so_condition_head .J_dropdown').eq(1).addClass('active');
+            }
+            if (this.trade && this.searchAlias == 'resumelist') {
+                this.getClassify('trade');
+                $('.so_condition_resume .J_dropdown').eq(5).addClass('active');
+            }
+            // 企业规模
+            if (this.scale) {
+                this.getClassify('companyScale');
+                $('.so_condition_head .J_dropdown').eq(3).addClass('active');
+            }
+            // 工作性质
+            if (this.nat && this.searchAlias == 'joblist') {
+                this.getClassify('jobNature');
+                $('.so_condition_head .J_dropdown').eq(4).addClass('active');
+            }
+            if (this.nat && this.searchAlias == 'resumelist') {
+                this.getClassify('resumeNature');
+                $('.so_condition_resume .J_dropdown').eq(7).addClass('active');
+            }
+            // 学历要求
+            if (this.edu && this.searchAlias == 'joblist') {
+                this.getClassify('education');
+                $('.so_condition_head .J_dropdown').eq(5).addClass('active');
+            }
+            if(this.edu && this.searchAlias == 'resumelist'){
+                this.getClassify('education');
+                $('.so_condition_resume .J_dropdown').eq(0).addClass('active');
+            }
+            // 更新时间
+            if (this.settr && this.searchAlias == 'joblist') {
+                this.settrSelectedText = this.settr + '天内';
+                $('.so_condition_head .J_dropdown').eq(6).addClass('active');
+            }
+            if (this.settr && this.searchAlias == 'resumelist') {
+                this.settrSelectedText = this.settr + '天内';
+                $('.so_condition_resume .J_dropdown').eq(9).addClass('active');
+            }
+            // 企业性质
+            if (this.nature) {
+                this.getClassify('companyNature');
+                $('.so_condition_head .J_dropdown').eq(0).addClass('active');
+            }
+            // 性别
+            if (this.sex) {
+                this.sexSelectedText = parseInt(this.sex) === 1 ? '男' : '女';
+                $('.so_condition_resume .J_dropdown').eq(2).addClass('active');
+            }
+            // 年龄
+            if (this.a1 && !this.a2) {
+                // 最大年龄以上
+                this.ageSelectedText = this.a1 + '岁以上';
+                $('.so_condition_resume .J_dropdown').eq(3).addClass('active');
+            } else if (this.a1 && this.a2) {
+                // 年龄区间
+                this.ageSelectedText = this.a1 + '-' + this.a2 + '岁';
+                $('.so_condition_resume .J_dropdown').eq(3).addClass('active');
+            } else if (!this.a1 && this.a2) {
+                // 最小年龄以下
+                this.ageSelectedText = this.a2 + '岁以下';
+                $('.so_condition_resume .J_dropdown').eq(3).addClass('active');
+            }
+            // 简历标签
+            if (this.tag) {
+                this.getClassify('resumeTag');
+                $('.so_condition_resume .J_dropdown').eq(4).addClass('active');
+            }
+            // 专业
+            if (this.major) {
+                this.getClassify('major');
+                $('.so_condition_resume .J_dropdown').eq(6).addClass('active');
+            }
+        },
+        methods: {
+            // 跳转简历诊断
+            jumpResumeDiagnosis(){
+                window.location.href = qscms.locationList.resumeDiagnosisIndex
+            },
+            // 回填地区
+            recoverDistrict:function(valueArr,arr){
+                valueArr.forEach(value=>{
+                    arr.forEach(item2=>{
+                        if(item2.children && item2.children.length>0 && value == item2.children[0].value && !this.d2){
+                            this.district_value.push(value)
+                        }
+                        if(item2.children && item2.children.length>0){
+                            item2.children.forEach(item3=>{
+                                if(item3.children && item3.children.length>0 && value == item3.children[0].value && !this.d3){
+                                    this.district_value.push(value)
+                                }
+                            })
+                        }
+                    })
+                })
+            },
+            // 地区选择
+            handleChangeDistrict:function(value){
+                let currentPath = window.location.pathname.replace(/\.html$/, '')
+                // 移除 d1 参数及其对应的值
+                currentPath = currentPath.replace(/\/d1\/[^/]+/, "");
+                 // 移除 d2 参数及其对应的值
+                currentPath = currentPath.replace(/\/d2\/[^/]+/, "");
+                // 移除 d3 参数及其对应的值
+                currentPath = currentPath.replace(/\/d3\/[^/]+/, "");
+                if(value.length == 1 && value[0]){
+                    currentPath += "/d1/" + value[0];
+                }
+                if(value.length == 2){
+                    if(value[0] == value[1]){
+                        currentPath += "/d1/" + value[0]
+                    }else{
+                        currentPath += "/d1/" + value[0] + "/d2/" + value[1];
+                    }
+                }
+                if(value.length == 3){
+                    if(value[1] == value[2]){
+                        currentPath += "/d1/" + value[0] + "/d2/" + value[1];
+                    }else{
+                        currentPath += "/d1/" + value[0] + "/d2/" + value[1] + "/d3/" + value[2];
+                    }
+                }
+                location.href = currentPath + '.html'
+            },
+            // 处理地区数据
+            getDistrictOptions:function(){
+                var that = this
+                httpget(qscms.apiList.classify + '?type=citycategory' ).then(res=>{
+                    res.data.unshift({label:'不限',value:''})
+                    res.data.forEach(item1=>{
+                        if(item1.children && item1.children.length == 0){
+                            delete item1.children
+                        }
+                        if(item1.children && item1.children.length>0){
+                            item1.children.unshift({
+                                label:'全' + item1.label,
+                                value:item1.value,
+                            })
+                            item1.children.forEach(item2=>{
+                                if(item2.children && item2.children.length == 0){
+                                    delete item2.children
+                                }
+                                if(item2.children && item2.children.length>0){
+                                    item2.children.unshift({
+                                        label:'全' + item2.label,
+                                        value:item2.value
+                                    })
+                                }
+                            })
+                        }
+                    })
+                    this.district_options = res.data
+                    this.recoverDistrict(this.district_value,this.district_options)
+                })
+            },
+            getClassify: function(type) {
+                var _this = this;
+                httpget(qscms.apiList.classify + '?type=' + type, {}).then(function(res) {
+                    if (res.code === 200) {
+                        if (type === 'citycategory') {
+                            var cityList = res.data;
+                            if (_this.d1) {
+                                if (_this.cityLevel === 2) {
+                                    // 地区为二级
+                                    _this.citySelectedText = cityList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.d1) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                }
+                                if (_this.cityLevel === 3) {
+                                    // 地区为三级
+                                    var levelTwoList = cityList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.d1) {
+                                            return item
+                                        }
+                                    })[0].children;
+                                    if (_this.d3) {
+                                        var levelThreeList = levelTwoList.filter(function(item) {
+                                            if (parseInt(item.value) === _this.d2) {
+                                                return item
+                                            }
+                                        })[0].children;
+                                        _this.citySelectedText = levelThreeList.filter(function(
+                                            item) {
+                                            if (parseInt(item.value) === _this.d3) {
+                                                return item
+                                            }
+                                        })[0].label;
+                                    } else {
+                                        _this.citySelectedText = levelTwoList.filter(function(
+                                            item) {
+                                            if (parseInt(item.value) === _this.d2) {
+                                                return item
+                                            }
+                                        })[0].label;
+                                    }
+                                }
+                            }
+                        } else if (type === 'jobcategory') {
+                            var categoryList = res.data;
+                            if (_this.c1) {
+                                if (_this.categoryLevel === 2) {
+                                    // 二级
+                                    _this.categorySelectedText = categoryList.filter(function(
+                                        item) {
+                                        if (parseInt(item.value) === _this.c1) {
+                                            return item
+                                        }
+                                    })[0].label;
+                                }
+                                if (_this.categoryLevel === 3) {
+                                    // 三级
+                                    var levelTwoList = categoryList.filter(function(item) {
+                                        if (parseInt(item.value) === _this.c1) {
+                                            return item
+                                        }
+                                    })[0].children;
+                                    if (_this.c3) {
+                                        var levelThreeList = levelTwoList.filter(function(item) {
+                                            if (parseInt(item.value) === _this.c2) {
+                                                return item
+                                            }
+                                        })[0].children;
+                                        _this.categorySelectedText = levelThreeList.filter(function(
+                                            item) {
+                                            if (parseInt(item.value) === _this.c3) {
+                                                return item
+                                            }
+                                        })[0].label;
+                                    } else {
+                                        _this.categorySelectedText = levelTwoList.filter(function(
+                                            item) {
+                                            if (parseInt(item.value) === _this.c2) {
+                                                return item
+                                            }
+                                        })[0].label;
+                                    }
+                                }
+                            }
+                        } else if (type === 'jobTag') {
+                            var tagList = res.data;
+                            var selectedTagList = _this.tag.split('_');
+                            var tagTextArr = [];
+                            selectedTagList.forEach(function(value) {
+                                var cuText = tagList.filter(function(item) {
+                                    if (parseInt(item.id) === parseInt(value)) {
+                                        return item
+                                    }
+                                })[0].name;
+                                tagTextArr.push(cuText);
+                            })
+                            _this.tagSelectedText = tagTextArr.join('+');
+                        } else if (type === 'trade') {
+                            var tradeList = res.data;
+                            _this.tradeSelectedText = tradeList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.trade)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'companyScale') {
+                            var scaleList = res.data;
+                            _this.scaleSelectedText = scaleList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.scale)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'jobNature') {
+                            var natureList = res.data;
+                            _this.natSelectedText = natureList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.nat)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'education') {
+                            var eduList = res.data;
+                            _this.eduSelectedText = eduList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.edu)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'experience') {
+                            var expList = res.data;
+                            _this.expSelectedText = expList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.exp)) {
+                                    return item
+                                }
+                            })[0].name;
+                        } else if (type === 'companyNature') {
+							var natureList = res.data;
+							_this.natureSelectedText = natureList.filter(function(item) {
+								if (parseInt(item.id) === parseInt(_this.nature)) {
+									return item;
+								}
+							})[0].name;
+						} else if (type === 'resumeTag') {
+                            var tagList = res.data;
+                            var selectedTagList = _this.tag.split('_');
+                            var tagTextArr = [];
+                            selectedTagList.forEach(function(value) {
+                                var cuText = tagList.filter(function(item) {
+                                    if (parseInt(item.id) === parseInt(value)) {
+                                        return item
+                                    }
+                                })[0].name;
+                                tagTextArr.push(cuText);
+                            })
+                            _this.tagSelectedText = tagTextArr.join('+');
+                        } else if (type === 'major') {
+                            var majorList = res.data;
+                            majorList.forEach(function(value) {
+                                value.children.filter(function(item) {
+                                    if (parseInt(item.value) === parseInt(_this
+                                            .major)) {
+                                        _this.majorSelectedText = item.label
+                                    }
+                                });
+                            })
+                        } else if (type === 'resumeNature') {
+                            var natureList = res.data;
+                            _this.natSelectedText = natureList.filter(function(item) {
+                                if (parseInt(item.id) === parseInt(_this.nat)) {
+                                    return item
+                                }
+                            })[0].name;
+                        }
+                    } else {
+                        console.log(res.message);
+                    }
+                }).catch(function(err) {
+                    console.log(err);
+                });
+            },
+            jumpPage(val) {
+                let url_list = qscms.locationList
+                if (qscms.isLogin) {
+                    switch (val) {
+                        case 'apply':
+                            location.href = qscms.loginUtype == 1 ? url_list.companyJobapply : url_list
+                                .personalJobapply
+                            break;
+                        case 'im':
+                            location.href = qscms.loginUtype == 1 ? url_list.companyIm : url_list.personalIm
+                            break;
+                        case 'fav':
+                            location.href = qscms.loginUtype == 1 ? url_list.companyFavjob : url_list
+                                .personalFavjob
+                            break;
+                        case 'invite':
+                            location.href = qscms.loginUtype == 1 ? url_list.companyInterview : url_list
+                                .personalInterview
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    location.href = url_list.loginPersonal
+                }
+            },
+            wakeupQq: function(qq) {
+                if (qq) {
+                    window.open('http://wpa.qq.com/msgrd?v=3&uin=' + qq + '&site=在线客服&menu=yes')
+                }
+            },
+            getServiceOl: function() {
+                var that = this
+                httpget(qscms.apiList.serviceOl).then(function(res) {
+                    that.customerList = res.data.items
+                }).catch(function() {})
+            },
+            setSubsite: function(subsiteid, url = '') {
+                if (this.subsite_open === 1 && this.subsite_domain != '') {
+                    Cookies.set('qscms_subsiteid', subsiteid, {
+                        domain: '.' + this.subsite_domain
+                    })
+                } else {
+                    Cookies.set('qscms_subsiteid', subsiteid, )
+                }
+                location.replace(url);
+            },
+            getConfig: function() {
+                var that = this
+                httpget(qscms.apiList.config)
+                    .then(function(res) {
+                        that.subsite_list = res.data.subsite_list
+                    })
+                    .catch(function() {})
+            },
+            cronRun: function() {
+                httpget(qscms.apiList.cronRun)
+                    .then(function() {})
+                    .catch(function() {})
+            },
+            registerUser(utype) {
+                if (parseInt("0") === 1) {
+                    this.$message.error('网站已关闭会员注册')
+                    return false
+                }
+                if (utype == 1) {
+                    location.href = qscms.locationList.regCompany
+                } else {
+                    location.href = qscms.locationList.regPersonal
+                }
+            },
+            handlerSearch: function() {
+                var that = this
+                var params = {
+                    alias: that.searchAlias,
+                    keyword: that.keyword
+                }
+                httpget(qscms.apiList.searchLocation, params).then(function(res) {
+                    location.href = res.data
+                }).catch(function() {})
+            },
+            handlerLogout: function() {
+                var that = this
+                this.$confirm('确定退出当前账号吗?', '提示', {
+                    type: 'warning'
+                }).then(function() {
+                    if (that.subsite_open === 1 && that.subsite_domain != '') {
+                        Cookies.remove('qscms_visitor', {
+                            domain: '.' + that.subsite_domain
+                        })
+                    }
+                    Cookies.remove('qscms_visitor')
+                    window.location.reload()
+                }).catch(function() {});
+            },
+            handlerMemberCenter: function() {
+                if (this.utype == 1) {
+                    location.href = qscms.locationList.indexCompany
+                } else {
+                    location.href = qscms.locationList.indexPersonal
+                }
+            },
+            locationTo: function() {
+                if (this.utype == 1) {
+                    location.href = qscms.locationList.companyIm
+                } else {
+                    location.href = qscms.locationList.personalIm
+                }
+            },
+            getUserInfo: function() {
+                var that = this
+                httpget(qscms.apiList.userinfo).then(function(res) {
+                    if (res.data.login === true) {
+                        that.isLogin = res.data.login
+                        that.utype = res.data.userinfo.utype
+                        if (that.utype == 1) {
+                            that.memberUrl = qscms.locationList.indexCompany
+                        } else {
+                            that.memberUrl = qscms.locationList.indexPersonal
+                        }
+                        that.loginUsername = res.data.show_username
+                        that.preview_id = res.data.preview_id
+                        that.imWindowGlobal()
+                    }
+                }).catch(function() {})
+            },
+            imWindowGlobal: function() {
+                var that = this
+                httpget(qscms.apiList.imGlobal, {})
+                    .then(function(res) {
+                        if (res.code == 200) {
+                            //检测通过
+                            if (res.data.next == '') {
+                                that.initWebSocket()
+                            }
+                        } else {
+                            console.log(res.message)
+                        }
+                    })
+                    .catch(() => {});
+            },
+            initWebSocket: function() {
+                var that = this
+                httpget(qscms.apiList.imGetToken, {})
+                    .then(function(res) {
+                        if (res.data != '') {
+                            qscms.imToken = res.data
+                            window.ws = new WebSocket('wss://imserv.v2.74cms.com');
+                            window.ws.onopen = that.websocketonopen;
+                            window.ws.onmessage = that.websocketonmessage;
+                            window.ws.onerror = that.websocketonerror;
+                            window.ws.onclose = that.websocketclose;
+                        }
+
+                    }).catch(() => {})
+            },
+            websocketonopen: function() {
+                var that = this
+                var msgObj = {
+                    controller: "Connect",
+                    action: "index",
+                    args: {
+                        token: qscms.imToken
+                    }
+                };
+                var msgStr = JSON.stringify(msgObj);
+                window.ws.send(msgStr);
+                that.getImUnreaded()
+            },
+            websocketonerror: function() {
+                console.log('client：连接websocket失败，请刷新页面重试')
+            },
+            websocketonmessage: function(e) {
+                var that = this
+                if (isJSON(e.data)) {
+                    var data = JSON.parse(e.data);
+                    if (data.error === undefined) {
+                        that.imUnreaded = true
+                    }
+                } else {
+                    console.log('client：' + e.data);
+                }
+            },
+            websocketclose: function() {
+                console.log("client：关闭连接");
+            },
+            getImUnreaded: function() {
+                var that = this
+                httppost(qscms.apiList.imChatlist, {
+                        token: qscms.imToken
+                    })
+                    .then(function(res) {
+                        for (var i = 0; i < res.data.items.length; i++) {
+                            if (res.data.items[i].new > 0) {
+                                that.imUnreaded = true
+                            }
+                        }
+
+                    })
+                    .catch(function() {})
+            },
+            handlerCompanyIndex: function() {
+                location.href = qscms.locationList.indexCompany
+            },
+            handlerResumeIndex: function() {
+                location.href = qscms.locationList.personalResume
+            },
+            handlerPersonalRecommend: function() {
+                location.href = qscms.locationList.recommendJob
+            },
+            handlerAddJob() {
+                var that = this
+                httpget(qscms.apiList.companyCheckJobaddNum, {}).then(function(res) {
+                    if (res.data.enable_addjob_num <= 0) {
+                        that.$confirm('您当前是' +
+                                res.data.setmeal_name +
+                                '，当前可发布职位数为0，建议您立即升级套餐或将暂时不招聘的职位设为关闭！', '系统提示', {
+                                    confirmButtonText: '升级套餐',
+                                    type: 'warning'
+                                })
+                            .then(function() {
+                                location.href = qscms.locationList.companySetmealAdd
+                            })
+                            .catch(function() {})
+                        return false
+                    } else {
+                        location.href = qscms.locationList.companyJobAdd
+                    }
+                }).catch(function() {})
+            },
+            handlerCompanyJoblist() {
+                location.href = qscms.locationList.companyJoblist
+            },
+            handlerCompanyRecommend() {
+                location.href = qscms.locationList.recommendResume
+            },
+            handlerCompanyService() {
+                location.href = qscms.locationList.companyService
+            },
+            handlerPersonalLogin() {
+                location.href = qscms.locationList.loginPersonal
+            },
+            handlerCompanyLogin() {
+                location.href = qscms.locationList.loginCompany
+            },
+            handlerForget() {
+                location.href = qscms.locationList.forget
+            },
+            handlerAppeal() {
+                location.href = qscms.locationList.appeal
+            },
+            // 地区选择
+            choseDistrict(val) {
+                console.log(val, '====')
+                // $('#district_text').text(val)
+                $('#subsite_pupop').removeClass('displayBlock').addClass('displayNone')
+            }
+        }
+    })
+
+    $(function() {
+    	// 头部下拉广告位
+    	var showPopup = false
+    	var current = new Date()
+    	var expire_time = localStorage.getItem('index_popup_expire_time')
+        console.log(current.getTime() > new Date(expire_time))
+    	if (expire_time === undefined || !expire_time || current.getTime() > new Date(expire_time)) {
+    		showPopup = true
+    		expire_time = new Date(new Date(new Date().toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000 - 1)
+    		localStorage.setItem('index_popup_expire_time', expire_time)
+    	}
+    	var header_source_time = 6;
+    	var header_time = null;
+    	var distinguish_source = true;
+
+    	if ($(".down_source")[0]) {
+    		down_source();
+    	} else {
+    		if ($(".popup_source")[0] && showPopup === true) {
+    			$('<div>').attr({
+    				'class': 'mantle_box'
+    			}).appendTo('body')
+    			$(".popup_source").show();
+    			popup_source();
+    		}
+    	}
+
+    	function down_source() {
+    		$(".source_box .img_link").animate({
+    			height: "500px"
+    		});
+    		$(".source_box").animate({
+    			height: "500px"
+    		});
+    		$(".down_source .source_btn").html(header_source_time);
+    		header_time = setInterval(function() {
+    			header_source_time--;
+    			$(".down_source .source_btn").html(header_source_time);
+    			if (header_source_time == 0) {
+    				$(".source_box .img_link").animate({
+    					height: "0px"
+    				});
+    				$(".source_box").animate({
+    					height: "0px"
+    				});
+    				$(".down_source .source_btn").html("重播");
+    				header_source_time = 6;
+    				$(".source_btn").attr({
+    					disabled: false
+    				});
+    				clearInterval(header_time);
+    				if ($(".popup_source")[0] && showPopup === true) {
+    					if (distinguish_source) {
+    						$('<div>').attr({
+    							'class': 'mantle_box'
+    						}).appendTo('body')
+    						$(".popup_source").show();
+    						$(".source_btn").attr({
+    							disabled: false
+    						});
+    						popup_source();
+    					}
+    				}
+    			}
+    		}, 1000);
+    	}
+    	// 重播点击事件
+    	$(".down_source .source_btn").click(function() {
+    		distinguish_source = false;
+    		$(this).attr({
+    			disabled: true
+    		});
+    		down_source();
+    	});
+    	// 关闭按钮
+    	$(".down_source .source_box .img_link .close").click(function(event) {
+    		var e = window.event || event;
+    		e.preventDefault();
+    		distinguish_source = false;
+    		$(".source_box .img_link").animate({
+    			height: "0px"
+    		});
+    		$(".source_box").animate({
+    			height: "0px"
+    		});
+    		header_source_time = 6;
+    		$(".down_source .source_btn").html("重播");
+    		clearInterval(header_time);
+    		$(".source_btn").attr({
+    			disabled: false
+    		});
+    		if (distinguish_source && showPopup === true) {
+    			$(".popup_source").show();
+    			popup_source();
+    		}
+    	});
+
+    	// 弹窗广告位
+    	var popup_time = null;
+
+    	function popup_source() {
+    		popup_time = setTimeout(function() {
+    			$('.mantle_box').hide()
+    			$(".popup_source").hide();
+    		}, 6000);
+    	}
+    	// 关闭
+    	$(".popup_close").click(function() {
+    		$(".popup_source").hide();
+    		$('.mantle_box').hide()
+    		clearTimeout(popup_time);
+    	});
+    })
+</script>
+
+		<!-- content -->
+		
+<link rel="stylesheet" type="text/css" href="/assets/css/index.css">
+<link rel="stylesheet" type="text/css" href="/assets/css/joblist.css">
+<div id="app" class="content_wrapper2"><div class="content"><div class="filter_combo"><div class="filter_line"><div class="line_title">职位薪资：</div> <div class="line_item"><a href="https://demo.74cms.com/job/famous/1.html" class="f_item active">不限</a> <a href="https://demo.74cms.com/job/famous/1/w1/1000/w2/2000.html" class="f_item ">1000-2000</a> <a href="https://demo.74cms.com/job/famous/1/w1/2000/w2/3000.html" class="f_item ">2000-3000</a> <a href="https://demo.74cms.com/job/famous/1/w1/3000/w2/5000.html" class="f_item ">3000-5000</a> <a href="https://demo.74cms.com/job/famous/1/w1/5000/w2/8000.html" class="f_item ">5000-8000</a> <a href="https://demo.74cms.com/job/famous/1/w1/8000/w2/12000.html" class="f_item ">8000-12000</a> <a href="https://demo.74cms.com/job/famous/1/w1/12000/w2/15000.html" class="f_item ">12000-15000</a> <a href="https://demo.74cms.com/job/famous/1/w1/15000/w2/0.html" class="f_item ">15000以上</a> <div class="clear"></div></div> <div class="clear"></div></div> <div class="filter_line"><div class="line_title">经验要求：</div> <div class="line_item"><a href="https://demo.74cms.com/job/famous/1.html" class="f_item active">不限</a> <a href="https://demo.74cms.com/job/famous/1/exp/1.html" data-id="1" class="f_item tagLink ">应届生</a> <a href="https://demo.74cms.com/job/famous/1/exp/2.html" data-id="2" class="f_item tagLink ">1年</a> <a href="https://demo.74cms.com/job/famous/1/exp/3.html" data-id="3" class="f_item tagLink ">2年</a> <a href="https://demo.74cms.com/job/famous/1/exp/4.html" data-id="4" class="f_item tagLink ">3年</a> <a href="https://demo.74cms.com/job/famous/1/exp/5.html" data-id="5" class="f_item tagLink ">3-5年</a> <a href="https://demo.74cms.com/job/famous/1/exp/6.html" data-id="6" class="f_item tagLink ">5-10年</a> <a href="https://demo.74cms.com/job/famous/1/exp/7.html" data-id="7" class="f_item tagLink ">10年以上</a> <div class="clear"></div></div> <div class="clear"></div></div> <div class="filter_line so_condition last"><div class="line_title">更多筛选：</div> <div class="f_select first J_dropdown"><span title="行业类别" class="s_text">
+                        行业类别
+                    </span> <div class="dropdowbox_searchtrade J_dropdown_menu"><div class="dropdow_inner_searchtrade"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1/trade/1.html">计算机软件/硬件</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/2.html">计算机系统/维修</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/3.html">通信(设备/运营/服务)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/4.html">互联网/电子商务</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/5.html">网络游戏</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/6.html">电子/半导体/集成电路</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/7.html">仪器仪表/工业自动化</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/8.html">会计/审计</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/9.html">金融(投资/证券</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/10.html">金融(银行/保险)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/11.html">贸易/进出口</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/12.html">批发/零售</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/13.html">消费品(食/饮/烟酒)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/14.html">服装/纺织/皮革</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/15.html">家具/家电/工艺品/玩具</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/16.html">办公用品及设备</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/17.html">机械/设备/重工</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/18.html">汽车/摩托车/零配件</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/19.html">制药/生物工程</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/20.html">医疗/美容/保健/卫生</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/21.html">医疗设备/器械</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/22.html">广告/市场推广</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/23.html">会展/博览</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/24.html">影视/媒体/艺术/出版</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/25.html">印刷/包装/造纸</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/26.html">房地产开发</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/27.html">建筑与工程</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/28.html">家居/室内设计/装潢</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/29.html">物业管理/商业中心</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/30.html">中介服务/家政服务</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/31.html">专业服务/财会/法律</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/32.html">检测/认证</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/33.html">教育/培训</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/34.html">学术/科研</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/35.html">餐饮/娱乐/休闲</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/36.html">酒店/旅游</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/37.html">交通/运输/物流</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/38.html">航天/航空</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/39.html">能源(石油/化工/矿产)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/40.html">能源(采掘/冶炼/原材料)</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/41.html">电力/水利/新能源</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/42.html">政府部门/事业单位</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/43.html">非盈利机构/行业协会</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/44.html">农业/渔业/林业/牧业</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/45.html">其他行业</a></li> <li><a href="https://demo.74cms.com/job/famous/1/trade/294.html">低空经济</a></li> <div class="clear"></div></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="企业规模" class="s_text">
+                        企业规模
+                    </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/80.html">10人以下</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/81.html">10～50人</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/82.html">50～200人</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/83.html">200～500人</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/84.html">500～1000人</a></li> <li><a href="https://demo.74cms.com/job/famous/1/scale/85.html">1000人以上</a></li></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="工作性质" class="s_text">
+                        工作性质
+                    </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/nat/1.html">全职</a></li> <li><a href="https://demo.74cms.com/job/famous/1/nat/2.html">实习</a></li></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="学历要求" class="s_text">
+                        学历要求
+                    </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/1.html">初中</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/2.html">高中</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/3.html">中技</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/4.html">中专</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/5.html">大专</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/6.html">本科</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/7.html">硕士</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/8.html">博士</a></li> <li><a href="https://demo.74cms.com/job/famous/1/edu/9.html">博后</a></li></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="岗位福利" class="s_text">
+                        岗位福利
+                    </span> <div class="dropdowbox_searchtrade J_dropdown_menu"><div class="dropdow_inner_searchtrade" style="width: 690px;"><ul class="nav_box"><li style="width: 166px;"><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li style="width: 166px;"><a>环境好</a></li> <li style="width: 166px;"><a>年终奖</a></li> <li style="width: 166px;"><a>双休</a></li> <li style="width: 166px;"><a>五险一金</a></li> <li style="width: 166px;"><a>加班费</a></li> <li style="width: 166px;"><a>朝九晚五</a></li> <li style="width: 166px;"><a>交通方便</a></li> <li style="width: 166px;"><a>加班补助</a></li> <li style="width: 166px;"><a>包食宿</a></li> <li style="width: 166px;"><a>管理规范</a></li> <li style="width: 166px;"><a>有提成</a></li> <li style="width: 166px;"><a>全勤奖</a></li> <li style="width: 166px;"><a>有年假</a></li> <li style="width: 166px;"><a>专车接送</a></li> <li style="width: 166px;"><a>有补助</a></li> <li style="width: 166px;"><a>晋升快</a></li> <li style="width: 166px;"><a>车贴</a></li> <li style="width: 166px;"><a>房贴</a></li> <li style="width: 166px;"><a>压力小</a></li> <li style="width: 166px;"><a>技术培训</a></li> <li style="width: 166px;"><a>旅游</a></li> <li style="width: 166px;"><a>退役军人优先</a></li> <div class="clear"></div></ul></div></div> <div class="clear"></div></div> <div class="f_select J_dropdown"><span title="更新时间" class="s_text">
+                        更新时间
+                    </span> <div class="dropdowbox_noa J_dropdown_menu"><div class="dropdow_inner_noa"><ul class="nav_box"><li><a href="https://demo.74cms.com/job/famous/1.html">不限</a></li> <li><a href="https://demo.74cms.com/job/famous/1/settr/3.html">3天内</a></li> <li><a href="https://demo.74cms.com/job/famous/1/settr/7.html">7天内</a></li> <li><a href="https://demo.74cms.com/job/famous/1/settr/15.html">15天内</a></li> <li><a href="https://demo.74cms.com/job/famous/1/settr/30.html">30天内</a></li></ul></div></div> <div class="clear"></div></div> <div class="clear"></div></div> <!----></div> <div class="content_box2"><ul class="box2_nav clearfix"><li class="tab nav_active"><a href="https://demo.74cms.com/job/famous/1.html" class="listtype">所有职位</a></li> <li class="tab "><a href="https://demo.74cms.com/job/famous/1/listtype/emergency.html" class="listtype">紧急招聘</a></li> <li class="tab"><a href="javascript:;" class="listtype">智能推荐</a></li></ul> <div class="array_type_no_border"><div class="t">筛选条件：</div> <label onclick="javascript:location.href='https://demo.74cms.com/job.html'" class="label_new"><input type="checkbox" checked="checked"> &nbsp;名企</label> <label onclick="javascript:location.href='https://demo.74cms.com/job/famous/1/license/1.html'" class="label_new"><input type="checkbox">
+                    &nbsp;企业已认证</label> <label onclick="javascript:location.href='https://demo.74cms.com/job/famous/1/filter_apply/1.html'" class="label_new"><input type="checkbox">
+                    &nbsp;过滤已投递</label></div></div> <div class="content_box3 clearfix"><div class="left_sidebar"><div class="job_list_box"><div class="J_allListBox"><div data-id="140" class="job_list2 clearfix"><div class="job_box_internal clearfix"><div class="hover_site_a_seat"></div> <a href="https://demo.74cms.com/job/140.html" target="_blank" class="job_text"><div class="line1"><div data-id="140" class="job_title"><div class="job_title_line"><p class="job_title_new  substring">
+                                                    设计师</p><span class="wage_text_new">5K~8K<span>/月</span></span></div> <div class="job_list_hover"><div class="hover_title_box clearfix"><div class="hover_title"><div class="hover_text1"><div onclick="javascript:location.href='https://demo.74cms.com/job/140.html'" class="title substring">
+                                                                设计师</div> <div class="oprate_btns_hover"><button data-id="140" class="hand_in_resume doApplyBtn">
+                                                                    投简历                                                                </button> <button class="have_a_chat">聊一聊</button></div></div> <p class="hover_text3">山西正力网络有限公司</p> <span data-id="140" id="favBox140" class="fav_box ">收藏</span></div></div> <div class="job_duty"><div class="job_desc">职位描述：</div> <ul class="duty_list"><li class="substring2">岗位职责：负责品牌视觉体系搭建与维护，独立完成海报、画册、KV、社交媒体配图等平面设计工作；参与产品包装、UI界面、营销活动页面等多维度设计输出；配合市场、运营、产品等部门完成创意提案与落地执行；把控设计质量与品牌调性一致性，持续优化视觉表达效果。<br> <br>
+任职要求：3年以上平面/品牌设计经验，有成熟作品集；熟练使用Photoshop、Illustrator、Sketch或Figma等设计工具；具备良好的审美能力、构图意识及字体应用能力；理解品牌逻辑，能将策略转化为视觉语言；责任心强，具备跨部门协作意识与高效执行力；投递请附带个人作品链接。</li></ul></div></div></div></div> <p class="job_salary job_salary_margin"><span>学历不限</span> <span>3年</span> <span class="substring distic">河北 / 石家庄 / 长安区</span></p></a> <div class="company"><div class="company_title"><a title="山西正力网络有限公司" href="https://demo.74cms.com/company/12.html" target="_blank" class="c_name substring">山西正力网络有限公司</a> <div class="s_ic1"></div> <div class="s_ic2" style="background: url(&quot;https://demo.74cms.com/upload/resource/setmeal4.png&quot;) 0px 4px / 15px 13px no-repeat;"></div> <div class="clear"></div></div> <div class="in_p"><span class="company_span">上市公司</span> <span class="company_span">互联网/电子商务</span> <span class="company_span">200～500人</span></div> <img src="https://demo.74cms.com/upload/resource/empty_logo.jpg" alt="" class="company_avator"></div></div> <p class="job_welfare job_welfare_margin"><span>招聘1人</span></p> <div class="wechat_apply_box"><div id="show_wx_qrcode_140" data-id="140" data-url="https://demo.74cms.com/v1_0/home/qrcode/index?alias=subscribe_job&amp;url=https://demo.74cms.com/m/commonViews/JobShow?id=140&amp;jobid=140" class="wx_qrcode">微信扫一扫快速求职
+                                    <div class="hover_img"><img id="wx_qrcode_140" src=""></div></div> <div class="update_time">更新：2026-04-20</div> <div class="oprate_btns"><button data-id="140" class="hand_in_resume doApplyBtn">投简历</button> <button class="have_a_chat">聊一聊</button></div></div></div></div> <!----> <div class="jobslist-login-layer"><div class="tip-block"><div class="tip-block-title"><p class="middle"><span class="font_red register_color">30秒</span>快速注册简历，海量职位任意投！</p> <p class="small">登录或注册简历后可以查看更多职位</p></div> <div class="tip_block_qr"><img src="https://demo.74cms.com/upload/resource/weixin_img.jpg" alt="" class="tip_qr"></div> <div class="tip_qr_txt">微信扫一扫，求职更轻松</div> <a href="javascript:;" class="btn_lightblue btn_inline btn_free_registration">30秒注册简历</a> <a href="javascript:;" class="btn_red btn_inline btn_existing_account">已有账号登录</a></div></div></div></div> <div class="right_sidebar"><div class="job_login_box"><div class="left box1_right"><div class="login_wrapper"><div class="login_title">海量职位任你选</div> <div class="scan_code scan_bg_1"></div> <div class="login_tab_box"><div class="login_con"><div class="tab_con_item tab_con"><input type="text" placeholder="请输入用户名/手机号/邮箱" autocomplete="off" class="user"> <input type="password" placeholder="请输入密码" autocomplete="off" class="pas"></div> <!----></div> <div class="tab_btns"><!----> <div class="btn_item">短信登录
+				</div> <a class="right text_2">忘记密码</a></div> <div class="index_login_btn">登录</div> <div class="to_register">没有账号，<span class="txt">立即注册</span></div></div> <div id="wxlogin" class="code_box" style="display: none;"></div></div></div></div> <div class="resume_diagnosis"><a class="btn">一键诊断简历</a></div> <div class="wechat_job_serach"><p class="wechat_qrcode_img"><img src="https://demo.74cms.com/upload/resource/weixin_img.jpg" alt=""></p> <div class="wechat_warn_text"><p>手机微信扫一扫</p> <p>求职招聘不求人</p></div></div></div></div> <div class="el-dialog__wrapper" style="display: none;"><div role="dialog" aria-modal="true" aria-label="验证码" class="el-dialog" style="margin-top: 15vh; width: 350px;"><div class="el-dialog__header"><span class="el-dialog__title">验证码</span><button type="button" aria-label="Close" class="el-dialog__headerbtn"><i class="el-dialog__close el-icon el-icon-close"></i></button></div><!----><!----></div></div> <div class="el-dialog__wrapper" style="display: none;"><div role="dialog" aria-modal="true" aria-label="系统提示" class="el-dialog el-dialog--center" style="margin-top: 15vh; width: 450px;"><div class="el-dialog__header"><span class="el-dialog__title">系统提示</span><button type="button" aria-label="Close" class="el-dialog__headerbtn"><i class="el-dialog__close el-icon el-icon-close"></i></button></div><!----><!----></div></div> <div class="el-dialog__wrapper" style="display: none;"><div role="dialog" aria-modal="true" aria-label="dialog" class="el-dialog wx_dialog" style="margin-top: 15vh; width: 300px;"><div class="el-dialog__header"><span class="el-dialog__title"></span><button type="button" aria-label="Close" class="el-dialog__headerbtn"><i class="el-dialog__close el-icon el-icon-close"></i></button></div><!----><!----></div></div></div> <div id="message-box-modal" class="message-box-modal displayNone"><div class="message-box"><div class="message-header"><span class="txt">提示</span> <span class="close-btn close-modal"></span></div> <div class="message-content"><span class="message-icon"></span> <span class="message-txt">当前操作需要登录求职者账号</span></div> <div class="message-footer"><span class="btn cancel-btn close-modal">取消</span> <span id="login-btn" class="btn primary-btn">去登录</span></div></div></div></div>
+<script>
+    var keyword = '';
+    var d1 = parseInt('');
+    var d2 = parseInt('');
+    var d3 = parseInt('');
+    var cityLevel = parseInt('1');
+    var c1 = parseInt('');
+    var c2 = parseInt('');
+    var c3 = parseInt('');
+    var categoryLevel = parseInt('1');
+    var w1 = parseInt('');
+    var w2 = parseInt('');
+    var tag = '';
+    var trade = '';
+    var scale = '';
+    var nat = '';
+    var edu = '';
+    var exp = '';
+    var settr = '';
+    var wechat_login_open = parseInt("1");
+    var jobContrastUrl = "https://demo.74cms.com/job/contrast.html";
+    var joblist = "https://demo.74cms.com/job/famous/1/tag/_tag_.html";
+    var id = ''
+</script>
+<script type="text/javascript" src="/assets/js/job/jobList.js"></script>
+
+		<!-- footer -->
+		<div id="footerContent" class="indexFooter_wrapper"><div class="indexFooter clearfix"><div class="clearfix float"><div class="float clearfix"><ul class="footer_list  float"><li class="fc">个人</li> <li><a href="javascript:;">登记简历</a></li> <li><a href="javascript:;">求职管理</a></li> <li><a href="https://demo.74cms.com/job.html">最新职位</a></li> <li><a href="https://demo.74cms.com/company.html">企业信息</a></li></ul> <ul class="footer_list float"><li class="fc">企业</li> <li><a href="javascript:;">企业入驻</a></li> <li><a href="javascript:;">发布招聘</a></li> <li><a href="javascript:;">会员服务</a></li> <li><a href="javascript:;">招聘管理</a></li></ul> <ul class="footer_list float"><li class="fc">特色</li> <li><a target="_self" href="https://demo.74cms.com/explain/1.html">网站介绍</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/2.html">产品服务</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/3.html">法律申明</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/4.html">推广合作</a></li></ul> <ul class="footer_list float"><li class="fc">帮助</li> <li><a href="https://demo.74cms.com/help/id/1.html">常见问题</a></li> <li><a href="https://demo.74cms.com/help/id/2.html">新手上路</a></li> <li><a href="https://demo.74cms.com/help/id/3.html">账号管理</a></li> <li><a href="https://demo.74cms.com/help/id/4.html">简历管理</a></li></ul></div> <div class="code_box float clearfix"><div class="float code1"><p>微信公众号</p> <div class="img"><img src="https://demo.74cms.com/upload/resource/weixin_img.jpg" class="codeImg"></div></div> <div class="float code2"><p>手机微信版</p> <div class="img1"><img src="https://demo.74cms.com/v1_0/home/qrcode/index?type=normal&amp;url=https://demo.74cms.com/m/" class="codeImg"></div></div></div></div> <div class="footer_contactType"><p class="contact_title">联系电话</p> <div class="contact_tel"><img src="/assets/images/contact_icon.png"> <span>18003431191</span></div> <p class="job_time">服务时间：周一至周六 8:00-17:30</p> <p class="job_QQ">客服QQ：<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&amp;uin=00000000000&amp;site=在线客服&amp;menu=yes">00000000000</a></p></div></div> <div class="indexFooter_nav_con"><ul class="indexFooter_nav clearfix"><li><a href="https://demo.74cms.com/">网站首页</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/5.html">联系我们</a></li> <li><a target="_self" href="https://demo.74cms.com/explain/6.html">招贤纳士</a></li></ul></div> <div class="footer_text1"><span class="address">联系地址：00省00市00路00号0大厦00楼</span></div> <div class="footer_text2"><span>
+                网站备案：
+                <a target="_blank" href="https://beian.miit.gov.cn/">
+                    icp000000000                </a></span> <span class="security">
+                公网安备：
+                <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=000000000000">
+                    晋公网安备000000000000号                </a></span></div> <div class="footer_text3"><span>Copyright © 2021 74cms.com All Right Reserved Powered by 74cmsse</span></div></div>
+<script>
+var version = "8.12.3 专业版";
+console.log('\n' + ' %c 74cmsSE v'+version+'  %c https://www.74cms.com ' + '\n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;');
+    var app = new Vue({
+        el: '#footerContent',
+        data:{
+            mobileQrcode:'',
+            backTopFlag: false,
+            scrollTop: 0,
+            mobileList:[],
+            qqList:[],
+            weixinList:[],
+        },
+        created:function(){
+            this.getServiceOl()
+            this.mobileQrcode = qscms.apiUrl + qscms.apiList.qrcode + "?type=normal&url=https://demo.74cms.com/m/"
+        },
+        mounted:function () {
+            window.addEventListener('scroll', this.scrollToTop)
+        },
+        destroyed:function () {
+            window.removeEventListener('scroll', this.scrollToTop)
+        },
+        methods:{
+            wakeupQq:function(qq){
+                if(qq){
+                    window.open('http://wpa.qq.com/msgrd?v=3&uin='+qq+'&site=在线客服&menu=yes')
+                }
+            },
+            getServiceOl:function() {
+                var that = this
+                httpget(qscms.apiList.serviceOl).then(function (res) {
+                 that.mobileList = res.data.mobile
+                 that.qqList = res.data.qq
+                 that.weixinList = res.data.weixin
+                }).catch(function () { })
+            },
+            // 点击图片回到顶部方法，加计时器是为了过渡顺滑
+            backTop:function() {
+                var that = this
+                var timer = setInterval(function(){
+                var ispeed = Math.floor(-that.scrollTop / 5)
+                document.documentElement.scrollTop = document.body.scrollTop = that.scrollTop + ispeed
+                if (that.scrollTop === 0) {
+                    clearInterval(timer)
+                }
+                }, 16)
+            },
+            // 为了计算距离顶部的高度，当高度大于60显示回顶部图标，小于60则隐藏
+            scrollToTop:function() {
+                var that = this
+                that.scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+                that.backTopFlag = that.scrollTop > 60;
+            },
+            handlerResumeIndex:function(){
+                location.href = qscms.locationList.personalResume
+            },
+            handlerPersonalJobApplyList:function(){
+                location.href = qscms.locationList.personalJobApplyList
+            },
+            handlerCompanyIndex:function(){
+                location.href = qscms.locationList.indexCompany
+            },
+            handlerAddJob:function(){
+                httpget(qscms.apiList.companyCheckJobaddNum, {}).then(function(res){
+                    if (res.data.enable_addjob_num <= 0) {
+                        this.$confirm('您当前是' +
+                            res.data.setmeal_name +
+                            '，当前可发布职位数为0，建议您立即升级套餐或将暂时不招聘的职位设为关闭！','系统提示',{
+                            confirmButtonText: '升级套餐',
+                            type: 'warning'
+                        })
+                        .then(function(){
+                            location.href = qscms.locationList.companySetmealAdd
+                        })
+                        .catch(function(){})
+                        return false
+                    } else {
+                        location.href = qscms.locationList.companyJobAdd
+                    }
+                }).catch(function(){})
+            },
+            handlerCompanyService:function(){
+                location.href = qscms.locationList.companyService
+            },
+            handlerCompanyJobApplyList:function(){
+                location.href = qscms.locationList.companyJobApplyList
+            },
+        }
+    })
+</script>
+
+	</div>
+
+
+<script type="text/javascript" src="https://cloud.zhitoo.cn/static/captcha/js/slidercaptcha.js"></script><script type="text/javascript" src="https://cloud.zhitoo.cn/static/captcha/js/crypto-js.min.js"></script></body></html>

@@ -21,6 +21,7 @@ cd frontend && npm test && npm run build
 | 首页高保真首屏 | `PortalHomePage.test.tsx` | 顶部工具条、搜索区、分类墙、登录卡、公告 tab、广告位、扫码 CTA、推荐企业、热招职位存在。 |
 | 公共门户 Shell | `PortalShell.test.tsx` | 导航、更多服务、Footer、右侧工具条存在；公开导航不出现“简历库/搜索简历”。 |
 | 找工作 | `JobSearchPage.test.tsx`、`JobVisibilityIT` | 只展示在线职位和认证企业职位；职位卡片不含联系人、审核材料或营业执照附件。 |
+| P1 公开频道补充 | `Phase2SupplementRoutes.test.tsx`、`check_phase2_demo_acceptance` | 名企直聘、急聘、今日招聘、网络招聘会、校园招聘、公开说明等稳定路由存在；高风险入口仍禁用。 |
 | 找企业 | `CompanySearchPage.test.tsx`、`PortalCompanyVisibilityIT` | 只展示已认证企业公开字段；企业主页只聚合在线且审核通过职位。 |
 | 人才服务区 | `TalentServiceArea.test.tsx`、`PortalFieldBlacklistTest`、`check_portal_snapshot_fields` | 唯一公开数据源是发布快照；DOM 和响应只含白名单字段；撤回下线不可见。 |
 | 招聘会/资讯/HR 工具箱 | `PortalContentChannels.test.tsx`、`PortalContentEventVisibilityIT` | `status=0` 不公开；不展示报名名单、候选人明细、签到证据或联系方式。 |
@@ -44,7 +45,7 @@ cd frontend && npm test && npm run build
 - 二期演示 SQL、导入脚本和文档存在。
 - 公开页面路由和对应测试存在。
 - sitemap 覆盖新增公开频道。
-- Prompt 23 完成记录和边界文件收口记录存在。
+- Prompt 23 主线收口和 Prompt 24 补充页完成记录存在。
 - 敏感字段黑名单仍在测试中被断言。
 
 `scripts/run_all` 顺序执行：

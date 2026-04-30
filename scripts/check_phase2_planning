@@ -9,11 +9,17 @@ INVENTORY_HTML="$PHASE_II_DIR/LocalTalent_phase2_demo_inventory.html"
 BOUNDARY_FILE="$PHASE_II_DIR/00_PHASE_II_BOUNDARY.md"
 BLUEPRINT_FILE="$PHASE_II_DIR/二期研发实施蓝图与任务拆解.md"
 PROMPTS_FILE="$PHASE_II_DIR/二期研发提示词.md"
+TEMPLATE_REPORT="$PHASE_II_DIR/74cms_42模板开发分析报告.md"
+TEMPLATE_DIR="$PHASE_II_DIR/74cms_42_templates"
+TEMPLATE_CSV="$TEMPLATE_DIR/template_list_42.csv"
+TEMPLATE_REPRESENTATIVES_DIR="$TEMPLATE_DIR/representative_templates"
 
 required_files=(
   "$BOUNDARY_FILE"
   "$PHASE_II_DIR/74cms人才网开发分析.md"
   "$PHASE_II_DIR/人才网总盘点与高风险深挖评审稿.md"
+  "$TEMPLATE_REPORT"
+  "$TEMPLATE_CSV"
   "$INVENTORY_MD"
   "$INVENTORY_HTML"
   "$PHASE_II_DIR/LocalTalent_phase2_step1.md"
@@ -38,9 +44,20 @@ if [ ! -d "$DEMO_DIR" ]; then
   exit 1
 fi
 
+if [ ! -d "$TEMPLATE_REPRESENTATIVES_DIR" ]; then
+  echo "FAIL: Phase II 42-template representative directory missing: $TEMPLATE_REPRESENTATIVES_DIR"
+  exit 1
+fi
+
 html_count=$(find "$DEMO_DIR" -name '*.html' | wc -l | tr -d '[:space:]')
 if [ "$html_count" != "24" ]; then
   echo "FAIL: Phase II demo HTML count must be 24, got $html_count"
+  exit 1
+fi
+
+template_html_count=$(find "$TEMPLATE_REPRESENTATIVES_DIR" -name '*.html' | wc -l | tr -d '[:space:]')
+if [ "$template_html_count" != "42" ]; then
+  echo "FAIL: Phase II 42-template representative HTML count must be 42, got $template_html_count"
   exit 1
 fi
 
@@ -82,7 +99,7 @@ for marker in "${boundary_markers[@]}"; do
   fi
 done
 
-for prompt_no in 15 16 17 18 19 20 21 22 23; do
+for prompt_no in 15 16 17 18 19 20 21 22 23 24; do
   if ! grep -Fq "Prompt $prompt_no" "$PROMPTS_FILE"; then
     echo "FAIL: Phase II prompts missing Prompt $prompt_no"
     exit 1
@@ -96,6 +113,20 @@ fi
 
 if grep -Fq "二期基线收口与文档闸门" "$BOUNDARY_FILE"; then
   echo "FAIL: Phase II boundary still contains old Prompt 15 title"
+  exit 1
+fi
+
+old_report_ref="deep-research-report "
+old_report_ref="${old_report_ref}(2).md"
+if grep -R -Fq "$old_report_ref" "$PHASE_II_DIR" "$ROOT_DIR/README.md" "$ROOT_DIR/scripts"; then
+  echo "FAIL: stale Phase II deep research report reference remains"
+  exit 1
+fi
+
+old_template_path="docs/Phase_III/"
+old_template_path="${old_template_path}74cms_42_templates"
+if grep -R -Fq "$old_template_path" "$PHASE_II_DIR" "$ROOT_DIR/README.md" "$ROOT_DIR/scripts"; then
+  echo "FAIL: stale Phase III 42-template path remains"
   exit 1
 fi
 

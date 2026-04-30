@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 三期研发方向与上线阶段判断</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #dfe6f0;
+      --brand: #0f766e;
+      --brand-2: #1d4ed8;
+      --soft: #e7f7f4;
+      --warn: #fff7ed;
+      --code-bg: #111827;
+      --code-ink: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 14% 0%, rgba(15, 118, 110, 0.14), transparent 28%),
+        radial-gradient(circle at 84% 4%, rgba(29, 78, 216, 0.10), transparent 30%),
+        linear-gradient(180deg, #fbfdff 0%, var(--bg) 48%, #edf2f7 100%);
+      line-height: 1.72;
+    }
+    header { padding: 56px 24px 30px; background: linear-gradient(135deg, #073b3a 0%, #0f766e 52%, #1d4ed8 100%); color: #fff; }
+    .hero { max-width: 1120px; margin: 0 auto; }
+    .eyebrow { margin: 0 0 10px; letter-spacing: .08em; opacity: .82; font-size: 14px; }
+    h1 { margin: 0; font-size: clamp(32px, 5vw, 54px); line-height: 1.12; }
+    .subtitle { max-width: 860px; margin: 18px 0 0; color: rgba(255,255,255,.88); font-size: 17px; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 24px 0 0; padding: 0; list-style: none; }
+    .summary li { padding: 13px 15px; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.1); border-radius: 14px; backdrop-filter: blur(6px); }
+    .layout { max-width: 1120px; margin: 0 auto; padding: 28px 24px 64px; display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 24px; }
+    nav { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.9); box-shadow: 0 16px 40px rgba(31,41,55,.07); }
+    nav strong { display: block; margin-bottom: 10px; color: var(--brand); }
+    nav a { display: block; padding: 6px 0; color: var(--muted); text-decoration: none; font-size: 14px; }
+    nav a:hover { color: var(--brand); }
+    .toc-level-3 { padding-left: 14px; font-size: 13px; }
+    main { min-width: 0; }
+    section.card { margin: 0 0 18px; padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: 0 18px 44px rgba(31,41,55,.06); }
+    h2 { margin: 0 0 14px; color: #0f3f3c; font-size: 24px; }
+    h3 { margin: 22px 0 10px; color: #1f4f4b; font-size: 19px; }
+    p { margin: 10px 0; }
+    ul { margin: 10px 0 14px; padding-left: 1.25rem; }
+    li { margin: 5px 0; }
+    code { padding: 2px 6px; border-radius: 7px; background: var(--soft); color: #075e57; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; }
+    pre { overflow-x: auto; padding: 16px; border-radius: 16px; background: var(--code-bg); color: var(--code-ink); line-height: 1.55; }
+    pre code { padding: 0; background: transparent; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0 18px; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); font-size: 14px; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: #eef8f6; color: #0f4f49; }
+    tr:last-child td { border-bottom: 0; }
+    .warn { background: var(--warn); border-color: #fed7aa; }
+    footer { max-width: 1120px; margin: 0 auto; padding: 0 24px 40px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } nav { position: static; max-height: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <p class="eyebrow">PHASE III STRATEGY</p>
+      <h1>LocalTalent 三期研发方向与上线阶段判断</h1>
+      <p class="subtitle">一期解决安全底座，二期解决高保真门户，三期要把可演示系统推进为可小范围试运营的真实业务系统。</p>
+      <ul class="summary">
+        <li>一期：合规安全底座 + 招聘基础闭环</li>
+        <li>二期：高保真人才网公开门户 + 演示收口</li>
+        <li>三期：真实业务试运营闭环</li>
+        <li>四期：公网正式运营治理</li>
+      </ul>
+    </div>
+  </header>
+  <div class="layout">
+    <nav aria-label="目录">
+      <strong>目录</strong>
+      <a href="#card">开发前必读卡</a>
+      <a href="#current">一、当前阶段判断</a>
+      <a href="#phase3">二、三期主要开发内容</a>
+      <a class="toc-level-3" href="#candidate">真实用户闭环生产化</a>
+      <a class="toc-level-3" href="#company">企业招聘工作台生产化</a>
+      <a class="toc-level-3" href="#admin">运营后台生产化</a>
+      <a class="toc-level-3" href="#portal">公开门户真实运营数据</a>
+      <a class="toc-level-3" href="#security">账号与安全体验</a>
+      <a class="toc-level-3" href="#ops">生产化工程收口</a>
+      <a href="#not-now">三、不建议三期做的内容</a>
+      <a href="#how-many">四、还需要几期才能上线使用</a>
+      <a href="#stages">五、推荐阶段划分</a>
+      <a href="#prompts">六、三期建议拆分方向</a>
+      <a href="#assumptions">七、Assumptions</a>
+    </nav>
+    <main>
+      <section class="card" id="card">
+        <h2>开发前必读卡</h2>
+        <ul>
+          <li><strong>文件定位：</strong>三期规划起点文件，用于判断一二期完成后下一阶段应做什么，以及距离真实上线还差几期。</li>
+          <li><strong>事实基线：</strong>一期已完成合规安全底座和招聘基础闭环；二期已完成高保真人才网公开门户和演示收口。</li>
+          <li><strong>三期目标：</strong>把“一二期可演示系统”推进为“可让真实求职者、企业、运营人员小范围试用的业务系统”。</li>
+          <li><strong>禁止越界点：</strong>三期不直接做公共简历库、受控找人才、联系解锁、会员支付、真实短信/微信/小程序/App、真实地图/视频/直播、真实 ATS/RPA 或受控候选池同步。</li>
+        </ul>
+        <p><strong>统一硬边界：</strong>人才服务区仅展示发布快照；对接接口仅 stub；不得输出原始候选人数据；同意、撤回、数据域、字段级权限必须在服务端收口。</p>
+      </section>
+
+      <section class="card" id="current">
+        <h2>一、当前阶段判断</h2>
+        <p>当前结论很清楚：一期完成“合规安全底座 + 招聘基础闭环”，二期完成“高保真人才网公开门户 + 演示收口”。三期不应继续堆更多静态高保真页面，也不应立刻做公共简历库、联系解锁、会员支付、真实外部能力。</p>
+        <pre><code>一期解决能不能安全地做；
+二期解决像不像一个人才网；
+三期要解决能不能让真实用户用起来。</code></pre>
+      </section>
+
+      <section class="card" id="phase3">
+        <h2>二、三期主要开发内容</h2>
+        <h3 id="candidate">1. 真实用户闭环生产化</h3>
+        <p>补齐求职者注册登录后的真实使用能力：简历编辑、简历预览、隐私与发布状态、投递记录、职位收藏、搜索/职位订阅、面试状态、站内通知、同意/撤回状态展示与便捷操作。</p>
+        <p>状态必须由后端返回，撤回后人才服务区和所有公开可见入口必须联动不可见。</p>
+        <h3 id="company">2. 企业招聘工作台生产化</h3>
+        <p>补企业资料维护、认证材料提交、职位创建/编辑/提交审核/下线、投递池筛选、投递详情、企业备注、阶段流转、面试邀约、导出申请入口。</p>
+        <p>企业只能访问和操作本企业数据，未认证企业不得上线职位。</p>
+        <h3 id="admin">3. 运营后台生产化</h3>
+        <p>补企业审核、职位审核、内容管理、活动/招聘会管理、风险审核、推荐位配置、审计中心查询 UI 和运营首页 overview。</p>
+        <p><code>operator</code> 可写，<code>auditor</code> 只读；所有审核、下线、软删除、推荐位调整、风险处理都必须写审计。</p>
+        <h3 id="portal">4. 公开门户从演示数据转真实运营数据</h3>
+        <p>首页推荐、找工作、找企业、人才服务区、招聘会、政策资讯、HR 工具箱从“演示可看”变成“后台可配置、前台可索引、状态可控、SEO 可运营”。</p>
+        <h3 id="security">5. 账号与安全体验补齐</h3>
+        <p>补正式登录体验、注册成功分流、找回密码或重置密码、会话过期提示、无权限态、错误提示 trace_id 和验证码占位治理。</p>
+        <h3 id="ops">6. 生产化工程收口</h3>
+        <p>补预发配置、生产环境变量说明、数据库备份恢复演练、对象存储生命周期、日志脱敏检查、监控告警、上线/回滚 Runbook 和真实数据前验收清单。</p>
+      </section>
+
+      <section class="card warn" id="not-now">
+        <h2>三、不建议三期做的内容</h2>
+        <ul>
+          <li>不做公共简历库：人才服务区仍只展示发布快照白名单。</li>
+          <li>不做受控找人才和联系解锁：必须先走 Phase II Step6 风险准入规则。</li>
+          <li>不做真实支付和会员商业化：套餐、权益、支付、发票、退款应放到商业化专项期。</li>
+          <li>不接真实短信、微信、小程序、App、地图、视频、直播：三期可保留入口或占位，但不接供应商。</li>
+          <li>不接真实 ATS/RPA/受控候选池同步：对接接口继续 stub，真实同步单独立项评审。</li>
+        </ul>
+      </section>
+
+      <section class="card" id="how-many">
+        <h2>四、还需要几期才能上线使用</h2>
+        <table>
+          <tbody>
+            <tr><th>目标</th><th>当前判断</th><th>还需要几期</th></tr>
+            <tr><td>内部演示 / 客户看样</td><td>二期已经基本可用，只需保持演示数据、文档和部署稳定。</td><td>0 期</td></tr>
+            <tr><td>小范围试运营</td><td>三期完成真实求职者中心、企业工作台、运营后台配置、通知和生产化 Runbook 后，可以灰度试运营。</td><td>1 期</td></tr>
+            <tr><td>公网正式运营</td><td>三期试运营闭环后，还需要四期做生产安全、运营治理、性能压测、监控告警、合规材料、备份和客服工单。</td><td>2 期</td></tr>
+            <tr><td>接近 74cms 完整商业化能力</td><td>三期试运营，四期生产上线，五期再评估会员商业化、联系解锁、真实外部能力。</td><td>3 期以上</td></tr>
+          </tbody>
+        </table>
+        <pre><code>三期后可进入灰度试运营；
+四期后再考虑公网正式运营；
+五期以后再评估商业化和高风险外部能力。</code></pre>
+      </section>
+
+      <section class="card" id="stages">
+        <h2>五、推荐阶段划分</h2>
+        <h3>三期：真实业务试运营闭环</h3>
+        <p>让求职者、企业、运营人员真的能用。重点是简历编辑、职位发布、投递处理、面试邀约、内容运营、站内通知、后台审核和生产化配置。</p>
+        <h3>四期：正式上线治理与运营稳定性</h3>
+        <p>从试运营走向公网正式使用。重点是监控告警、备份恢复、性能压测、SEO 运营、权限复核、日志脱敏、客服/问题处理、合规材料、上线演练和回滚演练。</p>
+        <h3>五期：风险池能力专项评估</h3>
+        <p>选择性进入商业化和外部能力。只有通过 Step6 准入后，才考虑受控找人才、联系解锁、会员权益、真实支付、短信/微信、小程序/App、地图/视频/直播、ATS/RPA 等。</p>
+      </section>
+
+      <section class="card" id="prompts">
+        <h2>六、三期建议拆分方向</h2>
+        <ol>
+          <li>三期边界与试运营蓝图。</li>
+          <li>求职者简历编辑与预览。</li>
+          <li>求职者收藏、订阅与站内通知。</li>
+          <li>企业资料与认证材料完善。</li>
+          <li>职位发布与编辑闭环。</li>
+          <li>投递池工作台增强。</li>
+          <li>面试邀约与站内通知闭环。</li>
+          <li>运营内容与推荐位配置。</li>
+          <li>审计中心 UI 与风险审核。</li>
+          <li>三期试运营演示数据、Runbook 与总闸门。</li>
+        </ol>
+        <p>正式进入三期前，应先写 <code>docs/Phase_III/00_PHASE_III_BOUNDARY.md</code>、三期蓝图和三期研发提示词。</p>
+      </section>
+
+      <section class="card" id="assumptions">
+        <h2>七、Assumptions</h2>
+        <ul>
+          <li>默认“上线使用”按“真实求职者和企业可小范围试运营”理解，因此建议三期后可进入灰度试运营。</li>
+          <li>默认不为了上线牺牲一期/二期硬边界：人才服务区只展示发布快照，对接接口仅 stub，原始候选人数据不得公开，权限/字段级权限/审计必须服务端收口。</li>
+          <li>如果目标改为“三期后直接公网正式上线”，三期范围需要显著扩大，并加入压测、监控、备份、合规审查、客服运营和正式发布演练。</li>
+          <li>如果目标改为“快速商业化”，则必须先完成 Step6 风险准入，不能把会员、支付、联系解锁直接塞进三期主线。</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+  <footer>LocalTalent Phase III Strategy. 本文件用于三期正式规划前的方向判断。</footer>
+</body>
+</html>

@@ -14,6 +14,12 @@ export type JobSearchInitialState = {
 
 type JobSearchPageProps = {
   initialState: JobSearchInitialState;
+  topic?: {
+    eyebrow?: string;
+    title?: string;
+    subtitle?: string;
+    badge?: string;
+  };
 };
 
 const categoryOptions = [
@@ -200,7 +206,7 @@ function SideBar() {
   );
 }
 
-export function JobSearchPage({ initialState }: JobSearchPageProps) {
+export function JobSearchPage({ initialState, topic }: JobSearchPageProps) {
   const jobs = initialState.page?.job_list ?? [];
   const activeTab = initialState.query.famous === '1' ? 'famous' : 'all';
 
@@ -208,15 +214,16 @@ export function JobSearchPage({ initialState }: JobSearchPageProps) {
     <main className={styles.page}>
       <section className={styles.hero} aria-label="找工作频道首屏">
         <div>
-          <p className={styles.eyebrow}>LocalTalent Jobs</p>
-          <h1 className={styles.title}>找工作与名企直聘</h1>
+          <p className={styles.eyebrow}>{topic?.eyebrow ?? 'LocalTalent Jobs'}</p>
+          <h1 className={styles.title}>{topic?.title ?? '找工作与名企直聘'}</h1>
           <p className={styles.subtitle}>
-            面向公开门户的职位搜索页。列表只读取在线职位和认证企业职位，地图找工作、会员置顶与付费推广均不在本轮实现。
+            {topic?.subtitle
+              ?? '面向公开门户的职位搜索页。列表只读取在线职位和认证企业职位，地图找工作、会员置顶与付费推广均不在本轮实现。'}
           </p>
         </div>
         <div className={styles.scanCard} aria-label="扫码求职 CTA">
           <span className={styles.qr}>QR</span>
-          <strong>求职更简单</strong>
+          <strong>{topic?.badge ?? '求职更简单'}</strong>
           <span className={styles.muted}>扫码入口占位</span>
         </div>
       </section>
@@ -225,7 +232,7 @@ export function JobSearchPage({ initialState }: JobSearchPageProps) {
         <Link className={activeTab === 'all' ? styles.tabActive : styles.tab} href="/jobs">
           全部职位
         </Link>
-        <Link className={activeTab === 'famous' ? styles.tabActive : styles.tab} href="/jobs?famous=1">
+        <Link className={activeTab === 'famous' ? styles.tabActive : styles.tab} href="/jobs/famous">
           名企直聘
         </Link>
       </nav>

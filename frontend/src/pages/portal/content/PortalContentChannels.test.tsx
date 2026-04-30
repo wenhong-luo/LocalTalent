@@ -158,8 +158,9 @@ describe('Portal public content channels', () => {
     const lowRiskRegion = screen.getByLabelText('低风险更多服务');
     expect(lowRiskRegion).toBeInTheDocument();
     expect(screen.getByLabelText('高风险更多服务占位')).toBeInTheDocument();
-    expect(within(lowRiskRegion).getByRole('link', { name: /今日招聘/ })).toHaveAttribute('href', '/jobs?sort=today');
-    expect(within(lowRiskRegion).getByRole('link', { name: /网络招聘会/ })).toHaveAttribute('href', '/job-fairs?type_code=online');
+    expect(within(lowRiskRegion).getByRole('link', { name: /今日招聘/ })).toHaveAttribute('href', '/daily-jobs');
+    expect(within(lowRiskRegion).getByRole('link', { name: /网络招聘会/ })).toHaveAttribute('href', '/job-fairs/online');
+    expect(within(lowRiskRegion).getByRole('link', { name: /校园招聘/ })).toHaveAttribute('href', '/campus');
 
     const highRiskRegion = screen.getByLabelText('高风险更多服务占位');
     for (const label of ['地图找工作', '视频招聘', '直播招聘', '自由职业', '求职登记', '短信通知', '微信通知']) {
