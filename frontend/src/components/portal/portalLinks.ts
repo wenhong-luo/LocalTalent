@@ -35,7 +35,7 @@ export const highRiskServicePlaceholders: PortalDisabledLink[] = [
 ];
 
 export const managementLinks: PortalLink[] = [
-  { label: '求职者中心', href: '/candidate/center' },
-  { label: '企业中心', href: '/company' },
-  { label: '运营后台', href: '/admin' }
+  { label: '求职者中心', href: '/auth/login?role=candidate&redirect=/candidate/center' },
+  { label: '企业中心', href: '/auth/login?role=company&redirect=/company' },
+  { label: '运营后台', href: '/auth/login?redirect=/admin' }
 ];

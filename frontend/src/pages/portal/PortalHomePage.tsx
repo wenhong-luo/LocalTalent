@@ -91,12 +91,12 @@ function LoginCard() {
         </div>
       </div>
       <div className={styles.loginMeta}>
-        <span>密码登录占位</span>
-        <span>忘记密码？</span>
+        <Link href="/auth/login?role=candidate&redirect=/candidate/center">密码登录</Link>
+        <Link href="/auth/register?role=candidate">立即注册</Link>
       </div>
-      <button className={styles.loginButton} type="button">
-        进入登录页占位
-      </button>
+      <Link className={styles.loginButton} href="/auth/login?role=candidate&redirect=/candidate/center">
+        进入登录页
+      </Link>
     </section>
   );
 }

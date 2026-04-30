@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+PHASE_II_DIR="$ROOT_DIR/docs/Phase_II"
+
+required_files=(
+  "$ROOT_DIR/demo/localtalent_phase2_demo_data.sql"
+  "$ROOT_DIR/scripts/seed_phase2_demo_data"
+  "$PHASE_II_DIR/二期演示使用说明.md"
+  "$PHASE_II_DIR/RUNBOOK.md"
+  "$PHASE_II_DIR/TESTING.md"
+  "$PHASE_II_DIR/二期验收清单.md"
+  "$PHASE_II_DIR/二期研发提示词.md"
+  "$PHASE_II_DIR/二期研发提示词.html"
+  "$PHASE_II_DIR/00_PHASE_II_BOUNDARY.md"
+  "$ROOT_DIR/frontend/src/pages/portal/PortalHomePage.test.tsx"
+  "$ROOT_DIR/frontend/src/pages/portal/jobs/JobSearchPage.test.tsx"
+  "$ROOT_DIR/frontend/src/pages/portal/companies/CompanySearchPage.test.tsx"
+  "$ROOT_DIR/frontend/src/pages/portal/TalentServiceArea.test.tsx"
+  "$ROOT_DIR/frontend/src/pages/portal/content/PortalContentChannels.test.tsx"
+  "$ROOT_DIR/frontend/src/pages/auth/AuthPages.test.tsx"
+)
+
+for required_file in "${required_files[@]}"; do
+  if [ ! -f "$required_file" ]; then
+    echo "FAIL: Phase II demo acceptance required file missing: $required_file"
+    exit 1
+  fi
+done
+
+if [ ! -x "$ROOT_DIR/scripts/seed_phase2_demo_data" ]; then
+  echo "FAIL: scripts/seed_phase2_demo_data must be executable"
+  exit 1
+fi
+
+html_count=$(find "$PHASE_II_DIR/demo" -name '*.html' | wc -l | tr -d '[:space:]')
+if [ "$html_count" != "24" ]; then
+  echo "FAIL: Phase II demo HTML count must be 24, got $html_count"
+  exit 1
+fi
+
+route_files=(
+  "$ROOT_DIR/frontend/src/app/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/jobs/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/jobs/[id]/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/companies/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/companies/[id]/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/portal/talent-service-area/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/job-fairs/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/job-fairs/[id]/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/articles/policies/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/articles/news/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/articles/notices/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/articles/[id]/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/hr-tools/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/hr-tools/[id]/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/help/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/more-services/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/auth/login/page.page.tsx"
+  "$ROOT_DIR/frontend/src/app/auth/register/page.page.tsx"
+)
+
+for route_file in "${route_files[@]}"; do
+  if [ ! -f "$route_file" ]; then
+    echo "FAIL: Phase II public route missing: $route_file"
+    exit 1
+  fi
+done
+
+sitemap_markers=(
+  "/jobs"
+  "/companies"
+  "/portal/talent-service-area"
+  "/job-fairs"
+  "/articles/policies"
+  "/articles/news"
+  "/hr-tools"
+  "/help"
+  "/more-services"
+)
+
+for marker in "${sitemap_markers[@]}"; do
+  if ! grep -Fq "$marker" "$ROOT_DIR/frontend/src/app/sitemap.xml/route.page.ts"; then
+    echo "FAIL: sitemap missing Phase II public route marker: $marker"
+    exit 1
+  fi
+done
+
+acceptance_markers=(
+  "首页"
+  "找工作"
+  "找企业"
+  "人才服务区"
+  "招聘会"
+  "就业政策"
+  "HR 工具箱"
+  "登录入口"
+  "字段白名单"
+  "撤回下线"
+  "IDOR"
+  "审计"
+  "SEO"
+  "风险池"
+)
+
+for marker in "${acceptance_markers[@]}"; do
+  if ! grep -Fq "$marker" "$PHASE_II_DIR/二期验收清单.md" "$PHASE_II_DIR/TESTING.md"; then
+    echo "FAIL: Phase II acceptance docs missing marker: $marker"
+    exit 1
+  fi
+done
+
+prompt_markers=(
+  "Prompt 23（P2-8）"
+  "二期主线 Prompt 15-23 已收口"
+  "scripts/seed_phase2_demo_data"
+  "scripts/check_phase2_demo_acceptance"
+)
+
+for marker in "${prompt_markers[@]}"; do
+  if ! grep -Fq "$marker" "$PHASE_II_DIR/二期研发提示词.md"; then
+    echo "FAIL: Phase II prompts missing Prompt 23 completion marker: $marker"
+    exit 1
+  fi
+done
+
+boundary_markers=(
+  "Prompt 15-23 已完成"
+  "二期主线已收口"
+  "高风险能力仍必须先走 Step6 准入规则"
+)
+
+for marker in "${boundary_markers[@]}"; do
+  if ! grep -Fq "$marker" "$PHASE_II_DIR/00_PHASE_II_BOUNDARY.md"; then
+    echo "FAIL: Phase II boundary missing closeout marker: $marker"
+    exit 1
+  fi
+done
+
+test_markers=(
+  "mobile"
+  "email"
+  "password_hash"
+  "attachment_object_key"
+  "evidence"
+)
+
+for marker in "${test_markers[@]}"; do
+  if ! grep -R -Fq "$marker" \
+    "$ROOT_DIR/frontend/src/pages/portal" \
+    "$ROOT_DIR/backend/src/test/java/cn/localtalent/backend"; then
+    echo "FAIL: Phase II tests missing sensitive marker assertion: $marker"
+    exit 1
+  fi
+done
+
+if ! grep -Fq "check_phase2_demo_acceptance" "$ROOT_DIR/scripts/run_all"; then
+  echo "FAIL: scripts/run_all must include check_phase2_demo_acceptance"
+  exit 1
+fi
+
+echo "PASS"

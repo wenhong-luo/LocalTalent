@@ -2,10 +2,10 @@ import Link from 'next/link';
 import styles from './PortalShell.module.css';
 
 const privateLinks = [
-  { label: '我的投递', href: '/candidate/center' },
-  { label: '我的消息', href: '/candidate/center' },
-  { label: '我的收藏', href: '/candidate/center' },
-  { label: '面试邀请', href: '/candidate/center' }
+  { label: '我的投递', href: '/auth/login?role=candidate&redirect=/candidate/center' },
+  { label: '我的消息', href: '/auth/login?role=candidate&redirect=/candidate/center' },
+  { label: '我的收藏', href: '/auth/login?role=candidate&redirect=/candidate/center' },
+  { label: '面试邀请', href: '/auth/login?role=candidate&redirect=/candidate/center' }
 ];
 
 const disabledEntries = ['公众号占位', '小程序占位', 'App 占位'];

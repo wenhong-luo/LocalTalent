@@ -35,7 +35,10 @@ describe('PortalShell', () => {
     expect(within(nav).getByRole('link', { name: '招聘会' })).toHaveAttribute('href', '/job-fairs');
     expect(within(nav).getByRole('link', { name: '就业政策' })).toHaveAttribute('href', '/articles/policies');
     expect(within(nav).getByRole('link', { name: 'HR 工具箱' })).toHaveAttribute('href', '/hr-tools');
-    expect(within(nav).getByRole('link', { name: '管理中心' })).toHaveAttribute('href', '/candidate/center');
+    expect(within(nav).getByRole('link', { name: '管理中心' })).toHaveAttribute(
+      'href',
+      '/auth/login?redirect=/candidate/center'
+    );
     expect(document.body).not.toHaveTextContent('简历库');
     expect(document.body).not.toHaveTextContent('搜索简历');
   });

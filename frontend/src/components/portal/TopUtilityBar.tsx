@@ -10,10 +10,10 @@ export function TopUtilityBar() {
           <span className={styles.utilityMuted}>[切换城市]</span>
         </div>
         <nav className={styles.utilityLinks} aria-label="会员与帮助入口">
-          <Link className={styles.utilityLink} href="/candidate/center">
+          <Link className={styles.utilityLink} href="/auth/login?role=candidate&redirect=/candidate/center">
             会员登录
           </Link>
-          <Link className={styles.utilityLink} href="/candidate/center">
+          <Link className={styles.utilityLink} href="/auth/register?role=candidate">
             会员注册
           </Link>
           <span className={styles.utilityMuted}>职聊占位</span>

@@ -1,0 +1,203 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+SQL_FILE="$ROOT_DIR/demo/localtalent_phase2_demo_data.sql"
+
+MYSQL_CONTAINER="${LOCALTALENT_DEMO_MYSQL_CONTAINER:-localtalent-mysql}"
+MYSQL_DATABASE="${LOCALTALENT_DEMO_MYSQL_DATABASE:-localtalent}"
+MYSQL_USER="${LOCALTALENT_DEMO_MYSQL_USER:-localtalent}"
+MYSQL_PASSWORD="${LOCALTALENT_DEMO_MYSQL_PASSWORD:-localtalent}"
+
+mysql_exec() {
+  docker exec -e MYSQL_PWD="$MYSQL_PASSWORD" "$MYSQL_CONTAINER" \
+    mysql --default-character-set=utf8mb4 --batch --skip-column-names -u"$MYSQL_USER" "$MYSQL_DATABASE" "$@"
+}
+
+mysql_import() {
+  docker exec -e MYSQL_PWD="$MYSQL_PASSWORD" -i "$MYSQL_CONTAINER" \
+    mysql --default-character-set=utf8mb4 -u"$MYSQL_USER" "$MYSQL_DATABASE" < "$SQL_FILE"
+}
+
+if [ ! -f "$SQL_FILE" ]; then
+  echo "FAIL: Phase II demo SQL not found: $SQL_FILE"
+  exit 1
+fi
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "FAIL: docker not found. Install Docker Desktop or Docker Engine first."
+  exit 1
+fi
+
+if ! docker ps --format '{{.Names}}' | grep -Fxq "$MYSQL_CONTAINER"; then
+  echo "FAIL: MySQL container '$MYSQL_CONTAINER' is not running."
+  echo "Run: docker compose -f infra/docker-compose.yml up -d"
+  exit 1
+fi
+
+core_table_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM information_schema.tables
+WHERE table_schema = DATABASE()
+  AND table_name IN (
+    'company',
+    'company_user',
+    'candidate_user',
+    'candidate_publish_snapshot',
+    'job_post',
+    'cms_content',
+    'activity_event',
+    'audit_log',
+    'open_api_log',
+    'sys_role'
+  );
+")
+
+if [ "$core_table_count" != "10" ]; then
+  echo "FAIL: Phase II core tables are missing. Start the backend once so Flyway can migrate the database."
+  echo "Run: cd backend && ./mvnw spring-boot:run"
+  exit 1
+fi
+
+phase2_column_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM information_schema.columns
+WHERE table_schema = DATABASE()
+  AND (
+    (table_name = 'company' AND column_name = 'nature_code')
+    OR (table_name = 'candidate_publish_snapshot' AND column_name IN ('city_code', 'category_code', 'experience_years'))
+  );
+")
+
+if [ "$phase2_column_count" != "4" ]; then
+  echo "FAIL: Phase II columns are missing. Confirm V0012/V0013 migrations have run."
+  echo "Run: cd backend && ./mvnw spring-boot:run"
+  exit 1
+fi
+
+echo "Importing Phase II demo data into $MYSQL_CONTAINER/$MYSQL_DATABASE ..."
+mysql_import
+
+snapshot_leak_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM candidate_publish_snapshot
+WHERE LOWER(CAST(snapshot_json AS CHAR)) REGEXP 'mobile|email|resume_body|attachment_object_key|evidence|password_hash|base_profile_json|education_json|experience_json|skills_json';
+")
+
+if [ "$snapshot_leak_count" != "0" ]; then
+  echo "FAIL: publish snapshot contains raw candidate data marker."
+  exit 1
+fi
+
+visible_snapshot_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM candidate_publish_snapshot
+WHERE publishable_flag = 1
+  AND consent_status = 1
+  AND status = 1
+  AND visibility_scope = 4;
+")
+
+visible_job_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM job_post j
+JOIN company c ON c.id = j.company_id
+WHERE j.status = 2
+  AND j.audit_status = 2
+  AND c.auth_status = 2
+  AND j.external_job_id LIKE 'LT-P2-%';
+")
+
+visible_company_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM company
+WHERE auth_status = 2
+  AND license_no LIKE 'LT-P2-%';
+")
+
+visible_event_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM activity_event
+WHERE status = 1
+  AND title LIKE 'LocalTalent 二期%';
+")
+
+visible_content_count=$(mysql_exec -e "
+SELECT COUNT(*)
+FROM cms_content
+WHERE status = 1
+  AND title LIKE 'LocalTalent 二期%';
+")
+
+phase2_job_id=$(mysql_exec -e "
+SELECT id
+FROM job_post
+WHERE external_job_id = 'LT-P2-JOB-JAVA'
+LIMIT 1;
+")
+
+phase2_company_id=$(mysql_exec -e "
+SELECT id
+FROM company
+WHERE license_no = 'LT-P2-COMPANY-APPROVED-1'
+LIMIT 1;
+")
+
+phase2_event_id=$(mysql_exec -e "
+SELECT id
+FROM activity_event
+WHERE title = 'LocalTalent 二期春季综合招聘会'
+ORDER BY id DESC
+LIMIT 1;
+")
+
+phase2_policy_id=$(mysql_exec -e "
+SELECT id
+FROM cms_content
+WHERE title = 'LocalTalent 二期就业政策：高校毕业生就业支持'
+ORDER BY id DESC
+LIMIT 1;
+")
+
+echo "PASS"
+cat <<EOF
+
+二期演示数据已导入。
+
+演示账号（默认密码均为 LocalTalent@123456）：
+- candidate: p2_candidate@localtalent.test
+- candidate-revoked: p2_revoked@localtalent.test
+- candidate-pending: p2_pending@localtalent.test
+- company: p2_company@localtalent.test
+- operator: operator
+
+核心页面：
+- 首页:                 http://localhost:3000/
+- 找工作:               http://localhost:3000/jobs?city_code=310000&category_code=software
+- 职位详情:             http://localhost:3000/jobs/$phase2_job_id
+- 找企业:               http://localhost:3000/companies?city_code=310000&industry_code=internet
+- 企业公开页:           http://localhost:3000/companies/$phase2_company_id
+- 人才服务区:           http://localhost:3000/portal/talent-service-area?city_code=310000&category_code=software
+- 招聘会:               http://localhost:3000/job-fairs
+- 招聘会详情:           http://localhost:3000/job-fairs/$phase2_event_id
+- 就业政策:             http://localhost:3000/articles/policies
+- 就业政策详情:         http://localhost:3000/articles/$phase2_policy_id
+- HR 工具箱:            http://localhost:3000/hr-tools
+- 登录入口:             http://localhost:3000/auth/login
+
+数据概览：
+- 二期公开职位数:       $visible_job_count
+- 二期认证企业数:       $visible_company_count
+- 二期公开招聘会数:     $visible_event_count
+- 二期公开内容数:       $visible_content_count
+- 全库可见发布快照数:   $visible_snapshot_count
+
+安全校验：
+- 发布快照 JSON 原始候选人字段扫描: PASS
+- 对接接口仍为 stub 演示日志，无真实外部同步。
+
+下一步：
+1. 后端保持运行: cd backend && ./mvnw spring-boot:run
+2. 启动前端: cd frontend && npm ci && npm run dev
+3. 直接使用 /auth/login 登录，或运行 ./scripts/demo_login_tokens p2-company
+EOF

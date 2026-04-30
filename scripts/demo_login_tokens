@@ -12,7 +12,11 @@ Account keys:
   candidate-consented
   candidate-revoked
   candidate-pending
+  p2-candidate
+  p2-revoked
+  p2-pending
   company
+  p2-company
   operator
   auditor
 
@@ -48,9 +52,29 @@ case "$account_key" in
     account="demo_pending@localtalent.test"
     target_path="/candidate/center"
     ;;
+  p2-candidate)
+    identity_type="candidate"
+    account="p2_candidate@localtalent.test"
+    target_path="/candidate/center"
+    ;;
+  p2-revoked)
+    identity_type="candidate"
+    account="p2_revoked@localtalent.test"
+    target_path="/candidate/center"
+    ;;
+  p2-pending)
+    identity_type="candidate"
+    account="p2_pending@localtalent.test"
+    target_path="/candidate/center"
+    ;;
   company)
     identity_type="company"
     account="demo_company@localtalent.test"
+    target_path="/company"
+    ;;
+  p2-company)
+    identity_type="company"
+    account="p2_company@localtalent.test"
     target_path="/company"
     ;;
   operator)

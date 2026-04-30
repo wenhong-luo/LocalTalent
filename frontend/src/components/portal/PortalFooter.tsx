@@ -16,14 +16,14 @@ export function PortalFooter() {
           <nav className={styles.footerLinks} aria-label="求职服务">
             <Link href="/jobs">找工作</Link>
             <Link href="/portal/talent-service-area">人才服务区</Link>
-            <Link href="/candidate/center">求职者中心</Link>
+            <Link href="/auth/login?role=candidate&redirect=/candidate/center">求职者中心</Link>
           </nav>
         </section>
         <section>
           <h3 className={styles.footerTitle}>招聘服务</h3>
           <nav className={styles.footerLinks} aria-label="招聘服务">
             <Link href="/companies">找企业</Link>
-            <Link href="/company">企业中心</Link>
+            <Link href="/auth/login?role=company&redirect=/company">企业中心</Link>
             <Link href="/job-fairs">招聘会</Link>
           </nav>
         </section>

@@ -1,6 +1,6 @@
-# LocalTalent Phase-1
+# LocalTalent Phase-1 + Phase-2
 
-LocalTalent 当前是地方人才服务平台一期工程。后端已按 Prompt 0-11.5 完成认证、权限、候选人发布快照、企业职位、投递面试、运营、导出、对接 stub、审计中心、门户公开读接口与发布快照读路径补强；前端已迁移为 Next/SSR 门户基线。本仓库仍严格遵守一期边界：不把人才服务区做成公共简历库，不把对接接口做成真实同步，不在公开层输出原始候选人数据。
+LocalTalent 当前已完成一期合规底座，并进入二期高保真门户阶段。后端已完成认证、权限、发布快照、企业职位、投递面试、运营、导出、对接 stub、审计中心和门户公开读接口；前端已迁移为 Next/SSR，并按二期 Prompt 15-23 补齐首页、找工作、找企业、人才服务区、招聘会、资讯、HR 工具箱和登录注册入口体验。本仓库仍严格遵守边界：不把人才服务区做成公共简历库，不把对接接口做成真实同步，不在公开层输出原始候选人数据。
 
 ## 一期硬边界
 
@@ -69,7 +69,8 @@ LocalTalent 当前是地方人才服务平台一期工程。后端已按 Prompt 
 |   |-- check_boundary
 |   `-- run_all
 |-- demo
-|   `-- localtalent_demo_data.sql
+|   |-- localtalent_demo_data.sql
+|   `-- localtalent_phase2_demo_data.sql
 `-- docs
 ```
 
@@ -117,7 +118,7 @@ npm start
 
 ## 演示数据与新人上手
 
-一期演示数据采用显式脚本加载，不进入 Flyway 自动迁移，不作为生产 seed。完整说明见 [docs/一期演示使用说明.md](docs/一期演示使用说明.md)。
+一期演示数据采用显式脚本加载，不进入 Flyway 自动迁移，不作为生产 seed。完整说明见 [docs/Phase_I/一期演示使用说明.md](docs/Phase_I/一期演示使用说明.md)。
 
 推荐本地演示流程：
 
@@ -144,11 +145,45 @@ npm run dev
 
 演示账号默认密码统一为 `LocalTalent@123456`。登录助手支持 `candidate-consented`、`candidate-revoked`、`candidate-pending`、`company`、`operator`、`auditor`，并输出可粘贴到浏览器 Console 的 `localStorage` 命令。
 
+二期高保真门户演示同样采用显式脚本加载，不进入 Flyway。完整说明见 [docs/Phase_II/二期演示使用说明.md](docs/Phase_II/二期演示使用说明.md)。
+
+推荐二期演示流程：
+
+```bash
+docker compose -f infra/docker-compose.yml up -d
+cd backend
+./mvnw spring-boot:run
+```
+
+后端保持运行后，在新终端执行：
+
+```bash
+./scripts/seed_phase2_demo_data
+cd frontend
+npm ci
+npm run dev
+```
+
+二期演示页面：
+
+- 首页：`http://localhost:3000/`
+- 找工作：`http://localhost:3000/jobs`
+- 找企业：`http://localhost:3000/companies`
+- 人才服务区：`http://localhost:3000/portal/talent-service-area`
+- 招聘会：`http://localhost:3000/job-fairs`
+- 就业政策：`http://localhost:3000/articles/policies`
+- HR 工具箱：`http://localhost:3000/hr-tools`
+- 登录入口：`http://localhost:3000/auth/login`
+
+二期登录助手支持 `p2-candidate`、`p2-revoked`、`p2-pending`、`p2-company`，也可以直接使用登录页输入账号密码。
+
 ## 测试命令
 
 ```bash
 ./scripts/check_boundary
 ./scripts/check_portal_snapshot_fields
+./scripts/check_phase2_planning
+./scripts/check_phase2_demo_acceptance
 cd backend && ./mvnw test
 cd frontend && npm ci && npm test && npm run build
 ./scripts/run_all
@@ -159,15 +194,19 @@ cd frontend && npm ci && npm test && npm run build
 ## CI / 测试矩阵 / Runbook
 
 - CI workflow：`.github/workflows/ci.yml`，PR 与主干 push 必跑边界脚本、后端测试、前端测试与前端构建。
-- 测试矩阵：`docs/TESTING.md`，列出一期硬边界与对应自动化测试/脚本。
-- 运维手册：`docs/RUNBOOK.md`，覆盖发布、回滚、备份、监控、日志脱敏、MinIO 预签名短期下载策略。
-- 本地总闸门：`./scripts/run_all`，顺序执行边界扫描、人才服务区字段扫描、后端测试、前端测试与前端构建。
+- 一期测试矩阵：`docs/Phase_I/TESTING.md`，列出一期硬边界与对应自动化测试/脚本。
+- 一期运维手册：`docs/Phase_I/RUNBOOK.md`，覆盖发布、回滚、备份、监控、日志脱敏、MinIO 预签名短期下载策略。
+- 二期测试矩阵：`docs/Phase_II/TESTING.md`，列出二期页面结构、字段白名单、SEO 和风险池闸门。
+- 二期运维手册：`docs/Phase_II/RUNBOOK.md`，覆盖二期高保真门户演示、发布和排障。
+- 本地总闸门：`./scripts/run_all`，顺序执行一期边界扫描、人才服务区字段扫描、二期规划闸门、二期演示验收闸门、后端测试、前端测试与前端构建。
 
 ## 自检清单
 
 - [ ] `/health` 返回 200，且响应体包含 `code / message / trace_id / data`
 - [ ] `scripts/check_boundary` 可执行并输出 `PASS`
 - [ ] `scripts/check_portal_snapshot_fields` 可执行并输出 `PASS`
+- [ ] `scripts/check_phase2_planning` 可执行并输出 `PASS`
+- [ ] `scripts/check_phase2_demo_acceptance` 可执行并输出 `PASS`
 - [ ] 后端测试通过，Flyway 迁移只向前新增，不修改旧版本迁移
 - [ ] 前端 `npm test` 与 `npm run build` 通过
 - [ ] CI workflow 任一门禁失败时阻断合并

@@ -77,8 +77,18 @@
         <td>完成招聘会、就业政策、职场资讯、公告、HR 工具箱、帮助中心和更多服务公开频道；新增 <code>GET /api/portal/job-fairs</code>、<code>GET /api/portal/contents</code> 公开只读接口，并补 <code>/job-fairs</code>、<code>/articles/*</code>、<code>/hr-tools</code>、<code>/help</code>、<code>/more-services</code> 页面。</td>
         <td>公开频道只读 <code>cms_content</code> 与 <code>activity_event</code> 的 <code>status=1</code> 内容；不公开报名名单、参会个人明细、签到证据、联系方式、审核材料或后台备注；地图、视频、直播、自由职业、求职登记、短信/微信通知仍为禁用占位或风险池。</td>
       </tr>
+      <tr>
+        <td>Prompt 22（P2-7）</td>
+        <td>完成 <code>/auth/login</code> 与 <code>/auth/register</code> 登录注册入口体验，支持求职者/招聘者账号密码登录注册、JWT 写入 <code>localStorage.localtalent_access_token</code>，并按后端 <code>identity_type</code> 分流到求职者中心、企业中心或运营后台。</td>
+        <td>只复用一期本地账号 + JWT；不接真实短信、微信扫码、小程序、App 或第三方登录；前端只做入口体验，后台与中心页权限仍由服务端 RBAC、数据域和字段级权限强制。</td>
+      </tr>
+      <tr>
+        <td>Prompt 23（P2-8）</td>
+        <td>完成二期高保真验收与演示收口：新增 <code>demo/localtalent_phase2_demo_data.sql</code>、<code>scripts/seed_phase2_demo_data</code>、<code>scripts/check_phase2_demo_acceptance</code>、二期演示说明、Runbook、Testing、验收清单，并将二期总闸门接入 <code>scripts/run_all</code>。</td>
+        <td>二期主线 Prompt 15-23 已收口；演示数据只显式导入、不进入 Flyway；不新增业务接口或迁移；高风险能力仍必须先走 Step6 准入规则。</td>
+      </tr>
     </table>
-    <p class="note">后续纪律：每完成一轮 Phase II Prompt，都必须同步更新本节和 Markdown，写清楚“做到了什么、没有做什么、下一轮从哪里继续”。</p>
+    <p class="note">后续纪律：每完成一轮 Phase II Prompt，都必须同步更新本节和 Markdown，写清楚“做到了什么、没有做什么、下一轮从哪里继续”。当前二期主线 Prompt 15-23 已收口；后续如要启动风险池专项或三期规划，必须另起边界与提示词，不得顺手混入已收口主线。</p>
   </section>
 
   <section class="card toc">

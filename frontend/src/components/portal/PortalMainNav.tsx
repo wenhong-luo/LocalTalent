@@ -17,7 +17,7 @@ export function PortalMainNav() {
           </Link>
         ))}
         <MoreServicesMenu />
-        <Link className={styles.navLink} href="/candidate/center">
+        <Link className={styles.navLink} href="/auth/login?redirect=/candidate/center">
           管理中心
         </Link>
       </nav>
