@@ -73,7 +73,8 @@
   <div class="layout">
     <nav aria-label="目录">
       <strong>目录</strong>
-      <a class="toc-level-2" href="#一演示边界">一、演示边界</a>
+      <a class="toc-level-2" href="#二期最终收口状态">二期最终收口状态</a>
+<a class="toc-level-2" href="#一演示边界">一、演示边界</a>
 <a class="toc-level-2" href="#二你现在可以看到什么">二、你现在可以看到什么</a>
 <a class="toc-level-2" href="#三本地环境检查">三、本地环境检查</a>
 <a class="toc-level-2" href="#四启动依赖服务">四、启动依赖服务</a>
@@ -108,6 +109,20 @@
     <main>
       <p>本文面向第一次接手 LocalTalent 的新同事。照着做，你可以在本地看到二期高保真门户：<code>首页 / 找工作 / 找企业 / 人才服务区 / 招聘会 / 就业政策 / 职场资讯 / HR 工具箱 / 帮助中心 / 更多服务 / 登录注册入口</code>。</p>
 <p>二期不是重做一期底座，而是在一期合规、安全、审计与 Next/SSR 基础上，把公开门户做得更像一个完整地方人才网。</p>
+<section class="card" id="二期最终收口状态"><h2>二期最终收口状态</h2>
+<ul>
+<li>二期 <code>Prompt 15-23</code> 是高保真门户主线，已完成首页、找工作、找企业、人才服务区、招聘会、就业政策、职场资讯、HR 工具箱、帮助中心、登录注册入口、二期演示数据、Runbook/Testing 和总闸门。</li>
+<li><code>Prompt 24（P2-S1）</code> 是进入三期前的低风险公开频道补充，已完成 <code>/jobs/famous</code>、<code>/jobs/emergency</code>、<code>/daily-jobs</code>、<code>/job-fairs/online</code>、<code>/job-fairs/campus</code>、<code>/campus</code>、<code>/campus/jobs</code>、<code>/campus/elections</code>、<code>/explain</code>、<code>/explain/[id]</code> 等稳定公开入口。</li>
+<li>42 模板资料已归档到 <code>docs/Phase_II/74cms_42模板开发分析报告.md</code> 与 <code>docs/Phase_II/74cms_42_templates/</code>，后续三期规划应读取这些资料，但不得把风险池能力混入已收口的二期主线。</li>
+<li>进入三期前建议最后跑一遍：</li>
+</ul>
+<pre><code class="language-bash">./scripts/check_phase2_planning
+./scripts/check_phase2_demo_acceptance
+./scripts/check_portal_snapshot_fields
+./scripts/check_boundary
+./scripts/run_all</code></pre>
+<p>如果 <code>npm run build</code> 或 <code>./scripts/run_all</code> 让 <code>frontend/next-env.d.ts</code> 出现 Next 生成噪音，只恢复该文件，不做功能变更。</p>
+</section>
 <section class="card" id="一演示边界"><h2>一、演示边界</h2>
 <ul>
 <li>二期演示数据只用于本地开发和验收，不是生产初始化数据。</li>
