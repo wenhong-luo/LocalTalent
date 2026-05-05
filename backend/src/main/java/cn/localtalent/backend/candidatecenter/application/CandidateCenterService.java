@@ -17,9 +17,11 @@ import org.springframework.stereotype.Service;
 public class CandidateCenterService {
 
     private final CandidateCenterJdbcRepository repository;
+    private final CandidateClosureService closureService;
 
-    public CandidateCenterService(CandidateCenterJdbcRepository repository) {
+    public CandidateCenterService(CandidateCenterJdbcRepository repository, CandidateClosureService closureService) {
         this.repository = repository;
+        this.closureService = closureService;
     }
 
     public CandidateCenterOverviewResponse overview() {
@@ -32,7 +34,9 @@ public class CandidateCenterService {
                 resume(repository.resumeSummary(candidateId)),
                 applications(repository.applicationSummary(candidateId)),
                 signin(repository.signinSummary(candidateId)),
-                consent(repository.consentSummary(candidateId)));
+                consent(repository.consentSummary(candidateId)),
+                closureService.stats(candidateId),
+                closureService.features());
     }
 
     private CandidateCenterOverviewResponse.CandidateResumeSummaryResponse resume(CandidateResumeSummary summary) {

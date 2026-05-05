@@ -51,6 +51,9 @@ class MigrationTest {
                 "open_api_log",
                 "open_api_nonce_record",
                 "auth_oidc_identity_link",
+                "candidate_job_favorite",
+                "candidate_search_subscription",
+                "candidate_notification",
                 "audit_log",
                 "field_access_log",
                 "api_idempotency_record"));
@@ -137,6 +140,41 @@ class MigrationTest {
         assertIndexesExist(jdbcTemplate, "auth_oidc_identity_link", List.of(
                 "uk_oidc_issuer_subject",
                 "idx_oidc_identity"));
+        assertColumnsExist(jdbcTemplate, "candidate_job_favorite", List.of(
+                "candidate_id",
+                "job_id",
+                "status",
+                "created_at",
+                "updated_at"));
+        assertIndexesExist(jdbcTemplate, "candidate_job_favorite", List.of(
+                "uk_candidate_job_favorite",
+                "idx_candidate_favorite_status",
+                "idx_favorite_job"));
+        assertColumnsExist(jdbcTemplate, "candidate_search_subscription", List.of(
+                "candidate_id",
+                "subscription_name",
+                "keyword",
+                "city_code",
+                "category_code",
+                "salary_min",
+                "salary_max",
+                "status",
+                "last_triggered_at"));
+        assertIndexesExist(jdbcTemplate, "candidate_search_subscription", List.of(
+                "idx_candidate_subscription_status",
+                "idx_subscription_filter"));
+        assertColumnsExist(jdbcTemplate, "candidate_notification", List.of(
+                "candidate_id",
+                "notification_type",
+                "title",
+                "content_summary",
+                "biz_type",
+                "biz_id",
+                "read_status",
+                "read_at"));
+        assertIndexesExist(jdbcTemplate, "candidate_notification", List.of(
+                "idx_candidate_notification_read",
+                "idx_candidate_notification_biz"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");

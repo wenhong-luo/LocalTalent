@@ -6,7 +6,9 @@ public record CandidateCenterOverviewResponse(
         CandidateResumeSummaryResponse resume,
         CandidateApplicationSummaryResponse applications,
         CandidateSigninSummaryResponse signin,
-        CandidateConsentSummaryResponse consent
+        CandidateConsentSummaryResponse consent,
+        CandidateCenterDtos.PrivateStatsResponse stats,
+        CandidateCenterDtos.FeatureResponse features
 ) {
 
     public record CandidateResumeSummaryResponse(

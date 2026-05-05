@@ -1,4 +1,5 @@
 import {
+  apiRequest,
   apiGet,
   apiPost,
   createIdempotencyKey,
@@ -40,11 +41,93 @@ export type CandidateConsentSummary = {
   updated_at: string;
 };
 
+export type CandidatePrivateStats = {
+  favorite_count: number;
+  subscription_count: number;
+  unread_notification_count: number;
+};
+
+export type CandidateCenterFeatures = {
+  candidate_closure_enabled: boolean;
+};
+
 export type CandidateCenterOverview = {
   resume: CandidateResumeSummary;
   applications: CandidateApplicationSummary;
   signin: CandidateSigninSummary;
   consent: CandidateConsentSummary;
+  stats: CandidatePrivateStats;
+  features: CandidateCenterFeatures;
+};
+
+export type CandidateResume = {
+  resume_id: number | null;
+  resume_status: string;
+  completion_percent: number;
+  updated_at: string;
+  resume_name: string;
+  base_profile: {
+    display_name: string;
+    city_code: string;
+    category_code: string;
+    experience_years: number | null;
+    summary: string;
+  };
+  education: string[];
+  experience: string[];
+  skills: string[];
+  has_attachment: boolean;
+};
+
+export type CandidateApplicationItem = {
+  application_id: number;
+  job_id: number;
+  job_title: string;
+  company_name: string;
+  application_status: number;
+  status_label: string;
+  apply_time: string;
+};
+
+export type CandidateFavoriteItem = {
+  favorite_id: number;
+  job_id: number;
+  job_title: string;
+  company_name: string;
+  city_code: string;
+  category_code: string;
+  favorite_status: string;
+  created_at: string;
+};
+
+export type CandidateSubscriptionItem = {
+  subscription_id: number;
+  subscription_name: string;
+  keyword: string;
+  city_code: string;
+  category_code: string;
+  salary_min: number | null;
+  salary_max: number | null;
+  subscription_status: string;
+  updated_at: string;
+};
+
+export type CandidateNotificationItem = {
+  notification_id: number;
+  notification_type: string;
+  title: string;
+  content_summary: string;
+  read_status: string;
+  created_at: string;
+};
+
+export type CandidateClosureData = {
+  resume: CandidateResume;
+  preview: CandidateResume;
+  applications: CandidateApplicationItem[];
+  favorites: CandidateFavoriteItem[];
+  subscriptions: CandidateSubscriptionItem[];
+  notifications: CandidateNotificationItem[];
 };
 
 const publishStatuses: CandidatePublishStatus[] = [
@@ -82,6 +165,16 @@ function nullableNumber(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+function arrayOfText(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+}
+
+function arrayOfRecord(value: unknown): RawRecord[] {
+  return Array.isArray(value)
+    ? value.map((item) => asRecord(item))
+    : [];
+}
+
 function publishStatus(value: unknown): CandidatePublishStatus {
   return publishStatuses.includes(value as CandidatePublishStatus)
     ? value as CandidatePublishStatus
@@ -117,8 +210,90 @@ export function toCandidateCenterOverview(raw: unknown): CandidateCenterOverview
       status_label: text(consent.status_label, '状态暂不可用'),
       reason: text(consent.reason),
       updated_at: text(consent.updated_at)
+    },
+    stats: {
+      favorite_count: numberOr(asRecord(payload.stats).favorite_count, 0),
+      subscription_count: numberOr(asRecord(payload.stats).subscription_count, 0),
+      unread_notification_count: numberOr(asRecord(payload.stats).unread_notification_count, 0)
+    },
+    features: {
+      candidate_closure_enabled: Boolean(asRecord(payload.features).candidate_closure_enabled)
     }
   };
+}
+
+function toCandidateResume(raw: unknown): CandidateResume {
+  const payload = asRecord(raw);
+  const baseProfile = asRecord(payload.base_profile);
+
+  return {
+    resume_id: nullableNumber(payload.resume_id),
+    resume_status: text(payload.resume_status, 'draft'),
+    completion_percent: numberOr(payload.completion_percent, 0),
+    updated_at: text(payload.updated_at),
+    resume_name: text(payload.resume_name, '我的简历'),
+    base_profile: {
+      display_name: text(baseProfile.display_name),
+      city_code: text(baseProfile.city_code),
+      category_code: text(baseProfile.category_code),
+      experience_years: nullableNumber(baseProfile.experience_years),
+      summary: text(baseProfile.summary)
+    },
+    education: arrayOfText(payload.education),
+    experience: arrayOfText(payload.experience),
+    skills: arrayOfText(payload.skills),
+    has_attachment: Boolean(payload.has_attachment)
+  };
+}
+
+function toApplicationList(raw: unknown): CandidateApplicationItem[] {
+  return arrayOfRecord(asRecord(raw).application_list).map((item) => ({
+    application_id: numberOr(item.application_id, 0),
+    job_id: numberOr(item.job_id, 0),
+    job_title: text(item.job_title, '职位'),
+    company_name: text(item.company_name, '认证企业'),
+    application_status: numberOr(item.application_status, 0),
+    status_label: text(item.status_label, '已投递'),
+    apply_time: text(item.apply_time)
+  }));
+}
+
+function toFavoriteList(raw: unknown): CandidateFavoriteItem[] {
+  return arrayOfRecord(asRecord(raw).favorite_list).map((item) => ({
+    favorite_id: numberOr(item.favorite_id, 0),
+    job_id: numberOr(item.job_id, 0),
+    job_title: text(item.job_title, '职位'),
+    company_name: text(item.company_name, '认证企业'),
+    city_code: text(item.city_code),
+    category_code: text(item.category_code),
+    favorite_status: text(item.favorite_status, 'active'),
+    created_at: text(item.created_at)
+  }));
+}
+
+function toSubscriptionList(raw: unknown): CandidateSubscriptionItem[] {
+  return arrayOfRecord(asRecord(raw).subscription_list).map((item) => ({
+    subscription_id: numberOr(item.subscription_id, 0),
+    subscription_name: text(item.subscription_name, '职位订阅'),
+    keyword: text(item.keyword),
+    city_code: text(item.city_code),
+    category_code: text(item.category_code),
+    salary_min: nullableNumber(item.salary_min),
+    salary_max: nullableNumber(item.salary_max),
+    subscription_status: text(item.subscription_status, 'active'),
+    updated_at: text(item.updated_at)
+  }));
+}
+
+function toNotificationList(raw: unknown): CandidateNotificationItem[] {
+  return arrayOfRecord(asRecord(raw).notification_list).map((item) => ({
+    notification_id: numberOr(item.notification_id, 0),
+    notification_type: text(item.notification_type, 'system'),
+    title: text(item.title, '站内通知'),
+    content_summary: text(item.content_summary),
+    read_status: text(item.read_status, 'unread'),
+    created_at: text(item.created_at)
+  }));
 }
 
 export async function fetchCandidateCenterOverview(token: string): Promise<ApiResult<CandidateCenterOverview>> {
@@ -128,6 +303,92 @@ export async function fetchCandidateCenterOverview(token: string): Promise<ApiRe
     data: toCandidateCenterOverview(result.data),
     traceId: result.traceId
   };
+}
+
+export async function fetchCandidateClosureData(token: string): Promise<CandidateClosureData> {
+  const [resume, preview, applications, favorites, subscriptions, notifications] = await Promise.all([
+    apiGet<unknown>('/api/candidate/center/resume', { token }),
+    apiGet<unknown>('/api/candidate/center/resume/preview', { token }),
+    apiGet<unknown>('/api/candidate/center/applications?page=1&size=20', { token }),
+    apiGet<unknown>('/api/candidate/center/favorites?page=1&size=20', { token }),
+    apiGet<unknown>('/api/candidate/center/subscriptions?page=1&size=20', { token }),
+    apiGet<unknown>('/api/candidate/center/notifications?page=1&size=20', { token })
+  ]);
+
+  return {
+    resume: toCandidateResume(resume.data),
+    preview: toCandidateResume(preview.data),
+    applications: toApplicationList(applications.data),
+    favorites: toFavoriteList(favorites.data),
+    subscriptions: toSubscriptionList(subscriptions.data),
+    notifications: toNotificationList(notifications.data)
+  };
+}
+
+export async function saveCandidateResume(
+  token: string,
+  resume: {
+    resume_name: string;
+    base_profile: CandidateResume['base_profile'];
+    education: string[];
+    experience: string[];
+    skills: string[];
+  }
+): Promise<ApiResult<CandidateResume>> {
+  const result = await apiRequest<unknown>('/api/candidate/center/resume', {
+    method: 'PUT',
+    token,
+    body: resume,
+    idempotencyKey: createIdempotencyKey('candidate-resume')
+  });
+
+  return {
+    data: toCandidateResume(result.data),
+    traceId: result.traceId
+  };
+}
+
+export async function createFavorite(token: string, jobId: number): Promise<ApiResult<unknown>> {
+  return apiPost('/api/candidate/center/favorites', { job_id: jobId }, {
+    token,
+    idempotencyKey: createIdempotencyKey('candidate-favorite')
+  });
+}
+
+export async function cancelFavorite(token: string, favoriteId: number): Promise<ApiResult<unknown>> {
+  return apiPost(`/api/candidate/center/favorites/${favoriteId}/cancel`, {}, {
+    token,
+    idempotencyKey: createIdempotencyKey('candidate-favorite-cancel')
+  });
+}
+
+export async function createSubscription(
+  token: string,
+  payload: {
+    subscription_name: string;
+    keyword: string;
+    city_code: string;
+    category_code: string;
+  }
+): Promise<ApiResult<unknown>> {
+  return apiPost('/api/candidate/center/subscriptions', payload, {
+    token,
+    idempotencyKey: createIdempotencyKey('candidate-subscription')
+  });
+}
+
+export async function cancelSubscription(token: string, subscriptionId: number): Promise<ApiResult<unknown>> {
+  return apiPost(`/api/candidate/center/subscriptions/${subscriptionId}/cancel`, {}, {
+    token,
+    idempotencyKey: createIdempotencyKey('candidate-subscription-cancel')
+  });
+}
+
+export async function markNotificationRead(token: string, notificationId: number): Promise<ApiResult<unknown>> {
+  return apiPost(`/api/candidate/center/notifications/${notificationId}/read`, {}, {
+    token,
+    idempotencyKey: createIdempotencyKey('candidate-notification-read')
+  });
 }
 
 export async function submitCandidateConsent(token: string): Promise<ApiResult<unknown>> {

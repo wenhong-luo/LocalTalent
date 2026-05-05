@@ -27,6 +27,14 @@ const consentedOverview: CandidateCenterOverview = {
     status_label: '服务端确认已同意',
     reason: '',
     updated_at: '2026-04-28T12:00:00+08:00'
+  },
+  stats: {
+    favorite_count: 0,
+    subscription_count: 0,
+    unread_notification_count: 0
+  },
+  features: {
+    candidate_closure_enabled: false
   }
 };
 
@@ -68,6 +76,154 @@ function setToken() {
   window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
 }
 
+function closureOverview(overrides: Partial<CandidateCenterOverview> = {}): CandidateCenterOverview {
+  return {
+    ...consentedOverview,
+    ...overrides,
+    stats: {
+      favorite_count: 1,
+      subscription_count: 1,
+      unread_notification_count: 1,
+      ...overrides.stats
+    },
+    features: {
+      candidate_closure_enabled: true,
+      ...overrides.features
+    }
+  };
+}
+
+function closurePayload(path: string): unknown {
+  if (path.includes('/resume/preview')) {
+    return {
+      resume_id: 5,
+      resume_status: 'complete',
+      completion_percent: 100,
+      updated_at: '2026-05-01T09:00:00+08:00',
+      resume_name: '三期试运营简历',
+      base_profile: {
+        display_name: '林同学',
+        city_code: '310000',
+        category_code: 'software',
+        experience_years: 5,
+        summary: '服务端返回的预览摘要'
+      },
+      education: ['本科'],
+      experience: ['后端服务建设'],
+      skills: ['Java', 'Spring'],
+      has_attachment: true
+    };
+  }
+
+  if (path.includes('/resume')) {
+    return {
+      resume_id: 5,
+      resume_status: 'complete',
+      completion_percent: 100,
+      updated_at: '2026-05-01T09:00:00+08:00',
+      resume_name: '三期试运营简历',
+      base_profile: {
+        display_name: '林同学',
+        city_code: '310000',
+        category_code: 'software',
+        experience_years: 5,
+        summary: '只在本人私有域展示'
+      },
+      education: ['本科'],
+      experience: ['后端服务建设'],
+      skills: ['Java', 'Spring'],
+      has_attachment: true
+    };
+  }
+
+  if (path.includes('/applications')) {
+    return {
+      application_list: [{
+        application_id: 9,
+        job_id: 18,
+        job_title: 'Java 工程师',
+        company_name: '认证科技公司',
+        application_status: 2,
+        status_label: '邀约面试',
+        apply_time: '2026-05-01T10:00:00'
+      }],
+      total: 1
+    };
+  }
+
+  if (path.includes('/favorites')) {
+    return {
+      favorite_list: [{
+        favorite_id: 3,
+        job_id: 18,
+        job_title: 'Java 工程师',
+        company_name: '认证科技公司',
+        city_code: '310000',
+        category_code: 'software',
+        favorite_status: 'active',
+        created_at: '2026-05-01T10:00:00'
+      }],
+      total: 1
+    };
+  }
+
+  if (path.includes('/subscriptions')) {
+    return {
+      subscription_list: [{
+        subscription_id: 4,
+        subscription_name: '后端岗位订阅',
+        keyword: 'Java',
+        city_code: '310000',
+        category_code: 'software',
+        salary_min: 15000,
+        salary_max: 30000,
+        subscription_status: 'active',
+        updated_at: '2026-05-01T10:00:00'
+      }],
+      total: 1
+    };
+  }
+
+  if (path.includes('/notifications')) {
+    return {
+      notification_list: [{
+        notification_id: 6,
+        notification_type: 'system',
+        title: '订阅已创建',
+        content_summary: '仅站内通知',
+        read_status: 'unread',
+        created_at: '2026-05-01T10:00:00'
+      }],
+      total: 1
+    };
+  }
+
+  return {};
+}
+
+function mockCandidateClosureFetch(extraResume: Record<string, unknown> = {}) {
+  return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+    const path = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+
+    if (path.includes('/api/candidate/center/overview')) {
+      return apiOk(closureOverview());
+    }
+
+    if (init?.method === 'PUT' || init?.method === 'POST') {
+      return apiOk({});
+    }
+
+    const payload = closurePayload(path);
+    if (path.includes('/resume') && !path.includes('/preview')) {
+      return apiOk({
+        ...(payload as Record<string, unknown>),
+        ...extraResume
+      });
+    }
+    return apiOk(payload);
+  });
+}
+
 describe('CandidateCenter', () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -84,6 +240,7 @@ describe('CandidateCenter', () => {
     expect(screen.getByRole('button', { name: '撤回同意' })).toBeInTheDocument();
     expect(screen.getByText('86% 完成')).toBeInTheDocument();
     expect(screen.getByText(/trace_id：trace-candidate-center/)).toBeInTheDocument();
+    expect(screen.getByText('三期求职者闭环未开启')).toBeInTheDocument();
   });
 
   it('renders revoked state and does not show active consent copy', async () => {
@@ -201,6 +358,70 @@ describe('CandidateCenter', () => {
     expect(body).not.toContain('attachment_object_key');
     expect(body).not.toContain('evidence');
     expect(body).not.toContain('password_hash');
+  });
+
+  it('renders phase 3 candidate closure sections when feature is enabled', async () => {
+    setToken();
+    mockCandidateClosureFetch();
+
+    render(<CandidateCenter />);
+
+    expect(await screen.findByText('简历编辑')).toBeInTheDocument();
+    expect(screen.getByText('简历预览')).toBeInTheDocument();
+    expect(screen.getByText('投递记录')).toBeInTheDocument();
+    expect(screen.getAllByText('职位收藏').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('搜索订阅').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('站内通知').length).toBeGreaterThan(0);
+    expect(screen.getByText('Java 工程师 · 认证科技公司')).toBeInTheDocument();
+    expect(screen.getByText(/后端岗位订阅/)).toBeInTheDocument();
+  });
+
+  it('sends token trace and idempotency key for candidate private writes then reloads server state', async () => {
+    setToken();
+    const fetchMock = mockCandidateClosureFetch();
+
+    render(<CandidateCenter />);
+
+    fireEvent.submit(await screen.findByRole('form', { name: '简历编辑表单' }));
+
+    await screen.findByText('已同意，发布快照可见');
+    const putCall = fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT');
+    expect(putCall).toBeTruthy();
+    const headers = putCall?.[1]?.headers as Headers;
+    expect(headers.get('Authorization')).toBe('Bearer candidate-token');
+    expect(headers.get('X-Trace-Id')).toBeTruthy();
+    expect(headers.get('X-Idempotency-Key')).toMatch(/^candidate-resume-/);
+  });
+
+  it('does not render raw candidate fields from phase 3 private responses', async () => {
+    setToken();
+    mockCandidateClosureFetch({
+      mobile: '13900001234',
+      email: 'candidate@example.com',
+      resume_body: 'raw resume body',
+      attachment_object_key: 'resume/private.pdf',
+      evidence: 'consent evidence',
+      password_hash: 'bcrypt-hash',
+      base_profile_json: '{"mobile":"13900001234"}',
+      education_json: 'raw education',
+      experience_json: 'raw experience',
+      skills_json: 'raw skills'
+    });
+
+    render(<CandidateCenter />);
+
+    expect(await screen.findByText('简历编辑')).toBeInTheDocument();
+    const body = document.body.textContent ?? '';
+    expect(body).not.toContain('13900001234');
+    expect(body).not.toContain('candidate@example.com');
+    expect(body).not.toContain('raw resume body');
+    expect(body).not.toContain('resume/private.pdf');
+    expect(body).not.toContain('consent evidence');
+    expect(body).not.toContain('bcrypt-hash');
+    expect(body).not.toContain('base_profile_json');
+    expect(body).not.toContain('education_json');
+    expect(body).not.toContain('experience_json');
+    expect(body).not.toContain('skills_json');
   });
 
   it('reloads overview after consent post instead of inferring from post response', async () => {
