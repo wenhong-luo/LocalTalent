@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalTalent Phase 3 Step6：灰度试运营工程治理与上线演练</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #dbe4f0;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --blue: #1d4ed8;
+      --blue-soft: #eff6ff;
+      --amber: #b45309;
+      --amber-soft: #fffbeb;
+      --code: #1e293b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 0, rgba(15, 118, 110, .14) 0, transparent 320px),
+        linear-gradient(180deg, #f8fafc 0, var(--bg) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px 72px; }
+    header.hero {
+      padding: 34px;
+      border: 1px solid rgba(15, 118, 110, .22);
+      background: rgba(255, 255, 255, .92);
+      border-radius: 28px;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, .08);
+    }
+    h1 { margin: 0 0 12px; font-size: 34px; letter-spacing: -.02em; }
+    h2 { margin-top: 0; font-size: 24px; }
+    h3 { margin-top: 24px; font-size: 19px; }
+    p { margin: 10px 0; }
+    a { color: var(--accent); text-decoration: none; }
+    code {
+      color: var(--code);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: .92em;
+    }
+    pre {
+      overflow: auto;
+      padding: 16px;
+      border-radius: 14px;
+      background: #1e293b;
+      color: #f8fafc;
+    }
+    pre code { color: inherit; background: transparent; border: 0; padding: 0; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    nav.toc {
+      margin: 22px 0;
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+    nav.toc a {
+      display: inline-block;
+      margin: 6px 12px 6px 0;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 14px;
+    }
+    .card {
+      margin-top: 22px;
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 14px 40px rgba(15, 23, 42, .06);
+    }
+    .callout {
+      margin: 16px 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(29, 78, 216, .22);
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 650;
+    }
+    .callout.warn {
+      border-color: rgba(180, 83, 9, .25);
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: #ecfdf5; text-align: left; color: #0f766e; }
+    tr:last-child td { border-bottom: 0; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .mini {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fbfeff;
+    }
+    @media (max-width: 760px) {
+      .wrap { padding: 18px 12px 48px; }
+      header.hero, .card { padding: 20px; border-radius: 18px; }
+      h1 { font-size: 26px; }
+      .grid { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <h1>LocalTalent Phase 3 Step6：灰度试运营工程治理与上线演练</h1>
+      <p>本文件把三期灰度前的工程治理收口为可执行口径：预发环境、灰度配置、feature flag、备份恢复、对象存储生命周期、监控告警、容量烟测、Runbook、灰度 KPI 和退出条件。</p>
+      <div class="meta">
+        <span class="pill">灰度试运营</span>
+        <span class="pill">feature flag</span>
+        <span class="pill">备份恢复</span>
+        <span class="pill">回滚 Runbook</span>
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="目录">
+      <a href="#readme">开发前必读卡</a>
+      <a href="#inherit">继承结论</a>
+      <a href="#baseline">工程基线</a>
+      <a href="#goal">Step6 总目标</a>
+      <a href="#env">预发与灰度</a>
+      <a href="#flag">feature flag</a>
+      <a href="#backup">备份恢复</a>
+      <a href="#storage">对象存储</a>
+      <a href="#observability">监控告警</a>
+      <a href="#capacity">容量烟测</a>
+      <a href="#runbook">Runbook</a>
+      <a href="#kpi">KPI 与退出</a>
+      <a href="#acceptance">验收关注点</a>
+      <a href="#next">结论与下一步</a>
+    </nav>
+
+    <section class="card" id="readme">
+      <h2>开发前必读卡</h2>
+      <ul>
+        <li><strong>文件定位</strong>：三期第六份 Step 文档；用于把 Step1-Step5 已规划的业务闭环、安全收口和运营边界，落到灰度试运营前必须具备的工程治理、上线演练和退出条件。</li>
+        <li><strong>输入资料</strong>：<code>00_PHASE_III_BOUNDARY.md</code>、<code>LocalTalent_phase3_step1.md</code> 至 <code>LocalTalent_phase3_step5.md</code>、<code>LocalTalent_三期总规划.md</code>、<code>三期研发方向与上线阶段判断.md</code>、Phase I/II Runbook、Testing、CI、MinIO、导出、审计和边界脚本基线。</li>
+        <li><strong>本轮目标</strong>：冻结三期灰度试运营工程治理口径，包括预发环境、灰度配置、feature flag、备份恢复、对象存储生命周期、日志脱敏、监控告警、容量烟测、上线/暂停/回滚 Runbook、灰度 KPI 和试运营退出条件。</li>
+        <li><strong>禁止越界点</strong>：不写代码，不新增迁移，不生成三期蓝图或提示词，不创建部署脚本，不把灰度试运营写成公网正式上线，不引入真实短信、真实微信、小程序、App、真实地图、视频、直播、真实 ATS/RPA 或风险池能力。</li>
+        <li><strong>输出边界</strong>：只定义后续实现阶段必须满足的工程治理、演练材料、验收门槛和阻断规则；K8s、监控、压测、备份恢复脚本均只作为后续实现输出物规划。</li>
+        <li><strong>下一步影响</strong>：本文件稳定后，Step1-Step6 即可作为三期蓝图和 Prompt 拆解的上游依据；下一份建议文档是 <code>三期研发实施蓝图与任务拆解.md/html</code>。</li>
+      </ul>
+      <div class="callout warn">统一硬边界：人才服务区仅展示发布快照；原始候选人数据不得公开；导出必须审批；审计必须脱敏；对接接口继续 stub；风险池能力不得绕过准入。</div>
+    </section>
+
+    <section class="card" id="inherit">
+      <h2>1. Step1-Step5 继承结论</h2>
+      <p>Step1 冻结三期目标为小范围真实试运营；Step2 收口 candidate 真实闭环；Step3 收口 company 招聘工作台；Step4 收口运营后台和门户运营化；Step5 收口审计、导出、风控与安全检查单。Step6 只做工程治理与上线演练，不扩展业务功能。</p>
+      <table>
+        <tr><th>继承结论</th><th>Step6 继承方式</th></tr>
+        <tr><td>candidate/company/operator/auditor 闭环已经规划完成。</td><td>灰度演练必须覆盖四类角色的关键路径，而不是只测公开门户。</td></tr>
+        <tr><td>门户由真实状态和后台配置驱动。</td><td>容量烟测、缓存、sitemap 和监控必须覆盖首页、找工作、找企业、人才服务区、招聘会、资讯等公开页。</td></tr>
+        <tr><td>Step5 已冻结安全检查单。</td><td>Step6 必须把安全检查单接入上线前闸门、暂停条件和回滚流程。</td></tr>
+        <tr><td>风险池能力不得偷跑。</td><td>灰度开关、Runbook、演示数据和故障处理都不得临时放开风险池能力。</td></tr>
+        <tr><td>三期不是公网正式运营。</td><td>工程目标是灰度试运营可控、可暂停、可回滚，不是一次性生产大上线。</td></tr>
+      </table>
+    </section>
+
+    <section class="card" id="baseline">
+      <h2>2. 一二期与三期工程治理基线</h2>
+      <table>
+        <tr><th>能力</th><th>已有基线</th><th>Step6 收口口径</th></tr>
+        <tr><td>本地依赖</td><td>Docker Compose 可拉起 MySQL、Redis、MinIO。</td><td>继续作为开发和单机预发基座，灰度前必须有明确环境变量和启动顺序。</td></tr>
+        <tr><td>CI/闸门</td><td>已有 run_all、边界脚本、字段黑名单脚本、Phase II planning/demo 闸门。</td><td>三期后续应补 check_phase3_boundary、check_phase3_ops 或同等闸门。</td></tr>
+        <tr><td>Next/SSR 门户</td><td>二期完成高保真公开门户和 SEO 基础。</td><td>灰度烟测必须覆盖 SSR 构建、公开页面可访问、sitemap 不含私有和撤回对象。</td></tr>
+        <tr><td>导出与 MinIO</td><td>已有审批、异步生成、短期预签名下载和审计链。</td><td>灰度前补对象生命周期、导出文件保留、过期清理和异常告警口径。</td></tr>
+        <tr><td>审计与 trace</td><td>已有 audit、field access、open api 三类日志查询与脱敏。</td><td>灰度运行必须能按 trace 串联关键路径，并有异常审计告警入口。</td></tr>
+        <tr><td>备份与回滚</td><td>Phase I/II Runbook 已有发布、回滚、备份、监控口径。</td><td>Step6 要求真实演练备份恢复、应用回滚、灰度暂停和 roll-forward 修复。</td></tr>
+      </table>
+    </section>
+
+    <section class="card" id="goal">
+      <h2>3. Step6 总目标</h2>
+      <pre><code>灰度试运营前，系统必须可启动、可灰度、可观测、可备份、可恢复、可暂停、可回滚、可退出。</code></pre>
+      <ol>
+        <li>本地、预发、灰度环境的配置差异清晰，敏感配置不进入仓库。</li>
+        <li>feature flag 能控制三期新增能力的打开、暂停和回滚。</li>
+        <li>数据库和对象存储有备份、恢复、保留、清理和负责人。</li>
+        <li>日志脱敏、监控指标、告警门槛、故障排查路径清晰。</li>
+        <li>公共门户、私有中心、后台、导出和审计关键路径具备 smoke test。</li>
+        <li>灰度容量烟测覆盖公开读流量、登录态接口、导出 worker 和撤回下线传播。</li>
+        <li>上线、暂停、回滚 Runbook 可被新人照着执行。</li>
+        <li>灰度 KPI、扩大范围条件、停止条件和试运营退出条件明确。</li>
+      </ol>
+    </section>
+
+    <section class="card" id="env">
+      <h2>4. 预发环境与灰度配置</h2>
+      <table>
+        <tr><th>环境</th><th>目标</th><th>允许能力</th><th>禁止事项</th></tr>
+        <tr><td>local</td><td>开发与自测</td><td>Compose、本地账号/JWT、演示数据、低风险脚本。</td><td>不接真实外部供应商，不存放生产数据。</td></tr>
+        <tr><td>staging</td><td>集成与演练</td><td>与灰度接近的配置、预发域名、脱敏样本数据、备份恢复演练。</td><td>不用生产明文数据，不绕过审批和审计。</td></tr>
+        <tr><td>gray</td><td>小范围真实试运营</td><td>真实候选人、企业、运营人员按白名单进入；feature flag 分批开启。</td><td>不直接变成公网正式运营，不开放风险池能力。</td></tr>
+        <tr><td>production-ready</td><td>四期正式上线准备</td><td>压测、监控、客服、合规材料、供应商治理和生产发布流程。</td><td>不在三期 Step6 中承诺完成。</td></tr>
+      </table>
+      <h3>4.1 配置口径</h3>
+      <ul>
+        <li><code>.env.phase3.example</code> 只保留示例值，不保存真实密钥。</li>
+        <li>环境变量清单覆盖数据库、Redis、MinIO/S3、JWT/OIDC、Next API base URL、日志级别、feature flag、导出 TTL、导出频控。</li>
+        <li>灰度账号白名单覆盖 candidate、company、operator、auditor。</li>
+        <li>三期新增功能默认关闭，逐项打开。</li>
+      </ul>
+      <h3>4.2 Compose 与 K8s 边界</h3>
+      <ul>
+        <li>本地和单机预发继续使用 Docker Compose 或单节点容器编排。</li>
+        <li>K8s 只作为无状态应用层的进阶选项：Next SSR/BFF、后端 API、worker。</li>
+        <li>MySQL、Redis、MinIO 不在三期同阶段强制迁移到 K8s。</li>
+        <li>不在没有备份恢复演练和回滚演练前进入灰度。</li>
+      </ul>
+    </section>
+
+    <section class="card" id="flag">
+      <h2>5. feature flag、灰度发布、暂停与回滚</h2>
+      <table>
+        <tr><th>flag 示例</th><th>控制范围</th><th>默认值</th><th>回滚动作</th></tr>
+        <tr><td><code>phase3.candidate.resume_edit</code></td><td>求职者简历编辑与预览。</td><td>关闭</td><td>关闭入口，保留只读 overview。</td></tr>
+        <tr><td><code>phase3.candidate.favorite_subscription</code></td><td>收藏、订阅、站内通知入口。</td><td>关闭</td><td>关闭入口，保留投递记录。</td></tr>
+        <tr><td><code>phase3.company.job_manage</code></td><td>企业职位创建、编辑、送审、下线。</td><td>关闭</td><td>关闭写入口，保留职位只读列表。</td></tr>
+        <tr><td><code>phase3.company.application_workspace</code></td><td>投递池阶段流转和面试邀约。</td><td>关闭</td><td>冻结写动作，保留只读投递池。</td></tr>
+        <tr><td><code>phase3.admin.portal_ops</code></td><td>推荐位、内容、活动、风险审核生产化。</td><td>关闭</td><td>回退到二期静态/只读展示。</td></tr>
+        <tr><td><code>phase3.export.quota</code></td><td>导出频控、配额、风险提示。</td><td>开启</td><td>不建议关闭；异常时暂停导出申请。</td></tr>
+      </table>
+      <h3>5.1 灰度发布步骤</h3>
+      <ol>
+        <li>确认本轮范围、禁止事项和 feature flag 列表冻结。</li>
+        <li>在 staging 打开目标 flag，跑 smoke、边界、字段黑名单、IDOR/BOLA、导出和审计回归。</li>
+        <li>做备份恢复演练和应用回滚演练。</li>
+        <li>在 gray 环境对白名单用户打开 5% 或指定账号范围。</li>
+        <li>观察 5xx、P95、登录成功率、撤回下线传播、导出审批合规率、审计覆盖率。</li>
+        <li>无 P0/P1 问题后扩大到 20%、50%、100% 白名单。</li>
+      </ol>
+      <h3>5.2 暂停条件</h3>
+      <ul>
+        <li>公开门户 API 5xx 持续超过 0.5%。</li>
+        <li>BOLA/IDOR、字段泄露、导出绕行、审计缺失等 P0/P1 安全问题。</li>
+        <li>撤回下线传播超过最大 5 分钟仍未收敛。</li>
+        <li>导出链接过期或二次发放规则失效。</li>
+        <li>关键角色无法登录或身份分流错误。</li>
+        <li>备份恢复失败或回滚演练失败。</li>
+      </ul>
+    </section>
+
+    <section class="card" id="backup">
+      <h2>6. 数据库备份恢复演练</h2>
+      <table>
+        <tr><th>项目</th><th>Step6 口径</th></tr>
+        <tr><td>备份范围</td><td>MySQL 主库、Flyway schema history、关键业务表、审计日志表。</td></tr>
+        <tr><td>备份频率</td><td>灰度期至少每日全量备份；关键上线窗口前手动备份。</td></tr>
+        <tr><td>恢复演练</td><td>staging 环境至少完成一次从备份恢复到可启动应用的演练。</td></tr>
+        <tr><td>校验方式</td><td>表数量、核心记录数、Flyway 版本、登录、门户、导出、审计查询 smoke test。</td></tr>
+        <tr><td>保留周期</td><td>灰度期建议至少保留 7 天，正式运营前再按合规要求扩展。</td></tr>
+        <tr><td>负责人</td><td>明确备份执行人、恢复执行人、复核人和失败升级路径。</td></tr>
+      </table>
+      <h3>6.1 数据库恢复后必须验证的路径</h3>
+      <ul>
+        <li><code>/health</code> 可访问。</li>
+        <li>首页、找工作、找企业、人才服务区可访问。</li>
+        <li>candidate、company、operator 登录可用。</li>
+        <li>同意/撤回状态与发布快照一致。</li>
+        <li>企业职位可见性与审核状态一致。</li>
+        <li>导出申请、审批、生成和审计记录可查询。</li>
+        <li><code>audit_log</code>、<code>field_access_log</code>、<code>open_api_log</code> 未丢失关键 trace。</li>
+      </ul>
+    </section>
+
+    <section class="card" id="storage">
+      <h2>7. 对象存储生命周期与导出文件保留策略</h2>
+      <table>
+        <tr><th>对象类型</th><th>保留策略</th><th>风险控制</th></tr>
+        <tr><td>导出文件</td><td>短期保留，建议 7 天内清理；下载链接 15-30 分钟 TTL。</td><td>未审批不可生成；过期不可下载；文件 key 不公开。</td></tr>
+        <tr><td>简历附件</td><td>仅本人私有域和授权流程可访问。</td><td>不进入公开门户、搜索、缓存或日志。</td></tr>
+        <tr><td>审核材料</td><td>仅 operator 授权查看，auditor 只读脱敏视图。</td><td>不公开营业执照附件、证据或后台材料。</td></tr>
+        <tr><td>演示素材</td><td>本地演示可用占位图。</td><td>不混入真实敏感材料。</td></tr>
+      </table>
+      <ul>
+        <li>继续使用 <code>export_apply</code> 审批链。</li>
+        <li>下载链接只能短期有效。</li>
+        <li>文件生成、链接发放、下载确认和过期拒绝均需可审计。</li>
+        <li>导出对象 key 不得进入公开 DOM、日志、open_api_log 或审计响应明文。</li>
+        <li>清理任务失败应有告警或人工检查入口。</li>
+      </ul>
+    </section>
+
+    <section class="card" id="observability">
+      <h2>8. 日志脱敏、监控告警与故障排查</h2>
+      <h3>8.1 日志脱敏规则</h3>
+      <p>日志、错误信息、审计响应、open_api_log、埋点和调试输出不得包含手机号、邮箱、联系方式、简历正文、附件对象 key、证据、原始候选人 JSON、营业执照附件、审核材料、后台备注、报名名单、签到证据、password、secret、token、signature、nonce 明文。</p>
+      <h3>8.2 最小监控指标</h3>
+      <table>
+        <tr><th>指标</th><th>灰度关注点</th></tr>
+        <tr><td>应用健康</td><td><code>/health</code>、后端启动、Next SSR 启动、worker 存活。</td></tr>
+        <tr><td>错误率</td><td>公开门户 5xx、私有中心 5xx、后台 5xx、导出失败率。</td></tr>
+        <tr><td>延迟</td><td>公开页 P95、登录 P95、导出申请 P95、审计查询 P95。</td></tr>
+        <tr><td>安全事件</td><td>AUTHZ_403 异常飙升、IDOR 拦截、字段黑名单扫描失败。</td></tr>
+        <tr><td>导出链路</td><td>申请数、审批数、生成成功/失败、下载链接发放、过期拒绝。</td></tr>
+        <tr><td>撤回下线</td><td>撤回动作数量、传播耗时、超时未下线对象。</td></tr>
+        <tr><td>对接 stub</td><td>签名错误、重放、幂等冲突、重试队列积压。</td></tr>
+      </table>
+      <div class="callout">告警不是为了吓人，是为了别让凌晨三点的你成为唯一监控系统。</div>
+    </section>
+
+    <section class="card" id="capacity">
+      <h2>9. 容量烟测与关键路径压测</h2>
+      <table>
+        <tr><th>指标</th><th>建议目标</th><th>口径</th></tr>
+        <tr><td>公开门户总读流量</td><td>峰值 120 QPS</td><td>首页、找工作、找企业、人才服务区、招聘会、资讯等公开页总和。</td></tr>
+        <tr><td>私有中心/后台混合流量</td><td>峰值 25 QPS</td><td>candidate/company/operator/auditor 登录后接口总和。</td></tr>
+        <tr><td>认证相关流量</td><td>峰值 12 QPS</td><td>登录、回调、token 刷新等。</td></tr>
+        <tr><td>导出申请提交</td><td>峰值 2 QPS</td><td>申请入口，不含下载链接访问。</td></tr>
+        <tr><td>导出并发</td><td>2 个 worker</td><td>按导出任务并发控制。</td></tr>
+        <tr><td>活跃发布快照规模</td><td>1 万条</td><td>当前对外可见 <code>candidate_publish_snapshot</code>。</td></tr>
+        <tr><td>历史快照保留规模</td><td>5 万条</td><td>含下线和撤回历史版本。</td></tr>
+        <tr><td>撤回下线传播 SLA</td><td>中位 &lt; 60 秒，最慢 &lt; 5 分钟</td><td>从撤回到公开门户、搜索、缓存、sitemap 不可见。</td></tr>
+      </table>
+      <h3>9.1 Smoke test 覆盖路径</h3>
+      <ul>
+        <li>首页、找工作、职位详情、找企业、企业主页。</li>
+        <li>人才服务区列表、筛选、空态。</li>
+        <li>招聘会、政策资讯、HR 工具箱、更多服务。</li>
+        <li><code>/auth/login</code>、<code>/auth/register</code>。</li>
+        <li><code>/candidate/center</code>、<code>/company</code>、<code>/admin</code>。</li>
+        <li>导出申请、审批状态查询、下载链接发放拒绝/成功场景。</li>
+        <li>审计 trace 查询。</li>
+      </ul>
+    </section>
+
+    <section class="card" id="runbook">
+      <h2>10. 上线、暂停、回滚 Runbook</h2>
+      <h3>10.1 上线前检查</h3>
+      <table>
+        <tr><th>检查项</th><th>要求</th></tr>
+        <tr><td>范围冻结</td><td>本次灰度包含哪些 flag、页面、接口和用户范围。</td></tr>
+        <tr><td>禁止事项确认</td><td>风险池能力未混入灰度主线。</td></tr>
+        <tr><td>测试通过</td><td>后端、前端、边界脚本、字段黑名单、三期专项脚本通过。</td></tr>
+        <tr><td>备份完成</td><td>数据库和对象存储备份完成并记录位置。</td></tr>
+        <tr><td>恢复演练</td><td>staging 恢复演练通过。</td></tr>
+        <tr><td>回滚演练</td><td>flag 关闭、应用回滚、roll-forward 修复路径演练通过。</td></tr>
+        <tr><td>监控告警</td><td>健康、5xx、延迟、导出、审计、撤回下线告警可用。</td></tr>
+        <tr><td>人员排班</td><td>产品、研发、运营、值守和决策人明确。</td></tr>
+      </table>
+      <h3>10.2 暂停步骤</h3>
+      <ol>
+        <li>停止扩大灰度名单。</li>
+        <li>关闭相关 feature flag。</li>
+        <li>暂停高风险写动作，例如导出申请、职位发布、推荐位调整。</li>
+        <li>保留只读入口，避免用户完全失联。</li>
+        <li>记录事件、trace、影响范围、临时处置和负责人。</li>
+        <li>完成根因确认后再决定恢复、回滚或 roll-forward。</li>
+      </ol>
+      <h3>10.3 回滚步骤</h3>
+      <ol>
+        <li>确认问题级别和影响范围。</li>
+        <li>先关闭相关 feature flag。</li>
+        <li>若仍未恢复，回滚应用版本。</li>
+        <li>数据库问题优先新增向前修复迁移，不直接修改旧迁移。</li>
+        <li>若涉及数据泄露或权限问题，立即冻结相关入口并保留审计证据。</li>
+        <li>回滚后执行 smoke test 和关键路径验证。</li>
+        <li>复盘记录必须写入故障记录模板。</li>
+      </ol>
+    </section>
+
+    <section class="card" id="kpi">
+      <h2>11. 灰度 KPI 与试运营退出条件</h2>
+      <table>
+        <tr><th>KPI</th><th>建议门槛</th><th>说明</th></tr>
+        <tr><td>公开门户 API 5xx</td><td>&lt; 0.5%</td><td>持续超标则暂停扩大灰度。</td></tr>
+        <tr><td>公开页 P95</td><td>&lt; 500ms</td><td>按服务端公开接口口径。</td></tr>
+        <tr><td>登录成功率</td><td>&gt; 99%</td><td>覆盖本地账号或 OIDC 灰度入口。</td></tr>
+        <tr><td>撤回下线传播</td><td>中位 &lt; 60 秒，最慢 &lt; 5 分钟</td><td>三期最关键合规指标之一。</td></tr>
+        <tr><td>导出审批合规率</td><td>100%</td><td>所有下载必须关联审批单和生成记录。</td></tr>
+        <tr><td>审计覆盖率</td><td>100%</td><td>审批、导出、撤回、高敏字段查看可追踪。</td></tr>
+        <tr><td>越权缺陷</td><td>P0 = 0，P1 = 0</td><td>BOLA、IDOR、字段泄露均为阻断级。</td></tr>
+        <tr><td>真实灰度闭环数</td><td>至少 20 位候选人、10 家企业、3 名运营跑通</td><td>避免三期变成“更完整的演示”。</td></tr>
+      </table>
+      <h3>11.1 退出试运营条件</h3>
+      <ol>
+        <li>candidate、company、operator、auditor 四类角色均完成真实闭环。</li>
+        <li>公开门户真实状态驱动稳定，SEO 与 sitemap 不含私有或撤回对象。</li>
+        <li>审计、导出、撤回、IDOR/BOLA、字段黑名单回归稳定。</li>
+        <li>备份恢复、回滚演练、告警联通和容量烟测都有记录。</li>
+        <li>风险池能力仍未偷跑。</li>
+        <li>产品、技术、运营共同确认可进入四期正式上线治理。</li>
+      </ol>
+    </section>
+
+    <section class="card" id="acceptance">
+      <h2>12. 自动化验收关注点</h2>
+      <table>
+        <tr><th>验收点</th><th>关注内容</th></tr>
+        <tr><td>环境配置</td><td>local/staging/gray 配置清单、敏感配置不入库、feature flag 默认关闭。</td></tr>
+        <tr><td>灰度开关</td><td>可按功能和用户范围打开、暂停、回滚。</td></tr>
+        <tr><td>备份恢复</td><td>数据库和对象存储可备份、可恢复、可验证。</td></tr>
+        <tr><td>日志脱敏</td><td>日志、错误、审计、open_api_log 不含敏感明文。</td></tr>
+        <tr><td>监控告警</td><td>5xx、延迟、登录、导出、审计、撤回下线、openapi stub 有观察入口。</td></tr>
+        <tr><td>容量烟测</td><td>公开门户 120 QPS、私有中心 25 QPS、导出 worker 并发等灰度目标可验证。</td></tr>
+        <tr><td>Runbook</td><td>上线、暂停、回滚、故障记录模板可由新人照着执行。</td></tr>
+        <tr><td>KPI</td><td>扩大灰度和退出试运营条件可量化。</td></tr>
+        <tr><td>风险池</td><td>公共简历库、受控找人才、联系解锁、真实支付、真实外部能力仍被阻断。</td></tr>
+      </table>
+      <p>建议后续实现阶段保留或新增 <code>scripts/check_phase3_boundary</code>、<code>scripts/check_phase3_ops</code>、<code>scripts/smoke_phase3</code>、公开门户 load 脚本、回滚演练记录模板和灰度故障记录模板。这些名称只是规划建议，不是本轮要创建的文件。</p>
+    </section>
+
+    <section class="card" id="next">
+      <h2>13. Step6 结论与下一步</h2>
+      <ul>
+        <li>三期 Step 文档已从产品目标、求职者闭环、企业工作台、运营后台、安全收口，推进到工程治理和上线演练。</li>
+        <li>灰度试运营不是正式公网运营；它必须可控、可暂停、可回滚、可证明。</li>
+        <li>三期工程默认路径是：开发/本地用 Compose，预发/单机灰度保持简单，K8s 仅作为无状态应用层进阶选项。</li>
+        <li>MySQL、Redis、MinIO 等状态组件不在三期同阶段强制重构。</li>
+        <li>灰度前必须完成备份恢复、对象存储保留、日志脱敏、监控告警、容量烟测、Runbook 和 KPI 闸门。</li>
+        <li>风险池能力仍不得进入三期主线。</li>
+      </ul>
+      <div class="callout">
+        建议下一份文档：<code>三期研发实施蓝图与任务拆解.md/html</code>。蓝图应基于 Step1-Step6 拆分 P3-0 至 P3-6 的实施路线、任务边界、测试矩阵、验收门槛和每轮 Prompt 依赖。
+      </div>
+    </section>
+  </main>
+</body>
+</html>

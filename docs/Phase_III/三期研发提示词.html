@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 三期 Codex 投喂手册（Prompt 25–31）</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #607086;
+      --line: #dce5ef;
+      --brand: #0f766e;
+      --blue: #1d4ed8;
+      --soft: #e8f7f4;
+      --warn: #fff7ed;
+      --danger: #fee2e2;
+      --code-bg: #101827;
+      --code-ink: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 2%, rgba(15, 118, 110, .14), transparent 28%),
+        radial-gradient(circle at 88% 0%, rgba(29, 78, 216, .12), transparent 30%),
+        linear-gradient(180deg, #fbfdff 0%, var(--bg) 48%, #edf2f7 100%);
+      line-height: 1.72;
+    }
+    header { padding: 56px 24px 34px; background: linear-gradient(135deg, #062f2d 0%, #0f766e 54%, #1d4ed8 100%); color: #fff; }
+    .hero { max-width: 1180px; margin: 0 auto; }
+    .eyebrow { margin: 0 0 10px; opacity: .82; letter-spacing: .08em; font-size: 14px; }
+    h1 { margin: 0; font-size: clamp(32px, 5vw, 54px); line-height: 1.1; }
+    .subtitle { max-width: 920px; margin: 18px 0 0; color: rgba(255,255,255,.9); font-size: 17px; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 24px 0 0; padding: 0; list-style: none; }
+    .summary li { padding: 13px 15px; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.1); border-radius: 14px; backdrop-filter: blur(6px); }
+    .layout { max-width: 1180px; margin: 0 auto; padding: 28px 24px 68px; display: grid; grid-template-columns: 286px minmax(0, 1fr); gap: 24px; }
+    nav { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.92); box-shadow: 0 16px 40px rgba(31,41,55,.07); }
+    nav strong { display: block; margin-bottom: 10px; color: var(--brand); }
+    nav a { display: block; padding: 6px 0; color: var(--muted); text-decoration: none; font-size: 14px; }
+    nav a:hover { color: var(--brand); }
+    main { min-width: 0; }
+    section.card { margin: 0 0 18px; padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: 0 18px 44px rgba(31,41,55,.06); }
+    section.prompt { border-left: 6px solid var(--brand); }
+    section.warn { background: var(--warn); border-color: #fed7aa; }
+    section.danger { background: #fff7f7; border-color: #fecaca; border-left: 6px solid #dc2626; }
+    h2 { margin: 0 0 14px; color: #0f3f3c; font-size: 24px; }
+    h3 { margin: 22px 0 10px; color: #1f4f4b; font-size: 19px; }
+    p { margin: 10px 0; }
+    ul, ol { margin: 10px 0 14px; padding-left: 1.25rem; }
+    li { margin: 5px 0; }
+    code { padding: 2px 6px; border-radius: 7px; background: var(--soft); color: #075e57; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; }
+    pre { overflow-x: auto; padding: 16px; border-radius: 16px; background: var(--code-bg); color: var(--code-ink); line-height: 1.55; white-space: pre-wrap; }
+    pre code { padding: 0; background: transparent; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0 18px; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); font-size: 14px; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: #eef8f6; color: #0f4f49; }
+    tr:last-child td { border-bottom: 0; }
+    .copy-title { margin-top: 18px; padding: 9px 12px; border-radius: 12px; background: #eef2ff; color: #1e3a8a; font-weight: 700; }
+    footer { max-width: 1180px; margin: 0 auto; padding: 0 24px 40px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 920px) { .layout { grid-template-columns: 1fr; } nav { position: static; max-height: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <p class="eyebrow">PHASE III CODEX PROMPTS</p>
+      <h1>LocalTalent 三期 Codex 投喂手册</h1>
+      <p class="subtitle">可执行版 · Prompt 25–31。三期目标是从可演示系统推进到小范围真实灰度试运营。</p>
+      <ul class="summary">
+        <li>Prompt 25–31 对应 P3-0 至 P3-6</li>
+        <li>每轮只执行当前 Prompt</li>
+        <li>人才服务区仅展示发布快照</li>
+        <li>风险池能力不得进入三期主线</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="目录">
+      <strong>目录</strong>
+      <a href="#intro">开发前必读</a>
+      <a href="#baseline">基线记录</a>
+      <a href="#templates">校验与修复模板</a>
+      <a href="#matrix">失败处理矩阵</a>
+      <a href="#overview">轮次总览</a>
+      <a href="#p25">Prompt 25（P3-0）</a>
+      <a href="#p26">Prompt 26（P3-1）</a>
+      <a href="#p27">Prompt 27（P3-2）</a>
+      <a href="#p28">Prompt 28（P3-3）</a>
+      <a href="#p29">Prompt 29（P3-4）</a>
+      <a href="#p30">Prompt 30（P3-5）</a>
+      <a href="#p31">Prompt 31（P3-6）</a>
+      <a href="#risk">风险池专项模板</a>
+    </nav>
+
+    <main>
+      <section class="card" id="intro">
+        <h2>开发前必读卡</h2>
+        <ul>
+          <li><strong>文件定位：</strong>Codex 三期逐轮投喂执行手册，覆盖 Prompt 25–31。</li>
+          <li><strong>实现约束：</strong>每轮只做当前 Prompt；不得跨 Prompt 偷跑；不得修改一期 Prompt 0–14、二期 Prompt 15–24 既定事实。</li>
+          <li><strong>三期目标：</strong>把一二期可演示系统推进为真实求职者、企业、运营人员可小范围灰度试运营的业务系统。</li>
+          <li><strong>禁止越界点：</strong>禁止公共简历库、受控找人才、联系解锁、会员支付、真实短信/微信/小程序/App、真实地图/视频/直播、真实 ATS/RPA 或受控候选池同步。</li>
+        </ul>
+        <p><strong>统一硬边界：</strong>人才服务区仅展示发布快照；原始候选人数据不得公开；对接接口仅 stub；同意、撤回、数据域、字段级权限、审计和导出审批必须由服务端收口。</p>
+        <h3>每轮开发读取顺序</h3>
+        <ol>
+          <li><code>docs/Phase_III/00_PHASE_III_BOUNDARY.md</code></li>
+          <li><code>docs/Phase_III/三期研发方向与上线阶段判断.md</code></li>
+          <li><code>docs/Phase_III/LocalTalent_三期总规划.md</code></li>
+          <li><code>docs/Phase_III/LocalTalent_phase3_step1.md</code> 至 <code>step6.md</code></li>
+          <li><code>docs/Phase_III/三期研发实施蓝图与任务拆解.md</code></li>
+          <li><code>docs/Phase_III/三期研发提示词.md</code></li>
+          <li>Phase I/II 边界、提示词、演示说明作为已完成基线回顾。</li>
+        </ol>
+      </section>
+
+      <section class="card" id="baseline">
+        <h2>三期已完成规划基线记录（开发前必读）</h2>
+        <p>三期边界、方向判断、总规划、Step1-Step6 和实施蓝图已完成。本文件生成后，三期规划进入代码实现准备状态。</p>
+        <table>
+          <tr><th>轮次</th><th>完成内容</th><th>固定边界</th></tr>
+          <tr><td>暂无</td><td>三期代码开发尚未开始。</td><td>首轮必须从 Prompt 25（P3-0）开始，不得直接实现业务闭环。</td></tr>
+        </table>
+      </section>
+
+      <section class="card" id="templates">
+        <h2>校验与修复模板</h2>
+        <h3>校验提示词模板</h3>
+        <pre><code>请对比 docs/Phase_III/00_PHASE_III_BOUNDARY.md、LocalTalent_三期总规划.md、Step1-Step6、三期蓝图和三期提示词：
+1) 本轮是否越界？
+2) 是否只实现当前 Prompt？
+3) 新增/修改了哪些文件？
+4) RBAC、数据域、字段级权限、审计、trace、幂等、IDOR/BOLA 是否落实？
+5) 给出必须修复清单。</code></pre>
+        <h3>修复提示词模板</h3>
+        <pre><code>继续本轮 Prompt XX（P3-X），禁止扩大范围。
+请只修复刚才验收失败项，不新增 Prompt XX 之外的功能。
+必须继续遵守 Phase III 边界：人才服务区仅展示发布快照；不输出原始候选人数据；对接接口仅 stub；高风险能力只占位或风险池。</code></pre>
+      </section>
+
+      <section class="card" id="matrix">
+        <h2>失败情形处理矩阵</h2>
+        <table>
+          <tr><th>现象</th><th>优先判断</th><th>动作</th></tr>
+          <tr><td>风险能力偷跑</td><td>是否出现公共简历库、联系解锁、真实外部能力。</td><td>删除真实能力，保留占位或风险池文案。</td></tr>
+          <tr><td>字段泄露</td><td>DTO、DOM、日志、缓存、搜索索引、sitemap、导出文件是否输出敏感字段。</td><td>服务端白名单裁剪，前端黑名单测试补齐。</td></tr>
+          <tr><td>IDOR/BOLA</td><td>对象级授权或数据域缺失。</td><td>在 service 层补数据域校验，补跨身份测试。</td></tr>
+          <tr><td>审计缺失</td><td>写动作、敏感字段读取、导出、风险处理是否未留痕。</td><td>补 audit_log 或 field_access_log，按 trace 串联。</td></tr>
+          <tr><td>灰度不可回滚</td><td>feature flag、Runbook、备份恢复、回滚步骤缺失。</td><td>先补暂停/回滚，不扩大灰度。</td></tr>
+        </table>
+      </section>
+
+      <section class="card" id="overview">
+        <h2>轮次总览</h2>
+        <table>
+          <tr><th>总序</th><th>三期序号</th><th>主题</th><th>重点</th></tr>
+          <tr><td>Prompt 25</td><td>P3-0</td><td>三期基线冻结与灰度闸门</td><td>feature flag、边界脚本、环境模板、README/Runbook</td></tr>
+          <tr><td>Prompt 26</td><td>P3-1</td><td>认证与身份映射</td><td>OIDC/SSO、内部用户映射、本地 JWT fallback</td></tr>
+          <tr><td>Prompt 27</td><td>P3-2</td><td>求职者真实闭环生产化</td><td>简历、投递、收藏、订阅、站内通知、同意/撤回</td></tr>
+          <tr><td>Prompt 28</td><td>P3-3</td><td>企业招聘工作台生产化</td><td>企业资料、认证材料、职位、投递池、面试、导出</td></tr>
+          <tr><td>Prompt 29</td><td>P3-4</td><td>运营后台生产化与门户运营化</td><td>审核、内容活动、推荐位、风险审核、审计 UI</td></tr>
+          <tr><td>Prompt 30</td><td>P3-5</td><td>审计、导出、风控与安全收口</td><td>trace、导出审批、撤回下线、字段黑名单、IDOR/BOLA</td></tr>
+          <tr><td>Prompt 31</td><td>P3-6</td><td>灰度试运营工程治理与上线演练</td><td>备份恢复、监控告警、容量烟测、Runbook、KPI</td></tr>
+        </table>
+      </section>
+
+      <section class="card prompt" id="p25">
+        <h2>Prompt 25（P3-0）：三期基线冻结与灰度闸门</h2>
+        <p><strong>主控说明：</strong>本轮只做三期基线冻结、feature flag、环境模板、边界脚本和文档入口，不实现业务功能。</p>
+        <p><strong>本轮目标：</strong>新增三期开发入口与本地/预发/灰度环境说明；建立三期 feature flag 注册表；新增或增强三期边界脚本；补环境模板和 README/Runbook 入口。</p>
+        <p><strong>禁止事项：</strong>禁止实现求职者、企业、运营后台任何新业务功能；禁止新增数据库迁移或生产写接口；禁止接入真实外部能力。</p>
+        <p><strong>输出要求：</strong>三期 README/Runbook 入口、feature flag 注册表、环境模板、灰度说明、三期闸门脚本。</p>
+        <p><strong>DoD：</strong>feature flag 默认关闭；边界脚本阻断风险能力和敏感字段；环境模板不含真实密钥；没有业务功能和迁移。</p>
+        <div class="copy-title">可复制投喂文本</div>
+        <pre><code>请先阅读并严格遵守：
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- docs/Phase_III/三期研发方向与上线阶段判断.md
+- docs/Phase_III/LocalTalent_三期总规划.md
+- docs/Phase_III/LocalTalent_phase3_step1.md
+- docs/Phase_III/LocalTalent_phase3_step2.md
+- docs/Phase_III/LocalTalent_phase3_step3.md
+- docs/Phase_III/LocalTalent_phase3_step4.md
+- docs/Phase_III/LocalTalent_phase3_step5.md
+- docs/Phase_III/LocalTalent_phase3_step6.md
+- docs/Phase_III/三期研发实施蓝图与任务拆解.md
+- docs/Phase_III/三期研发提示词.md
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_I/00_MASTER_BOUNDARY.md
+
+本轮只执行 docs/Phase_III/三期研发提示词.md 中的 Prompt 25（P3-0）。
+禁止实现 Prompt 25 之外的内容。
+
+以下是 Prompt 25（P3-0）：“三期基线冻结与灰度闸门”的提示词：
+主控说明：本轮只做三期基线冻结、feature flag、环境模板、边界脚本和文档入口，不实现业务功能。
+本轮目标：新增三期开发入口与环境说明；建立 feature flag 注册表且默认关闭；新增或增强三期边界脚本；补环境模板和 README/Runbook 入口。
+禁止事项：禁止实现业务功能、迁移、生产写接口或真实外部能力。
+输出要求：三期 README/Runbook 入口、feature flag 注册表、环境模板、灰度说明、三期闸门脚本。
+验收要求：flag 默认关闭；脚本阻断风险能力和敏感字段；环境模板不含真实密钥；无业务功能和迁移。
+</code></pre>
+      </section>
+
+      <section class="card prompt" id="p26">
+        <h2>Prompt 26（P3-1）：认证与身份映射</h2>
+        <p><strong>主控说明：</strong>OIDC 只负责认证和基础 claims；LocalTalent 后端继续负责 RBAC、数据域、字段级权限和审计。</p>
+        <p><strong>本轮目标：</strong>接入 OIDC/SSO 登录、回调、登出、失败态；建立外部身份到内部角色映射；保留本地 JWT dev/test fallback；日志脱敏。</p>
+        <p><strong>禁止事项：</strong>禁止把授权交给 IdP claim；禁止泄露 token/secret/claims；禁止接入真实微信、短信、小程序、App。</p>
+        <p><strong>DoD：</strong>预发/灰度 OIDC 登录可映射内部身份；dev/test fallback 可用；gray/prod 本地登录默认关闭或白名单启用；日志不含敏感令牌。</p>
+        <div class="copy-title">可复制投喂文本</div>
+        <pre><code>请先阅读并严格遵守本文件“每轮开发读取顺序”列出的所有文档。
+
+本轮只执行 docs/Phase_III/三期研发提示词.md 中的 Prompt 26（P3-1）。
+禁止实现 Prompt 26 之外的内容。
+
+以下是 Prompt 26（P3-1）：“认证与身份映射”的提示词：
+主控说明：OIDC 只负责认证和基础 claims；LocalTalent 后端继续负责 RBAC、数据域、字段级权限和审计。
+本轮目标：接入 OIDC/SSO 登录、回调、登出、失败态；建立 OIDC 外部身份到内部 candidate/company/operator/auditor 的映射策略；保留本地账号 + JWT 作为 dev/test fallback；日志不得记录 token、secret、claims 明文。
+禁止事项：禁止把角色授权完全交给 IdP claim；禁止泄露 token、secret、claims 到日志、响应或 URL；禁止接入真实微信、短信、小程序、App；禁止修改业务闭环。
+输出要求：后端 OIDC 配置、回调、映射、登出、fallback；前端登录入口适配；环境变量示例；认证测试。
+验收要求：OIDC 登录映射成功；dev/test fallback 可用；gray/prod 本地登录默认关闭或白名单启用；权限仍由服务端强制；敏感令牌不入日志。
+</code></pre>
+      </section>
+
+      <section class="card prompt" id="p27">
+        <h2>Prompt 27（P3-2）：求职者真实闭环生产化</h2>
+        <p><strong>主控说明：</strong>本轮只做 candidate 本人私有闭环，所有状态由服务端返回，前端不得推断。</p>
+        <p><strong>本轮目标：</strong>中心首页、简历编辑/预览、投递记录、收藏、订阅、站内通知、隐私与发布状态、同意/撤回。</p>
+        <p><strong>禁止事项：</strong>禁止公开原始候选人数据；禁止公共简历库、查看完整简历、联系解锁、受控找人才；禁止真实外部推送。</p>
+        <p><strong>DoD：</strong>candidate 只能访问本人数据；撤回后所有公开入口不可见；公开 DOM/响应/日志/缓存/sitemap 不含原始候选人数据。</p>
+        <div class="copy-title">可复制投喂文本</div>
+        <pre><code>请先阅读并严格遵守本文件“每轮开发读取顺序”列出的所有文档。
+
+本轮只执行 docs/Phase_III/三期研发提示词.md 中的 Prompt 27（P3-2）。
+禁止实现 Prompt 27 之外的内容。
+
+以下是 Prompt 27（P3-2）：“求职者真实闭环生产化”的提示词：
+主控说明：本轮只做 candidate 本人私有闭环，不做企业工作台、运营后台、公共简历库或联系解锁；所有状态必须由服务端返回。
+本轮目标：求职者中心生产化，包含中心首页、简历编辑、简历预览、投递记录、收藏、订阅、站内通知、隐私与发布状态、同意/撤回；撤回后发布快照、人才服务区、推荐位、搜索索引、缓存、sitemap 联动不可见或失效。
+禁止事项：禁止公开原始候选人数据；禁止公共简历库、搜索简历、查看完整简历、联系解锁、受控找人才；禁止真实短信、微信、小程序、App 推送；禁止访问其他 candidate 数据。
+输出要求：candidate 私有接口、状态机、数据域校验、审计、幂等；求职者中心页面增强；跨 candidate 阻断、字段黑名单、撤回下线传播测试。
+验收要求：candidate 能维护简历、预览、查看投递/收藏/订阅/通知/发布状态；只能访问本人数据；撤回后公开不可见；公开层不含原始候选人数据。
+</code></pre>
+      </section>
+
+      <section class="card prompt" id="p28">
+        <h2>Prompt 28（P3-3）：企业招聘工作台生产化</h2>
+        <p><strong>主控说明：</strong>本轮只做 company 私有招聘工作台，不做受控找人才、联系解锁、会员特权或公共简历库。</p>
+        <p><strong>本轮目标：</strong>企业资料、认证材料、职位创建/编辑/送审/下线、投递池、投递详情、面试邀约、导出申请入口。</p>
+        <p><strong>禁止事项：</strong>禁止跨企业访问；禁止展示未授权联系方式和简历正文；禁止绕过导出审批。</p>
+        <p><strong>DoD：</strong>company 只能处理本企业数据；未认证企业职位和未审核职位不公开；导出继承审批、字段级权限和审计。</p>
+        <div class="copy-title">可复制投喂文本</div>
+        <pre><code>请先阅读并严格遵守本文件“每轮开发读取顺序”列出的所有文档。
+
+本轮只执行 docs/Phase_III/三期研发提示词.md 中的 Prompt 28（P3-3）。
+禁止实现 Prompt 28 之外的内容。
+
+以下是 Prompt 28（P3-3）：“企业招聘工作台生产化”的提示词：
+主控说明：本轮只做 company 私有招聘工作台，不做受控找人才、联系解锁、会员特权或公共简历库；企业公开主页与企业中心彻底隔离。
+本轮目标：企业中心生产化，包含企业资料维护、认证材料提交、职位创建/编辑/送审/下线、投递池、投递详情、面试邀约、导出申请入口。
+禁止事项：禁止跨企业访问资料、职位、投递、面试、导出申请；禁止展示未授权手机号、邮箱、简历正文、附件对象 key、证据；禁止公共简历库、受控找人才、联系解锁、会员权益、真实支付；禁止绕过导出审批。
+输出要求：company 私有接口、数据域校验、职位状态机、投递阶段流转、面试邀约、导出申请接入；企业中心页面；跨企业 IDOR/BOLA、未认证职位不可见、投递池字段裁剪、导出审批继承测试。
+验收要求：company 能维护资料、提交认证、创建/编辑/送审/下线职位；只能处理本企业投递和面试；未认证和未审核职位不公开；导出不绕过审批、字段级权限和审计。
+</code></pre>
+      </section>
+
+      <section class="card prompt" id="p29">
+        <h2>Prompt 29（P3-4）：运营后台生产化与门户运营化</h2>
+        <p><strong>主控说明：</strong>本轮只做 operator/auditor 后台生产化和公开门户运营化，不做商业化、真实支付或外部能力。</p>
+        <p><strong>本轮目标：</strong>运营首页、企业审核、职位审核、内容管理、活动/招聘会管理、推荐位配置、风险审核、审计中心入口；门户由真实状态和运营配置驱动。</p>
+        <p><strong>禁止事项：</strong>禁止 auditor 写；禁止推荐撤回、下线、未审核对象；禁止推荐位绕过字段白名单。</p>
+        <p><strong>DoD：</strong>operator 写动作审计；auditor 写拒绝；门户只展示有效公开对象；推荐位目标失效后隐藏或降级。</p>
+        <div class="copy-title">可复制投喂文本</div>
+        <pre><code>请先阅读并严格遵守本文件“每轮开发读取顺序”列出的所有文档。
+
+本轮只执行 docs/Phase_III/三期研发提示词.md 中的 Prompt 29（P3-4）。
+禁止实现 Prompt 29 之外的内容。
+
+以下是 Prompt 29（P3-4）：“运营后台生产化与门户运营化”的提示词：
+主控说明：本轮只做 operator/auditor 后台生产化和公开门户运营化，不做商业化、真实支付或外部能力。
+本轮目标：运营后台生产化，包含运营首页、企业审核、职位审核、内容管理、活动/招聘会管理、推荐位配置、风险审核、审计中心入口；公开门户由真实状态和运营配置驱动，推荐位只能引用已审核、已发布、在线且合规的公开对象。
+禁止事项：禁止 auditor 写操作；禁止推荐撤回快照、下线职位、未认证企业、未发布内容；禁止推荐位绕过字段白名单、审核状态、发布状态；禁止会员商业化、真实支付、真实短信、真实微信、小程序、App、地图、视频、直播、ATS/RPA。
+输出要求：运营后台接口、推荐位配置、风险审核、服务端权限、审计；运营后台页面、门户运营配置入口、审计中心 UI；operator 写审计、auditor 写拒绝、门户有效对象、推荐位合法测试。
+验收要求：operator 能审核和配置且写 audit_log；auditor 只读；公开门户只展示已审核、已发布、在线、未撤回对象；推荐位失效目标不公开。
+</code></pre>
+      </section>
+
+      <section class="card prompt" id="p30">
+        <h2>Prompt 30（P3-5）：审计、导出、风控与安全收口</h2>
+        <p><strong>主控说明：</strong>本轮只做灰度前安全收口，不新增业务范围。</p>
+        <p><strong>本轮目标：</strong>审计 trace 串联、导出审批回归、撤回下线传播、IDOR/BOLA 与字段黑名单总验收、风险池阻断。</p>
+        <p><strong>禁止事项：</strong>禁止新增业务功能；禁止导出旁路；禁止放宽字段黑名单和审计脱敏；禁止风险能力升级。</p>
+        <p><strong>DoD：</strong>三类日志可按 trace 串联且脱敏；导出不能绕过审批；撤回传播满足灰度口径；风险能力没有偷跑。</p>
+        <div class="copy-title">可复制投喂文本</div>
+        <pre><code>请先阅读并严格遵守本文件“每轮开发读取顺序”列出的所有文档。
+
+本轮只执行 docs/Phase_III/三期研发提示词.md 中的 Prompt 30（P3-5）。
+禁止实现 Prompt 30 之外的内容。
+
+以下是 Prompt 30（P3-5）：“审计、导出、风控与安全收口”的提示词：
+主控说明：本轮只做灰度前安全收口，不新增业务范围；目标是证明系统可追踪、可裁剪、可撤回、可阻断、可回滚、可证明。
+本轮目标：审计 trace 串联；导出审批回归；撤回下线传播；IDOR/BOLA 与字段黑名单总验收；风险池阻断。
+禁止事项：禁止新增业务功能；禁止新增导出旁路、调试接口、临时脚本导出生产数据；禁止放宽字段黑名单、审计脱敏、权限校验或导出审批；禁止风险池能力升级为当前需求。
+输出要求：必要的安全回归修复、审计 UI 补齐、字段裁剪修复；三期安全边界脚本、字段黑名单脚本、审计/导出回归脚本或测试入口；审计 trace、导出审批、撤回下线、IDOR/BOLA、字段黑名单、auditor 只读测试。
+验收要求：audit_log、field_access_log、open_api_log 可按 trace 串联且响应脱敏；导出不绕过审批、字段级权限、短期下载和审计；撤回下线传播满足灰度口径；所有角色 IDOR/BOLA 和字段黑名单测试通过；风险池能力没有偷跑。
+</code></pre>
+      </section>
+
+      <section class="card prompt" id="p31">
+        <h2>Prompt 31（P3-6）：灰度试运营工程治理与上线演练</h2>
+        <p><strong>主控说明：</strong>本轮只做灰度试运营工程治理和上线演练，不宣布公网正式运营。</p>
+        <p><strong>本轮目标：</strong>环境配置、feature flag 灰度发布/暂停/回滚、备份恢复、对象存储生命周期、日志脱敏、监控告警、容量烟测、Runbook、KPI。</p>
+        <p><strong>禁止事项：</strong>禁止直接公网正式上线；禁止无备份恢复演练进灰度；禁止同阶段迁移状态层；禁止真实外部能力和风险池能力。</p>
+        <p><strong>DoD：</strong>备份恢复演练通过；容量烟测达标；flag 可回滚；监控告警覆盖关键路径；灰度进入/暂停/退出条件可执行。</p>
+        <div class="copy-title">可复制投喂文本</div>
+        <pre><code>请先阅读并严格遵守本文件“每轮开发读取顺序”列出的所有文档。
+
+本轮只执行 docs/Phase_III/三期研发提示词.md 中的 Prompt 31（P3-6）。
+禁止实现 Prompt 31 之外的内容。
+
+以下是 Prompt 31（P3-6）：“灰度试运营工程治理与上线演练”的提示词：
+主控说明：本轮只做灰度试运营工程治理和上线演练，不宣布公网正式运营；K8s 仅可作为无状态应用层进阶选项，MySQL/Redis/MinIO 状态层不在本轮做高风险迁移。
+本轮目标：完成 local/staging/gray 配置说明和环境变量模板；完成 feature flag 灰度发布、暂停、回滚流程；完成数据库备份恢复演练、对象存储生命周期与导出文件保留策略；完成日志脱敏、监控指标、告警规则、故障排查指南；完成容量烟测；完成上线/暂停/回滚 Runbook、灰度故障记录模板、灰度 KPI 与试运营退出条件。
+禁止事项：禁止直接宣布公网正式上线；禁止在没有备份恢复演练前进入灰度；禁止同阶段大规模迁移状态型基础设施；禁止接入真实外部能力；禁止放开风险池能力。
+输出要求：Runbook、环境模板、Smoke/Load 脚本、监控指标说明、备份恢复记录模板、灰度故障记录模板；可选无状态应用层 K8s manifests/Helm 占位或说明；run_all、三期 smoke/load、备份恢复演练、前后端测试与构建。
+验收要求：备份恢复演练通过；容量烟测达到三期灰度目标；feature flag 可逐步打开、暂停、关闭并单独回滚；监控告警覆盖健康、5xx、延迟、登录、导出、审计、撤回下线、openapi stub；灰度进入、暂停、退出条件清晰可执行。
+</code></pre>
+      </section>
+
+      <section class="card danger" id="risk">
+        <h2>风险池专项 Prompt 模板（非当前开发范围）</h2>
+        <p><strong>警示：</strong>以下模板不是 Prompt 25–31 的一部分，不得在三期主线中执行。只有当某个风险能力完成独立准入评审，并在边界文件中标记为 <code>approved_for_prompt</code> 后，才允许复制使用。</p>
+        <pre><code>请先阅读并严格遵守：
+- docs/Phase_II/LocalTalent_phase2_step6.md
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- 风险能力专项准入材料
+
+本轮只执行已批准的风险池专项 Prompt：[专项名称]。
+禁止实现专项范围之外的内容。
+
+主控说明：
+- 该能力已完成业务目的、数据来源、合法性依据、同意/撤回方案、字段白名单、服务端权限、审计日志、IDOR/BOLA 测试、字段黑名单测试、脱敏策略、缓存/搜索/日志/导出边界、回滚/下线方案评审。
+
+本轮目标：
+- 仅实现已批准的最小能力闭环。
+
+禁止事项：
+- 禁止绕过字段白名单、同意/撤回、服务端权限、审计和回滚方案。
+- 禁止扩大到其它风险池能力。
+
+验收要求：
+- 准入材料中的所有阻断项自动化通过。
+- 审计、字段裁剪、撤回联动、IDOR/BOLA、日志脱敏全绿。</code></pre>
+      </section>
+    </main>
+  </div>
+  <footer>LocalTalent Phase III Codex Prompt Manual. 本文件用于三期逐轮代码开发投喂。</footer>
+</body>
+</html>

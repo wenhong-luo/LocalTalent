@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalTalent Phase 3 Step3：企业招聘工作台生产化</title>
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --card: #ffffff;
+      --ink: #1f2933;
+      --muted: #697586;
+      --line: #e4dccf;
+      --accent: #b45309;
+      --accent-soft: #fff7ed;
+      --green: #0f766e;
+      --green-soft: #ecfdf5;
+      --warn: #9f1239;
+      --warn-soft: #fff1f2;
+      --code: #1e293b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: radial-gradient(circle at 10% 0, #fff7ed 0, #f7f6f2 360px);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px 72px; }
+    header.hero {
+      padding: 34px;
+      border: 1px solid rgba(180, 83, 9, .22);
+      background: rgba(255, 255, 255, .88);
+      border-radius: 28px;
+      box-shadow: 0 24px 80px rgba(80, 54, 28, .1);
+    }
+    h1 { margin: 0 0 12px; font-size: 34px; letter-spacing: -.02em; }
+    h2 { margin-top: 0; font-size: 24px; }
+    h3 { margin-top: 24px; font-size: 19px; }
+    p { margin: 10px 0; }
+    a { color: var(--accent); text-decoration: none; }
+    code {
+      color: var(--code);
+      background: #f4f0e8;
+      border: 1px solid #e5d9c7;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: .92em;
+    }
+    pre {
+      overflow: auto;
+      padding: 16px;
+      border-radius: 14px;
+      background: #1e293b;
+      color: #f8fafc;
+    }
+    pre code { color: inherit; background: transparent; border: 0; padding: 0; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    nav.toc {
+      margin: 22px 0;
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+    nav.toc a {
+      display: inline-block;
+      margin: 6px 12px 6px 0;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #faf7f1;
+      color: #475569;
+      font-size: 14px;
+    }
+    .card {
+      margin-top: 22px;
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 14px 40px rgba(80, 54, 28, .06);
+    }
+    .callout {
+      margin: 16px 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(15, 118, 110, .22);
+      background: var(--green-soft);
+      color: var(--green);
+      font-weight: 650;
+    }
+    .callout.warn {
+      border-color: rgba(159, 18, 57, .22);
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: #fff7ed; text-align: left; color: #92400e; }
+    tr:last-child td { border-bottom: 0; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .mini {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fffdf9;
+    }
+    @media (max-width: 760px) {
+      .wrap { padding: 18px 12px 48px; }
+      header.hero, .card { padding: 20px; border-radius: 18px; }
+      h1 { font-size: 26px; }
+      .grid { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <h1>LocalTalent Phase 3 Step3：企业招聘工作台生产化</h1>
+      <p>本文件把企业后台从“演示可看”收口为“灰度试运营可用”的企业招聘工作台产品边界，供后续蓝图与 Prompt 继承。</p>
+      <div class="meta">
+        <span class="pill">company 私有域</span>
+        <span class="pill">职位审核状态</span>
+        <span class="pill">投递池非简历库</span>
+        <span class="pill">导出审批链</span>
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="目录">
+      <a href="#readme">开发前必读卡</a>
+      <a href="#inherit">继承结论</a>
+      <a href="#baseline">企业能力基线</a>
+      <a href="#goal">Step3 总目标</a>
+      <a href="#ia">信息架构</a>
+      <a href="#state">状态机</a>
+      <a href="#fields">字段与权限</a>
+      <a href="#audit">审计与数据域</a>
+      <a href="#acceptance">验收关注点</a>
+      <a href="#next">结论与下一步</a>
+    </nav>
+
+    <section class="card" id="readme">
+      <h2>开发前必读卡</h2>
+      <ul>
+        <li><strong>文件定位</strong>：三期第三份 Step 文档；用于把“企业后台演示能力”设计成后续蓝图和 Prompt 可继承的真实企业招聘工作台。</li>
+        <li><strong>输入资料</strong>：<code>00_PHASE_III_BOUNDARY.md</code>、<code>LocalTalent_phase3_step1.md</code>、<code>LocalTalent_phase3_step2.md</code>、<code>LocalTalent_三期总规划.md</code>、Phase I/II 企业、职位、投递、面试、导出相关基线。</li>
+        <li><strong>本轮目标</strong>：冻结 company 在三期灰度试运营中必须具备的资料维护、认证材料、职位管理、投递处理、面试邀约和导出申请能力。</li>
+        <li><strong>禁止越界点</strong>：不写代码，不新增迁移，不生成三期蓝图或提示词，不实现公共简历库、受控找人才、联系解锁、会员特权、真实支付或任何外部同步能力。</li>
+        <li><strong>输出边界</strong>：只定义企业招聘工作台的产品范围、状态口径、字段边界、审计要求和验收关注点。</li>
+        <li><strong>下一步影响</strong>：本文件稳定后，下一份建议文档是 <code>LocalTalent_phase3_step4.md：运营后台生产化与门户运营化</code>。</li>
+      </ul>
+      <div class="callout">统一硬边界：企业中心是 company 私有域；企业公开主页与企业中心必须彻底隔离；企业只能访问本企业数据；未认证企业不得上线职位；投递池不是公共简历库；导出仍必须走审批、字段级权限和审计链。</div>
+    </section>
+
+    <section class="card" id="inherit">
+      <h2>一、Step1/Step2 继承结论</h2>
+      <p>Step1 已经冻结三期目标是 <strong>小范围真实试运营</strong>；Step2 已经把 candidate 侧真实闭环收口。Step3 只承接 company 工作台，不处理运营后台、商业化、风险池能力或公开门户运营配置。</p>
+      <table>
+        <thead><tr><th>继承结论</th><th>Step3 继承方式</th></tr></thead>
+        <tbody>
+          <tr><td>三期目标是灰度试运营，不是公网正式运营。</td><td>Step3 只要求企业招聘工作台真实可用，暂不追求会员商业化、广告结算或大规模企业服务。</td></tr>
+          <tr><td>企业中心是本企业私有域。</td><td>所有企业资料、职位、投递、面试、导出申请必须服务端强制 company 数据域。</td></tr>
+          <tr><td>企业公开主页与企业中心隔离。</td><td>公开页只展示企业公开白名单；企业中心可管理私有资料和审核材料，但不得公开泄露。</td></tr>
+          <tr><td>未认证企业不得上线职位。</td><td>职位发布、编辑、送审、上线必须依赖企业认证状态和运营审核状态。</td></tr>
+          <tr><td>投递池不是公共简历库。</td><td>企业只能处理投递到本企业职位的 application，不得扩展成搜索简历、找人才或联系解锁。</td></tr>
+          <tr><td>导出是高风险动作。</td><td>Step3 只规划导出申请入口和状态查看；下载、生成、字段裁剪继续继承一期审批链。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card" id="baseline">
+      <h2>二、一二期企业能力基线</h2>
+      <table>
+        <thead><tr><th>能力</th><th>已有基线</th><th>Step3 增量</th></tr></thead>
+        <tbody>
+          <tr><td>企业注册登录</td><td>已有 company 身份、本地账号/JWT 与登录注册入口。</td><td>三期后续按总规划接入认证与身份映射；Step3 只定义 company 招聘工作台。</td></tr>
+          <tr><td>企业认证</td><td>已有企业认证三态：待审核、通过、驳回。</td><td>补企业资料维护、认证材料提交、驳回后补正、认证状态解释。</td></tr>
+          <tr><td>职位状态</td><td>已有职位待审核、在线、下线与门户可见性。</td><td>补职位创建、编辑、预览、送审、下线、驳回修改再提交。</td></tr>
+          <tr><td>门户职位可见性</td><td>公开职位只展示在线且审核通过、企业已认证的职位。</td><td>继续继承，不允许前端或企业中心绕过审核直接上线。</td></tr>
+          <tr><td>企业公开页</td><td>二期已有找企业与企业公开主页。</td><td>企业中心维护公开资料后，公开页只读取公开白名单字段。</td></tr>
+          <tr><td>投递池</td><td>已有企业投递池仅查本企业 applications。</td><td>补筛选、详情、备注、阶段流转、面试邀约入口。</td></tr>
+          <tr><td>面试场次</td><td>已有面试场次创建、签到码和签到记录。</td><td>补企业工作台里的邀约与场次状态管理口径。</td></tr>
+          <tr><td>导出申请</td><td>已有导出审批与一次性下载链路。</td><td>企业侧只提供申请入口和状态查看，不直接下载未审批数据。</td></tr>
+        </tbody>
+      </table>
+      <div class="callout warn">Step3 允许企业中心处理本企业私有资料、认证材料和投递信息，但所有公开展示、导出、审计、字段访问都必须沿用一二期边界。</div>
+    </section>
+
+    <section class="card" id="goal">
+      <h2>三、Step3 总目标</h2>
+      <pre><code>company 能完成：维护企业资料 → 提交认证材料 → 创建/编辑职位 → 提交审核 → 审核通过后公开可见 → 处理投递 → 邀约面试 → 申请导出。</code></pre>
+      <ol>
+        <li>登录后进入企业中心，看到企业认证状态、职位统计、待处理投递、面试邀约、导出申请状态。</li>
+        <li>维护本企业资料，并清楚区分公开资料、认证材料和后台私有资料。</li>
+        <li>提交认证材料，查看审核进度、驳回原因并补正。</li>
+        <li>创建、编辑、预览职位，提交审核，审核通过后才在门户可见。</li>
+        <li>处理本企业职位投递，筛选 application，查看投递详情，记录备注和阶段流转。</li>
+        <li>基于本企业 application 发起面试邀约，查看面试和签到状态。</li>
+        <li>发起导出申请，查看审批、生成、下载链接发放状态，但不得绕过审批直接导出。</li>
+      </ol>
+    </section>
+
+    <section class="card" id="ia">
+      <h2>四、企业中心信息架构</h2>
+      <table>
+        <thead><tr><th>模块</th><th>目标能力</th><th>状态与边界</th></tr></thead>
+        <tbody>
+          <tr><td>企业首页</td><td>展示认证状态、在招职位、待审职位、待处理投递、面试邀约、导出申请摘要。</td><td>只展示本企业数据；状态来自服务端。</td></tr>
+          <tr><td>企业资料</td><td>维护企业名称、行业、规模、性质、城市、公开简介、Logo 占位等。</td><td>公开字段和私有字段分层；公开页只读白名单。</td></tr>
+          <tr><td>认证材料</td><td>提交或补正营业执照、联系人、认证说明等材料。</td><td>认证材料不得进入公开企业主页；运营审核后才改变 auth_status。</td></tr>
+          <tr><td>职位管理</td><td>创建、编辑、预览、提交审核、下线职位。</td><td>未认证企业不得上线职位；状态由服务端返回。</td></tr>
+          <tr><td>投递池</td><td>按职位、状态、时间筛选本企业 applications。</td><td>不是公共简历库；不得跨企业访问。</td></tr>
+          <tr><td>投递详情</td><td>查看投递摘要、候选人授权字段、流程状态、企业备注。</td><td>联系方式和高敏字段必须受字段级权限与导出审批约束。</td></tr>
+          <tr><td>阶段流转</td><td>查看/更新投递阶段，例如待处理、已查看、邀约面试、已拒绝。</td><td>写动作需要 trace、审计和对象级授权。</td></tr>
+          <tr><td>面试邀约</td><td>基于本企业 application 创建邀约或场次，查看签到状态。</td><td>不接真实短信/微信/App；通知默认站内。</td></tr>
+          <tr><td>导出申请</td><td>提交导出申请、查看审批与生成状态、跳转已授权下载入口。</td><td>仍走 <code>export_apply</code>，未审批不显示下载入口。</td></tr>
+        </tbody>
+      </table>
+      <p>企业中心可以像招聘 CRM，但不能把“本企业投递处理”扩展成“平台全量找人才”。</p>
+    </section>
+
+    <section class="card" id="state">
+      <h2>五、状态机与服务端口径</h2>
+      <p>Step3 的核心纪律是：<strong>企业侧所有状态以服务端返回为准</strong>。</p>
+      <table>
+        <thead><tr><th>状态域</th><th>服务端应返回的状态口径</th><th>前端禁止行为</th></tr></thead>
+        <tbody>
+          <tr><td>company</td><td>待认证、认证通过、认证驳回、资料待补正、禁用或冻结。</td><td>禁止前端根据资料完整度推断认证通过。</td></tr>
+          <tr><td>auth</td><td>未提交、待审核、通过、驳回、补正中。</td><td>禁止跳过运营审核改变认证结果。</td></tr>
+          <tr><td>job</td><td>草稿、待审核、审核通过、审核驳回、在线、下线。</td><td>禁止未认证企业或未审核职位公开可见。</td></tr>
+          <tr><td>application</td><td>新投递、已查看、邀约面试、已签到、已拒绝、已归档。</td><td>禁止前端按按钮点击自行构造阶段。</td></tr>
+          <tr><td>interview</td><td>待邀约、已邀约、已确认、已签到、已取消、已过期。</td><td>禁止外部短信/微信/App 作为默认通知渠道。</td></tr>
+          <tr><td>export</td><td>待审批、通过、驳回、生成中、已生成、生成失败、链接已发放、已过期。</td><td>禁止未审批展示下载入口。</td></tr>
+        </tbody>
+      </table>
+      <p>任何写动作成功后，页面应重新读取服务端状态。企业中心的体验可以乐观提示“处理中”，但最终业务状态必须来自服务端。</p>
+    </section>
+
+    <section class="card" id="fields">
+      <h2>六、字段与权限边界</h2>
+      <div class="grid">
+        <div class="mini">
+          <h3>本企业私有域</h3>
+          <p>company 在企业中心内，可以维护和查看本企业必要字段，例如企业资料、认证材料、职位草稿、投递详情、企业备注、面试邀约和导出申请。</p>
+          <ul>
+            <li>必须 company 登录。</li>
+            <li>必须强制当前 company 只能访问本企业数据。</li>
+            <li>所有含对象 ID 的接口必须覆盖 IDOR/BOLA。</li>
+            <li>跨 company 访问必须返回统一无权限响应与 trace。</li>
+          </ul>
+        </div>
+        <div class="mini">
+          <h3>企业公开域</h3>
+          <p>公开企业列表和企业主页只能展示公开白名单字段。</p>
+          <ul>
+            <li>可展示企业名称、Logo/占位、城市、行业、性质、规模、认证标签。</li>
+            <li>可展示公开简介摘要、在招职位数、在线职位列表和更新时间。</li>
+            <li>不得展示联系人手机号、邮箱、营业执照附件、审核材料、后台备注、风控结论。</li>
+          </ul>
+        </div>
+      </div>
+      <h3>投递池候选人字段</h3>
+      <ul>
+        <li>企业投递池只能展示与本企业职位投递相关的候选人摘要和流程字段。</li>
+        <li>不得展示未授权联系方式、简历正文、附件对象 key、证据或原始 JSON。</li>
+        <li>高敏字段必须通过字段级权限裁剪或脱敏。</li>
+        <li>企业备注只能属于本企业私有域，不得进入公开门户或导出旁路。</li>
+      </ul>
+      <div class="callout warn">导出必须先提交 <code>export_apply</code>，经 operator 审批通过后异步生成，并继续走字段级权限、audit_log、field_access_log 和短期下载链。</div>
+    </section>
+
+    <section class="card" id="audit">
+      <h2>七、审计、幂等与数据域</h2>
+      <table>
+        <thead><tr><th>动作</th><th>要求</th></tr></thead>
+        <tbody>
+          <tr><td>企业资料保存</td><td>防重复提交；记录更新时间和 trace；区分公开字段与私有字段。</td></tr>
+          <tr><td>认证材料提交</td><td>写 <code>audit_log</code>；状态进入待审核；驳回原因由运营返回。</td></tr>
+          <tr><td>职位创建/编辑</td><td>幂等或防重复提交；未认证企业不得提交上线；写 audit_log。</td></tr>
+          <tr><td>职位送审/下线</td><td>写 audit_log；上线必须依赖运营审核通过。</td></tr>
+          <tr><td>投递阶段流转</td><td>仅限本企业 application；写 audit_log；覆盖 IDOR/BOLA。</td></tr>
+          <tr><td>企业备注</td><td>仅本企业可见；不得公开或导出旁路泄露。</td></tr>
+          <tr><td>面试邀约</td><td>基于本企业 application；默认站内通知；写 audit_log。</td></tr>
+          <tr><td>导出申请</td><td>继承一期导出审批；申请、审批、生成、下载链接发放均可追踪。</td></tr>
+        </tbody>
+      </table>
+      <p>数据域必须覆盖企业资料、职位、投递、面试和导出申请：只能本企业访问，本企业操作。运营审核和审计另由后续 Step 设计，不由企业中心绕行。</p>
+    </section>
+
+    <section class="card" id="acceptance">
+      <h2>八、自动化验收关注点</h2>
+      <table>
+        <thead><tr><th>验收点</th><th>关注内容</th></tr></thead>
+        <tbody>
+          <tr><td>跨企业 IDOR/BOLA</td><td>企业 A 不能访问或操作企业 B 的资料、职位、投递、面试、导出申请。</td></tr>
+          <tr><td>未认证企业阻断</td><td>未认证企业不得上线职位；门户不展示未认证企业职位。</td></tr>
+          <tr><td>职位可见性</td><td>只有企业认证通过、职位审核通过且在线的职位可公开可见。</td></tr>
+          <tr><td>投递池字段裁剪</td><td>不展示未授权手机号、邮箱、简历正文、附件、证据、原始 JSON。</td></tr>
+          <tr><td>投递阶段审计</td><td>阶段流转、拒绝、邀约等动作有 audit_log 和 trace。</td></tr>
+          <tr><td>面试邀约边界</td><td>只能基于本企业 application；不接真实短信/微信/App。</td></tr>
+          <tr><td>导出审批</td><td>未审批不可下载；字段级权限和审计链继续生效。</td></tr>
+          <tr><td>auditor/operator 分权继承</td><td>企业中心不授予 auditor 写能力；运营写动作留给运营后台。</td></tr>
+        </tbody>
+      </table>
+      <p>后续实现阶段可规划 <code>CompanyProfileCertificationIT</code>、<code>CompanyJobManagementIT</code>、<code>CompanyApplicationWorkbenchIT</code>、<code>CompanyInterviewInvitationIT</code>、<code>CompanyExportEntryIT</code> 等测试方向；这些只是规划建议，不是本轮要创建的代码文件。</p>
+    </section>
+
+    <section class="card" id="next">
+      <h2>九、Step3 结论与下一步</h2>
+      <ul>
+        <li>三期企业工作台应优先让 company 真实完成招聘流程，而不是扩展公共简历库或商业化能力。</li>
+        <li>企业中心是本企业私有域；公开企业主页只展示公开白名单字段。</li>
+        <li>未认证企业不得上线职位，未审核职位不得公开可见。</li>
+        <li>投递池只处理本企业职位产生的投递，不是找人才、搜索简历或联系解锁入口。</li>
+        <li>面试邀约默认走站内通知，不接真实短信、真实微信、小程序或 App。</li>
+        <li>导出只规划申请入口与状态查看，必须继承一期审批、字段裁剪、MinIO 短期下载和审计链。</li>
+        <li>所有对象 ID 必须覆盖 IDOR/BOLA。</li>
+      </ul>
+      <p>建议下一份文档：</p>
+      <pre><code>LocalTalent_phase3_step4.md：运营后台生产化与门户运营化</code></pre>
+      <p>Step4 应聚焦运营侧，不建议直接跳到商业化或风险池能力。</p>
+    </section>
+  </main>
+</body>
+</html>

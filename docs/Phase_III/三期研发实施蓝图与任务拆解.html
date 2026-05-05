@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalTalent 三期研发实施蓝图与任务拆解</title>
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --card: #ffffff;
+      --ink: #1f2933;
+      --muted: #667085;
+      --line: #e4ded2;
+      --accent: #a16207;
+      --accent-soft: #fffbeb;
+      --green: #0f766e;
+      --green-soft: #ecfdf5;
+      --blue: #1d4ed8;
+      --blue-soft: #eff6ff;
+      --code: #1e293b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0, rgba(245, 158, 11, .16) 0, transparent 340px),
+        linear-gradient(180deg, #fffdf7 0, var(--bg) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px 72px; }
+    header.hero {
+      padding: 34px;
+      border: 1px solid rgba(161, 98, 7, .22);
+      background: rgba(255, 255, 255, .93);
+      border-radius: 28px;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, .08);
+    }
+    h1 { margin: 0 0 12px; font-size: 34px; letter-spacing: -.02em; }
+    h2 { margin-top: 0; font-size: 24px; }
+    h3 { margin-top: 24px; font-size: 19px; }
+    p { margin: 10px 0; }
+    a { color: var(--accent); text-decoration: none; }
+    code {
+      color: var(--code);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: .92em;
+    }
+    pre {
+      overflow: auto;
+      padding: 16px;
+      border-radius: 14px;
+      background: #1e293b;
+      color: #f8fafc;
+    }
+    pre code { color: inherit; background: transparent; border: 0; padding: 0; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    nav.toc {
+      margin: 22px 0;
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+    nav.toc a {
+      display: inline-block;
+      margin: 6px 12px 6px 0;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #fffaf0;
+      color: #475569;
+      font-size: 14px;
+    }
+    .card {
+      margin-top: 22px;
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 14px 40px rgba(15, 23, 42, .06);
+    }
+    .callout {
+      margin: 16px 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(29, 78, 216, .22);
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 650;
+    }
+    .callout.warn {
+      border-color: rgba(161, 98, 7, .25);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: #fffbeb; text-align: left; color: #a16207; }
+    tr:last-child td { border-bottom: 0; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+    @media (max-width: 760px) {
+      .wrap { padding: 18px 12px 48px; }
+      header.hero, .card { padding: 20px; border-radius: 18px; }
+      h1 { font-size: 26px; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <h1>LocalTalent 三期研发实施蓝图与任务拆解</h1>
+      <p>本蓝图把 Phase III Step1-Step6 收口为可拆 Prompt 的实施路线、任务分层、测试矩阵和灰度闸门。目标是小范围真实试运营，不是公网正式运营或商业化完整版。</p>
+      <div class="meta">
+        <span class="pill">P3-0 至 P3-6</span>
+        <span class="pill">真实试运营</span>
+        <span class="pill">字段级权限</span>
+        <span class="pill">灰度 Runbook</span>
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="目录">
+      <a href="#readme">开发前必读卡</a>
+      <a href="#summary">执行摘要</a>
+      <a href="#inputs">读取顺序</a>
+      <a href="#scope">范围与边界</a>
+      <a href="#milestone">里程碑</a>
+      <a href="#tasks">任务拆解</a>
+      <a href="#data">接口与字段</a>
+      <a href="#flags">迁移与 flag</a>
+      <a href="#tests">测试矩阵</a>
+      <a href="#gray">灰度条件</a>
+      <a href="#next">交付与后续</a>
+    </nav>
+
+    <section class="card" id="readme">
+      <h2>开发前必读卡</h2>
+      <ul>
+        <li><strong>文件定位</strong>：三期研发从规划进入 Prompt 拆解前的实施蓝图。</li>
+        <li><strong>权威输入</strong>：三期边界、方向判断、总规划、Step1-Step6，以及 Phase I/II 的边界、提示词、Runbook、Testing 和演示收口文档。</li>
+        <li><strong>三期目标</strong>：把一二期可演示系统推进为可让真实求职者、企业、运营人员小范围使用的灰度试运营系统。</li>
+        <li><strong>禁止越界点</strong>：不把本蓝图当作代码实现；不新增 API schema、迁移、脚本或前后端文件；不把风险池能力混入三期主线。</li>
+        <li><strong>下一步影响</strong>：本文件稳定后，下一份文档应生成 <code>三期研发提示词.md/html</code>。</li>
+      </ul>
+      <div class="callout warn">统一硬边界：人才服务区仅展示发布快照；原始候选人数据不得公开；对接接口继续 stub；同意、撤回、数据域、字段级权限、审计和导出审批必须由服务端收口。</div>
+    </section>
+
+    <section class="card" id="summary">
+      <h2>1. 执行摘要</h2>
+      <p>三期不是继续堆静态页面，也不是直接冲完整商业化。三期的核心任务是把一期的合规安全底座和二期的高保真门户，推进为一套真实用户可灰度试运营的业务闭环。</p>
+      <ul>
+        <li>candidate 能注册登录、维护简历、投递、收藏、订阅、接收站内通知、同意与撤回。</li>
+        <li>company 能维护企业资料、提交认证、发布职位、处理投递、邀约面试、申请导出。</li>
+        <li>operator 能审核、配置、发布、下线、推荐、处理风险和查审计。</li>
+        <li>auditor 能只读查看运营和审计数据，不具备任何写权限。</li>
+        <li>公开门户由真实审核状态、发布状态和运营配置驱动。</li>
+        <li>灰度试运营具备预发配置、feature flag、备份恢复、监控告警、容量烟测和回滚 Runbook。</li>
+      </ul>
+    </section>
+
+    <section class="card" id="inputs">
+      <h2>2. 权威输入与读取顺序</h2>
+      <ol>
+        <li><code>docs/Phase_III/00_PHASE_III_BOUNDARY.md</code></li>
+        <li><code>docs/Phase_III/三期研发方向与上线阶段判断.md</code></li>
+        <li><code>docs/Phase_III/LocalTalent_三期总规划.md</code></li>
+        <li><code>docs/Phase_III/LocalTalent_phase3_step1.md</code> 至 <code>LocalTalent_phase3_step6.md</code></li>
+        <li><code>docs/Phase_III/三期研发实施蓝图与任务拆解.md</code></li>
+        <li>Phase II 和 Phase I 的边界、提示词、Runbook、Testing 与演示说明。</li>
+      </ol>
+      <table>
+        <tr><th>文件</th><th>定位</th><th>蓝图使用方式</th></tr>
+        <tr><td><code>00_PHASE_III_BOUNDARY.md</code></td><td>三期总边界</td><td>所有 Prompt 的红线和风险禁区。</td></tr>
+        <tr><td><code>三期研发方向与上线阶段判断.md</code></td><td>决策备忘录</td><td>解释为什么三期做灰度试运营、为什么暂缓高风险能力。</td></tr>
+        <tr><td><code>LocalTalent_三期总规划.md</code></td><td>主规划/作战手册</td><td>提供 P3-0 至 P3-6 阶段拆分、默认工程口径和灰度 KPI。</td></tr>
+        <tr><td><code>LocalTalent_phase3_step1-6.md</code></td><td>阶段设计</td><td>将产品域、安全域和工程域拆成可继承的 Step 口径。</td></tr>
+      </table>
+    </section>
+
+    <section class="card" id="scope">
+      <h2>3. 三期范围与硬边界</h2>
+      <table>
+        <tr><th>能力域</th><th>三期要做到</th></tr>
+        <tr><td>基础治理</td><td>三期边界、feature flag、环境模板、阶段闸门、边界脚本。</td></tr>
+        <tr><td>认证与身份映射</td><td>预发/灰度默认 OIDC，本地账号 + JWT 保留为 dev/test fallback；授权仍由平台后端强制。</td></tr>
+        <tr><td>求职者真实闭环</td><td>简历编辑/预览、投递记录、收藏、订阅、站内通知、同意/撤回、发布状态。</td></tr>
+        <tr><td>企业招聘工作台</td><td>企业资料、认证材料、职位创建/编辑/送审/下线、投递池、面试邀约、导出申请。</td></tr>
+        <tr><td>运营后台生产化</td><td>企业/职位/内容/活动审核、推荐位、风险审核、审计中心 UI、operator/auditor 分权。</td></tr>
+        <tr><td>安全与工程灰度</td><td>审计 trace、导出审批、撤回下线、IDOR/BOLA、备份恢复、监控告警、Runbook。</td></tr>
+      </table>
+      <table>
+        <tr><th>禁区</th><th>蓝图结论</th></tr>
+        <tr><td>公共简历库</td><td>禁止；人才服务区仍只展示发布快照。</td></tr>
+        <tr><td>受控找人才 / 联系解锁</td><td>不进入三期主线，未来必须先走风险准入。</td></tr>
+        <tr><td>会员商业化 / 真实支付</td><td>不进入三期主线。</td></tr>
+        <tr><td>真实短信 / 微信 / 小程序 / App / 地图 / 视频 / 直播</td><td>不进入三期主线。</td></tr>
+        <tr><td>真实 ATS / RPA / 受控候选池同步</td><td>对接接口继续 stub。</td></tr>
+        <tr><td>AI 处理原始候选人数据</td><td>不进入三期主线。</td></tr>
+      </table>
+    </section>
+
+    <section class="card" id="milestone">
+      <h2>4. 里程碑规划 P3-0 至 P3-6</h2>
+      <table>
+        <tr><th>阶段</th><th>建议周期</th><th>核心交付</th><th>退出条件</th></tr>
+        <tr><td>P3-0</td><td>1 周</td><td>三期基线冻结、feature flag、边界脚本、环境模板、灰度开关。</td><td>三期 README / scripts / env 栈完整，所有 flag 默认关闭，未新增业务功能。</td></tr>
+        <tr><td>P3-1</td><td>1 周</td><td>OIDC/SSO 默认认证、角色映射、本地 JWT 旁路策略。</td><td>预发可用 OIDC 登录；本地 JWT 仅 dev/test；日志不泄露 token/claims。</td></tr>
+        <tr><td>P3-2</td><td>2 周</td><td>求职者真实闭环生产化。</td><td>candidate 能完成编辑简历、投递、收藏、订阅、站内通知、同意/撤回。</td></tr>
+        <tr><td>P3-3</td><td>2 周</td><td>企业招聘工作台生产化。</td><td>company 能完成认证、职位发布送审、投递池处理、面试邀约、导出申请。</td></tr>
+        <tr><td>P3-4</td><td>2 周</td><td>运营后台生产化与门户运营化。</td><td>operator 可审核和配置；auditor 只读；门户由真实数据和运营配置驱动。</td></tr>
+        <tr><td>P3-5</td><td>1-1.5 周</td><td>审计、导出、风控与安全收口。</td><td>BOLA、字段泄露、导出审批、审计 trace、撤回下线回归全绿。</td></tr>
+        <tr><td>P3-6</td><td>1.5-2 周</td><td>灰度试运营工程治理与上线演练。</td><td>备份恢复、容量烟测、回滚演练通过，灰度 KPI 达标。</td></tr>
+      </table>
+    </section>
+
+    <section class="card" id="tasks">
+      <h2>5. 任务拆解</h2>
+      <h3>5.1 基础治理与灰度闸门</h3>
+      <ul>
+        <li>建立三期 README、环境模板、feature flag 注册表、开发日志和边界脚本。</li>
+        <li>所有三期 flag 默认关闭，必须能按用户范围、角色范围和功能范围灰度打开。</li>
+        <li>增加三期边界与运维闸门，阻断风险池能力、敏感字段和越界文件。</li>
+      </ul>
+      <h3>5.2 认证与身份映射</h3>
+      <ul>
+        <li>预发/灰度默认 OIDC；本地账号 + JWT 仅用于 dev/test 和应急白名单。</li>
+        <li>IdP 只负责“你是谁”，LocalTalent 后端继续负责“你能看什么、能做什么”。</li>
+        <li>日志不得输出 token、secret、claims 明文。</li>
+      </ul>
+      <h3>5.3 求职者中心生产化</h3>
+      <ul>
+        <li>完成简历编辑、预览、投递记录、收藏、订阅、站内通知、同意/撤回和发布状态。</li>
+        <li>状态全部由服务端返回，前端不得推断。</li>
+        <li>撤回后必须联动发布快照、人才服务区、推荐位、搜索索引、缓存和 sitemap。</li>
+      </ul>
+      <h3>5.4 企业招聘工作台生产化</h3>
+      <ul>
+        <li>完成企业资料维护、认证材料提交、职位创建/编辑/送审/下线、投递池、投递详情、面试邀约和导出申请入口。</li>
+        <li>企业只能访问本企业资料、职位、投递、面试和导出申请。</li>
+        <li>未认证企业不得上线职位；未审核职位不得进入公开门户。</li>
+      </ul>
+      <h3>5.5 运营后台与门户运营化</h3>
+      <ul>
+        <li>operator 能审核企业、职位、内容、活动，管理招聘会、推荐位、风险审核和审计入口。</li>
+        <li>auditor 只读，不得调用任何写接口。</li>
+        <li>公开门户由真实状态和运营配置驱动。</li>
+      </ul>
+      <h3>5.6 安全风控与工程灰度</h3>
+      <ul>
+        <li>核心业务动作按 trace 串联 audit、field access、open api。</li>
+        <li>导出继续走审批、异步生成、字段裁剪、短期下载和审计链。</li>
+        <li>建立预发、灰度、备份恢复、监控告警、容量烟测和 Runbook。</li>
+      </ul>
+    </section>
+
+    <section class="card" id="data">
+      <h2>6. 接口、数据与字段边界</h2>
+      <p>本蓝图不定义最终 API schema。后续每个 Prompt 必须在当前阶段内细化接口，并遵守统一响应体、<code>X-Trace-Id</code>、服务端 RBAC、数据域、字段级权限、必要幂等和审计要求。</p>
+      <table>
+        <tr><th>身份</th><th>可访问数据</th><th>必须阻断</th></tr>
+        <tr><td>visitor</td><td>公开职位、公开企业、公开内容、公开活动、发布快照白名单。</td><td>candidate/company/admin 私有接口和原始候选人数据。</td></tr>
+        <tr><td>candidate</td><td>本人简历、投递、收藏、订阅、通知、同意/撤回状态。</td><td>其他 candidate 数据、company 私有数据、admin 数据。</td></tr>
+        <tr><td>company</td><td>本企业资料、职位、投递池、面试、导出申请。</td><td>其他 company 数据、未授权候选人字段、公共简历库能力。</td></tr>
+        <tr><td>operator</td><td>授权范围内审核、配置、风险处理和审计查询。</td><td>绕过审核、字段级权限、导出审批或审计留痕。</td></tr>
+        <tr><td>auditor</td><td>只读审核、运营、风险和审计数据。</td><td>任何写接口。</td></tr>
+        <tr><td>openapi client</td><td>签名、nonce、幂等保护下的 stub 契约。</td><td>原始候选人数据、真实同步、绕过签名或重放。</td></tr>
+      </table>
+      <p>禁止进入公开响应、公开 DOM、搜索索引、缓存、sitemap、日志、埋点和审计响应的字段包括手机号、邮箱、联系方式、简历正文、附件对象 key、证据、原始候选人 JSON、审核材料、后台备注、报名名单、签到证据、secret、token、signature、nonce 明文。</p>
+    </section>
+
+    <section class="card" id="flags">
+      <h2>7. 迁移、配置与 feature flag 纪律</h2>
+      <ul>
+        <li>不修改旧迁移；任何数据库结构变化只能新增 forward-only migration。</li>
+        <li>DB 结构问题优先 roll-forward 修复，不直接回滚已应用结构。</li>
+        <li><code>.env.phase3.example</code> 只能保存示例值，不保存真实密钥。</li>
+        <li>local、staging、gray 的配置差异必须可读、可审计。</li>
+        <li>三期新增能力默认关闭，每个 flag 必须有负责人、默认值、影响范围、灰度范围和回滚方式。</li>
+        <li>flag 不得用于绕过服务端权限、字段级权限、导出审批或审计留痕。</li>
+      </ul>
+    </section>
+
+    <section class="card" id="tests">
+      <h2>8. 测试矩阵与验收标准</h2>
+      <table>
+        <tr><th>测试域</th><th>必测场景</th></tr>
+        <tr><td>边界脚本</td><td>风险池关键词、公开字段黑名单、三期 flag 默认关闭、文档入口和越界文件扫描。</td></tr>
+        <tr><td>认证授权</td><td>OIDC、本地 dev fallback、角色映射、token/claims 不入日志。</td></tr>
+        <tr><td>candidate</td><td>本人简历、投递、收藏、订阅、通知、同意/撤回；跨 candidate 阻断。</td></tr>
+        <tr><td>company</td><td>企业认证、职位管理、投递池、面试邀约、导出申请；跨企业阻断。</td></tr>
+        <tr><td>operator/auditor</td><td>operator 写动作审计；auditor 写接口全拒绝。</td></tr>
+        <tr><td>公开门户</td><td>只展示已审核、已发布、在线对象；撤回快照不可见；私有页 noindex。</td></tr>
+        <tr><td>导出</td><td>未审批不可下载、审批后短期下载、字段裁剪、过期和二次发放拒绝。</td></tr>
+        <tr><td>审计</td><td>audit_log、field_access_log、open_api_log 可按 trace 串联且响应脱敏。</td></tr>
+        <tr><td>撤回下线</td><td>快照、门户、推荐位、搜索、缓存、sitemap 全部不可见或失效。</td></tr>
+        <tr><td>容量烟测</td><td>公开门户 120 QPS、私有中心/后台 25 QPS、导出 worker 并发等灰度目标。</td></tr>
+        <tr><td>Runbook</td><td>上线、暂停、回滚、备份恢复、故障记录模板可执行。</td></tr>
+      </table>
+    </section>
+
+    <section class="card" id="gray">
+      <h2>9. 灰度试运营进入条件、暂停条件和退出条件</h2>
+      <h3>进入条件</h3>
+      <ol>
+        <li>当前阶段范围、禁止事项、feature flag 和上线对象已经冻结。</li>
+        <li>边界脚本、后端测试、前端测试、构建和三期专项脚本通过。</li>
+        <li>OIDC 或本地 dev 登录正常，跨对象、跨企业、跨角色访问被后端拒绝。</li>
+        <li>candidate、company、operator、auditor 关键闭环跑通。</li>
+        <li>导出审批、字段访问留痕、trace 串联和日志脱敏通过。</li>
+        <li>人才服务区、公开搜索、sitemap、缓存、埋点没有原始候选人数据旁路。</li>
+        <li>备份恢复、回滚、灰度开关、容量烟测、告警联通都跑过一遍。</li>
+      </ol>
+      <h3>暂停条件</h3>
+      <ul>
+        <li>公开门户 API 5xx 持续超过 0.5%。</li>
+        <li>BOLA/IDOR、字段泄露、导出绕行、审计缺失等 P0/P1 安全问题。</li>
+        <li>撤回下线传播超过 5 分钟仍未收敛。</li>
+        <li>导出链接过期、二次发放或审批规则失效。</li>
+        <li>任一核心身份无法登录或分流错误。</li>
+      </ul>
+      <h3>退出条件</h3>
+      <ul>
+        <li>至少 20 位 candidate、10 家 company、3 名 operator/auditor 完整跑通真实闭环。</li>
+        <li>公开门户真实状态驱动稳定，SEO 与 sitemap 不含私有或撤回对象。</li>
+        <li>审计、导出、撤回、IDOR/BOLA、字段黑名单回归稳定。</li>
+        <li>备份恢复、回滚演练、告警联通和容量烟测都有记录。</li>
+        <li>风险池能力仍未偷跑。</li>
+      </ul>
+    </section>
+
+    <section class="card" id="next">
+      <h2>10. 交付与后续</h2>
+      <p>本蓝图完成后，三期规划进入 Prompt 拆解阶段。建议下一份文档：</p>
+      <pre><code>docs/Phase_III/三期研发提示词.md/html</code></pre>
+      <p>三期研发提示词应沿用一二期可执行投喂手册风格：每轮包含主控说明、本轮目标、禁止事项、输出要求、DoD、最小投喂片段；每轮只执行当前 Prompt；每轮完成后更新已完成轮次基线记录。</p>
+    </section>
+  </main>
+</body>
+</html>

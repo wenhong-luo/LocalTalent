@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalTalent Phase 3 Step4：运营后台生产化与门户运营化</title>
+  <style>
+    :root {
+      --bg: #f6f7f3;
+      --card: #ffffff;
+      --ink: #1f2933;
+      --muted: #697586;
+      --line: #dde6d7;
+      --accent: #166534;
+      --accent-soft: #ecfdf5;
+      --blue: #1d4ed8;
+      --blue-soft: #eff6ff;
+      --warn: #9f1239;
+      --warn-soft: #fff1f2;
+      --code: #1e293b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: radial-gradient(circle at 12% 0, #dcfce7 0, #f6f7f3 360px);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px 72px; }
+    header.hero {
+      padding: 34px;
+      border: 1px solid rgba(22, 101, 52, .22);
+      background: rgba(255, 255, 255, .9);
+      border-radius: 28px;
+      box-shadow: 0 24px 80px rgba(31, 83, 47, .1);
+    }
+    h1 { margin: 0 0 12px; font-size: 34px; letter-spacing: -.02em; }
+    h2 { margin-top: 0; font-size: 24px; }
+    h3 { margin-top: 24px; font-size: 19px; }
+    p { margin: 10px 0; }
+    a { color: var(--accent); text-decoration: none; }
+    code {
+      color: var(--code);
+      background: #f2f7ee;
+      border: 1px solid #dbe8d0;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: .92em;
+    }
+    pre {
+      overflow: auto;
+      padding: 16px;
+      border-radius: 14px;
+      background: #1e293b;
+      color: #f8fafc;
+    }
+    pre code { color: inherit; background: transparent; border: 0; padding: 0; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    nav.toc {
+      margin: 22px 0;
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+    nav.toc a {
+      display: inline-block;
+      margin: 6px 12px 6px 0;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f6faf2;
+      color: #475569;
+      font-size: 14px;
+    }
+    .card {
+      margin-top: 22px;
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 14px 40px rgba(31, 83, 47, .06);
+    }
+    .callout {
+      margin: 16px 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(29, 78, 216, .22);
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 650;
+    }
+    .callout.warn {
+      border-color: rgba(159, 18, 57, .22);
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: #ecfdf5; text-align: left; color: #166534; }
+    tr:last-child td { border-bottom: 0; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .mini {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fbfff8;
+    }
+    @media (max-width: 760px) {
+      .wrap { padding: 18px 12px 48px; }
+      header.hero, .card { padding: 20px; border-radius: 18px; }
+      h1 { font-size: 26px; }
+      .grid { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <h1>LocalTalent Phase 3 Step4：运营后台生产化与门户运营化</h1>
+      <p>本文件把运营后台和二期高保真门户收口为“灰度试运营可用”的运营配置、审核、风险、审计和公开展示边界，供后续蓝图与 Prompt 继承。</p>
+      <div class="meta">
+        <span class="pill">operator 可写</span>
+        <span class="pill">auditor 只读</span>
+        <span class="pill">门户真实状态驱动</span>
+        <span class="pill">审计脱敏</span>
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="目录">
+      <a href="#readme">开发前必读卡</a>
+      <a href="#inherit">继承结论</a>
+      <a href="#baseline">运营能力基线</a>
+      <a href="#goal">Step4 总目标</a>
+      <a href="#ia">运营后台架构</a>
+      <a href="#portal">门户运营化</a>
+      <a href="#state">状态机</a>
+      <a href="#auth">权限与审计</a>
+      <a href="#risk">风险审核</a>
+      <a href="#acceptance">验收关注点</a>
+      <a href="#next">结论与下一步</a>
+    </nav>
+
+    <section class="card" id="readme">
+      <h2>开发前必读卡</h2>
+      <ul>
+        <li><strong>文件定位</strong>：三期第四份 Step 文档；用于把“运营后台演示能力”和“二期高保真门户”设计成后续蓝图和 Prompt 可继承的真实运营后台与门户运营体系。</li>
+        <li><strong>输入资料</strong>：<code>00_PHASE_III_BOUNDARY.md</code>、<code>LocalTalent_phase3_step1.md</code>、<code>LocalTalent_phase3_step2.md</code>、<code>LocalTalent_phase3_step3.md</code>、<code>LocalTalent_三期总规划.md</code>、Phase I/II 运营审核、CMS/event、审计中心、公开门户相关基线。</li>
+        <li><strong>本轮目标</strong>：冻结 operator/auditor 在三期灰度试运营中必须具备的审核、配置、发布、下线、推荐、风险处理、审计查询和门户运营化能力。</li>
+        <li><strong>禁止越界点</strong>：不写代码，不新增迁移，不生成三期蓝图或提示词，不实现会员商业化、真实支付、真实短信、真实微信、小程序、App、真实地图、视频、直播、ATS/RPA 或风险池能力。</li>
+        <li><strong>输出边界</strong>：只定义运营后台生产化与门户运营化的产品范围、状态口径、权限边界、审计要求和验收关注点。</li>
+        <li><strong>下一步影响</strong>：本文件稳定后，下一份建议文档是 <code>LocalTalent_phase3_step5.md：审计、导出、风控与安全收口</code>。</li>
+      </ul>
+      <div class="callout">统一硬边界：运营后台可以管理和审核，但不得绕过服务端权限、数据域、字段级权限和审计链；公开门户只能展示已审核、已发布、在线且合规的公开白名单字段；人才服务区仍只展示发布快照。</div>
+    </section>
+
+    <section class="card" id="inherit">
+      <h2>一、Step1-Step3 继承结论</h2>
+      <p>Step1 已经冻结三期目标是 <strong>小范围真实试运营</strong>；Step2 已经收口 candidate 真实闭环；Step3 已经收口 company 招聘工作台。Step4 只承接运营后台和门户运营化，不处理商业化、外部能力或风险池专项。</p>
+      <table>
+        <thead><tr><th>继承结论</th><th>Step4 继承方式</th></tr></thead>
+        <tbody>
+          <tr><td>三期目标是灰度试运营，不是公网正式运营。</td><td>Step4 只要求运营后台能支撑小范围真实运营，不追求完整商业运营平台。</td></tr>
+          <tr><td>求职者中心是本人私有域。</td><td>运营后台不得把候选人原始字段暴露到公开门户或推荐位。</td></tr>
+          <tr><td>企业中心是本企业私有域。</td><td>运营审核可改变企业/职位状态，但不能替企业绕过认证、审核或数据域。</td></tr>
+          <tr><td>公开门户必须真实状态驱动。</td><td>首页、找工作、找企业、招聘会、资讯、HR 工具箱等必须只展示合法公开对象。</td></tr>
+          <tr><td>operator/auditor 分权必须强制。</td><td>operator 可在授权范围内写；auditor 只读，所有写接口必须拒绝 auditor。</td></tr>
+          <tr><td>风险池能力不得偷跑。</td><td>推荐位、内容活动、风险审核不得包装成联系解锁、会员权益或外部同步。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card" id="baseline">
+      <h2>二、一二期运营能力基线</h2>
+      <table>
+        <thead><tr><th>能力</th><th>已有基线</th><th>Step4 增量</th></tr></thead>
+        <tbody>
+          <tr><td>企业审核</td><td>已有企业审核队列、详情、通过、驳回和审计。</td><td>补生产化列表筛选、驳回补正链路、风险提示和审核效率视图。</td></tr>
+          <tr><td>职位审核</td><td>已有职位审核队列、详情、通过、驳回和可见性联动。</td><td>补职位内容风险提示、批量审核边界、审核后门户状态解释。</td></tr>
+          <tr><td>CMS/event</td><td>已有内容和活动最小 CRUD、软删除、operator/auditor 权限。</td><td>补内容频道、招聘会、活动公开展示配置和发布/下线状态治理。</td></tr>
+          <tr><td>导出审批</td><td>已有 export_apply、审批、生成、MinIO 短期下载和审计链。</td><td>运营后台只强化审批视图、风险提示和审计跳转，不绕过审批。</td></tr>
+          <tr><td>审计中心</td><td>已有 audit_log、field_access_log、open_api_log 查询和脱敏。</td><td>补运营视角的 trace 聚合、筛选、异常入口和只读审计 UI。</td></tr>
+          <tr><td>admin 前端入口</td><td>已有企业审核、职位审核、导出审批、审计入口基础页面。</td><td>补可支撑真实试运营的导航、状态、空态、权限提示和 noindex 口径。</td></tr>
+          <tr><td>二期公开门户</td><td>已有首页、找工作、找企业、人才服务区、招聘会、资讯、HR 工具箱、更多服务。</td><td>从静态演示和低风险占位转为后台配置与真实状态驱动。</td></tr>
+        </tbody>
+      </table>
+      <div class="callout warn">Step4 允许运营后台管理公开展示配置，但公开门户最终展示必须继续由服务端可见性规则和字段白名单收口。</div>
+    </section>
+
+    <section class="card" id="goal">
+      <h2>三、Step4 总目标</h2>
+      <pre><code>operator 能完成：审核企业/职位 → 管理内容/活动/招聘会 → 配置推荐位 → 处理风险 → 查询审计 → 驱动公开门户真实展示。
+auditor 能完成：只读查看审核、风险、审计和运营记录，不得写入任何业务状态。</code></pre>
+      <ol>
+        <li>运营首页看到待审核企业、待审核职位、待处理内容、待处理活动、导出审批、风险提示和最近审计摘要。</li>
+        <li>审核企业和职位，填写驳回原因，审核结果联动公开门户可见性。</li>
+        <li>管理就业政策、职场资讯、公告、HR 工具箱、帮助中心等内容，并支持发布、下线、软删除。</li>
+        <li>管理招聘会和活动公开展示配置，不暴露报名名单、签到证据或候选人明细。</li>
+        <li>配置首页和频道推荐位，但推荐对象必须是已审核、已发布、在线且合规的公开对象。</li>
+        <li>处理内容、企业、职位、导出、审计异常等风险项，并记录处理结论。</li>
+        <li>通过审计中心 UI 查询 trace、审核记录、字段访问记录和开放接口日志，且响应脱敏。</li>
+      </ol>
+    </section>
+
+    <section class="card" id="ia">
+      <h2>四、运营后台信息架构</h2>
+      <table>
+        <thead><tr><th>模块</th><th>目标能力</th><th>状态与边界</th></tr></thead>
+        <tbody>
+          <tr><td>运营首页</td><td>汇总待审核、待发布、待处理风险、导出审批、审计异常和门户健康摘要。</td><td>operator/auditor 均可读；写入口按权限显示，服务端强制。</td></tr>
+          <tr><td>企业审核</td><td>查看企业资料、认证材料、历史审核、通过或驳回。</td><td>不公开营业执照附件、审核材料、后台备注；写 audit_log。</td></tr>
+          <tr><td>职位审核</td><td>查看职位内容、企业认证状态、风险提示、通过或驳回。</td><td>未认证企业职位不得通过上线；写 audit_log。</td></tr>
+          <tr><td>内容管理</td><td>管理就业政策、资讯、公告、HR 工具箱、帮助中心。</td><td>发布/下线/软删除均写审计；公开输出做字段白名单和安全文本处理。</td></tr>
+          <tr><td>活动/招聘会管理</td><td>管理现场招聘会、网络招聘会占位、校园活动、普通活动。</td><td>不公开报名名单、签到证据、参会个人明细。</td></tr>
+          <tr><td>推荐位配置</td><td>配置首页、频道、企业、职位、招聘会、内容推荐。</td><td>推荐对象必须状态合法；不得推荐撤回快照、下线职位、未认证企业。</td></tr>
+          <tr><td>风险审核</td><td>处理内容风险、企业资料风险、职位风险、导出风险、审计异常风险。</td><td>风险池能力不能直接升级为开发功能；处理动作写 audit_log。</td></tr>
+          <tr><td>审计中心</td><td>查询 audit_log、field_access_log、open_api_log 和 trace 聚合。</td><td>只读、脱敏、可按 trace 串联；敏感字段读取写 field_access_log。</td></tr>
+          <tr><td>系统配置占位</td><td>展示灰度配置、门户开关、环境提示、Runbook 链接。</td><td>不提供真实支付、短信、微信、地图、直播等外部能力开关。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card" id="portal">
+      <h2>五、门户运营化设计</h2>
+      <p>二期已经实现高保真门户；三期 Step4 的目标是让这些页面由真实状态和后台配置驱动。</p>
+      <table>
+        <thead><tr><th>门户区域</th><th>运营化目标</th><th>可见性规则</th></tr></thead>
+        <tbody>
+          <tr><td>首页</td><td>推荐位、公告、招聘会、推荐企业、热招职位由后台配置或服务端规则驱动。</td><td>只展示已审核、已发布、在线对象。</td></tr>
+          <tr><td>找工作</td><td>职位列表、名企直聘、急聘/今日招聘从真实职位状态读取。</td><td>企业认证通过、职位审核通过、职位在线。</td></tr>
+          <tr><td>找企业</td><td>企业列表和企业主页从企业认证状态和公开资料读取。</td><td>企业认证通过，且只展示公开白名单字段。</td></tr>
+          <tr><td>人才服务区</td><td>继续只读 <code>candidate_publish_snapshot</code>，可按低风险筛选展示。</td><td>候选人同意、可发布、快照有效；撤回后不可见。</td></tr>
+          <tr><td>招聘会</td><td>招聘会列表/详情由活动状态驱动。</td><td>活动 <code>status=1</code> 且公开展示，不含报名名单或签到证据。</td></tr>
+          <tr><td>政策资讯</td><td>就业政策、职场资讯、公告、HR 工具箱由 CMS 状态驱动。</td><td>内容已发布、未软删除，正文安全输出。</td></tr>
+          <tr><td>更多服务</td><td>低风险页面稳定路由；高风险入口保留占位或风险池文案。</td><td>禁止真实地图、视频、直播、短信、微信、小程序、App。</td></tr>
+          <tr><td>sitemap/SEO</td><td>只收录公开页面和合法公开对象。</td><td>私有中心、后台、审计、风险页全部 noindex。</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">推荐位配置必须具备状态校验。如果配置对象后续被驳回、下线、撤回或软删除，门户应自动隐藏或降级，不得继续展示陈旧对象。</div>
+    </section>
+
+    <section class="card" id="state">
+      <h2>六、状态机与服务端口径</h2>
+      <table>
+        <thead><tr><th>状态域</th><th>服务端应返回的状态口径</th><th>前端禁止行为</th></tr></thead>
+        <tbody>
+          <tr><td>company_review</td><td>待审核、通过、驳回、补正中、冻结。</td><td>禁止前端根据资料完整度自行判定认证通过。</td></tr>
+          <tr><td>job_review</td><td>待审核、通过、驳回、下线、风险待处理。</td><td>禁止未审核或驳回职位公开可见。</td></tr>
+          <tr><td>cms_content</td><td>草稿、待发布、已发布、已下线、软删除。</td><td>禁止直接渲染未经安全处理的 HTML。</td></tr>
+          <tr><td>activity_event</td><td>草稿、待发布、已发布、已下线、软删除、已结束。</td><td>禁止公开报名名单、签到证据或参会个人明细。</td></tr>
+          <tr><td>recommendation</td><td>待生效、生效中、已下线、目标失效、风险拦截。</td><td>禁止推荐无效、未审核、已撤回或高风险对象。</td></tr>
+          <tr><td>risk_review</td><td>待处理、处理中、已通过、已驳回、已转风险池。</td><td>禁止风险池能力进入主线开发。</td></tr>
+          <tr><td>audit_center</td><td>可查询、无结果、脱敏输出、权限不足。</td><td>禁止审计接口返回敏感明文。</td></tr>
+        </tbody>
+      </table>
+      <p>任何写动作成功后，运营页面应重新读取服务端状态；前端按钮隐藏只是体验，不能替代服务端权限控制。</p>
+    </section>
+
+    <section class="card" id="auth">
+      <h2>七、权限、字段与审计边界</h2>
+      <h3>7.1 operator 与 auditor</h3>
+      <table>
+        <thead><tr><th>角色</th><th>权限口径</th></tr></thead>
+        <tbody>
+          <tr><td>operator</td><td>可在授权范围内执行审核、发布、下线、软删除、推荐位调整、风险处理、导出审批等写动作。</td></tr>
+          <tr><td>auditor</td><td>只读查看审核、风险、审计和运营记录；不得调用任何写接口。</td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li>前端可隐藏写按钮，但服务端必须强制 RBAC。</li>
+        <li>auditor 写接口必须统一返回无权限响应和 trace。</li>
+        <li>operator 写动作必须写 <code>audit_log</code>。</li>
+        <li>敏感字段读取必须写 <code>field_access_log</code>。</li>
+      </ul>
+
+      <h3>7.2 公开字段边界</h3>
+      <p>运营后台可以看到更多管理字段，但公开门户只能展示公开白名单。禁止进入公开门户、sitemap、缓存、搜索索引、埋点和推荐位摘要的字段包括：</p>
+      <div class="grid">
+        <div class="mini">手机号、邮箱、身份证、联系方式。</div>
+        <div class="mini">简历正文、附件对象 key、证据、原始候选人 JSON。</div>
+        <div class="mini">营业执照附件、认证材料、审核材料、后台备注。</div>
+        <div class="mini">报名名单、签到证据、参会个人明细。</div>
+        <div class="mini">审计详情、字段访问记录、风控结论。</div>
+        <div class="mini">开放接口 secret、token、签名、nonce 明文。</div>
+      </div>
+
+      <h3>7.3 审计口径</h3>
+      <table>
+        <thead><tr><th>必须写 audit_log 的动作</th><th>必须考虑 field_access_log 的读取</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>企业审核、职位审核、内容发布/下线/软删除、活动发布/下线/软删除、推荐位调整、风险审核、导出审批、审计异常处理。</td>
+            <td>查看高敏候选人字段、导出字段明细、认证材料、审核材料、风险材料、开放接口敏感摘要。</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout warn">审计中心自身响应必须脱敏，不能因为“审计人员要查问题”就返回敏感明文。</div>
+    </section>
+
+    <section class="card" id="risk">
+      <h2>八、风险审核与风险池边界</h2>
+      <table>
+        <thead><tr><th>风险类型</th><th>Step4 允许做</th><th>Step4 禁止做</th></tr></thead>
+        <tbody>
+          <tr><td>内容风险</td><td>标记、驳回、下线、转人工复核。</td><td>自动发布高风险内容。</td></tr>
+          <tr><td>企业资料风险</td><td>驳回认证、要求补正、冻结展示。</td><td>公开营业执照附件或审核材料。</td></tr>
+          <tr><td>职位内容风险</td><td>驳回职位、下线职位、记录原因。</td><td>允许未审核职位公开可见。</td></tr>
+          <tr><td>导出风险</td><td>审批驳回、记录原因、跳转审计。</td><td>绕过 export_apply 直接导出。</td></tr>
+          <tr><td>审计异常风险</td><td>标记异常、记录处理、关联 trace。</td><td>删除或篡改审计日志。</td></tr>
+          <tr><td>风险池能力</td><td>记录评估状态、关联 Step6 准入规则。</td><td>直接上线受控找人才、联系解锁、支付、短信、微信、地图、直播、ATS/RPA。</td></tr>
+        </tbody>
+      </table>
+      <p>风险审核结论必须可追踪、可解释、可回滚。任何无法回滚的风险动作不应进入三期灰度试运营。</p>
+    </section>
+
+    <section class="card" id="acceptance">
+      <h2>九、自动化验收关注点</h2>
+      <table>
+        <thead><tr><th>验收点</th><th>关注内容</th></tr></thead>
+        <tbody>
+          <tr><td>auditor 写拒绝</td><td>auditor 调用企业审核、职位审核、内容发布、活动发布、推荐位、风险处理写接口必须 403。</td></tr>
+          <tr><td>operator 写审计</td><td>operator 审核、发布、下线、软删除、推荐位调整、风险处理必须写 <code>audit_log</code>。</td></tr>
+          <tr><td>门户可见性</td><td>公开门户只展示已审核、已发布、在线、未撤回、未软删除对象。</td></tr>
+          <tr><td>推荐位合法性</td><td>推荐位不得引用撤回快照、下线职位、未认证企业、未发布内容或软删除活动。</td></tr>
+          <tr><td>审计脱敏</td><td>审计中心响应不含手机号、邮箱、简历正文、附件、证据、secret、token。</td></tr>
+          <tr><td>字段黑名单</td><td>公开 DOM、响应、sitemap、缓存、搜索索引不含原始候选人数据和审核材料。</td></tr>
+          <tr><td>noindex</td><td>私有中心、运营后台、审计中心、风险页默认 noindex。</td></tr>
+          <tr><td>风险池阻断</td><td>高风险入口只能是占位、禁用或风险池状态，不存在真实外部调用。</td></tr>
+        </tbody>
+      </table>
+      <p>建议后续实现阶段保留或新增 <code>AdminReviewProductionIT</code>、<code>AdminContentActivityProductionIT</code>、<code>AdminRecommendationIT</code>、<code>AdminRiskReviewIT</code>、<code>AuditCenterUiAccessIT</code> 等测试方向。</p>
+    </section>
+
+    <section class="card" id="next">
+      <h2>十、Step4 结论与下一步</h2>
+      <ul>
+        <li>三期运营后台应优先支撑真实试运营，而不是扩展完整商业化运营平台。</li>
+        <li>operator 可写、auditor 只读是硬边界，必须由服务端强制。</li>
+        <li>公开门户运营化必须受状态机、字段白名单、推荐位合法性和 SEO/noindex 规则约束。</li>
+        <li>内容、活动、招聘会、推荐位、风险审核都必须可审计、可回滚、可解释。</li>
+        <li>审计中心是只读脱敏查询，不是敏感明文查看后门。</li>
+        <li>高风险能力仍停留在风险池，必须先走准入规则。</li>
+      </ul>
+      <pre><code>LocalTalent_phase3_step5.md：审计、导出、风控与安全收口</code></pre>
+      <p>Step5 应聚焦审计 trace 串联、导出审批回归、撤回下线传播、IDOR/BOLA、字段黑名单、风险池阻断和灰度试运营安全检查单。</p>
+    </section>
+  </main>
+</body>
+</html>
