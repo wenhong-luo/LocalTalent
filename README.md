@@ -198,6 +198,10 @@ cd frontend && npm ci && npm test && npm run build
 - 一期运维手册：`docs/Phase_I/RUNBOOK.md`，覆盖发布、回滚、备份、监控、日志脱敏、MinIO 预签名短期下载策略。
 - 二期测试矩阵：`docs/Phase_II/TESTING.md`，列出二期页面结构、字段白名单、SEO 和风险池闸门。
 - 二期运维手册：`docs/Phase_II/RUNBOOK.md`，覆盖二期高保真门户演示、发布和排障。
+- 三期开发入口：`docs/Phase_III/三期研发提示词.md`，当前从 Prompt 25（P3-0）开始逐轮执行。
+- 三期灰度 Runbook：`docs/Phase_III/RUNBOOK.md`，覆盖 feature flag、环境模板、预发/灰度、暂停回滚、备份恢复、监控告警和容量烟测口径。
+- 三期 feature flag 注册表：`docs/Phase_III/feature_flags.md`，三期新增能力默认关闭，不得绕过服务端权限、字段级权限、导出审批和审计。
+- 三期 P3-0 闸门：`scripts/check_phase3_boundary` 与 `scripts/check_phase3_ops`，用于阻断风险能力、敏感字段、真实外部能力和环境模板密钥误配置。
 - 本地总闸门：`./scripts/run_all`，顺序执行一期边界扫描、人才服务区字段扫描、二期规划闸门、二期演示验收闸门、后端测试、前端测试与前端构建。
 
 ## 自检清单
@@ -207,6 +211,8 @@ cd frontend && npm ci && npm test && npm run build
 - [ ] `scripts/check_portal_snapshot_fields` 可执行并输出 `PASS`
 - [ ] `scripts/check_phase2_planning` 可执行并输出 `PASS`
 - [ ] `scripts/check_phase2_demo_acceptance` 可执行并输出 `PASS`
+- [ ] `scripts/check_phase3_boundary` 可执行并输出 `PASS`
+- [ ] `scripts/check_phase3_ops` 可执行并输出 `PASS`
 - [ ] 后端测试通过，Flyway 迁移只向前新增，不修改旧版本迁移
 - [ ] 前端 `npm test` 与 `npm run build` 通过
 - [ ] CI workflow 任一门禁失败时阻断合并

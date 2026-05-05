@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+PHASE_III_DIR="$ROOT_DIR/docs/Phase_III"
+RUNBOOK="$PHASE_III_DIR/RUNBOOK.md"
+FEATURE_FLAGS="$PHASE_III_DIR/feature_flags.md"
+ENV_TEMPLATE="$ROOT_DIR/.env.phase3.example"
+README_FILE="$ROOT_DIR/README.md"
+
+required_files=(
+  "$RUNBOOK"
+  "$FEATURE_FLAGS"
+  "$ENV_TEMPLATE"
+  "$README_FILE"
+)
+
+for required_file in "${required_files[@]}"; do
+  if [ ! -f "$required_file" ]; then
+    echo "FAIL: Phase III ops required file missing: $required_file"
+    exit 1
+  fi
+done
+
+runbook_markers=(
+  "Prompt 25"
+  "本地开发入口"
+  "预发"
+  "灰度"
+  "Feature Flag"
+  "暂停"
+  "回滚"
+  "备份恢复"
+  "监控告警"
+  "容量烟测"
+  "验收命令"
+  "人才服务区仅展示发布快照"
+)
+
+for marker in "${runbook_markers[@]}"; do
+  if ! grep -Fq "$marker" "$RUNBOOK"; then
+    echo "FAIL: Phase III Runbook missing marker: $marker"
+    exit 1
+  fi
+done
+
+env_markers=(
+  "LOCALTALENT_ENV=local"
+  "LOCALTALENT_OIDC_ENABLED=false"
+  "LOCALTALENT_LOCAL_JWT_FALLBACK_ENABLED=false"
+  "LOCALTALENT_EXPORT_DOWNLOAD_TTL_SECONDS=900"
+  "LOCALTALENT_LOG_SENSITIVE_MASKING_ENABLED=true"
+)
+
+for marker in "${env_markers[@]}"; do
+  if ! grep -Fq "$marker" "$ENV_TEMPLATE"; then
+    echo "FAIL: Phase III env template missing marker: $marker"
+    exit 1
+  fi
+done
+
+feature_markers=(
+  "默认状态必须是"
+  "不得绕过服务端 RBAC"
+  "导出审批"
+  "审计"
+  "风险池能力不得通过 feature flag 偷跑"
+)
+
+for marker in "${feature_markers[@]}"; do
+  if ! grep -Fq "$marker" "$FEATURE_FLAGS"; then
+    echo "FAIL: Phase III feature flag registry missing marker: $marker"
+    exit 1
+  fi
+done
+
+readme_markers=(
+  "三期开发入口"
+  "docs/Phase_III/RUNBOOK.md"
+  "scripts/check_phase3_boundary"
+  "scripts/check_phase3_ops"
+)
+
+for marker in "${readme_markers[@]}"; do
+  if ! grep -Fq "$marker" "$README_FILE"; then
+    echo "FAIL: README missing Phase III ops marker: $marker"
+    exit 1
+  fi
+done
+
+if grep -Eq '(sk_live_|pk_live_|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' "$RUNBOOK" "$FEATURE_FLAGS" "$ENV_TEMPLATE"; then
+  echo "FAIL: Phase III ops docs/templates appear to contain real secrets"
+  exit 1
+fi
+
+echo "PASS"

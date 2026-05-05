@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+PHASE_III_DIR="$ROOT_DIR/docs/Phase_III"
+FEATURE_FLAGS="$PHASE_III_DIR/feature_flags.md"
+ENV_TEMPLATE="$ROOT_DIR/.env.phase3.example"
+
+required_files=(
+  "$PHASE_III_DIR/00_PHASE_III_BOUNDARY.md"
+  "$PHASE_III_DIR/三期研发方向与上线阶段判断.md"
+  "$PHASE_III_DIR/LocalTalent_三期总规划.md"
+  "$PHASE_III_DIR/LocalTalent_phase3_step1.md"
+  "$PHASE_III_DIR/LocalTalent_phase3_step2.md"
+  "$PHASE_III_DIR/LocalTalent_phase3_step3.md"
+  "$PHASE_III_DIR/LocalTalent_phase3_step4.md"
+  "$PHASE_III_DIR/LocalTalent_phase3_step5.md"
+  "$PHASE_III_DIR/LocalTalent_phase3_step6.md"
+  "$PHASE_III_DIR/三期研发实施蓝图与任务拆解.md"
+  "$PHASE_III_DIR/三期研发提示词.md"
+  "$FEATURE_FLAGS"
+  "$PHASE_III_DIR/RUNBOOK.md"
+  "$ENV_TEMPLATE"
+)
+
+for required_file in "${required_files[@]}"; do
+  if [ ! -f "$required_file" ]; then
+    echo "FAIL: Phase III required file missing: $required_file"
+    exit 1
+  fi
+done
+
+for prompt_no in 25 26 27 28 29 30 31; do
+  if ! grep -Fq "Prompt $prompt_no" "$PHASE_III_DIR/三期研发提示词.md"; then
+    echo "FAIL: Phase III prompts missing Prompt $prompt_no"
+    exit 1
+  fi
+done
+
+required_boundary_terms=(
+  "人才服务区仅展示发布快照"
+  "原始候选人数据不得公开"
+  "对接接口仅 stub"
+  "公共简历库"
+  "受控找人才"
+  "联系解锁"
+  "真实短信"
+  "真实微信"
+  "小程序"
+  "App"
+  "真实地图"
+  "视频"
+  "直播"
+  "ATS"
+  "RPA"
+)
+
+for term in "${required_boundary_terms[@]}"; do
+  if ! grep -Fq "$term" "$PHASE_III_DIR/00_PHASE_III_BOUNDARY.md" "$FEATURE_FLAGS"; then
+    echo "FAIL: Phase III boundary/feature flags missing required term: $term"
+    exit 1
+  fi
+done
+
+flag_keys=(
+  "phase3.baseline_gate"
+  "phase3.oidc_login"
+  "phase3.local_jwt_fallback"
+  "phase3.candidate_closure"
+  "phase3.company_workbench"
+  "phase3.operator_portal_ops"
+  "phase3.audit_security_gate"
+  "phase3.gray_ops"
+)
+
+for flag_key in "${flag_keys[@]}"; do
+  if ! grep -F "$flag_key" "$FEATURE_FLAGS" | grep -Fq "| off |"; then
+    echo "FAIL: Phase III feature flag must exist and default off: $flag_key"
+    exit 1
+  fi
+done
+
+env_flag_keys=(
+  "PHASE3_FEATURE_PHASE3_BASELINE_GATE=off"
+  "PHASE3_FEATURE_OIDC_LOGIN=off"
+  "PHASE3_FEATURE_LOCAL_JWT_FALLBACK=off"
+  "PHASE3_FEATURE_CANDIDATE_CLOSURE=off"
+  "PHASE3_FEATURE_COMPANY_WORKBENCH=off"
+  "PHASE3_FEATURE_OPERATOR_PORTAL_OPS=off"
+  "PHASE3_FEATURE_AUDIT_SECURITY_GATE=off"
+  "PHASE3_FEATURE_GRAY_OPS=off"
+)
+
+for env_flag_key in "${env_flag_keys[@]}"; do
+  if ! grep -Fq "$env_flag_key" "$ENV_TEMPLATE"; then
+    echo "FAIL: Phase III env template missing default-off flag: $env_flag_key"
+    exit 1
+  fi
+done
+
+if grep -Eq '(sk_live_|pk_live_|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' "$ENV_TEMPLATE"; then
+  echo "FAIL: Phase III env template appears to contain a real key"
+  exit 1
+fi
+
+if grep -Eq '=(password|secret|token|changeme|123456|admin)$' "$ENV_TEMPLATE"; then
+  echo "FAIL: Phase III env template contains unsafe trivial secret value"
+  exit 1
+fi
+
+implementation_paths=(
+  "$ROOT_DIR/backend/src"
+  "$ROOT_DIR/frontend/src"
+)
+
+for implementation_path in "${implementation_paths[@]}"; do
+  if [ -e "$implementation_path" ]; then
+    if grep -RIE \
+      --exclude='*.test.ts' \
+      --exclude='*.test.tsx' \
+      --exclude='*.spec.ts' \
+      --exclude='*.spec.tsx' \
+      -q 'twilio|sendSms|wechat-sdk|wx\.login|alipay|stripe|paypal|google\.maps|baidu.*map|ats.*sync|rpa.*sync|candidate.*pool.*sync|unlock.*contact|contact.*unlock' \
+      "$implementation_path"; then
+      echo "FAIL: Phase III forbidden real external/risk capability marker detected under $implementation_path"
+      exit 1
+    fi
+  fi
+done
+
+echo "PASS"
