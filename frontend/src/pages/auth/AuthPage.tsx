@@ -1,16 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { isHttpClientError } from '@/lib/httpClient';
 import {
   type AuthMode,
   type AuthRole,
   destinationForIdentity,
+  fetchOidcConfig,
   login,
+  oidcLoginUrl,
   registerCandidate,
   registerCompany,
-  saveAccessToken
+  saveAccessToken,
+  type OidcConfig
 } from './authApi';
 import styles from './AuthPage.module.css';
 
@@ -18,6 +21,8 @@ type AuthPageProps = {
   mode: AuthMode;
   initialRole?: AuthRole;
   redirect?: string;
+  oidcError?: string;
+  oidcTraceId?: string;
   onNavigate?: (href: string) => void;
 };
 
@@ -43,7 +48,17 @@ const initialForm: FormState = {
   userName: ''
 };
 
-function normalizeRole(role?: AuthRole): AuthRole {
+const defaultOidcConfig: OidcConfig = {
+  oidc_enabled: false,
+  local_fallback_enabled: true,
+  login_url: '/api/auth/oidc/login',
+  logout_url: '/api/auth/logout'
+};
+
+function normalizeRole(role: AuthRole | undefined, mode: AuthMode): AuthRole {
+  if (mode === 'login' && role === 'operator') {
+    return 'operator';
+  }
   return role === 'company' ? 'company' : 'candidate';
 }
 
@@ -52,6 +67,9 @@ function defaultNavigate(href: string): void {
 }
 
 function roleLabel(role: AuthRole): string {
+  if (role === 'operator') {
+    return '运营';
+  }
   return role === 'company' ? '招聘者' : '求职者';
 }
 
@@ -64,7 +82,7 @@ function loginHref(role: AuthRole): string {
 }
 
 function registerHref(role: AuthRole): string {
-  return `/auth/register?role=${role}`;
+  return `/auth/register?role=${role === 'operator' ? 'candidate' : role}`;
 }
 
 function ExternalLoginPlaceholders() {
@@ -82,21 +100,49 @@ function ExternalLoginPlaceholders() {
   );
 }
 
-export function AuthPage({ mode, initialRole, redirect, onNavigate = defaultNavigate }: AuthPageProps) {
-  const [role, setRole] = useState<AuthRole>(normalizeRole(initialRole));
+export function AuthPage({
+  mode,
+  initialRole,
+  redirect,
+  oidcError,
+  oidcTraceId,
+  onNavigate = defaultNavigate
+}: AuthPageProps) {
+  const [role, setRole] = useState<AuthRole>(normalizeRole(initialRole, mode));
   const [form, setForm] = useState<FormState>(initialForm);
+  const [oidcConfig, setOidcConfig] = useState<OidcConfig>(defaultOidcConfig);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string>();
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<string | undefined>(
+    oidcError ? `SSO 登录失败：${oidcError}${oidcTraceId ? ` trace_id：${oidcTraceId}` : ''}` : undefined
+  );
 
   const title = useMemo(() => `${roleLabel(role)}${modeLabel(mode)}`, [mode, role]);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchOidcConfig()
+      .then((result) => {
+        if (mounted) {
+          setOidcConfig(result.data);
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setOidcConfig(defaultOidcConfig);
+        }
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   function updateField(field: keyof FormState, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
   function switchRole(nextRole: AuthRole) {
-    setRole(nextRole);
+    setRole(normalizeRole(nextRole, mode));
     setMessage(undefined);
     setError(undefined);
   }
@@ -116,7 +162,7 @@ export function AuthPage({ mode, initialRole, redirect, onNavigate = defaultNavi
       password: form.password
     });
     const identityType = result.data.identity.identity_type;
-    saveAccessToken(result.data.access_token, identityType);
+    saveAccessToken(result.data.access_token, identityType, result.data.identity.role_codes);
     onNavigate(destinationForIdentity(identityType, redirect));
   }
 
@@ -139,7 +185,7 @@ export function AuthPage({ mode, initialRole, redirect, onNavigate = defaultNavi
 
     if (result.data.access_token) {
       const identityType = result.data.identity.identity_type;
-      saveAccessToken(result.data.access_token, identityType);
+      saveAccessToken(result.data.access_token, identityType, result.data.identity.role_codes);
       onNavigate(destinationForIdentity(identityType, redirect));
       return;
     }
@@ -149,6 +195,10 @@ export function AuthPage({ mode, initialRole, redirect, onNavigate = defaultNavi
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (mode === 'login' && !oidcConfig.local_fallback_enabled) {
+      setError('本地账号 fallback 当前已关闭，请使用 SSO 登录。');
+      return;
+    }
     setSubmitting(true);
     setMessage(undefined);
     setError(undefined);
@@ -173,7 +223,8 @@ export function AuthPage({ mode, initialRole, redirect, onNavigate = defaultNavi
           <p className={styles.eyebrow}>LocalTalent Account</p>
           <h1 className={styles.title}>登录注册只是入口，权限仍由服务端强制。</h1>
           <p className={styles.description}>
-            本轮复用一期本地账号与 JWT。真实短信、微信扫码、小程序和 App 登录均保持禁用占位，不接外部服务。
+            三期支持标准 OIDC/SSO 认证入口；本地账号与 JWT 仅作为 dev/test fallback。
+            真实短信、微信扫码、小程序和 App 登录均保持禁用占位，不接外部服务。
           </p>
           <div className={styles.featureGrid}>
             <article className={styles.featureCard}>
@@ -211,7 +262,34 @@ export function AuthPage({ mode, initialRole, redirect, onNavigate = defaultNavi
             >
               招聘者{modeLabel(mode)}
             </button>
+            {mode === 'login' ? (
+              <button
+                className={role === 'operator' ? styles.tabActive : styles.tab}
+                type="button"
+                role="tab"
+                aria-selected={role === 'operator'}
+                onClick={() => switchRole('operator')}
+              >
+                运营登录
+              </button>
+            ) : null}
           </div>
+
+          {mode === 'login' && oidcConfig.oidc_enabled ? (
+            <button
+              className={styles.ssoButton}
+              type="button"
+              onClick={() => onNavigate(oidcLoginUrl(role, redirect))}
+            >
+              使用 SSO 登录{roleLabel(role)}入口
+            </button>
+          ) : null}
+
+          {mode === 'login' && !oidcConfig.local_fallback_enabled ? (
+            <div className={styles.fallbackNotice}>
+              本地账号 fallback 当前已关闭。gray/prod 环境必须使用 SSO，白名单例外仍由后端控制。
+            </div>
+          ) : null}
 
           <form className={styles.form} onSubmit={handleSubmit}>
             {mode === 'login' ? (

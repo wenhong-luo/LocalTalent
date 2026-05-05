@@ -50,6 +50,7 @@ class MigrationTest {
                 "open_client",
                 "open_api_log",
                 "open_api_nonce_record",
+                "auth_oidc_identity_link",
                 "audit_log",
                 "field_access_log",
                 "api_idempotency_record"));
@@ -125,6 +126,17 @@ class MigrationTest {
         assertIndexesExist(jdbcTemplate, "audit_log", List.of("idx_audit_trace_time"));
         assertIndexesExist(jdbcTemplate, "field_access_log", List.of("idx_field_access_trace_time"));
         assertIndexesExist(jdbcTemplate, "open_api_log", List.of("idx_open_api_trace_time"));
+        assertColumnsExist(jdbcTemplate, "auth_oidc_identity_link", List.of(
+                "issuer",
+                "subject_sha256",
+                "identity_type",
+                "user_id",
+                "company_id",
+                "email_hash",
+                "last_login_at"));
+        assertIndexesExist(jdbcTemplate, "auth_oidc_identity_link", List.of(
+                "uk_oidc_issuer_subject",
+                "idx_oidc_identity"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");

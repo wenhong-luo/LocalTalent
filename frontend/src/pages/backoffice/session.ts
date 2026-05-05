@@ -12,6 +12,7 @@ export type AuthIdentity = {
   company_id?: number | null;
   display_name?: string;
   status?: number | null;
+  role_codes?: string[];
 };
 
 export function readAccessToken(): string | null {

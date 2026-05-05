@@ -15,7 +15,10 @@ export const metadata: Metadata = {
 type SearchParams = Record<string, string | string[] | undefined>;
 
 function roleFromSearchParams(searchParams: SearchParams): AuthRole {
-  return searchParams.role === 'company' ? 'company' : 'candidate';
+  if (searchParams.role === 'company' || searchParams.role === 'operator') {
+    return searchParams.role;
+  }
+  return 'candidate';
 }
 
 function stringParam(value: string | string[] | undefined): string | undefined {
@@ -31,6 +34,8 @@ export default async function LoginPage({ searchParams }: { searchParams?: Promi
         mode="login"
         initialRole={roleFromSearchParams(resolvedSearchParams)}
         redirect={stringParam(resolvedSearchParams.redirect)}
+        oidcError={stringParam(resolvedSearchParams.oidc_error)}
+        oidcTraceId={stringParam(resolvedSearchParams.trace_id)}
       />
     </PortalShell>
   );

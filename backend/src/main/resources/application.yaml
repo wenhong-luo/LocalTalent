@@ -12,10 +12,23 @@ spring:
     validate-on-migrate: true
 
 localtalent:
+  env: ${LOCALTALENT_ENV:local}
   auth:
     jwt:
       secret: ${LOCALTALENT_JWT_SECRET:localtalent-dev-jwt-secret-change-before-production-2026}
       ttl-seconds: ${LOCALTALENT_JWT_TTL_SECONDS:7200}
+    local-login:
+      enabled: ${LOCALTALENT_LOCAL_JWT_FALLBACK_ENABLED:true}
+      whitelist: ${LOCALTALENT_LOCAL_JWT_FALLBACK_WHITELIST:}
+    oidc:
+      enabled: ${LOCALTALENT_OIDC_ENABLED:false}
+      issuer-uri: ${LOCALTALENT_OIDC_ISSUER_URI:https://issuer.example.invalid}
+      client-id: ${LOCALTALENT_OIDC_CLIENT_ID:CHANGE_ME_CLIENT_ID}
+      client-secret: ${LOCALTALENT_OIDC_CLIENT_SECRET:CHANGE_ME_CLIENT_SECRET}
+      redirect-uri: ${LOCALTALENT_OIDC_REDIRECT_URI:http://localhost:8080/api/auth/oidc/callback}
+      scopes: ${LOCALTALENT_OIDC_SCOPES:openid email profile}
+      state-secret: ${LOCALTALENT_OIDC_STATE_SECRET:CHANGE_ME_OIDC_STATE_SECRET}
+      frontend-base-url: ${LOCALTALENT_OIDC_FRONTEND_BASE_URL:http://localhost:3000}
   minio:
     endpoint: ${LOCALTALENT_MINIO_ENDPOINT:http://localhost:9000}
     access-key: ${LOCALTALENT_MINIO_ACCESS_KEY:localtalent}

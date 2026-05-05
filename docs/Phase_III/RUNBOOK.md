@@ -5,9 +5,9 @@
 ## 1. 当前阶段
 
 - 三期目标：小范围真实试运营。
-- 当前轮次：Prompt 25（P3-0）三期基线冻结与灰度闸门。
-- 当前能力：文档、配置模板、feature flag 注册表、静态闸门脚本。
-- 当前非目标：不实现求职者、企业、运营后台任何新增业务功能；不新增迁移；不接真实外部能力。
+- 当前轮次：Prompt 26（P3-1）认证与身份映射已完成，下一轮进入 Prompt 27（P3-2）求职者真实闭环生产化。
+- 当前能力：三期文档、配置模板、feature flag 注册表、静态闸门脚本、OIDC/SSO 授权码登录、内部账号映射、dev/test 本地 JWT fallback。
+- 当前非目标：不实现求职者、企业、运营后台业务闭环；不接真实短信、微信、小程序、App；不把授权交给 IdP claim。
 
 ## 2. 必读文件
 
@@ -90,7 +90,7 @@ npm ci
 npm run dev
 ```
 
-三期 Prompt 26 以后如引入 OIDC/SSO，必须继续保留 dev/test fallback 的边界说明，并确保 gray/prod 默认关闭本地 fallback 或仅允许白名单应急。
+三期 Prompt 26 已引入 OIDC/SSO。OIDC 只负责认证和基础 claims；LocalTalent 后端继续负责 RBAC、数据域、字段级权限、导出审批和审计。dev/test 可使用本地 JWT fallback；gray/prod 默认关闭本地 fallback，只有显式白名单账号可作为应急入口。
 
 ## 6. 预发与灰度配置
 

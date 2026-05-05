@@ -1,7 +1,7 @@
-import { apiPost, type ApiResult } from '@/lib/httpClient';
+import { apiGet, apiPost, type ApiResult } from '@/lib/httpClient';
 import { ACCESS_TOKEN_STORAGE_KEY, ADMIN_ROLE_HINT_STORAGE_KEY, type AuthIdentity } from '@/pages/backoffice/session';
 
-export type AuthRole = 'candidate' | 'company';
+export type AuthRole = 'candidate' | 'company' | 'operator';
 export type AuthMode = 'login' | 'register';
 
 export type LoginPayload = {
@@ -42,8 +42,19 @@ export type RegisterResponse = {
   expires_in?: number;
 };
 
+export type OidcConfig = {
+  oidc_enabled: boolean;
+  local_fallback_enabled: boolean;
+  login_url: string;
+  logout_url: string;
+};
+
 export function login(payload: LoginPayload): Promise<ApiResult<LoginResponse>> {
   return apiPost<LoginResponse>('/api/auth/login', payload);
+}
+
+export function fetchOidcConfig(): Promise<ApiResult<OidcConfig>> {
+  return apiGet<OidcConfig>('/api/auth/oidc/config');
 }
 
 export function registerCandidate(payload: Omit<RegisterCandidatePayload, 'identity_type'>): Promise<ApiResult<RegisterResponse>> {
@@ -60,7 +71,17 @@ export function registerCompany(payload: Omit<RegisterCompanyPayload, 'identity_
   });
 }
 
-export function saveAccessToken(token: string, identityType?: string): void {
+export function oidcLoginUrl(role: AuthRole, redirect?: string): string {
+  const params = new URLSearchParams({
+    identity_type: role
+  });
+  if (redirect && isSafeInternalPath(redirect)) {
+    params.set('redirect', redirect);
+  }
+  return `/api/auth/oidc/login?${params.toString()}`;
+}
+
+export function saveAccessToken(token: string, identityType?: string, roleCodes: string[] = []): void {
   if (typeof window === 'undefined') {
     return;
   }
@@ -68,7 +89,10 @@ export function saveAccessToken(token: string, identityType?: string): void {
   window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
 
   if (identityType === 'operator') {
-    window.localStorage.setItem(ADMIN_ROLE_HINT_STORAGE_KEY, 'operator');
+    window.localStorage.setItem(
+      ADMIN_ROLE_HINT_STORAGE_KEY,
+      roleCodes.includes('auditor') ? 'auditor' : 'operator'
+    );
     return;
   }
 

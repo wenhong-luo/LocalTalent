@@ -12,6 +12,7 @@ import cn.localtalent.backend.auth.domain.JwtPrincipal;
 import cn.localtalent.backend.auth.infrastructure.AuthJdbcRepository;
 import cn.localtalent.backend.auth.infrastructure.JwtService;
 import cn.localtalent.backend.auth.infrastructure.PasswordHasher;
+import cn.localtalent.backend.auth.oidc.OidcProperties;
 import cn.localtalent.backend.common.exception.ApiException;
 import java.util.Locale;
 import java.util.Optional;
@@ -29,11 +30,18 @@ public class AuthService {
     private final AuthJdbcRepository authRepository;
     private final PasswordHasher passwordHasher;
     private final JwtService jwtService;
+    private final OidcProperties oidcProperties;
 
-    public AuthService(AuthJdbcRepository authRepository, PasswordHasher passwordHasher, JwtService jwtService) {
+    public AuthService(
+            AuthJdbcRepository authRepository,
+            PasswordHasher passwordHasher,
+            JwtService jwtService,
+            OidcProperties oidcProperties
+    ) {
         this.authRepository = authRepository;
         this.passwordHasher = passwordHasher;
         this.jwtService = jwtService;
+        this.oidcProperties = oidcProperties;
     }
 
     @Transactional
@@ -64,6 +72,9 @@ public class AuthService {
         IdentityType identityType = IdentityType.parse(request.identityType());
         String account = normalizeAccount(required(request.account(), "account"));
         String password = required(request.password(), "password");
+        if (!oidcProperties.isLocalLoginAllowed(account)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "AUTHZ_403", "local login fallback is disabled");
+        }
 
         AuthAccount authAccount = findAccount(identityType, account)
                 .filter(accountRow -> accountRow.status() == 1)
@@ -76,10 +87,18 @@ public class AuthService {
                 authAccount.companyId(),
                 authAccount.displayName(),
                 authAccount.status());
-        authRepository.updateLastLogin(identity);
+        return issueLoginResponse(identity);
+    }
 
-        String token = jwtService.issueToken(identity);
-        return new AuthLoginResponse(token, "Bearer", jwtService.ttlSeconds(), toResponse(identity));
+    @Transactional
+    public AuthLoginResponse issueLoginResponse(AuthIdentity identity) {
+        AuthIdentity currentIdentity = authRepository.findIdentity(identity.identityType(), identity.userId())
+                .filter(identityRow -> identityRow.status() == 1)
+                .orElseThrow(this::unauthorized);
+        authRepository.updateLastLogin(currentIdentity);
+
+        String token = jwtService.issueToken(currentIdentity);
+        return new AuthLoginResponse(token, "Bearer", jwtService.ttlSeconds(), toResponse(currentIdentity));
     }
 
     @Transactional(readOnly = true)
@@ -134,7 +153,8 @@ public class AuthService {
                 identity.userId(),
                 identity.companyId(),
                 identity.displayName(),
-                identity.status());
+                identity.status(),
+                authRepository.findRoleCodes(identity.identityType(), identity.userId()));
     }
 
     private String bearerToken(String authorizationHeader) {
