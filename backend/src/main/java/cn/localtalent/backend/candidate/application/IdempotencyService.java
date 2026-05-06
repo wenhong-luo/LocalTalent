@@ -22,7 +22,7 @@ public class IdempotencyService {
 
     public IdempotencyService(IdempotencyJdbcRepository repository) {
         this.repository = repository;
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = new ObjectMapper().findAndRegisterModules();
     }
 
     public <T> T execute(

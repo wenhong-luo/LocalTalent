@@ -12,11 +12,24 @@ public class Phase3FeatureProperties {
      */
     private boolean candidateClosure;
 
+    /**
+     * Prompt 28 private company workbench. Defaults to false in configuration.
+     */
+    private boolean companyWorkbench;
+
     public boolean isCandidateClosure() {
         return candidateClosure;
     }
 
     public void setCandidateClosure(boolean candidateClosure) {
         this.candidateClosure = candidateClosure;
+    }
+
+    public boolean isCompanyWorkbench() {
+        return companyWorkbench;
+    }
+
+    public void setCompanyWorkbench(boolean companyWorkbench) {
+        this.companyWorkbench = companyWorkbench;
     }
 }

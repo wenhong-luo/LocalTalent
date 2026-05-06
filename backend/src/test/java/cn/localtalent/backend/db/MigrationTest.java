@@ -84,6 +84,7 @@ class MigrationTest {
         assertColumnsAbsent(jdbcTemplate, "candidate_user", List.of("snapshot_json"));
         assertColumnsExist(jdbcTemplate, "company", List.of(
                 "nature_code",
+                "certification_material_summary_json",
                 "auth_reject_reason",
                 "auth_review_user_id",
                 "auth_review_time",
@@ -175,6 +176,11 @@ class MigrationTest {
         assertIndexesExist(jdbcTemplate, "candidate_notification", List.of(
                 "idx_candidate_notification_read",
                 "idx_candidate_notification_biz"));
+        assertColumnsExist(jdbcTemplate, "job_application", List.of(
+                "company_stage_note",
+                "stage_changed_by",
+                "stage_changed_at"));
+        assertIndexesExist(jdbcTemplate, "job_application", List.of("idx_application_company_stage_time"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");

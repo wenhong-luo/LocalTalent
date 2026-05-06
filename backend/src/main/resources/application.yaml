@@ -40,3 +40,4 @@ localtalent:
     timestamp-window-seconds: ${LOCALTALENT_OPENAPI_TIMESTAMP_WINDOW_SECONDS:300}
   phase3:
     candidate-closure: ${LOCALTALENT_PHASE3_CANDIDATE_CLOSURE:false}
+    company-workbench: ${LOCALTALENT_PHASE3_COMPANY_WORKBENCH:false}

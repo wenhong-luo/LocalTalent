@@ -173,9 +173,10 @@ for required_path in "${prompt5_required_paths[@]}"; do
   fi
 done
 
-if grep -RIEiq "job_application|interview_session|export_apply|open_api|integration_sync|ats|candidate_pool" \
-  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/company" \
-  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/job"; then
+if find "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/company" \
+    "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/job" \
+    -type f ! -path '*/company/workbench/*' -print0 \
+    | xargs -0 grep -IEiq "job_application|interview_session|export_apply|open_api|integration_sync|ats|candidate_pool"; then
   echo "FAIL: Prompt 5 company/job module contains later-scope implementation marker"
   exit 1
 fi
