@@ -5,7 +5,7 @@
 ## 1. 当前阶段
 
 - 三期目标：小范围真实试运营。
-- 当前轮次：Prompt 29（P3-4）运营后台生产化与门户运营化已完成，下一轮进入 Prompt 30（P3-5）审计、导出、风控与安全收口。
+- 当前轮次：Prompt 30（P3-5）审计、导出、风控与安全收口已完成，下一轮进入 Prompt 31（P3-6）灰度试运营工程治理与上线演练。
 - 当前能力：三期文档、配置模板、feature flag 注册表、静态闸门脚本、OIDC/SSO 授权码登录、内部账号映射、dev/test 本地 JWT fallback、candidate 私有简历/投递/收藏/订阅/站内通知闭环、company 私有企业资料/认证材料/职位/投递池/面试邀约/导出申请工作台、operator/auditor 运营后台、推荐位配置、风险审核和公开推荐读取。
 - 当前非目标：不实现审计/导出/风控总收口之外的新业务；不接真实短信、微信、小程序、App；不把授权交给 IdP claim；不开放公共简历库、联系解锁、受控找人才、会员权益、商业化广告或真实支付。
 
@@ -61,6 +61,7 @@ docs/Phase_III/feature_flags.md
 ```bash
 ./scripts/check_phase3_boundary
 ./scripts/check_phase3_ops
+./scripts/check_phase3_security_acceptance
 ./scripts/check_portal_snapshot_fields
 ./scripts/check_boundary
 ```
@@ -158,6 +159,7 @@ Prompt 25 至少执行：
 ```bash
 ./scripts/check_phase3_boundary
 ./scripts/check_phase3_ops
+./scripts/check_phase3_security_acceptance
 ./scripts/check_portal_snapshot_fields
 ./scripts/check_boundary
 ```

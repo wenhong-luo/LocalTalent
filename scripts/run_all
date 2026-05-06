@@ -31,19 +31,28 @@ require_java() {
   exit 1
 }
 
-echo "[1/7] boundary checks"
+echo "[1/10] boundary checks"
 "$ROOT_DIR/scripts/check_boundary"
 
-echo "[2/7] portal snapshot field checks"
+echo "[2/10] portal snapshot field checks"
 "$ROOT_DIR/scripts/check_portal_snapshot_fields"
 
-echo "[3/7] Phase II planning checks"
+echo "[3/10] Phase II planning checks"
 "$ROOT_DIR/scripts/check_phase2_planning"
 
-echo "[4/7] Phase II demo acceptance checks"
+echo "[4/10] Phase II demo acceptance checks"
 "$ROOT_DIR/scripts/check_phase2_demo_acceptance"
 
-echo "[5/7] backend tests"
+echo "[5/10] Phase III boundary checks"
+"$ROOT_DIR/scripts/check_phase3_boundary"
+
+echo "[6/10] Phase III ops checks"
+"$ROOT_DIR/scripts/check_phase3_ops"
+
+echo "[7/10] Phase III security acceptance checks"
+"$ROOT_DIR/scripts/check_phase3_security_acceptance"
+
+echo "[8/10] backend tests"
 require_java
 (
   cd "$ROOT_DIR/backend"
@@ -51,14 +60,14 @@ require_java
   ./mvnw ${BACKEND_MAVEN_ARGS:-} test
 )
 
-echo "[6/7] frontend tests"
+echo "[9/10] frontend tests"
 require_node
 (
   cd "$ROOT_DIR/frontend"
   npm test
 )
 
-echo "[7/7] frontend build"
+echo "[10/10] frontend build"
 (
   cd "$ROOT_DIR/frontend"
   npm run build

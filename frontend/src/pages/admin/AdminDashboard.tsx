@@ -425,12 +425,52 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
             <button type="submit" style={buttonStyle}>查询审计链路</button>
           </form>
           {auditTrace ? (
-            <p>
-              trace {auditTrace.trace_id}：审计 {auditTrace.audit_count} 条，字段访问 {auditTrace.access_count} 条，对接日志 {auditTrace.open_api_count} 条。
-            </p>
+            <div style={{ display: 'grid', gap: '12px', marginTop: '14px' }}>
+              <p style={{ margin: 0 }}>
+                trace {auditTrace.trace_id}：审计 {auditTrace.audit_count} 条，字段访问 {auditTrace.access_count} 条，对接日志 {auditTrace.open_api_count} 条。
+              </p>
+              <AuditTraceList
+                title="audit_log 摘要"
+                empty="暂无审计动作。"
+                rows={auditTrace.audit_log_list.map((item) => (
+                  `#${item.id} ${item.biz_type}/${item.biz_id} · ${item.action_type} · ${item.operator_role}`
+                ))}
+              />
+              <AuditTraceList
+                title="field_access_log 摘要"
+                empty="暂无字段访问记录。"
+                rows={auditTrace.access_log_list.map((item) => (
+                  `#${item.id} ${item.biz_type}/${item.biz_id} · ${item.field_name} · ${item.access_type} · ${item.operator_role}`
+                ))}
+              />
+              <AuditTraceList
+                title="open_api_log 摘要"
+                empty="暂无对接日志。"
+                rows={auditTrace.open_api_log_list.map((item) => (
+                  `#${item.id} ${item.source_system}/${item.client_code} · ${item.api_code} · HTTP ${item.http_status}`
+                ))}
+              />
+            </div>
           ) : null}
         </section>
       </div>
     </main>
+  );
+}
+
+function AuditTraceList({ title, rows, empty }: { title: string; rows: string[]; empty: string }) {
+  return (
+    <div style={{ border: '1px solid var(--lt-line)', borderRadius: '16px', padding: '12px', background: '#fff' }}>
+      <strong>{title}</strong>
+      {rows.length === 0 ? (
+        <p style={{ margin: '8px 0 0', color: 'var(--lt-ink-muted)' }}>{empty}</p>
+      ) : (
+        <ul style={{ margin: '8px 0 0', paddingLeft: '18px', color: 'var(--lt-ink-muted)' }}>
+          {rows.slice(0, 8).map((row) => (
+            <li key={row}>{row}</li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

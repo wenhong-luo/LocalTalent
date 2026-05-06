@@ -293,7 +293,8 @@ public class AdminPortalOpsJdbcRepository {
                 "SELECT id, display_name_masked, city_code, category_code, experience_years, updated_at, "
                         + "JSON_UNQUOTE(JSON_EXTRACT(snapshot_json, '$.skills_summary')) AS skills_summary "
                         + "FROM candidate_publish_snapshot "
-                        + "WHERE id = ? AND publishable_flag = 1 AND consent_status = 1 AND status = 1 AND visibility_scope = 2 LIMIT 1",
+                        + "WHERE id = ? AND publishable_flag = 1 AND consent_status = 1 AND status = 1 "
+                        + "AND visibility_scope IN (2, 4) LIMIT 1",
                 (rs, rowNum) -> new TargetCard(
                         nullable(rs.getString("display_name_masked"), "发布快照"),
                         nullable(rs.getString("skills_summary"), "人才服务区发布快照"),

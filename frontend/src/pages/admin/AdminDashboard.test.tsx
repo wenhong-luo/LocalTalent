@@ -145,9 +145,37 @@ function installAdminFetchMock(options: { operatorOpsEnabled?: boolean } = {}) {
     if (url.includes('/api/admin/audit-traces/')) {
       return apiOk({
         trace_id: 'trace-demo',
-        audit_log_list: [{ id: 1 }],
-        access_log_list: [{ id: 2 }],
-        open_api_log_list: [{ id: 3 }]
+        audit_log_list: [{
+          id: 1,
+          biz_type: 'export_apply',
+          biz_id: 30,
+          action_type: 'export_approve',
+          operator_role: 'operator',
+          before_json: '{"mobile":"13900000000"}',
+          after_json: '{"attachment_object_key":"private/export.csv"}',
+          trace_id: 'trace-demo'
+        }],
+        access_log_list: [{
+          id: 2,
+          biz_type: 'export_application',
+          biz_id: 100,
+          field_name: 'mobile',
+          access_type: 'MASK',
+          operator_role: 'operator',
+          trace_id: 'trace-demo'
+        }],
+        open_api_log_list: [{
+          id: 3,
+          source_system: 'stub_partner',
+          client_code: 'localtalent_stub',
+          api_code: 'open.jobs.sync',
+          biz_type: 'job',
+          biz_id: 20,
+          http_status: 200,
+          success_flag: true,
+          trace_id: 'trace-demo',
+          request_uri: '/api/open/v1/jobs/sync?access_token=secret-token'
+        }]
       });
     }
 
@@ -269,6 +297,29 @@ describe('AdminDashboard', () => {
       expect(riskCall).toBeTruthy();
       expect((riskCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toContain('admin-risk-review');
     });
+  });
+
+  it('renders sanitized audit trace details without raw sensitive payloads', async () => {
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'operator-token');
+    window.localStorage.setItem(ADMIN_ROLE_HINT_STORAGE_KEY, 'operator');
+    installAdminFetchMock({ operatorOpsEnabled: true });
+
+    render(<AdminDashboard />);
+
+    expect(await screen.findByText(/三期运营化已开启/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '查询审计链路' }));
+
+    expect(await screen.findByText('audit_log 摘要')).toBeInTheDocument();
+    expect(screen.getByText('field_access_log 摘要')).toBeInTheDocument();
+    expect(screen.getByText('open_api_log 摘要')).toBeInTheDocument();
+    expect(screen.getByText(/export_apply\/30 · export_approve/)).toBeInTheDocument();
+    expect(screen.getByText(/export_application\/100 · mobile · MASK/)).toBeInTheDocument();
+    expect(screen.getByText(/stub_partner\/localtalent_stub · open.jobs.sync/)).toBeInTheDocument();
+
+    const body = document.body.textContent ?? '';
+    expect(body).not.toContain('13900000000');
+    expect(body).not.toContain('private/export.csv');
+    expect(body).not.toContain('secret-token');
   });
 
   it('does not submit reject action without memo', async () => {

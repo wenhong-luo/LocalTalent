@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+BACKEND_TEST_DIR="$ROOT_DIR/backend/src/test/java/cn/localtalent/backend"
+PHASE_III_DIR="$ROOT_DIR/docs/Phase_III"
+
+required_files=(
+  "$BACKEND_TEST_DIR/auditcenter/Phase3AuditTraceRegressionIT.java"
+  "$BACKEND_TEST_DIR/candidate/Phase3ConsentWithdrawalPropagationIT.java"
+  "$BACKEND_TEST_DIR/phase3/Phase3ExportSecurityRegressionIT.java"
+  "$BACKEND_TEST_DIR/phase3/Phase3IdorBolaMatrixIT.java"
+  "$BACKEND_TEST_DIR/phase3/Phase3SensitiveFieldBlacklistTest.java"
+  "$PHASE_III_DIR/LocalTalent_phase3_step5.md"
+  "$PHASE_III_DIR/三期研发提示词.md"
+)
+
+for required_file in "${required_files[@]}"; do
+  if [ ! -f "$required_file" ]; then
+    echo "FAIL: Prompt 30 security acceptance file missing: $required_file"
+    exit 1
+  fi
+done
+
+security_markers=(
+  "audit_log"
+  "field_access_log"
+  "open_api_log"
+  "export_apply"
+  "EXPORT_403"
+  "EXPORT_409"
+  "snapshot_offline"
+  "IDOR"
+  "BOLA"
+  "auditor"
+  "OPEN_SENSITIVE_400"
+)
+
+for marker in "${security_markers[@]}"; do
+  if ! grep -R -Fq "$marker" \
+    "$BACKEND_TEST_DIR/auditcenter/Phase3AuditTraceRegressionIT.java" \
+    "$BACKEND_TEST_DIR/candidate/Phase3ConsentWithdrawalPropagationIT.java" \
+    "$BACKEND_TEST_DIR/phase3" \
+    "$PHASE_III_DIR/LocalTalent_phase3_step5.md"; then
+    echo "FAIL: Prompt 30 security acceptance marker missing: $marker"
+    exit 1
+  fi
+done
+
+sensitive_markers=(
+  "mobile"
+  "email"
+  "resume_body"
+  "attachment_object_key"
+  "evidence"
+  "password_hash"
+  "base_profile_json"
+  "education_json"
+  "experience_json"
+  "skills_json"
+  "营业执照附件"
+  "审核材料"
+  "报名名单"
+  "签到证据"
+)
+
+for marker in "${sensitive_markers[@]}"; do
+  if ! grep -R -Fq "$marker" "$BACKEND_TEST_DIR/phase3/Phase3SensitiveFieldBlacklistTest.java" "$PHASE_III_DIR/LocalTalent_phase3_step5.md"; then
+    echo "FAIL: Prompt 30 sensitive blacklist marker missing: $marker"
+    exit 1
+  fi
+done
+
+risk_markers=(
+  "公共简历库"
+  "受控找人才"
+  "联系解锁"
+  "真实支付"
+  "真实短信"
+  "真实微信"
+  "小程序"
+  "App"
+  "真实地图"
+  "视频"
+  "直播"
+  "ATS"
+  "RPA"
+)
+
+for marker in "${risk_markers[@]}"; do
+  if ! grep -Fq "$marker" "$PHASE_III_DIR/LocalTalent_phase3_step5.md" "$PHASE_III_DIR/三期研发提示词.md"; then
+    echo "FAIL: Prompt 30 risk-pool marker missing: $marker"
+    exit 1
+  fi
+done
+
+if grep -RIEq "debug.*export|temporary.*export|临时脚本.*导出|direct.*download|export.*bypass" \
+  "$ROOT_DIR/backend/src" "$ROOT_DIR/frontend/src"; then
+  echo "FAIL: Prompt 30 detected possible export bypass/debug export marker"
+  exit 1
+fi
+
+echo "PASS"

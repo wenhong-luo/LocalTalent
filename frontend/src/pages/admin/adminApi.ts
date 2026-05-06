@@ -28,6 +28,43 @@ export type AuditTraceSummary = {
   audit_count: number;
   access_count: number;
   open_api_count: number;
+  audit_log_list: AuditLogItem[];
+  access_log_list: FieldAccessLogItem[];
+  open_api_log_list: OpenApiLogItem[];
+};
+
+export type AuditLogItem = {
+  id: number;
+  biz_type: string;
+  biz_id: number;
+  action_type: string;
+  operator_role: string;
+  trace_id: string;
+  created_at: string;
+};
+
+export type FieldAccessLogItem = {
+  id: number;
+  biz_type: string;
+  biz_id: number;
+  field_name: string;
+  access_type: string;
+  operator_role: string;
+  trace_id: string;
+  created_at: string;
+};
+
+export type OpenApiLogItem = {
+  id: number;
+  source_system: string;
+  client_code: string;
+  api_code: string;
+  biz_type: string;
+  biz_id: number;
+  http_status: number;
+  success_flag: boolean;
+  trace_id: string;
+  created_at: string;
 };
 
 export type OpsOverview = {
@@ -177,6 +214,49 @@ function toRiskReviewItem(raw: unknown): RiskReviewItem {
   };
 }
 
+function toAuditLogItem(raw: unknown): AuditLogItem {
+  const row = asRecord(raw);
+  return {
+    id: numberOr(row.id),
+    biz_type: text(row.biz_type),
+    biz_id: numberOr(row.biz_id),
+    action_type: text(row.action_type),
+    operator_role: text(row.operator_role),
+    trace_id: text(row.trace_id),
+    created_at: text(row.created_at)
+  };
+}
+
+function toFieldAccessLogItem(raw: unknown): FieldAccessLogItem {
+  const row = asRecord(raw);
+  return {
+    id: numberOr(row.id),
+    biz_type: text(row.biz_type),
+    biz_id: numberOr(row.biz_id),
+    field_name: text(row.field_name),
+    access_type: text(row.access_type),
+    operator_role: text(row.operator_role),
+    trace_id: text(row.trace_id),
+    created_at: text(row.created_at)
+  };
+}
+
+function toOpenApiLogItem(raw: unknown): OpenApiLogItem {
+  const row = asRecord(raw);
+  return {
+    id: numberOr(row.id),
+    source_system: text(row.source_system),
+    client_code: text(row.client_code),
+    api_code: text(row.api_code),
+    biz_type: text(row.biz_type),
+    biz_id: numberOr(row.biz_id),
+    http_status: numberOr(row.http_status),
+    success_flag: Boolean(row.success_flag),
+    trace_id: text(row.trace_id),
+    created_at: text(row.created_at)
+  };
+}
+
 export async function fetchCompanyReviewQueue(token: string): Promise<ApiResult<CompanyReviewItem[]>> {
   const result = await apiGet<unknown>('/api/admin/companies/review?auth_status=1&page=1&size=20', { token });
   const rows = Array.isArray(asRecord(result.data).company_list) ? asRecord(result.data).company_list as unknown[] : [];
@@ -309,7 +389,10 @@ export async function fetchAuditTrace(token: string, traceId: string): Promise<A
       trace_id: text(payload.trace_id, traceId),
       audit_count: auditRows.length,
       access_count: accessRows.length,
-      open_api_count: openApiRows.length
+      open_api_count: openApiRows.length,
+      audit_log_list: auditRows.map(toAuditLogItem),
+      access_log_list: accessRows.map(toFieldAccessLogItem),
+      open_api_log_list: openApiRows.map(toOpenApiLogItem)
     },
     traceId: result.traceId
   };
