@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+API_BASE=${LOCALTALENT_API_BASE_URL:-http://localhost:8080}
+FRONTEND_BASE=${LOCALTALENT_FRONTEND_BASE_URL:-${NEXT_PUBLIC_LOCALTALENT_SITE_URL:-http://localhost:3000}}
+TRACE_ID=${LOCALTALENT_PHASE3_SMOKE_TRACE_ID:-phase3-smoke-local}
+CURL_TIMEOUT=${LOCALTALENT_PHASE3_SMOKE_TIMEOUT_SECONDS:-10}
+
+trim_slash() {
+  printf '%s' "$1" | sed 's:/*$::'
+}
+
+API_BASE=$(trim_slash "$API_BASE")
+FRONTEND_BASE=$(trim_slash "$FRONTEND_BASE")
+
+require_curl() {
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "FAIL: curl not found"
+    exit 1
+  fi
+}
+
+request_status() {
+  local url=$1
+  shift
+  curl -sS -o /tmp/localtalent_phase3_smoke_body.$$ \
+    -w '%{http_code}' \
+    --max-time "$CURL_TIMEOUT" \
+    -H "X-Trace-Id: $TRACE_ID" \
+    "$@" \
+    "$url"
+}
+
+expect_status() {
+  local label=$1
+  local url=$2
+  local expected_csv=$3
+  shift 3
+  local status
+  status=$(request_status "$url" "$@") || {
+    echo "FAIL: smoke request failed: $label ($url)"
+    rm -f /tmp/localtalent_phase3_smoke_body.$$
+    exit 1
+  }
+  case ",$expected_csv," in
+    *,"$status",*) ;;
+    *)
+      echo "FAIL: smoke unexpected status for $label: got $status expected $expected_csv ($url)"
+      rm -f /tmp/localtalent_phase3_smoke_body.$$
+      exit 1
+      ;;
+  esac
+}
+
+expect_body_contains() {
+  local label=$1
+  local needle=$2
+  if ! grep -Fq "$needle" /tmp/localtalent_phase3_smoke_body.$$; then
+    echo "FAIL: smoke body for $label missing marker: $needle"
+    rm -f /tmp/localtalent_phase3_smoke_body.$$
+    exit 1
+  fi
+}
+
+require_curl
+
+expect_status "backend health" "$API_BASE/health" "200"
+expect_body_contains "backend health" "trace_id"
+
+public_pages=(
+  "/"
+  "/jobs"
+  "/companies"
+  "/portal/talent-service-area"
+  "/job-fairs"
+  "/articles/policies"
+  "/hr-tools"
+  "/auth/login"
+  "/more-services"
+)
+
+for path in "${public_pages[@]}"; do
+  expect_status "frontend $path" "$FRONTEND_BASE$path" "200,301,302,307,308"
+done
+
+public_api_paths=(
+  "/api/portal/jobs?size=1"
+  "/api/portal/companies?size=1"
+  "/api/portal/talent-snapshots?size=1"
+  "/api/portal/job-fairs?size=1"
+  "/api/portal/contents?content_type=policy&size=1"
+)
+
+for path in "${public_api_paths[@]}"; do
+  expect_status "public api $path" "$API_BASE$path" "200"
+done
+
+private_block_paths=(
+  "/api/candidate/center/overview"
+  "/api/company/workbench/overview"
+  "/api/admin/ops/overview"
+)
+
+for path in "${private_block_paths[@]}"; do
+  expect_status "private unauthenticated block $path" "$API_BASE$path" "401,403"
+done
+
+if [ -n "${LOCALTALENT_PHASE3_SMOKE_CANDIDATE_TOKEN:-}" ]; then
+  expect_status "candidate overview token smoke" "$API_BASE/api/candidate/center/overview" "200" \
+    -H "Authorization: Bearer $LOCALTALENT_PHASE3_SMOKE_CANDIDATE_TOKEN"
+fi
+
+if [ -n "${LOCALTALENT_PHASE3_SMOKE_COMPANY_TOKEN:-}" ]; then
+  expect_status "company workbench token smoke" "$API_BASE/api/company/workbench/overview" "${LOCALTALENT_PHASE3_SMOKE_COMPANY_EXPECTED_STATUS:-200,403}" \
+    -H "Authorization: Bearer $LOCALTALENT_PHASE3_SMOKE_COMPANY_TOKEN"
+fi
+
+if [ -n "${LOCALTALENT_PHASE3_SMOKE_ADMIN_TOKEN:-}" ]; then
+  expect_status "admin ops token smoke" "$API_BASE/api/admin/ops/overview" "${LOCALTALENT_PHASE3_SMOKE_ADMIN_EXPECTED_STATUS:-200,403}" \
+    -H "Authorization: Bearer $LOCALTALENT_PHASE3_SMOKE_ADMIN_TOKEN"
+fi
+
+rm -f /tmp/localtalent_phase3_smoke_body.$$
+echo "PASS"

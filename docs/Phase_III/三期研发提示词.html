@@ -121,7 +121,7 @@
 
       <section class="card" id="baseline">
         <h2>三期已完成规划基线记录（开发前必读）</h2>
-        <p>三期边界、方向判断、总规划、Step1-Step6 和实施蓝图已完成。Prompt 25（P3-0）至 Prompt 30（P3-5）已完成，下一轮从 Prompt 31（P3-6）继续。</p>
+        <p>三期边界、方向判断、总规划、Step1-Step6 和实施蓝图已完成。Prompt 25（P3-0）至 Prompt 31（P3-6）已完成，三期主线已收口。下一步进入灰度试运营复核或四期正式上线治理规划，不得把新范围混入已收口的三期主线。</p>
         <table>
           <tr><th>轮次</th><th>完成内容</th><th>固定边界</th></tr>
           <tr><td>Prompt 25（P3-0）</td><td>已完成三期基线冻结与灰度闸门：新增 <code>docs/Phase_III/feature_flags.md</code>、<code>docs/Phase_III/RUNBOOK.md</code>、<code>.env.phase3.example</code>、<code>scripts/check_phase3_boundary</code>、<code>scripts/check_phase3_ops</code>，并在 README 中加入三期开发入口。</td><td>未实现任何业务功能、数据库迁移、生产写接口或真实外部能力；所有三期 feature flag 默认关闭。下一轮必须从 Prompt 26（P3-1）认证与身份映射继续。</td></tr>
@@ -130,6 +130,7 @@
           <tr><td>Prompt 28（P3-3）</td><td>已完成企业招聘工作台生产化：新增 <code>phase3.company_workbench</code> 运行时开关、<code>V0016__extend_company_workbench.sql</code>、company 私有认证材料摘要和投递阶段元数据、企业工作台 overview/profile/certification/jobs/applications/interview/export 私有接口、企业中心三期增强页面、noindex 私有中心、权限 seed、迁移测试、CompanyWorkbenchFlow/Disabled 集成测试和前端状态/字段/幂等测试。</td><td>只做 company 本企业私有工作台；未实现受控找人才、联系解锁、会员权益、真实支付、公共简历库、企业后台商业化或真实短信/微信/小程序/App。企业公开主页与企业中心隔离；投递池只返回安全候选人摘要，敏感源字段访问写 <code>field_access_log</code>；导出继续走审批链。下一轮必须从 Prompt 29（P3-4）运营后台生产化与门户运营化继续。</td></tr>
           <tr><td>Prompt 29（P3-4）</td><td>已完成运营后台生产化与门户运营化：新增 <code>phase3.operator_portal_ops</code> 运行时开关、<code>V0017__create_admin_portal_ops_tables.sql</code>、<code>portal_recommendation</code> 推荐位配置表、<code>risk_review</code> 风险审核表、运营 overview、推荐位配置、风险审核与公开推荐只读接口，增强 <code>/admin</code> 运营后台页面，并让首页推荐位优先读取公开推荐接口。</td><td>只做 operator/auditor 运营后台与公开门户运营配置；未实现会员商业化、真实支付、真实短信/微信/小程序/App、地图/视频/直播、ATS/RPA、公共简历库、受控找人才或联系解锁。operator 写动作使用 trace、幂等和审计；auditor 写操作拒绝；公开推荐只返回已审核、已发布、在线、未撤回且字段白名单裁剪后的合法对象。下一轮必须从 Prompt 30（P3-5）审计、导出、风控与安全收口继续。</td></tr>
           <tr><td>Prompt 30（P3-5）</td><td>已完成审计、导出、风控与安全收口：新增 <code>Phase3AuditTraceRegressionIT</code>、<code>Phase3ConsentWithdrawalPropagationIT</code>、<code>Phase3ExportSecurityRegressionIT</code>、<code>Phase3IdorBolaMatrixIT</code>、<code>Phase3SensitiveFieldBlacklistTest</code>，补强审计中心脱敏与 <code>/admin</code> trace 三类日志摘要展示，新增 <code>scripts/check_phase3_security_acceptance</code> 并接入 <code>scripts/run_all</code>。</td><td>只做灰度前安全证据收口；未新增业务功能、迁移、导出旁路、生产写接口或真实外部能力。导出继续走审批、字段裁剪、短期下载和审计；撤回后人才服务区和公开推荐位不可见；IDOR/BOLA、字段黑名单、auditor 只读和风险池阻断进入总闸门。下一轮必须从 Prompt 31（P3-6）灰度试运营工程治理与上线演练继续。</td></tr>
+          <tr><td>Prompt 31（P3-6）</td><td>已完成灰度试运营工程治理与上线演练：扩展三期 Runbook 和 <code>.env.phase3.example</code>，新增灰度备份恢复演练记录、灰度故障记录、灰度上线暂停回滚检查单，新增 <code>scripts/smoke_phase3</code>、<code>scripts/load_phase3_public</code>、<code>scripts/backup_phase3_mysql</code>、<code>scripts/restore_phase3_mysql_drill</code>、<code>scripts/check_phase3_gray_acceptance</code>，并将灰度验收接入 <code>scripts/run_all</code>。</td><td>只做灰度工程治理、演练脚本、记录模板和总闸门；未新增业务功能、迁移、HTTP API、真实外部能力或 K8s/Helm manifests。MySQL/Redis/MinIO 状态层不迁移；风险池能力仍禁止。三期主线 Prompt 25-31 已收口，下一步进入灰度试运营复核或四期正式上线治理规划。</td></tr>
         </table>
       </section>
 
@@ -330,7 +331,7 @@
 主控说明：本轮只做灰度试运营工程治理和上线演练，不宣布公网正式运营；K8s 仅可作为无状态应用层进阶选项，MySQL/Redis/MinIO 状态层不在本轮做高风险迁移。
 本轮目标：完成 local/staging/gray 配置说明和环境变量模板；完成 feature flag 灰度发布、暂停、回滚流程；完成数据库备份恢复演练、对象存储生命周期与导出文件保留策略；完成日志脱敏、监控指标、告警规则、故障排查指南；完成容量烟测；完成上线/暂停/回滚 Runbook、灰度故障记录模板、灰度 KPI 与试运营退出条件。
 禁止事项：禁止直接宣布公网正式上线；禁止在没有备份恢复演练前进入灰度；禁止同阶段大规模迁移状态型基础设施；禁止接入真实外部能力；禁止放开风险池能力。
-输出要求：Runbook、环境模板、Smoke/Load 脚本、监控指标说明、备份恢复记录模板、灰度故障记录模板；可选无状态应用层 K8s manifests/Helm 占位或说明；run_all、三期 smoke/load、备份恢复演练、前后端测试与构建。
+输出要求：Runbook、环境模板、Smoke/Load 脚本、监控指标说明、备份恢复记录模板、灰度故障记录模板；仅提供无状态应用层 K8s 未来说明，不新增 manifests/Helm；run_all、三期 smoke/load、备份恢复演练、前后端测试与构建。
 验收要求：备份恢复演练通过；容量烟测达到三期灰度目标；feature flag 可逐步打开、暂停、关闭并单独回滚；监控告警覆盖健康、5xx、延迟、登录、导出、审计、撤回下线、openapi stub；灰度进入、暂停、退出条件清晰可执行。
 </code></pre>
       </section>

@@ -13,6 +13,13 @@ required_files=(
   "$FEATURE_FLAGS"
   "$ENV_TEMPLATE"
   "$README_FILE"
+  "$PHASE_III_DIR/灰度备份恢复演练记录模板.md"
+  "$PHASE_III_DIR/灰度故障记录模板.md"
+  "$PHASE_III_DIR/灰度上线暂停回滚检查单.md"
+  "$ROOT_DIR/scripts/smoke_phase3"
+  "$ROOT_DIR/scripts/load_phase3_public"
+  "$ROOT_DIR/scripts/backup_phase3_mysql"
+  "$ROOT_DIR/scripts/restore_phase3_mysql_drill"
 )
 
 for required_file in "${required_files[@]}"; do
@@ -23,16 +30,20 @@ for required_file in "${required_files[@]}"; do
 done
 
 runbook_markers=(
-  "Prompt 25"
+  "Prompt 31"
   "本地开发入口"
   "预发"
   "灰度"
   "Feature Flag"
   "暂停"
   "回滚"
-  "备份恢复"
+  "备份恢复演练"
+  "对象存储生命周期"
+  "导出文件保留策略"
   "监控告警"
   "容量烟测"
+  "灰度 KPI"
+  "试运营退出条件"
   "验收命令"
   "人才服务区仅展示发布快照"
 )
@@ -50,6 +61,11 @@ env_markers=(
   "LOCALTALENT_LOCAL_JWT_FALLBACK_ENABLED=false"
   "LOCALTALENT_EXPORT_DOWNLOAD_TTL_SECONDS=900"
   "LOCALTALENT_LOG_SENSITIVE_MASKING_ENABLED=true"
+  "LOCALTALENT_GRAY_PERCENT=0"
+  "LOCALTALENT_PHASE3_BACKUP_DIR=/tmp/localtalent-phase3-backups"
+  "LOCALTALENT_OBJECT_RETENTION_DAYS=7"
+  "LOCALTALENT_PHASE3_LOAD_P95_MS=1500"
+  "LOCALTALENT_ALERT_HEALTH_FAIL_COUNT=3"
 )
 
 for marker in "${env_markers[@]}"; do
@@ -79,6 +95,7 @@ readme_markers=(
   "docs/Phase_III/RUNBOOK.md"
   "scripts/check_phase3_boundary"
   "scripts/check_phase3_ops"
+  "scripts/check_phase3_gray_acceptance"
 )
 
 for marker in "${readme_markers[@]}"; do
@@ -92,5 +109,12 @@ if grep -Eq '(sk_live_|pk_live_|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?
   echo "FAIL: Phase III ops docs/templates appear to contain real secrets"
   exit 1
 fi
+
+for gray_script in smoke_phase3 load_phase3_public backup_phase3_mysql restore_phase3_mysql_drill; do
+  if [ ! -x "$ROOT_DIR/scripts/$gray_script" ]; then
+    echo "FAIL: Phase III gray script is not executable: scripts/$gray_script"
+    exit 1
+  fi
+done
 
 echo "PASS"

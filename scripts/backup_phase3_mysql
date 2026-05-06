@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONTAINER=${LOCALTALENT_DB_CONTAINER:-localtalent-mysql}
+DB_NAME=${LOCALTALENT_DB_NAME:-localtalent}
+DB_USER=${LOCALTALENT_DB_USER:-root}
+DB_PASSWORD=${LOCALTALENT_DB_PASSWORD:-localtalent_root}
+BACKUP_DIR=${LOCALTALENT_PHASE3_BACKUP_DIR:-/tmp/localtalent-phase3-backups}
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "FAIL: docker not found"
+  exit 1
+fi
+
+if ! docker ps --format '{{.Names}}' | grep -Fxq "$CONTAINER"; then
+  echo "FAIL: MySQL container not running: $CONTAINER"
+  exit 1
+fi
+
+mkdir -p "$BACKUP_DIR"
+timestamp=$(date +%Y%m%d%H%M%S)
+backup_file="$BACKUP_DIR/${DB_NAME}_phase3_${timestamp}.sql"
+
+docker exec "$CONTAINER" sh -c \
+  "MYSQL_PWD=\"\$1\" mysqldump --single-transaction --routines --triggers -u\"\$2\" \"\$3\"" \
+  sh "$DB_PASSWORD" "$DB_USER" "$DB_NAME" > "$backup_file"
+
+if [ ! -s "$backup_file" ]; then
+  echo "FAIL: backup file is empty: $backup_file"
+  exit 1
+fi
+
+if ! grep -Eq 'CREATE TABLE|INSERT INTO|Dump completed' "$backup_file"; then
+  echo "FAIL: backup file does not look like a MySQL dump: $backup_file"
+  exit 1
+fi
+
+echo "PASS: $backup_file"

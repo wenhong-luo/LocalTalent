@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+PHASE_III_DIR="$ROOT_DIR/docs/Phase_III"
+RUNBOOK="$PHASE_III_DIR/RUNBOOK.md"
+ENV_TEMPLATE="$ROOT_DIR/.env.phase3.example"
+
+required_files=(
+  "$RUNBOOK"
+  "$ENV_TEMPLATE"
+  "$PHASE_III_DIR/灰度备份恢复演练记录模板.md"
+  "$PHASE_III_DIR/灰度故障记录模板.md"
+  "$PHASE_III_DIR/灰度上线暂停回滚检查单.md"
+  "$ROOT_DIR/scripts/smoke_phase3"
+  "$ROOT_DIR/scripts/load_phase3_public"
+  "$ROOT_DIR/scripts/backup_phase3_mysql"
+  "$ROOT_DIR/scripts/restore_phase3_mysql_drill"
+  "$PHASE_III_DIR/三期研发提示词.md"
+  "$PHASE_III_DIR/00_PHASE_III_BOUNDARY.md"
+)
+
+for required_file in "${required_files[@]}"; do
+  if [ ! -f "$required_file" ]; then
+    echo "FAIL: Phase III gray acceptance required file missing: $required_file"
+    exit 1
+  fi
+done
+
+for script_name in smoke_phase3 load_phase3_public backup_phase3_mysql restore_phase3_mysql_drill; do
+  if [ ! -x "$ROOT_DIR/scripts/$script_name" ]; then
+    echo "FAIL: Phase III gray script is not executable: scripts/$script_name"
+    exit 1
+  fi
+done
+
+runbook_markers=(
+  "Prompt 31"
+  "灰度试运营工程治理"
+  "备份恢复演练"
+  "对象存储生命周期"
+  "导出文件保留策略"
+  "日志脱敏"
+  "监控告警"
+  "容量烟测"
+  "上线、暂停、回滚"
+  "灰度 KPI"
+  "试运营退出条件"
+  "无状态应用层"
+  "MySQL、Redis、MinIO 状态层不在 Prompt 31 做迁移"
+)
+
+for marker in "${runbook_markers[@]}"; do
+  if ! grep -Fq "$marker" "$RUNBOOK"; then
+    echo "FAIL: Phase III gray Runbook missing marker: $marker"
+    exit 1
+  fi
+done
+
+env_markers=(
+  "LOCALTALENT_GRAY_PERCENT=0"
+  "LOCALTALENT_PHASE3_BACKUP_DIR=/tmp/localtalent-phase3-backups"
+  "LOCALTALENT_OBJECT_RETENTION_DAYS=7"
+  "LOCALTALENT_EXPORT_FILE_RETENTION_DAYS=7"
+  "LOCALTALENT_PHASE3_LOAD_ROUNDS=2"
+  "LOCALTALENT_PHASE3_LOAD_CONCURRENCY=2"
+  "LOCALTALENT_PHASE3_LOAD_P95_MS=1500"
+  "LOCALTALENT_ALERT_HEALTH_FAIL_COUNT=3"
+  "LOCALTALENT_ALERT_PUBLIC_5XX_RATE=0.01"
+  "LOCALTALENT_ALERT_WITHDRAWAL_PUBLIC_VISIBLE_ALLOWED=false"
+)
+
+for marker in "${env_markers[@]}"; do
+  if ! grep -Fq "$marker" "$ENV_TEMPLATE"; then
+    echo "FAIL: Phase III env template missing gray marker: $marker"
+    exit 1
+  fi
+done
+
+template_markers=(
+  "备份恢复演练"
+  "故障记录"
+  "上线、暂停、回滚"
+  "trace_id"
+  "公共简历库"
+  "受控找人才"
+  "联系解锁"
+)
+
+for marker in "${template_markers[@]}"; do
+  if ! grep -R -Fq "$marker" \
+    "$PHASE_III_DIR/灰度备份恢复演练记录模板.md" \
+    "$PHASE_III_DIR/灰度故障记录模板.md" \
+    "$PHASE_III_DIR/灰度上线暂停回滚检查单.md"; then
+    echo "FAIL: Phase III gray templates missing marker: $marker"
+    exit 1
+  fi
+done
+
+prompt_markers=(
+  "Prompt 31"
+  "三期主线 Prompt 25-31 收口"
+  "灰度试运营复核"
+)
+
+for marker in "${prompt_markers[@]}"; do
+  if ! grep -Fq "$marker" "$PHASE_III_DIR/三期研发提示词.md" "$PHASE_III_DIR/00_PHASE_III_BOUNDARY.md"; then
+    echo "FAIL: Phase III prompt/boundary missing gray completion marker: $marker"
+    exit 1
+  fi
+done
+
+risk_markers=(
+  "公共简历库"
+  "受控找人才"
+  "联系解锁"
+  "真实支付"
+  "真实短信"
+  "真实微信"
+  "小程序"
+  "App"
+  "真实地图"
+  "视频"
+  "直播"
+  "ATS"
+  "RPA"
+)
+
+for marker in "${risk_markers[@]}"; do
+  if ! grep -Fq "$marker" "$RUNBOOK" "$PHASE_III_DIR/三期研发提示词.md" "$PHASE_III_DIR/00_PHASE_III_BOUNDARY.md"; then
+    echo "FAIL: Phase III gray risk-pool marker missing: $marker"
+    exit 1
+  fi
+done
+
+if grep -Eq '(sk_live_|pk_live_|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' \
+  "$RUNBOOK" "$ENV_TEMPLATE" "$PHASE_III_DIR/灰度备份恢复演练记录模板.md" "$PHASE_III_DIR/灰度故障记录模板.md" "$PHASE_III_DIR/灰度上线暂停回滚检查单.md"; then
+  echo "FAIL: Phase III gray docs/templates appear to contain real secrets"
+  exit 1
+fi
+
+if find "$ROOT_DIR" -path "$ROOT_DIR/.git" -prune -o \( -path "*/k8s/*" -o -path "*/helm/*" -o -name "Chart.yaml" \) -print | grep -q .; then
+  echo "FAIL: Prompt 31 should not add K8s/Helm manifests"
+  exit 1
+fi
+
+echo "PASS"

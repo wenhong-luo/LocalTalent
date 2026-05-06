@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+FRONTEND_BASE=${LOCALTALENT_FRONTEND_BASE_URL:-${NEXT_PUBLIC_LOCALTALENT_SITE_URL:-http://localhost:3000}}
+ROUNDS=${LOCALTALENT_PHASE3_LOAD_ROUNDS:-2}
+CONCURRENCY=${LOCALTALENT_PHASE3_LOAD_CONCURRENCY:-2}
+P95_MS=${LOCALTALENT_PHASE3_LOAD_P95_MS:-1500}
+MAX_FAILURE_RATE=${LOCALTALENT_PHASE3_LOAD_MAX_FAILURE_RATE:-0}
+CURL_TIMEOUT=${LOCALTALENT_PHASE3_LOAD_TIMEOUT_SECONDS:-10}
+
+FRONTEND_BASE=$(printf '%s' "$FRONTEND_BASE" | sed 's:/*$::')
+
+if ! command -v curl >/dev/null 2>&1; then
+  echo "FAIL: curl not found"
+  exit 1
+fi
+
+if [ "$ROUNDS" -lt 1 ] || [ "$CONCURRENCY" -lt 1 ]; then
+  echo "FAIL: rounds and concurrency must be >= 1"
+  exit 1
+fi
+
+paths=(
+  "/"
+  "/jobs"
+  "/jobs/famous"
+  "/companies"
+  "/portal/talent-service-area"
+  "/job-fairs"
+  "/articles/policies"
+  "/hr-tools"
+  "/more-services"
+)
+
+tmp_file=$(mktemp)
+trap 'rm -f "$tmp_file"' EXIT
+
+request_one() {
+  local url=$1
+  curl -sS -o /dev/null \
+    -w '%{http_code} %{time_total} '"$url"'\n' \
+    --max-time "$CURL_TIMEOUT" \
+    "$url" >> "$tmp_file" || printf '000 9999 %s\n' "$url" >> "$tmp_file"
+}
+
+running=0
+for _round in $(seq 1 "$ROUNDS"); do
+  for path in "${paths[@]}"; do
+    request_one "$FRONTEND_BASE$path" &
+    running=$((running + 1))
+    if [ "$running" -ge "$CONCURRENCY" ]; then
+      wait -n || true
+      running=$((running - 1))
+    fi
+  done
+done
+wait || true
+
+total=$(wc -l < "$tmp_file" | tr -d ' ')
+failures=$(awk '$1 < 200 || $1 >= 400 { count++ } END { print count + 0 }' "$tmp_file")
+p95=$(awk '{ printf "%.0f\n", $2 * 1000 }' "$tmp_file" | sort -n | awk -v total="$total" 'BEGIN { target=int(total*0.95); if (target < 1) target=1 } NR==target { print; found=1 } END { if (!found) print 0 }')
+failure_rate=$(awk -v f="$failures" -v t="$total" 'BEGIN { if (t == 0) print 1; else printf "%.4f", f / t }')
+
+if [ "$total" -eq 0 ]; then
+  echo "FAIL: no load test requests were recorded"
+  exit 1
+fi
+
+if awk -v actual="$failure_rate" -v max="$MAX_FAILURE_RATE" 'BEGIN { exit !(actual > max) }'; then
+  echo "FAIL: load failure rate $failure_rate exceeds $MAX_FAILURE_RATE"
+  cat "$tmp_file"
+  exit 1
+fi
+
+if [ "$p95" -gt "$P95_MS" ]; then
+  echo "FAIL: load p95 ${p95}ms exceeds ${P95_MS}ms"
+  cat "$tmp_file"
+  exit 1
+fi
+
+echo "PASS: total=$total failures=$failures failure_rate=$failure_rate p95_ms=$p95"
