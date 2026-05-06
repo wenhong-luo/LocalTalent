@@ -41,3 +41,4 @@ localtalent:
   phase3:
     candidate-closure: ${LOCALTALENT_PHASE3_CANDIDATE_CLOSURE:false}
     company-workbench: ${LOCALTALENT_PHASE3_COMPANY_WORKBENCH:false}
+    operator-portal-ops: ${LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS:false}

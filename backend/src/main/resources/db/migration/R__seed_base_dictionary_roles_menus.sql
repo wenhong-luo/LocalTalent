@@ -136,7 +136,14 @@ VALUES
   ('admin_audit_log_read', '审计日志读取', NULL, 'api', NULL, 'admin.audit-log.read', 870, 1),
   ('admin_field_access_log_read', '字段访问日志读取', NULL, 'api', NULL, 'admin.field-access-log.read', 871, 1),
   ('admin_open_api_log_read', '对接调用日志读取', NULL, 'api', NULL, 'admin.open-api-log.read', 872, 1),
-  ('admin_audit_trace_read', '审计链路读取', NULL, 'api', NULL, 'admin.audit-trace.read', 873, 1)
+  ('admin_audit_trace_read', '审计链路读取', NULL, 'api', NULL, 'admin.audit-trace.read', 873, 1),
+  ('admin_ops_read', '运营生产化首页读取', NULL, 'api', NULL, 'admin.ops.read', 880, 1),
+  ('admin_recommendation_read', '运营推荐位读取', NULL, 'api', NULL, 'admin.recommendation.read', 881, 1),
+  ('admin_recommendation_write', '运营推荐位写入', NULL, 'api', NULL, 'admin.recommendation.write', 882, 1),
+  ('admin_risk_review_read', '运营风险审核读取', NULL, 'api', NULL, 'admin.risk-review.read', 883, 1),
+  ('admin_risk_review_write', '运营风险审核写入', NULL, 'api', NULL, 'admin.risk-review.write', 884, 1),
+  ('admin_portal_config_read', '门户运营配置读取', NULL, 'api', NULL, 'admin.portal-config.read', 885, 1),
+  ('admin_portal_config_write', '门户运营配置写入', NULL, 'api', NULL, 'admin.portal-config.write', 886, 1)
 AS new
 ON DUPLICATE KEY UPDATE
   menu_name = new.menu_name,
@@ -237,7 +244,14 @@ JOIN sys_menu m ON (
     'admin_audit_log_read',
     'admin_field_access_log_read',
     'admin_open_api_log_read',
-    'admin_audit_trace_read'
+    'admin_audit_trace_read',
+    'admin_ops_read',
+    'admin_recommendation_read',
+    'admin_recommendation_write',
+    'admin_risk_review_read',
+    'admin_risk_review_write',
+    'admin_portal_config_read',
+    'admin_portal_config_write'
   ))
   OR (r.role_code = 'auditor' AND m.menu_code IN (
     'audit_console',
@@ -249,7 +263,11 @@ JOIN sys_menu m ON (
     'admin_audit_log_read',
     'admin_field_access_log_read',
     'admin_open_api_log_read',
-    'admin_audit_trace_read'
+    'admin_audit_trace_read',
+    'admin_ops_read',
+    'admin_recommendation_read',
+    'admin_risk_review_read',
+    'admin_portal_config_read'
   ))
   OR (r.role_code = 'open_client' AND m.menu_code IN (
     'open_api_stub',

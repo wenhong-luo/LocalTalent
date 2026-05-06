@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import styles from './PortalHomePage.module.css';
+import { type PortalRecommendationItem } from './portalRecommendationApi';
 
 const categories = [
   '生活 | 服务业',
@@ -23,19 +24,10 @@ const quickEntries = [
 const notices = ['系统升级公告', '活动预告公告'];
 const fairNotices = ['春风行动招聘会开放预约', '网络招聘会频道占位'];
 
-const featuredCompanies = [
-  { name: '山西正力网络有限公司', city: '太原', industry: '互联网服务', jobs: 3 },
-  { name: '唐文文化传媒有限公司', city: '北京', industry: '文化传媒', jobs: 5 },
-  { name: '盐城市数据公司', city: '盐城', industry: '数据服务', jobs: 1 },
-  { name: '北京渤星科技有限公司', city: '北京', industry: '科技服务', jobs: 2 }
-];
-
-const hotJobs = [
-  { title: 'Java 后端工程师', city: '上海', salary: '12K~18K', exp: '3-5年', edu: '本科', company: '山西正力网络有限公司' },
-  { title: '运营专员', city: '太原', salary: '5K~8K', exp: '1-3年', edu: '大专', company: '唐文文化传媒有限公司' },
-  { title: '客服主管', city: '青岛', salary: '6K~9K', exp: '经验不限', edu: '学历不限', company: '胶州市彩霞超市店' },
-  { title: 'UI 设计师', city: '北京', salary: '9K~14K', exp: '2年', edu: '本科', company: '北京渤星科技有限公司' }
-];
+type PortalHomePageProps = {
+  hotJobs?: PortalRecommendationItem[];
+  featuredCompanies?: PortalRecommendationItem[];
+};
 
 function JobCategoryWall() {
   return (
@@ -133,7 +125,17 @@ function AdvertisementBand() {
   );
 }
 
-function RecommendedCompanies() {
+function RecommendationEmpty({ label }: { label: string }) {
+  return (
+    <article className={styles.companyCard}>
+      <h3 className={styles.companyName}>{label}</h3>
+      <p className={styles.muted}>运营位待配置或目标已失效；公开门户不会回退到敏感数据或假推荐。</p>
+      <span className={styles.tag}>公开白名单</span>
+    </article>
+  );
+}
+
+function RecommendedCompanies({ items }: { items: PortalRecommendationItem[] }) {
   return (
     <section className={`${styles.card} ${styles.sectionCard}`} aria-label="推荐企业">
       <div className={styles.sectionHeader}>
@@ -143,18 +145,18 @@ function RecommendedCompanies() {
         </Link>
       </div>
       <div className={styles.companyList}>
-        {featuredCompanies.map((company) => (
-          <article key={company.name} className={styles.companyCard}>
+        {items.length === 0 ? <RecommendationEmpty label="明星企业待配置" /> : items.map((company) => (
+          <article key={`${company.target_type}-${company.target_id}`} className={styles.companyCard}>
             <div className={styles.companyTop}>
               <div>
-                <h3 className={styles.companyName}>{company.name}</h3>
+                <h3 className={styles.companyName}>{company.title}</h3>
                 <p className={styles.muted}>
-                  {company.city} · {company.industry}
+                  {company.city_code || '城市待配置'} · {company.summary || '公开企业摘要'}
                 </p>
               </div>
               <span className={styles.tag}>认证企业</span>
             </div>
-            <p className={styles.muted}>该企业共有 {company.jobs} 个职位热招</p>
+            <Link className={styles.moreLink} href={company.url}>进入企业公开页</Link>
           </article>
         ))}
       </div>
@@ -162,7 +164,7 @@ function RecommendedCompanies() {
   );
 }
 
-function HotJobs() {
+function HotJobs({ items }: { items: PortalRecommendationItem[] }) {
   return (
     <section className={`${styles.card} ${styles.sectionCard}`} aria-label="热招职位">
       <div className={styles.sectionHeader}>
@@ -172,20 +174,19 @@ function HotJobs() {
         </Link>
       </div>
       <div className={styles.jobGrid}>
-        {hotJobs.map((job) => (
-          <article key={`${job.company}-${job.title}`} className={styles.jobCard}>
+        {items.length === 0 ? <RecommendationEmpty label="热招职位待配置" /> : items.map((job) => (
+          <article key={`${job.target_type}-${job.target_id}`} className={styles.jobCard}>
             <div className={styles.jobTop}>
               <h3 className={styles.jobTitle}>{job.title}</h3>
-              <span className={styles.salary}>{job.salary}</span>
+              <span className={styles.salary}>公开推荐</span>
             </div>
             <p className={styles.muted}>
-              {job.city} · {job.exp} · {job.edu}
+              {job.city_code || '城市待配置'} · {job.summary || '在线职位公开摘要'}
             </p>
-            <p className={styles.muted}>{job.company}</p>
             <div className={styles.tagRow}>
-              <span className={styles.tag}>在线职位</span>
-              <span className={styles.tag}>公开字段</span>
+              {(job.tags.length === 0 ? ['公开字段'] : job.tags).map((tag) => <span key={tag} className={styles.tag}>{tag}</span>)}
             </div>
+            <Link className={styles.moreLink} href={job.url}>查看公开详情</Link>
           </article>
         ))}
       </div>
@@ -207,7 +208,7 @@ function ScanCta() {
   );
 }
 
-export function PortalHomePage() {
+export function PortalHomePage({ hotJobs = [], featuredCompanies = [] }: PortalHomePageProps) {
   return (
     <main className={styles.home}>
       <section className={styles.heroGrid} aria-label="首页高保真首屏">
@@ -231,8 +232,8 @@ export function PortalHomePage() {
       <AdvertisementBand />
       <ScanCta />
       <section className={styles.recommendGrid} aria-label="公开推荐模块">
-        <HotJobs />
-        <RecommendedCompanies />
+        <HotJobs items={hotJobs} />
+        <RecommendedCompanies items={featuredCompanies} />
       </section>
     </main>
   );

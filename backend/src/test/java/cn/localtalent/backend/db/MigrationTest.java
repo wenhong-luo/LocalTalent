@@ -54,6 +54,8 @@ class MigrationTest {
                 "candidate_job_favorite",
                 "candidate_search_subscription",
                 "candidate_notification",
+                "portal_recommendation",
+                "risk_review",
                 "audit_log",
                 "field_access_log",
                 "api_idempotency_record"));
@@ -181,6 +183,36 @@ class MigrationTest {
                 "stage_changed_by",
                 "stage_changed_at"));
         assertIndexesExist(jdbcTemplate, "job_application", List.of("idx_application_company_stage_time"));
+        assertColumnsExist(jdbcTemplate, "portal_recommendation", List.of(
+                "slot_code",
+                "target_type",
+                "target_id",
+                "title_override",
+                "summary_override",
+                "display_order",
+                "status",
+                "start_time",
+                "end_time",
+                "operator_id"));
+        assertIndexesExist(jdbcTemplate, "portal_recommendation", List.of(
+                "idx_slot_status_order",
+                "idx_target",
+                "idx_status_time"));
+        assertColumnsExist(jdbcTemplate, "risk_review", List.of(
+                "risk_type",
+                "target_type",
+                "target_id",
+                "severity",
+                "status",
+                "title",
+                "summary",
+                "decision",
+                "handler_id",
+                "handled_at"));
+        assertIndexesExist(jdbcTemplate, "risk_review", List.of(
+                "idx_status_severity_time",
+                "idx_target",
+                "idx_handler_time"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");

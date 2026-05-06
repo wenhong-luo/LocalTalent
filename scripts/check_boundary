@@ -257,8 +257,9 @@ for required_path in "${prompt7_required_paths[@]}"; do
   fi
 done
 
-if grep -RIEiq "candidate_user|candidate_resume|activity_registration|export_apply|open_api|integration_sync|ats|candidate_pool" \
-  "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/admin"; then
+if find "$ROOT_DIR/backend/src/main/java/cn/localtalent/backend/admin" \
+    -type f ! -path '*/admin/ops/*' -print0 \
+    | xargs -0 grep -IEiq "candidate_user|candidate_resume|activity_registration|export_apply|open_api|integration_sync|ats|candidate_pool"; then
   echo "FAIL: Prompt 7 admin module contains out-of-scope implementation marker"
   exit 1
 fi

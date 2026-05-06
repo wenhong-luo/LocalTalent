@@ -17,6 +17,11 @@ public class Phase3FeatureProperties {
      */
     private boolean companyWorkbench;
 
+    /**
+     * Prompt 29 operator/auditor portal operations. Defaults to false in configuration.
+     */
+    private boolean operatorPortalOps;
+
     public boolean isCandidateClosure() {
         return candidateClosure;
     }
@@ -31,5 +36,13 @@ public class Phase3FeatureProperties {
 
     public void setCompanyWorkbench(boolean companyWorkbench) {
         this.companyWorkbench = companyWorkbench;
+    }
+
+    public boolean isOperatorPortalOps() {
+        return operatorPortalOps;
+    }
+
+    public void setOperatorPortalOps(boolean operatorPortalOps) {
+        this.operatorPortalOps = operatorPortalOps;
     }
 }

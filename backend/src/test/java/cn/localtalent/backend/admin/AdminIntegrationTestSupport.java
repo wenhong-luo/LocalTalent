@@ -156,6 +156,46 @@ abstract class AdminIntegrationTestSupport {
         return send(builder.build());
     }
 
+    protected HttpJsonResponse postJson(
+            String path,
+            String body,
+            String traceId,
+            String authorization,
+            String idempotencyKey
+    ) throws Exception {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri(path))
+                .header("Content-Type", "application/json")
+                .header("X-Trace-Id", traceId)
+                .POST(HttpRequest.BodyPublishers.ofString(body));
+        if (authorization != null) {
+            builder.header("Authorization", authorization);
+        }
+        if (idempotencyKey != null) {
+            builder.header("X-Idempotency-Key", idempotencyKey);
+        }
+        return send(builder.build());
+    }
+
+    protected HttpJsonResponse putJson(
+            String path,
+            String body,
+            String traceId,
+            String authorization,
+            String idempotencyKey
+    ) throws Exception {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri(path))
+                .header("Content-Type", "application/json")
+                .header("X-Trace-Id", traceId)
+                .PUT(HttpRequest.BodyPublishers.ofString(body));
+        if (authorization != null) {
+            builder.header("Authorization", authorization);
+        }
+        if (idempotencyKey != null) {
+            builder.header("X-Idempotency-Key", idempotencyKey);
+        }
+        return send(builder.build());
+    }
+
     protected HttpJsonResponse putJson(String path, String body, String traceId, String authorization) throws Exception {
         HttpRequest.Builder builder = HttpRequest.newBuilder(uri(path))
                 .header("Content-Type", "application/json")

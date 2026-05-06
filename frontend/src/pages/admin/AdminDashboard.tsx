@@ -6,17 +6,27 @@ import { ReviewTable } from '@/components/backoffice/ReviewTable';
 import { RouteGuard, type GuardContext } from '@/components/backoffice/RouteGuard';
 import { StatusBadge } from '@/components/backoffice/StatusBadge';
 import { StateView } from '@/components/StateView';
+import { isHttpClientError } from '@/lib/httpClient';
 import {
+  createRecommendation,
   fetchAuditTrace,
   fetchCompanyReviewQueue,
   fetchExportReviewQueue,
   fetchJobReviewQueue,
+  fetchOpsOverview,
+  fetchRecommendations,
+  fetchRiskReviews,
+  handleRiskReview,
+  offlineRecommendation,
   reviewCompany,
   reviewExport,
   reviewJob,
   type AuditTraceSummary,
   type CompanyReviewItem,
-  type JobReviewItem
+  type JobReviewItem,
+  type OpsOverview,
+  type RecommendationItem,
+  type RiskReviewItem
 } from './adminApi';
 import { type CompanyExportApply } from '@/pages/company/companyApi';
 
@@ -58,8 +68,14 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
   const [companies, setCompanies] = useState<CompanyReviewItem[]>([]);
   const [jobs, setJobs] = useState<JobReviewItem[]>([]);
   const [exports, setExports] = useState<CompanyExportApply[]>([]);
+  const [opsOverview, setOpsOverview] = useState<OpsOverview | null>(null);
+  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
+  const [riskReviews, setRiskReviews] = useState<RiskReviewItem[]>([]);
+  const [operatorOpsEnabled, setOperatorOpsEnabled] = useState(false);
   const [auditTraceId, setAuditTraceId] = useState('trace-demo');
   const [auditTrace, setAuditTrace] = useState<AuditTraceSummary | null>(null);
+  const [recommendationTargetId, setRecommendationTargetId] = useState('1');
+  const [recommendationTitle, setRecommendationTitle] = useState('首页推荐位');
   const [status, setStatus] = useState<'loading' | 'ready' | 'error' | 'retrying'>('loading');
   const [message, setMessage] = useState('正在读取运营后台队列。');
   const [traceId, setTraceId] = useState<string>();
@@ -68,7 +84,7 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
 
   async function load() {
     setStatus('retrying');
-    setMessage('正在读取企业审核、职位审核与导出审批队列。');
+    setMessage('正在读取企业审核、职位审核、导出审批与运营化配置。');
     try {
       const [companyResult, jobResult, exportResult] = await Promise.all([
         fetchCompanyReviewQueue(context.token),
@@ -78,7 +94,31 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
       setCompanies(companyResult.data);
       setJobs(jobResult.data);
       setExports(exportResult.data);
-      setTraceId(exportResult.traceId || jobResult.traceId || companyResult.traceId);
+      let latestTraceId = exportResult.traceId || jobResult.traceId || companyResult.traceId;
+
+      try {
+        const overviewResult = await fetchOpsOverview(context.token);
+        const [recommendationResult, riskResult] = await Promise.all([
+          fetchRecommendations(context.token),
+          fetchRiskReviews(context.token)
+        ]);
+        setOpsOverview(overviewResult.data);
+        setOperatorOpsEnabled(overviewResult.data.features.operator_portal_ops_enabled);
+        setRecommendations(recommendationResult.data);
+        setRiskReviews(riskResult.data);
+        latestTraceId = riskResult.traceId || recommendationResult.traceId || overviewResult.traceId || latestTraceId;
+      } catch (error) {
+        if (isHttpClientError(error) && error.code === 'FEATURE_DISABLED_403') {
+          setOperatorOpsEnabled(false);
+          setOpsOverview(null);
+          setRecommendations([]);
+          setRiskReviews([]);
+        } else {
+          throw error;
+        }
+      }
+
+      setTraceId(latestTraceId);
       setStatus('ready');
       setMessage('');
     } catch (error) {
@@ -118,6 +158,63 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
     await load();
   }
 
+  async function onCreateRecommendation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const targetId = Number.parseInt(recommendationTargetId, 10);
+    if (!Number.isFinite(targetId) || targetId <= 0) {
+      setStatus('error');
+      setMessage('请输入合法的推荐目标 ID。');
+      return;
+    }
+    setStatus('retrying');
+    setMessage('正在保存推荐位配置。');
+    try {
+      const result = await createRecommendation(context.token, {
+        slot_code: 'home_hot_jobs',
+        target_type: 'job',
+        target_id: targetId,
+        title_override: recommendationTitle,
+        summary_override: '运营推荐位公开摘要',
+        display_order: 1,
+        status: 1
+      });
+      setTraceId(result.traceId);
+      await load();
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : '推荐位保存失败。');
+    }
+  }
+
+  async function onOfflineRecommendation(recommendationId: number) {
+    setStatus('retrying');
+    setMessage('正在下线推荐位。');
+    try {
+      const result = await offlineRecommendation(context.token, recommendationId);
+      setTraceId(result.traceId);
+      await load();
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : '推荐位下线失败。');
+    }
+  }
+
+  async function onHandleRisk(riskId: number) {
+    setStatus('retrying');
+    setMessage('正在处理风险审核任务。');
+    try {
+      const result = await handleRiskReview(context.token, riskId, {
+        status: 2,
+        decision: '已核查，按低风险公开对象处理。'
+      });
+      setTraceId(result.traceId);
+      await load();
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : '风险审核处理失败。');
+    }
+  }
+
   async function onAuditTrace(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!auditTraceId.trim()) {
@@ -151,6 +248,7 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
           <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
             当前账号：{context.identity.display_name ?? '内部账号'}。
             {canWrite ? ' operator 写操作入口已显示。' : ' auditor/未知角色按只读展示，写入口隐藏。'}
+            {operatorOpsEnabled ? ' 三期运营化已开启。' : ' 三期运营化未开启，保留二期审核基础界面。'}
             {traceId ? <span> trace_id：{traceId}</span> : null}
           </p>
         </section>
@@ -166,6 +264,33 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
         ) : null}
 
         <div style={{ display: 'grid', gap: '18px', marginTop: '22px' }}>
+          <section style={cardStyle} aria-label="运营生产化首页">
+            <h2 style={{ marginTop: 0 }}>运营首页</h2>
+            {operatorOpsEnabled && opsOverview ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
+                {[
+                  ['待审企业', opsOverview.pending_company_count],
+                  ['待审职位', opsOverview.pending_job_count],
+                  ['待审导出', opsOverview.pending_export_count],
+                  ['已发布内容', opsOverview.published_content_count],
+                  ['已发布活动', opsOverview.published_event_count],
+                  ['有效推荐位', opsOverview.active_recommendation_count],
+                  ['待处理风险', opsOverview.pending_risk_count],
+                  ['近 7 日审计', opsOverview.recent_audit_count]
+                ].map(([label, value]) => (
+                  <div key={label} style={{ border: '1px solid var(--lt-line)', borderRadius: '18px', padding: '14px' }}>
+                    <strong style={{ display: 'block', fontSize: '1.7rem' }}>{value}</strong>
+                    <span style={{ color: 'var(--lt-ink-muted)' }}>{label}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: 'var(--lt-ink-muted)' }}>
+                phase3.operator_portal_ops 默认关闭；当前仅展示二期企业审核、职位审核、导出审批与审计入口。
+              </p>
+            )}
+          </section>
+
           <ReviewTable<CompanyReviewItem>
             title="企业审核"
             rows={companies}
@@ -219,6 +344,72 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
               }
             ]}
           />
+
+          <section style={cardStyle} aria-label="内容管理与活动招聘会管理">
+            <h2 style={{ marginTop: 0 }}>内容管理 / 活动与招聘会管理</h2>
+            <p style={{ color: 'var(--lt-ink-muted)', lineHeight: 1.7 }}>
+              本轮复用既有 CMS 与 activity_event 后台能力；公开门户只读取已发布、在线对象。推荐位不得引用撤回快照、下线职位、未认证企业或未发布内容。
+            </p>
+          </section>
+
+          <section style={cardStyle} aria-label="推荐位配置">
+            <h2 style={{ marginTop: 0 }}>推荐位配置</h2>
+            <p style={{ color: 'var(--lt-ink-muted)', lineHeight: 1.7 }}>
+              推荐位是运营配置，不是广告售卖系统；服务端会校验目标必须已审核、已发布、在线且合规。
+            </p>
+            {operatorOpsEnabled && canWrite ? (
+              <form onSubmit={onCreateRecommendation} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', alignItems: 'end' }}>
+                <label>
+                  <span style={{ display: 'block', marginBottom: '7px', color: 'var(--lt-ink-muted)' }}>推荐职位 ID</span>
+                  <input value={recommendationTargetId} onChange={(event) => setRecommendationTargetId(event.target.value)} style={inputStyle} />
+                </label>
+                <label>
+                  <span style={{ display: 'block', marginBottom: '7px', color: 'var(--lt-ink-muted)' }}>标题覆盖</span>
+                  <input value={recommendationTitle} onChange={(event) => setRecommendationTitle(event.target.value)} style={inputStyle} />
+                </label>
+                <button type="submit" style={buttonStyle}>保存推荐位</button>
+              </form>
+            ) : (
+              <p style={{ color: 'var(--lt-ink-muted)' }}>{canWrite ? '三期运营化未开启。' : 'auditor/未知角色只读，不显示推荐位写入口。'}</p>
+            )}
+            <div style={{ display: 'grid', gap: '10px', marginTop: '14px' }}>
+              {recommendations.length === 0 ? (
+                <p style={{ color: 'var(--lt-ink-muted)' }}>暂无推荐位配置。</p>
+              ) : recommendations.map((item) => (
+                <article key={item.recommendation_id} style={{ border: '1px solid var(--lt-line)', borderRadius: '16px', padding: '12px' }}>
+                  <strong>{item.slot_code} · {item.target_type} #{item.target_id}</strong>
+                  <p style={{ margin: '6px 0', color: 'var(--lt-ink-muted)' }}>
+                    {item.title_override || '未设置标题覆盖'} · {item.target_valid ? '目标合法' : '目标已失效'}
+                  </p>
+                  {operatorOpsEnabled && canWrite && item.status === 1 ? (
+                    <button type="button" style={buttonStyle} onClick={() => onOfflineRecommendation(item.recommendation_id)}>下线推荐位</button>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section style={cardStyle} aria-label="风险审核">
+            <h2 style={{ marginTop: 0 }}>风险审核</h2>
+            {riskReviews.length === 0 ? (
+              <p style={{ color: 'var(--lt-ink-muted)' }}>暂无风险审核任务。高风险能力仍在风险池，不会自动进入主线。</p>
+            ) : (
+              <div style={{ display: 'grid', gap: '10px' }}>
+                {riskReviews.map((risk) => (
+                  <article key={risk.risk_id} style={{ border: '1px solid var(--lt-line)', borderRadius: '16px', padding: '12px' }}>
+                    <strong>{risk.title}</strong>
+                    <p style={{ margin: '6px 0', color: 'var(--lt-ink-muted)' }}>
+                      {risk.risk_type} · {risk.target_type} #{risk.target_id} · {risk.severity} · 状态 {risk.status}
+                    </p>
+                    <p style={{ color: 'var(--lt-ink-muted)' }}>{risk.summary}</p>
+                    {operatorOpsEnabled && canWrite && risk.status === 0 ? (
+                      <button type="button" style={buttonStyle} onClick={() => onHandleRisk(risk.risk_id)}>处理为低风险</button>
+                    ) : <span style={{ color: 'var(--lt-ink-muted)' }}>只读</span>}
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
 
         <section style={{ ...cardStyle, marginTop: '18px' }}>

@@ -5,7 +5,34 @@ import { PortalHomePage } from './PortalHomePage';
 function renderHome() {
   render(
     <PortalShell>
-      <PortalHomePage />
+      <PortalHomePage
+        hotJobs={[
+          {
+            target_type: 'job',
+            target_id: 1,
+            title: 'Java 后端工程师',
+            summary: '山西正力网络有限公司 · 12K~18K',
+            tags: ['在线职位', '认证企业'],
+            url: '/jobs/1',
+            city_code: '上海',
+            updated_at: '2026-05-01T10:00:00',
+            display_order: 1
+          }
+        ]}
+        featuredCompanies={[
+          {
+            target_type: 'company',
+            target_id: 2,
+            title: '山西正力网络有限公司',
+            summary: '互联网服务',
+            tags: ['认证企业'],
+            url: '/companies/2',
+            city_code: '太原',
+            updated_at: '2026-05-01T10:00:00',
+            display_order: 1
+          }
+        ]}
+      />
     </PortalShell>
   );
 }
@@ -37,6 +64,18 @@ describe('PortalHomePage', () => {
     expect(screen.getByText('Java 后端工程师')).toBeInTheDocument();
     expect(screen.getAllByText('山西正力网络有限公司').length).toBeGreaterThan(0);
     expect(screen.getAllByText('认证企业').length).toBeGreaterThan(0);
+  });
+
+  it('shows an operations placeholder when recommendation slots are empty', () => {
+    render(
+      <PortalShell>
+        <PortalHomePage />
+      </PortalShell>
+    );
+
+    expect(screen.getByText('热招职位待配置')).toBeInTheDocument();
+    expect(screen.getByText('明星企业待配置')).toBeInTheDocument();
+    expect(screen.getAllByText(/运营位待配置或目标已失效/).length).toBeGreaterThan(0);
   });
 
   it('keeps login and external capabilities as placeholders', () => {

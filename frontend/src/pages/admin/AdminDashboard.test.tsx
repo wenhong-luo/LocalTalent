@@ -14,7 +14,8 @@ function apiOk(data: unknown, traceId = 'trace-admin'): Response {
   );
 }
 
-function installAdminFetchMock() {
+function installAdminFetchMock(options: { operatorOpsEnabled?: boolean } = {}) {
+  const operatorOpsEnabled = Boolean(options.operatorOpsEnabled);
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
     const url = String(input);
     const method = init?.method ?? 'GET';
@@ -77,6 +78,70 @@ function installAdminFetchMock() {
       });
     }
 
+    if (url.includes('/api/admin/ops/overview') && method === 'GET') {
+      if (!operatorOpsEnabled) {
+        return new Response(
+          JSON.stringify({
+            code: 'FEATURE_DISABLED_403',
+            message: 'operator portal ops disabled',
+            trace_id: 'trace-admin-ops-disabled',
+            data: null
+          }),
+          { status: 403, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      return apiOk({
+        features: { operator_portal_ops_enabled: true },
+        pending_company_count: 1,
+        pending_job_count: 1,
+        pending_export_count: 1,
+        published_content_count: 2,
+        published_event_count: 3,
+        active_recommendation_count: 1,
+        pending_risk_count: 1,
+        recent_audit_count: 5
+      }, 'trace-admin-ops');
+    }
+
+    if (url.includes('/api/admin/recommendations') && method === 'GET') {
+      return apiOk({
+        recommendation_list: operatorOpsEnabled ? [
+          {
+            recommendation_id: 88,
+            slot_code: 'home_hot_jobs',
+            target_type: 'job',
+            target_id: 20,
+            title_override: 'Prompt29 推荐位',
+            summary_override: '公开推荐摘要',
+            display_order: 1,
+            status: 1,
+            target_valid: true,
+            updated_at: '2026-05-01T10:00:00'
+          }
+        ] : [],
+        total: operatorOpsEnabled ? 1 : 0
+      }, 'trace-admin-recommendations');
+    }
+
+    if (url.includes('/api/admin/risk-reviews') && method === 'GET') {
+      return apiOk({
+        risk_review_list: operatorOpsEnabled ? [
+          {
+            risk_id: 99,
+            risk_type: 'content_risk',
+            target_type: 'content',
+            target_id: 77,
+            severity: 'medium',
+            status: 0,
+            title: 'Prompt29 风险任务',
+            summary: '仅公开摘要',
+            updated_at: '2026-05-01T10:00:00'
+          }
+        ] : [],
+        total: operatorOpsEnabled ? 1 : 0
+      }, 'trace-admin-risks');
+    }
+
     if (url.includes('/api/admin/audit-traces/')) {
       return apiOk({
         trace_id: 'trace-demo',
@@ -84,6 +149,28 @@ function installAdminFetchMock() {
         access_log_list: [{ id: 2 }],
         open_api_log_list: [{ id: 3 }]
       });
+    }
+
+    if (url.includes('/api/admin/recommendations') && method === 'POST') {
+      return apiOk({
+        recommendation_id: 89,
+        slot_code: 'home_hot_jobs',
+        target_type: 'job',
+        target_id: 1,
+        title_override: '首页推荐位',
+        summary_override: '运营推荐位公开摘要',
+        display_order: 1,
+        status: 1,
+        target_valid: true
+      }, 'trace-admin-recommendation-write');
+    }
+
+    if (url.includes('/api/admin/risk-reviews') && method === 'POST') {
+      return apiOk({
+        risk_id: 99,
+        status: 2,
+        decision: '已核查，按低风险公开对象处理。'
+      }, 'trace-admin-risk-write');
     }
 
     if (method === 'POST') {
@@ -147,6 +234,41 @@ describe('AdminDashboard', () => {
     expect(await screen.findByText('星河科技')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '审批' })).not.toBeInTheDocument();
     expect(screen.getAllByText('只读').length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('renders phase3 operations sections and sends idempotent writes for operator', async () => {
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'operator-token');
+    window.localStorage.setItem(ADMIN_ROLE_HINT_STORAGE_KEY, 'operator');
+    const fetchMock = installAdminFetchMock({ operatorOpsEnabled: true });
+
+    render(<AdminDashboard />);
+
+    expect(await screen.findByText(/三期运营化已开启/)).toBeInTheDocument();
+    expect(screen.getByText('运营首页')).toBeInTheDocument();
+    expect(screen.getByLabelText('推荐位配置')).toBeInTheDocument();
+    expect(screen.getByLabelText('风险审核')).toBeInTheDocument();
+    expect(screen.getByText('Prompt29 风险任务')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '保存推荐位' }));
+
+    await waitFor(() => {
+      const postCall = fetchMock.mock.calls.find(([input, init]) => (
+        String(input).includes('/api/admin/recommendations') && init?.method === 'POST'
+      ));
+      expect(postCall).toBeTruthy();
+      expect((postCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toContain('admin-recommendation');
+      expect(postCall?.[1]?.body).toContain('"slot_code":"home_hot_jobs"');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: '处理为低风险' }));
+
+    await waitFor(() => {
+      const riskCall = fetchMock.mock.calls.find(([input, init]) => (
+        String(input).includes('/api/admin/risk-reviews/99/handle') && init?.method === 'POST'
+      ));
+      expect(riskCall).toBeTruthy();
+      expect((riskCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toContain('admin-risk-review');
+    });
   });
 
   it('does not submit reject action without memo', async () => {

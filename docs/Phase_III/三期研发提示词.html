@@ -121,13 +121,14 @@
 
       <section class="card" id="baseline">
         <h2>三期已完成规划基线记录（开发前必读）</h2>
-        <p>三期边界、方向判断、总规划、Step1-Step6 和实施蓝图已完成。Prompt 25（P3-0）至 Prompt 28（P3-3）已完成，下一轮从 Prompt 29（P3-4）继续。</p>
+        <p>三期边界、方向判断、总规划、Step1-Step6 和实施蓝图已完成。Prompt 25（P3-0）至 Prompt 29（P3-4）已完成，下一轮从 Prompt 30（P3-5）继续。</p>
         <table>
           <tr><th>轮次</th><th>完成内容</th><th>固定边界</th></tr>
           <tr><td>Prompt 25（P3-0）</td><td>已完成三期基线冻结与灰度闸门：新增 <code>docs/Phase_III/feature_flags.md</code>、<code>docs/Phase_III/RUNBOOK.md</code>、<code>.env.phase3.example</code>、<code>scripts/check_phase3_boundary</code>、<code>scripts/check_phase3_ops</code>，并在 README 中加入三期开发入口。</td><td>未实现任何业务功能、数据库迁移、生产写接口或真实外部能力；所有三期 feature flag 默认关闭。下一轮必须从 Prompt 26（P3-1）认证与身份映射继续。</td></tr>
           <tr><td>Prompt 26（P3-1）</td><td>已完成认证与身份映射：新增标准 OIDC 授权码登录、回调、登出、非敏感配置接口、<code>auth_oidc_identity_link</code> 映射表、OIDC fake provider 集成测试、本地 JWT dev/test fallback 控制，以及前端登录页 SSO 入口、operator 登录 tab、fallback 显隐和 OIDC 错误态。</td><td>OIDC 只负责认证与基础 claims；内部 RBAC、数据域、字段级权限、导出审批和审计仍由 LocalTalent 服务端强制。未接真实短信、微信、小程序、App；未实现求职者/企业/运营业务闭环。下一轮必须从 Prompt 27（P3-2）求职者真实闭环生产化继续。</td></tr>
           <tr><td>Prompt 27（P3-2）</td><td>已完成求职者真实闭环生产化：新增 <code>phase3.candidate_closure</code> 运行时开关、<code>V0015__create_candidate_closure_tables.sql</code>、candidate 私有收藏/订阅/站内通知表、简历编辑/预览/投递/收藏/订阅/通知私有接口、求职者中心三期增强页面、noindex 私有中心、权限 seed、迁移测试、CandidateClosureFlow/Disabled 集成测试和前端状态/字段/幂等测试。</td><td>只做 candidate 本人私有域；未实现企业工作台、运营后台、公共简历库、搜索简历、查看完整简历、联系解锁、受控找人才、真实短信/微信/小程序/App 推送或外部能力。人才服务区仍只展示发布快照；写动作使用 trace、幂等和审计，敏感源字段访问写 <code>field_access_log</code>。下一轮必须从 Prompt 28（P3-3）企业招聘工作台生产化继续。</td></tr>
           <tr><td>Prompt 28（P3-3）</td><td>已完成企业招聘工作台生产化：新增 <code>phase3.company_workbench</code> 运行时开关、<code>V0016__extend_company_workbench.sql</code>、company 私有认证材料摘要和投递阶段元数据、企业工作台 overview/profile/certification/jobs/applications/interview/export 私有接口、企业中心三期增强页面、noindex 私有中心、权限 seed、迁移测试、CompanyWorkbenchFlow/Disabled 集成测试和前端状态/字段/幂等测试。</td><td>只做 company 本企业私有工作台；未实现受控找人才、联系解锁、会员权益、真实支付、公共简历库、企业后台商业化或真实短信/微信/小程序/App。企业公开主页与企业中心隔离；投递池只返回安全候选人摘要，敏感源字段访问写 <code>field_access_log</code>；导出继续走审批链。下一轮必须从 Prompt 29（P3-4）运营后台生产化与门户运营化继续。</td></tr>
+          <tr><td>Prompt 29（P3-4）</td><td>已完成运营后台生产化与门户运营化：新增 <code>phase3.operator_portal_ops</code> 运行时开关、<code>V0017__create_admin_portal_ops_tables.sql</code>、<code>portal_recommendation</code> 推荐位配置表、<code>risk_review</code> 风险审核表、运营 overview、推荐位配置、风险审核与公开推荐只读接口，增强 <code>/admin</code> 运营后台页面，并让首页推荐位优先读取公开推荐接口。</td><td>只做 operator/auditor 运营后台与公开门户运营配置；未实现会员商业化、真实支付、真实短信/微信/小程序/App、地图/视频/直播、ATS/RPA、公共简历库、受控找人才或联系解锁。operator 写动作使用 trace、幂等和审计；auditor 写操作拒绝；公开推荐只返回已审核、已发布、在线、未撤回且字段白名单裁剪后的合法对象。下一轮必须从 Prompt 30（P3-5）审计、导出、风控与安全收口继续。</td></tr>
         </table>
       </section>
 

@@ -1,4 +1,4 @@
-import { apiGet, apiPost, type ApiResult } from '@/lib/httpClient';
+import { apiGet, apiPost, apiRequest, createIdempotencyKey, type ApiResult } from '@/lib/httpClient';
 import { type CompanyExportApply } from '@/pages/company/companyApi';
 
 type RawRecord = Record<string, unknown>;
@@ -28,6 +28,48 @@ export type AuditTraceSummary = {
   audit_count: number;
   access_count: number;
   open_api_count: number;
+};
+
+export type OpsOverview = {
+  features: {
+    operator_portal_ops_enabled: boolean;
+  };
+  pending_company_count: number;
+  pending_job_count: number;
+  pending_export_count: number;
+  published_content_count: number;
+  published_event_count: number;
+  active_recommendation_count: number;
+  pending_risk_count: number;
+  recent_audit_count: number;
+};
+
+export type RecommendationItem = {
+  recommendation_id: number;
+  slot_code: string;
+  target_type: string;
+  target_id: number;
+  title_override: string;
+  summary_override: string;
+  display_order: number;
+  status: number;
+  target_valid: boolean;
+  invalid_reason: string;
+  updated_at: string;
+};
+
+export type RiskReviewItem = {
+  risk_id: number;
+  risk_type: string;
+  target_type: string;
+  target_id: number;
+  severity: string;
+  status: number;
+  title: string;
+  summary: string;
+  decision: string;
+  handled_at: string;
+  updated_at: string;
 };
 
 function asRecord(value: unknown): RawRecord {
@@ -83,6 +125,58 @@ function toExportApply(raw: unknown): CompanyExportApply {
   };
 }
 
+function toOpsOverview(raw: unknown): OpsOverview {
+  const row = asRecord(raw);
+  const features = asRecord(row.features);
+  return {
+    features: {
+      operator_portal_ops_enabled: Boolean(features.operator_portal_ops_enabled)
+    },
+    pending_company_count: numberOr(row.pending_company_count),
+    pending_job_count: numberOr(row.pending_job_count),
+    pending_export_count: numberOr(row.pending_export_count),
+    published_content_count: numberOr(row.published_content_count),
+    published_event_count: numberOr(row.published_event_count),
+    active_recommendation_count: numberOr(row.active_recommendation_count),
+    pending_risk_count: numberOr(row.pending_risk_count),
+    recent_audit_count: numberOr(row.recent_audit_count)
+  };
+}
+
+function toRecommendationItem(raw: unknown): RecommendationItem {
+  const row = asRecord(raw);
+  return {
+    recommendation_id: numberOr(row.recommendation_id),
+    slot_code: text(row.slot_code),
+    target_type: text(row.target_type),
+    target_id: numberOr(row.target_id),
+    title_override: text(row.title_override),
+    summary_override: text(row.summary_override),
+    display_order: numberOr(row.display_order),
+    status: numberOr(row.status),
+    target_valid: Boolean(row.target_valid),
+    invalid_reason: text(row.invalid_reason),
+    updated_at: text(row.updated_at)
+  };
+}
+
+function toRiskReviewItem(raw: unknown): RiskReviewItem {
+  const row = asRecord(raw);
+  return {
+    risk_id: numberOr(row.risk_id),
+    risk_type: text(row.risk_type),
+    target_type: text(row.target_type),
+    target_id: numberOr(row.target_id),
+    severity: text(row.severity, 'low'),
+    status: numberOr(row.status),
+    title: text(row.title, '风险任务'),
+    summary: text(row.summary),
+    decision: text(row.decision),
+    handled_at: text(row.handled_at),
+    updated_at: text(row.updated_at)
+  };
+}
+
 export async function fetchCompanyReviewQueue(token: string): Promise<ApiResult<CompanyReviewItem[]>> {
   const result = await apiGet<unknown>('/api/admin/companies/review?auth_status=1&page=1&size=20', { token });
   const rows = Array.isArray(asRecord(result.data).company_list) ? asRecord(result.data).company_list as unknown[] : [];
@@ -99,6 +193,66 @@ export async function fetchExportReviewQueue(token: string): Promise<ApiResult<C
   const result = await apiGet<unknown>('/api/admin/exports/review?approve_status=0&page=1&size=20', { token });
   const rows = Array.isArray(asRecord(result.data).export_list) ? asRecord(result.data).export_list as unknown[] : [];
   return { data: rows.map(toExportApply), traceId: result.traceId };
+}
+
+export async function fetchOpsOverview(token: string): Promise<ApiResult<OpsOverview>> {
+  const result = await apiGet<unknown>('/api/admin/ops/overview', { token });
+  return { data: toOpsOverview(result.data), traceId: result.traceId };
+}
+
+export async function fetchRecommendations(token: string): Promise<ApiResult<RecommendationItem[]>> {
+  const result = await apiGet<unknown>('/api/admin/recommendations?page=1&size=20', { token });
+  const rows = Array.isArray(asRecord(result.data).recommendation_list)
+    ? asRecord(result.data).recommendation_list as unknown[]
+    : [];
+  return { data: rows.map(toRecommendationItem), traceId: result.traceId };
+}
+
+export async function createRecommendation(
+  token: string,
+  payload: {
+    slot_code: string;
+    target_type: string;
+    target_id: number;
+    title_override: string;
+    summary_override: string;
+    display_order: number;
+    status: number;
+  }
+): Promise<ApiResult<RecommendationItem>> {
+  const result = await apiPost<unknown>('/api/admin/recommendations', payload, {
+    token,
+    idempotencyKey: createIdempotencyKey('admin-recommendation')
+  });
+  return { data: toRecommendationItem(result.data), traceId: result.traceId };
+}
+
+export async function offlineRecommendation(token: string, recommendationId: number): Promise<ApiResult<RecommendationItem>> {
+  const result = await apiPost<unknown>(`/api/admin/recommendations/${recommendationId}/offline`, {}, {
+    token,
+    idempotencyKey: createIdempotencyKey('admin-recommendation-offline')
+  });
+  return { data: toRecommendationItem(result.data), traceId: result.traceId };
+}
+
+export async function fetchRiskReviews(token: string): Promise<ApiResult<RiskReviewItem[]>> {
+  const result = await apiGet<unknown>('/api/admin/risk-reviews?page=1&size=20', { token });
+  const rows = Array.isArray(asRecord(result.data).risk_review_list)
+    ? asRecord(result.data).risk_review_list as unknown[]
+    : [];
+  return { data: rows.map(toRiskReviewItem), traceId: result.traceId };
+}
+
+export async function handleRiskReview(
+  token: string,
+  riskId: number,
+  payload: { status: number; decision: string }
+): Promise<ApiResult<RiskReviewItem>> {
+  const result = await apiPost<unknown>(`/api/admin/risk-reviews/${riskId}/handle`, payload, {
+    token,
+    idempotencyKey: createIdempotencyKey('admin-risk-review')
+  });
+  return { data: toRiskReviewItem(result.data), traceId: result.traceId };
 }
 
 export async function reviewCompany(
@@ -120,6 +274,28 @@ export async function reviewExport(
   payload: { export_id: number; approve_status: 1 | 2; memo: string }
 ): Promise<ApiResult<unknown>> {
   return apiPost('/api/admin/exports/review', payload, { token });
+}
+
+export async function updateRecommendation(
+  token: string,
+  recommendationId: number,
+  payload: {
+    slot_code: string;
+    target_type: string;
+    target_id: number;
+    title_override: string;
+    summary_override: string;
+    display_order: number;
+    status: number;
+  }
+): Promise<ApiResult<RecommendationItem>> {
+  const result = await apiRequest<unknown>(`/api/admin/recommendations/${recommendationId}`, {
+    method: 'PUT',
+    body: payload,
+    token,
+    idempotencyKey: createIdempotencyKey('admin-recommendation-update')
+  });
+  return { data: toRecommendationItem(result.data), traceId: result.traceId };
 }
 
 export async function fetchAuditTrace(token: string, traceId: string): Promise<ApiResult<AuditTraceSummary>> {
