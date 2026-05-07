@@ -1,0 +1,22 @@
+[Unit]
+Description=LocalTalent Backend
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=localtalent
+Group=localtalent
+WorkingDirectory=/opt/localtalent/app/backend
+EnvironmentFile=-/etc/localtalent/backend.env
+ExecStart=/usr/bin/java -jar /opt/localtalent/app/backend/target/backend-0.1.0-SNAPSHOT.jar
+Restart=on-failure
+RestartSec=5
+SuccessExitStatus=143
+StandardOutput=append:/var/log/localtalent/backend.log
+StandardError=append:/var/log/localtalent/backend.err.log
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

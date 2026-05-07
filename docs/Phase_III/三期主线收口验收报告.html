@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 三期主线收口验收报告</title>
+  <style>
+    :root { --bg:#f7f7f4; --card:#fff; --ink:#18202a; --line:#e2e0d8; --brand:#365f7c; --ok:#0f7b55; --warn:#a05a00; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--ink); line-height:1.72; }
+    header { padding:42px 28px; background:linear-gradient(135deg,#1c3344,#365f7c); color:white; }
+    main { max-width:1100px; margin:0 auto; padding:28px; }
+    h1 { margin:0 0 10px; }
+    h2 { margin-top:0; color:#24485e; }
+    code, pre { font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:22px; margin:18px 0; box-shadow:0 8px 22px rgba(30,36,44,.05); }
+    table { width:100%; border-collapse:collapse; margin:12px 0; }
+    th, td { border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top; }
+    th { background:#eef2f4; }
+    .ok { color:var(--ok); font-weight:700; }
+    .warn { background:#fff8ed; border-left:5px solid var(--warn); padding:12px 14px; border-radius:10px; }
+    .toc { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; }
+    .toc a { display:block; background:white; border:1px solid var(--line); border-radius:12px; padding:10px 12px; text-decoration:none; color:#24485e; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LocalTalent 三期主线收口验收报告</h1>
+    <p>记录 Prompt 25-31 完成内容、验收结果和后续边界。</p>
+  </header>
+  <main>
+    <section class="card">
+      <nav class="toc">
+        <a href="#conclusion">收口结论</a>
+        <a href="#prompts">Prompt 摘要</a>
+        <a href="#verified">验收结果</a>
+        <a href="#security">安全边界</a>
+        <a href="#next">后续建议</a>
+      </nav>
+    </section>
+
+    <section id="conclusion" class="card">
+      <h2>1. 收口结论</h2>
+      <ul>
+        <li>三期主线 <code>Prompt 25-31</code> 已完成。</li>
+        <li>当前状态：可进入灰度试运营复核，或另起四期正式上线治理规划。</li>
+        <li>三期目标仍是小范围真实试运营，不是公网正式运营。</li>
+        <li>后续新需求不得混入已收口的 Prompt 25-31。</li>
+      </ul>
+    </section>
+
+    <section id="prompts" class="card">
+      <h2>2. Prompt 25-31 完成摘要</h2>
+      <table>
+        <tr><th>Prompt</th><th>主题</th><th>完成内容</th></tr>
+        <tr><td>25（P3-0）</td><td>基线冻结</td><td>feature flag、环境模板、Runbook、边界脚本、README 入口。</td></tr>
+        <tr><td>26（P3-1）</td><td>认证与身份映射</td><td>OIDC/SSO、内部身份映射、本地 JWT fallback、SSO 登录入口。</td></tr>
+        <tr><td>27（P3-2）</td><td>求职者闭环</td><td>简历、投递、收藏、订阅、站内通知、同意/撤回。</td></tr>
+        <tr><td>28（P3-3）</td><td>企业工作台</td><td>企业资料、认证、职位、投递池、面试邀约、导出申请。</td></tr>
+        <tr><td>29（P3-4）</td><td>运营后台与门户运营</td><td>推荐位、风险审核、运营首页、公开推荐。</td></tr>
+        <tr><td>30（P3-5）</td><td>安全收口</td><td>trace、导出、撤回、IDOR/BOLA、字段黑名单、风险池阻断。</td></tr>
+        <tr><td>31（P3-6）</td><td>灰度工程治理</td><td>smoke/load、备份恢复、监控告警、灰度模板、总闸门。</td></tr>
+      </table>
+    </section>
+
+    <section id="verified" class="card">
+      <h2>3. 本次已验证结果</h2>
+      <table>
+        <tr><th>验收项</th><th>结果</th><th>备注</th></tr>
+        <tr><td><code>./scripts/run_all</code></td><td class="ok">PASS</td><td>包含边界脚本、后端测试、前端测试和构建。</td></tr>
+        <tr><td>后端测试</td><td class="ok">70 tests PASS</td><td>覆盖迁移、认证、candidate、company、admin、审计、导出、openapi、安全矩阵。</td></tr>
+        <tr><td>前端测试</td><td class="ok">85 tests PASS</td><td>覆盖门户、登录、candidate、company、admin、字段黑名单和占位态。</td></tr>
+        <tr><td>Next build</td><td class="ok">PASS</td><td>已还原 <code>frontend/next-env.d.ts</code> 生成噪音。</td></tr>
+        <tr><td><code>smoke_phase3</code></td><td class="ok">PASS</td><td>在前后端运行中环境下通过。</td></tr>
+        <tr><td><code>load_phase3_public</code></td><td class="ok">PASS</td><td>首次本地冷启动 P95 1719ms 超过 1500ms，全部请求 200；热身后复跑 PASS，p95_ms=351。</td></tr>
+        <tr><td>备份恢复演练</td><td class="ok">PASS</td><td>已生成 dump，恢复到 scratch DB 并校验 Flyway 与核心表。</td></tr>
+        <tr><td>Phase III 专项闸门</td><td class="ok">PASS</td><td><code>check_phase3_boundary</code>、<code>check_phase3_ops</code>、<code>check_phase3_security_acceptance</code>、<code>check_phase3_gray_acceptance</code> 均通过。</td></tr>
+      </table>
+      <div class="warn">冷启动 load 观察不是失败结论：本地 Next 首次访问可能触发冷页开销。灰度环境应以热身后稳定复跑和监控指标为准。</div>
+    </section>
+
+    <section id="security" class="card">
+      <h2>4. 已落实的安全边界</h2>
+      <ul>
+        <li>人才服务区只展示发布快照。</li>
+        <li>公开层不输出手机号、邮箱、简历正文、附件对象 key、证据、原始 JSON、审核材料、报名名单、签到证据。</li>
+        <li>candidate/company 私有接口强制本人/本企业数据域。</li>
+        <li>operator 写操作要求权限、trace、幂等和审计；auditor 只读。</li>
+        <li>导出仍走审批、字段裁剪、短期下载和审计链。</li>
+        <li>OIDC 只负责认证，RBAC 和字段级权限仍由服务端强制。</li>
+        <li>OpenAPI 对接仍为 stub。</li>
+      </ul>
+      <p>未进入三期主线：公共简历库、受控找人才、联系解锁、会员商业化、真实支付、真实短信/微信/小程序/App、真实地图/视频/直播、ATS/RPA、AI 处理原始候选人数据。</p>
+    </section>
+
+    <section id="next" class="card">
+      <h2>5. 后续建议</h2>
+      <p>下一步建议二选一：</p>
+      <ol>
+        <li>灰度复核：使用本文、Runbook 和三份灰度模板完成一次真实灰度演练。</li>
+        <li>四期规划：另起 <code>docs/Phase_IV</code>，规划公网正式上线治理、生产 SLA、客服工单、合规材料、供应商治理和正式发布流程。</li>
+      </ol>
+      <p>风险池能力必须先走风险准入，不得混入三期主线。</p>
+    </section>
+  </main>
+</body>
+</html>

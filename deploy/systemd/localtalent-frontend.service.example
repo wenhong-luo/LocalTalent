@@ -1,0 +1,22 @@
+[Unit]
+Description=LocalTalent Frontend
+After=network.target localtalent-backend.service
+
+[Service]
+Type=simple
+User=localtalent
+Group=localtalent
+WorkingDirectory=/opt/localtalent/app/frontend
+EnvironmentFile=-/etc/localtalent/frontend.env
+Environment=PORT=3000
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/var/log/localtalent/frontend.log
+StandardError=append:/var/log/localtalent/frontend.err.log
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

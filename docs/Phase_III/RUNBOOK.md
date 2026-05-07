@@ -18,6 +18,8 @@
 - `docs/Phase_III/LocalTalent_phase3_step1.md` 至 `LocalTalent_phase3_step6.md`
 - `docs/Phase_III/三期研发实施蓝图与任务拆解.md`
 - `docs/Phase_III/三期研发提示词.md`
+- `docs/Phase_III/三期灰度试运营使用说明.md`
+- `docs/Phase_III/三期主线收口验收报告.md`
 - `docs/Phase_III/feature_flags.md`
 - `docs/Phase_III/灰度上线暂停回滚检查单.md`
 - `docs/Phase_III/灰度备份恢复演练记录模板.md`

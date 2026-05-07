@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 三期灰度试运营使用说明</title>
+  <style>
+    :root { --bg:#f6f8fb; --card:#fff; --ink:#172033; --muted:#637083; --line:#dfe6ef; --brand:#0f9f7a; --warn:#a15c00; --soft:#eefaf6; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--ink); line-height:1.7; }
+    header { background:linear-gradient(135deg,#083b3d,#0f9f7a); color:white; padding:44px 28px; }
+    main { max-width:1120px; margin:0 auto; padding:28px; }
+    h1 { margin:0 0 10px; font-size:32px; }
+    h2 { margin-top:0; color:#0b594d; }
+    h3 { color:#145c6b; }
+    a { color:#08785f; }
+    code, pre { font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace; }
+    pre { background:#111827; color:#e5e7eb; padding:14px 16px; border-radius:12px; overflow:auto; }
+    table { border-collapse:collapse; width:100%; margin:12px 0; background:white; }
+    th, td { border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top; }
+    th { background:#edf4f7; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:22px; margin:18px 0; box-shadow:0 8px 24px rgba(16,24,40,.05); }
+    .toc { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; }
+    .toc a { display:block; background:white; border:1px solid var(--line); border-radius:12px; padding:10px 12px; text-decoration:none; }
+    .note { background:var(--soft); border-left:5px solid var(--brand); padding:12px 14px; border-radius:10px; }
+    .warn { background:#fff8ed; border-left:5px solid var(--warn); padding:12px 14px; border-radius:10px; }
+    .muted { color:var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LocalTalent 三期灰度试运营使用说明</h1>
+    <p>面向新人和验收人：怎么启动、怎么看页面、怎么打开三期能力、怎么做灰度前验收。</p>
+  </header>
+  <main>
+    <section class="card">
+      <h2>目录</h2>
+      <nav class="toc">
+        <a href="#read">先读这一段</a>
+        <a href="#start">本地启动</a>
+        <a href="#flags">Feature Flag</a>
+        <a href="#login">账号与登录</a>
+        <a href="#walkthrough">页面 Walkthrough</a>
+        <a href="#checks">灰度前必跑命令</a>
+        <a href="#limits">当前限制</a>
+      </nav>
+    </section>
+
+    <section id="read" class="card">
+      <h2>1. 先读这一段</h2>
+      <div class="note">
+        三期主线 Prompt 25-31 已收口，目标是小范围真实试运营，不是公网正式上线。
+      </div>
+      <ul>
+        <li>三期新增能力默认由 feature flag 控制，默认关闭。</li>
+        <li>人才服务区只展示发布快照，公开层不展示原始候选人数据。</li>
+        <li>对接接口仍是 stub；真实 ATS/RPA、受控候选池同步不在三期。</li>
+        <li>真实短信、微信、小程序、App、地图、视频、直播、支付、会员商业化、公共简历库、受控找人才、联系解锁都不在三期主线。</li>
+      </ul>
+    </section>
+
+    <section id="start" class="card">
+      <h2>2. 本地启动</h2>
+      <pre><code>docker compose -f infra/docker-compose.yml up -d
+cd backend
+./mvnw spring-boot:run</code></pre>
+      <pre><code>cd frontend
+npm ci
+npm run dev</code></pre>
+      <table>
+        <tr><th>服务</th><th>地址</th></tr>
+        <tr><td>前端</td><td><code>http://localhost:3000</code></td></tr>
+        <tr><td>后端健康检查</td><td><code>http://localhost:8080/health</code></td></tr>
+      </table>
+      <p>推荐先导入二期门户演示数据：</p>
+      <pre><code>./scripts/seed_phase2_demo_data</code></pre>
+    </section>
+
+    <section id="flags" class="card">
+      <h2>3. Feature Flag</h2>
+      <p>三期 flag 注册表：<code>docs/Phase_III/feature_flags.md</code>。</p>
+      <pre><code>export LOCALTALENT_PHASE3_CANDIDATE_CLOSURE=true
+export LOCALTALENT_PHASE3_COMPANY_WORKBENCH=true
+export LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS=true</code></pre>
+      <div class="warn">gray 环境不能随意打开全部 flag，必须按白名单、比例和观察窗口逐步开启。flag 不得绕过 RBAC、数据域、字段级权限、导出审批或审计。</div>
+    </section>
+
+    <section id="login" class="card">
+      <h2>4. 账号与登录</h2>
+      <p>默认演示密码：<code>LocalTalent@123456</code>。</p>
+      <table>
+        <tr><th>脚本 key</th><th>账号</th><th>身份</th><th>用途</th></tr>
+        <tr><td><code>p2-candidate</code></td><td><code>p2_candidate@localtalent.test</code></td><td>candidate</td><td>求职者中心</td></tr>
+        <tr><td><code>p2-company</code></td><td><code>p2_company@localtalent.test</code></td><td>company</td><td>企业中心</td></tr>
+        <tr><td><code>operator</code></td><td><code>operator</code></td><td>operator</td><td>运营写操作</td></tr>
+        <tr><td><code>auditor</code></td><td><code>auditor_demo</code></td><td>operator + auditor</td><td>运营只读</td></tr>
+      </table>
+      <pre><code>./scripts/demo_login_tokens p2-candidate
+./scripts/demo_login_tokens p2-company
+./scripts/demo_login_tokens operator
+./scripts/demo_login_tokens auditor</code></pre>
+      <p>也可以直接访问 <code>/auth/login</code>。</p>
+    </section>
+
+    <section id="walkthrough" class="card">
+      <h2>5. 页面 Walkthrough</h2>
+      <h3>公开门户</h3>
+      <table>
+        <tr><th>页面</th><th>地址</th><th>说明</th></tr>
+        <tr><td>首页</td><td><code>/</code></td><td>高保真门户、推荐位、公开频道入口</td></tr>
+        <tr><td>找工作</td><td><code>/jobs</code></td><td>公开职位搜索</td></tr>
+        <tr><td>找企业</td><td><code>/companies</code></td><td>已认证企业公开列表</td></tr>
+        <tr><td>人才服务区</td><td><code>/portal/talent-service-area</code></td><td>只展示发布快照白名单</td></tr>
+        <tr><td>招聘会</td><td><code>/job-fairs</code></td><td>公开招聘会频道</td></tr>
+        <tr><td>校园招聘</td><td><code>/campus</code></td><td>校园职位、活动、资讯聚合</td></tr>
+      </table>
+      <h3>私有中心</h3>
+      <ul>
+        <li><code>/candidate/center</code>：简历、投递、收藏、订阅、站内通知、同意/撤回。</li>
+        <li><code>/company</code>：企业资料、认证、职位、投递池、面试邀约、导出申请。</li>
+        <li><code>/admin</code>：审核、推荐位、风险审核、审计 trace。</li>
+      </ul>
+    </section>
+
+    <section id="checks" class="card">
+      <h2>6. 灰度前必跑命令</h2>
+      <pre><code>./scripts/check_phase3_boundary
+./scripts/check_phase3_ops
+./scripts/check_phase3_security_acceptance
+./scripts/check_phase3_gray_acceptance
+./scripts/check_portal_snapshot_fields
+./scripts/check_boundary
+./scripts/run_all</code></pre>
+      <pre><code>./scripts/smoke_phase3
+./scripts/load_phase3_public
+./scripts/backup_phase3_mysql
+LOCALTALENT_PHASE3_BACKUP_FILE=/tmp/localtalent-phase3-backups/&lt;dump&gt;.sql ./scripts/restore_phase3_mysql_drill</code></pre>
+      <p class="muted">如果 load 首次因本地 Next 冷启动导致 P95 超阈值但全部请求为 200，可热身后复跑；灰度环境以稳定复跑和监控为准。</p>
+    </section>
+
+    <section id="limits" class="card">
+      <h2>7. 当前限制</h2>
+      <ul>
+        <li>不做公共简历库、搜索简历、查看完整简历。</li>
+        <li>不做受控找人才、联系解锁、会员商业化和真实支付。</li>
+        <li>不接真实短信、微信、小程序、App、地图、视频、直播。</li>
+        <li>不接真实 ATS/RPA 或受控候选池同步。</li>
+        <li>不承诺公网正式运营 SLA。</li>
+      </ul>
+      <div class="note">一句话理解三期：从“能演示的人才网”推进到“可小范围真实试运营的人才网”。</div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+BRANCH="${LOCALTALENT_DEPLOY_BRANCH:-main}"
+REMOTE="${LOCALTALENT_DEPLOY_REMOTE:-origin}"
+RESTART_MODE="${LOCALTALENT_DEPLOY_RESTART_MODE:-systemd}"
+BACKEND_SERVICE="${LOCALTALENT_BACKEND_SERVICE:-localtalent-backend}"
+FRONTEND_SERVICE="${LOCALTALENT_FRONTEND_SERVICE:-localtalent-frontend}"
+
+if [ "${LOCALTALENT_DEPLOY_CONFIRM:-}" != "deploy" ]; then
+  cat <<'MSG'
+FAIL: refusing to deploy without explicit confirmation.
+
+Run on the server only:
+  LOCALTALENT_DEPLOY_CONFIRM=deploy ./scripts/deploy_server_source
+
+Optional:
+  LOCALTALENT_DEPLOY_RESTART_MODE=none    # build only, no service restart
+  LOCALTALENT_DEPLOY_BRANCH=main
+MSG
+  exit 1
+fi
+
+if [ -n "${NODE_BIN_DIR:-}" ]; then
+  export PATH="$NODE_BIN_DIR:$PATH"
+fi
+
+if [ -n "${JAVA_HOME_OVERRIDE:-}" ]; then
+  export JAVA_HOME="$JAVA_HOME_OVERRIDE"
+fi
+
+require_command() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "FAIL: required command not found: $1"
+    exit 1
+  fi
+}
+
+require_command git
+require_command java
+require_command javac
+require_command node
+require_command npm
+
+cd "$ROOT_DIR"
+
+if [ ! -d .git ]; then
+  echo "FAIL: deploy script must run inside a git checkout"
+  exit 1
+fi
+
+if [ -n "$(git status --porcelain)" ] && [ "${LOCALTALENT_DEPLOY_FORCE_RESET:-false}" != "true" ]; then
+  echo "FAIL: working tree is not clean. Commit/stash changes or set LOCALTALENT_DEPLOY_FORCE_RESET=true on a disposable server checkout."
+  git status --short
+  exit 1
+fi
+
+echo "[1/9] fetch ${REMOTE}/${BRANCH}"
+git fetch "$REMOTE" "$BRANCH"
+
+echo "[2/9] reset to ${REMOTE}/${BRANCH}"
+git reset --hard "${REMOTE}/${BRANCH}"
+
+echo "[3/9] boundary checks"
+./scripts/check_boundary
+./scripts/check_portal_snapshot_fields
+./scripts/check_phase3_boundary
+./scripts/check_phase3_ops
+./scripts/check_phase3_security_acceptance
+./scripts/check_phase3_gray_acceptance
+
+echo "[4/9] backend package"
+(
+  cd backend
+  ./mvnw ${BACKEND_MAVEN_ARGS:-} clean package
+)
+
+echo "[5/9] frontend dependencies"
+(
+  cd frontend
+  npm ci
+)
+
+echo "[6/9] frontend build"
+(
+  cd frontend
+  npm run build
+)
+
+if [ "$RESTART_MODE" = "none" ]; then
+  echo "[7/9] restart skipped"
+else
+  require_command systemctl
+  echo "[7/9] restart backend service: $BACKEND_SERVICE"
+  systemctl restart "$BACKEND_SERVICE"
+
+  echo "[8/9] restart frontend service: $FRONTEND_SERVICE"
+  systemctl restart "$FRONTEND_SERVICE"
+
+  echo "[9/9] service status"
+  systemctl --no-pager --lines=20 status "$BACKEND_SERVICE" "$FRONTEND_SERVICE"
+fi
+
+echo "PASS"

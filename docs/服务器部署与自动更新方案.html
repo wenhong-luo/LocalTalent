@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 服务器部署与自动更新方案</title>
+  <style>
+    :root { --bg:#f7f7f4; --card:#fff; --ink:#17212b; --muted:#68737e; --line:#e2e3dc; --brand:#265a73; --accent:#0f766e; --warn:#a05a00; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--ink); line-height:1.72; }
+    header { padding:44px 28px; color:#fff; background:linear-gradient(135deg,#1c3344,#265a73); }
+    header .wrap, main { max-width:1120px; margin:0 auto; }
+    h1 { margin:0 0 10px; font-size:clamp(30px,4vw,46px); }
+    h2 { margin:0 0 14px; color:#24485e; }
+    h3 { margin:18px 0 8px; color:#24485e; }
+    main { padding:28px; }
+    a { color:var(--accent); text-decoration:none; }
+    code, pre { font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace; }
+    pre { padding:14px 16px; background:#122127; color:#eef8f5; border-radius:14px; overflow:auto; line-height:1.55; }
+    table { width:100%; border-collapse:collapse; margin:12px 0; }
+    th, td { border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top; }
+    th { background:#eef3f5; }
+    .subtitle { max-width:860px; color:rgba(255,255,255,.86); font-size:18px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:22px; margin:18px 0; box-shadow:0 10px 28px rgba(24,33,43,.06); }
+    .toc { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; }
+    .toc a { display:block; background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-weight:650; color:#24485e; }
+    .warn { background:#fff8ed; border-left:5px solid var(--warn); border-radius:12px; padding:13px 15px; margin:12px 0; }
+    .ok { color:#0f7b55; font-weight:700; }
+    ul, ol { padding-left:22px; }
+    li { margin:5px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>LocalTalent 服务器部署与自动更新方案</h1>
+      <p class="subtitle">VPS 源码部署、服务器构建、systemd 重启，以及 push 后自动更新的落地说明。</p>
+    </div>
+  </header>
+  <main>
+    <section class="card">
+      <nav class="toc">
+        <a href="#summary">结论</a>
+        <a href="#arch">推荐架构</a>
+        <a href="#prepare">服务器准备</a>
+        <a href="#first">首次部署</a>
+        <a href="#manual">手动更新</a>
+        <a href="#auto">自动更新</a>
+        <a href="#verify">部署验收</a>
+        <a href="#security">安全边界</a>
+      </nav>
+    </section>
+
+    <section id="summary" class="card">
+      <h2>1. 结论先行</h2>
+      <ul>
+        <li>可以部署到服务器上。</li>
+        <li>本地 <code>git commit</code> 不会自动影响服务器；必须至少 <code>git push</code> 到远程仓库。</li>
+        <li>服务器要更新，需要执行 <code>git pull</code> 或由 webhook / CI 触发部署脚本。</li>
+        <li>前端是 Next.js SSR，生产运行依赖 <code>.next</code> 构建产物，所以正式部署必须重新 <code>npm run build</code>。</li>
+        <li>后端 Java 代码变化后也必须重新 <code>./mvnw clean package</code> 并重启服务。</li>
+      </ul>
+      <div class="warn">不建议用 <code>npm run dev</code> 给领导或灰度环境看；开发模式不代表试运营形态。</div>
+    </section>
+
+    <section id="arch" class="card">
+      <h2>2. 推荐架构</h2>
+      <pre><code>用户浏览器
+  |
+  v
+Nginx :80/:443
+  |-- /api/*  -> Spring Boot backend :8080
+  |-- /health -> Spring Boot backend :8080
+  `-- /*      -> Next.js frontend :3000</code></pre>
+      <p>当前仓库已提供依赖 compose、Next standalone 构建配置、服务器部署脚本、systemd 模板和 Nginx 模板。</p>
+    </section>
+
+    <section id="prepare" class="card">
+      <h2>3. 服务器准备</h2>
+      <table>
+        <tr><th>组件</th><th>建议</th></tr>
+        <tr><td>OS</td><td>Ubuntu 22.04/24.04 或同类 Linux</td></tr>
+        <tr><td>Node</td><td>Node 24 LTS</td></tr>
+        <tr><td>Java</td><td>JDK 21</td></tr>
+        <tr><td>Docker</td><td>Docker Engine + Compose plugin</td></tr>
+        <tr><td>Nginx</td><td>稳定版</td></tr>
+      </table>
+      <pre><code>sudo useradd -r -m -d /opt/localtalent -s /bin/bash localtalent
+sudo mkdir -p /opt/localtalent /etc/localtalent /var/log/localtalent
+sudo chown -R localtalent:localtalent /opt/localtalent /var/log/localtalent</code></pre>
+    </section>
+
+    <section id="first" class="card">
+      <h2>4. 首次部署</h2>
+      <pre><code>sudo -iu localtalent
+git clone https://github.com/wenhong-luo/LocalTalent.git /opt/localtalent/app
+cd /opt/localtalent/app
+docker compose -f infra/docker-compose.yml up -d</code></pre>
+      <pre><code>sudo cp .env.phase3.example /etc/localtalent/backend.env
+sudo cp .env.phase3.example /etc/localtalent/frontend.env
+sudo chmod 600 /etc/localtalent/*.env</code></pre>
+      <pre><code>./scripts/check_boundary
+./scripts/check_portal_snapshot_fields
+./scripts/check_phase3_boundary
+./scripts/check_phase3_ops
+./scripts/check_phase3_security_acceptance
+./scripts/check_phase3_gray_acceptance
+
+cd backend
+./mvnw clean package
+
+cd ../frontend
+npm ci
+npm run build</code></pre>
+      <pre><code>sudo cp deploy/systemd/localtalent-backend.service.example /etc/systemd/system/localtalent-backend.service
+sudo cp deploy/systemd/localtalent-frontend.service.example /etc/systemd/system/localtalent-frontend.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now localtalent-backend localtalent-frontend</code></pre>
+    </section>
+
+    <section id="manual" class="card">
+      <h2>5. 手动更新流程</h2>
+      <pre><code>cd /opt/localtalent/app
+git pull --ff-only
+
+./scripts/check_boundary
+./scripts/check_portal_snapshot_fields
+./scripts/check_phase3_boundary
+./scripts/check_phase3_ops
+./scripts/check_phase3_security_acceptance
+./scripts/check_phase3_gray_acceptance
+
+cd backend && ./mvnw clean package
+cd ../frontend && npm ci && npm run build
+
+sudo systemctl restart localtalent-backend
+sudo systemctl restart localtalent-frontend</code></pre>
+    </section>
+
+    <section id="auto" class="card">
+      <h2>6. 推荐自动更新：push 后部署</h2>
+      <pre><code>本地 commit -> git push origin main -> 服务器 webhook / CI 触发 -> git pull -> 检查 -> 构建 -> 重启服务</code></pre>
+      <p>服务器上可执行：</p>
+      <pre><code>cd /opt/localtalent/app
+LOCALTALENT_DEPLOY_CONFIRM=deploy ./scripts/deploy_server_source</code></pre>
+      <p>如果只演练，不重启服务：</p>
+      <pre><code>LOCALTALENT_DEPLOY_CONFIRM=deploy \
+LOCALTALENT_DEPLOY_RESTART_MODE=none \
+./scripts/deploy_server_source</code></pre>
+      <div class="warn">不要在 webhook 中执行未校验来源的 shell 命令；自动部署必须校验 webhook secret 或由可信 CI 触发。</div>
+    </section>
+
+    <section id="verify" class="card">
+      <h2>7. 部署后验收</h2>
+      <pre><code>curl -I http://你的域名/
+curl -I http://你的域名/jobs
+curl -I http://你的域名/companies
+curl -I http://你的域名/portal/talent-service-area
+curl -I http://你的域名/auth/login
+curl http://你的域名/health</code></pre>
+      <pre><code>LOCALTALENT_FRONTEND_BASE_URL=http://你的域名 \
+LOCALTALENT_API_BASE_URL=http://你的域名 \
+./scripts/smoke_phase3
+
+LOCALTALENT_FRONTEND_BASE_URL=http://你的域名 \
+./scripts/load_phase3_public</code></pre>
+    </section>
+
+    <section id="security" class="card">
+      <h2>8. 安全边界</h2>
+      <ul>
+        <li>人才服务区仍只展示发布快照。</li>
+        <li>公开门户不输出原始候选人数据。</li>
+        <li>对接接口仍为 stub。</li>
+        <li>公共简历库、受控找人才、联系解锁、真实支付、真实短信/微信/小程序/App、真实地图/视频/直播、ATS/RPA 仍不得上线。</li>
+        <li>生产/灰度环境不要使用模板中的占位密钥。</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

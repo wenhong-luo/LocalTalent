@@ -199,10 +199,13 @@ cd frontend && npm ci && npm test && npm run build
 - 二期测试矩阵：`docs/Phase_II/TESTING.md`，列出二期页面结构、字段白名单、SEO 和风险池闸门。
 - 二期运维手册：`docs/Phase_II/RUNBOOK.md`，覆盖二期高保真门户演示、发布和排障。
 - 三期开发入口：`docs/Phase_III/三期研发提示词.md`，当前从 Prompt 25（P3-0）开始逐轮执行。
+- 三期灰度试运营使用说明：`docs/Phase_III/三期灰度试运营使用说明.md`，面向新人说明如何启动、登录、查看页面、打开三期 flag 和执行灰度验收。
+- 三期主线收口验收报告：`docs/Phase_III/三期主线收口验收报告.md`，记录 Prompt 25-31 完成内容、已验证结果、冷启动 load 观察和后续边界。
 - 三期灰度 Runbook：`docs/Phase_III/RUNBOOK.md`，覆盖 feature flag、环境模板、预发/灰度、暂停回滚、备份恢复演练、对象存储生命周期、监控告警、容量烟测和灰度 KPI。
 - 三期 feature flag 注册表：`docs/Phase_III/feature_flags.md`，三期新增能力默认关闭，不得绕过服务端权限、字段级权限、导出审批和审计。
 - 三期 P3-0/P3-6 闸门：`scripts/check_phase3_boundary`、`scripts/check_phase3_ops`、`scripts/check_phase3_gray_acceptance`，用于阻断风险能力、敏感字段、真实外部能力、环境模板密钥误配置，并检查灰度演练材料。
 - 三期灰度演练脚本：`scripts/smoke_phase3`、`scripts/load_phase3_public`、`scripts/backup_phase3_mysql`、`scripts/restore_phase3_mysql_drill`。
+- 服务器部署与自动更新：`docs/服务器部署与自动更新方案.md`，覆盖 VPS 源码部署、服务器构建、systemd/Nginx 模板、push 后自动更新和部署后验收；服务器源码部署脚本见 `scripts/deploy_server_source`。
 - 本地总闸门：`./scripts/run_all`，顺序执行一期边界扫描、人才服务区字段扫描、二期规划闸门、二期演示验收闸门、后端测试、前端测试与前端构建。
 
 ## 自检清单
