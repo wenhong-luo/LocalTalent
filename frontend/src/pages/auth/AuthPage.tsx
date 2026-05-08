@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { isHttpClientError } from '@/lib/httpClient';
+import { fetchCandidateCenterOverview } from '@/pages/candidate/candidateCenterApi';
 import {
   type AuthMode,
   type AuthRole,
@@ -163,7 +164,27 @@ export function AuthPage({
     });
     const identityType = result.data.identity.identity_type;
     saveAccessToken(result.data.access_token, identityType, result.data.identity.role_codes);
+    if (identityType === 'candidate') {
+      onNavigate(await candidateDestinationAfterLogin(result.data.access_token));
+      return;
+    }
     onNavigate(destinationForIdentity(identityType, redirect));
+  }
+
+  async function candidateDestinationAfterLogin(accessToken: string): Promise<string> {
+    try {
+      const overview = await fetchCandidateCenterOverview(accessToken);
+      if (
+        overview.data.features.candidate_closure_enabled
+        && overview.data.onboarding?.onboarding_required
+      ) {
+        return '/candidate/resume/create';
+      }
+    } catch {
+      return destinationForIdentity('candidate', redirect);
+    }
+
+    return destinationForIdentity('candidate', redirect);
   }
 
   async function submitRegister() {
@@ -186,6 +207,10 @@ export function AuthPage({
     if (result.data.access_token) {
       const identityType = result.data.identity.identity_type;
       saveAccessToken(result.data.access_token, identityType, result.data.identity.role_codes);
+      if (identityType === 'candidate') {
+        onNavigate(await candidateDestinationAfterLogin(result.data.access_token));
+        return;
+      }
       onNavigate(destinationForIdentity(identityType, redirect));
       return;
     }

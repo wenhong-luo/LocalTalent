@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { type FormEvent, type ReactNode, useEffect, useState } from 'react';
 import { StateView } from '@/components/StateView';
 import { isHttpClientError } from '@/lib/httpClient';
@@ -546,11 +547,26 @@ export function CandidateCenter() {
         city_code: formText(formData, 'city_code'),
         category_code: formText(formData, 'category_code'),
         experience_years: formNumber(formData, 'experience_years'),
-        summary: formText(formData, 'summary')
+        summary: formText(formData, 'summary'),
+        gender: '',
+        birth_date: '',
+        highest_education: '',
+        start_work_date: '',
+        no_experience: false,
+        contact_phone: '',
+        contact_wechat: '',
+        wechat_same_as_phone: false,
+        expected_positions: [],
+        expected_salary: '',
+        expected_cities: [],
+        job_status: ''
       },
       education: formLines(formData, 'education'),
       experience: formLines(formData, 'experience'),
-      skills: formLines(formData, 'skills')
+      skills: formLines(formData, 'skills'),
+      work_experience: [],
+      education_experience: [],
+      self_description: formText(formData, 'summary')
     }));
   }
 
@@ -661,6 +677,21 @@ export function CandidateCenter() {
                   helper={`最近签到时间：${overview.signin.latest_time || '暂无'}`}
                 />
               </section>
+
+              {overview.onboarding?.onboarding_required ? (
+                <article style={{ ...cardStyle, marginTop: '18px', borderColor: 'rgba(37, 99, 235, 0.28)' }}>
+                  <h2 style={sectionTitleStyle}>首次登录资料待完善</h2>
+                  <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
+                    服务端判断当前简历尚未完成。请先完成基本信息和简历详情，再进入完整会员中心体验。
+                  </p>
+                  <Link
+                    href="/candidate/resume/create"
+                    style={{ ...primaryButtonStyle, display: 'inline-flex', marginTop: '16px', textDecoration: 'none' }}
+                  >
+                    去完善简历
+                  </Link>
+                </article>
+              ) : null}
 
               <CandidateClosurePanel
                 overview={overview}

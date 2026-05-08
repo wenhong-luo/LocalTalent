@@ -13,6 +13,13 @@ public final class CandidateCenterDtos {
     ) {
     }
 
+    public record OnboardingResponse(
+            @JsonProperty("onboarding_required") boolean onboardingRequired,
+            @JsonProperty("onboarding_step") String onboardingStep,
+            @JsonProperty("publish_status") String publishStatus
+    ) {
+    }
+
     public record PrivateStatsResponse(
             @JsonProperty("favorite_count") long favoriteCount,
             @JsonProperty("subscription_count") long subscriptionCount,
@@ -30,6 +37,9 @@ public final class CandidateCenterDtos {
             List<String> education,
             List<String> experience,
             List<String> skills,
+            @JsonProperty("work_experience") List<WorkExperienceResponse> workExperience,
+            @JsonProperty("education_experience") List<EducationExperienceResponse> educationExperience,
+            @JsonProperty("self_description") String selfDescription,
             @JsonProperty("has_attachment") boolean hasAttachment
     ) {
     }
@@ -39,7 +49,19 @@ public final class CandidateCenterDtos {
             @JsonProperty("city_code") String cityCode,
             @JsonProperty("category_code") String categoryCode,
             @JsonProperty("experience_years") Integer experienceYears,
-            @JsonProperty("summary") String summary
+            @JsonProperty("summary") String summary,
+            String gender,
+            @JsonProperty("birth_date") String birthDate,
+            @JsonProperty("highest_education") String highestEducation,
+            @JsonProperty("start_work_date") String startWorkDate,
+            @JsonProperty("no_experience") boolean noExperience,
+            @JsonProperty("contact_phone") String contactPhone,
+            @JsonProperty("contact_wechat") String contactWechat,
+            @JsonProperty("wechat_same_as_phone") boolean wechatSameAsPhone,
+            @JsonProperty("expected_positions") List<String> expectedPositions,
+            @JsonProperty("expected_salary") String expectedSalary,
+            @JsonProperty("expected_cities") List<String> expectedCities,
+            @JsonProperty("job_status") String jobStatus
     ) {
     }
 
@@ -48,7 +70,10 @@ public final class CandidateCenterDtos {
             @JsonProperty("base_profile") BaseProfileRequest baseProfile,
             List<String> education,
             List<String> experience,
-            List<String> skills
+            List<String> skills,
+            @JsonProperty("work_experience") List<WorkExperienceRequest> workExperience,
+            @JsonProperty("education_experience") List<EducationExperienceRequest> educationExperience,
+            @JsonProperty("self_description") String selfDescription
     ) {
     }
 
@@ -57,7 +82,59 @@ public final class CandidateCenterDtos {
             @JsonProperty("city_code") String cityCode,
             @JsonProperty("category_code") String categoryCode,
             @JsonProperty("experience_years") Integer experienceYears,
-            @JsonProperty("summary") String summary
+            @JsonProperty("summary") String summary,
+            String gender,
+            @JsonProperty("birth_date") String birthDate,
+            @JsonProperty("highest_education") String highestEducation,
+            @JsonProperty("start_work_date") String startWorkDate,
+            @JsonProperty("no_experience") Boolean noExperience,
+            @JsonProperty("contact_phone") String contactPhone,
+            @JsonProperty("contact_wechat") String contactWechat,
+            @JsonProperty("wechat_same_as_phone") Boolean wechatSameAsPhone,
+            @JsonProperty("expected_positions") List<String> expectedPositions,
+            @JsonProperty("expected_salary") String expectedSalary,
+            @JsonProperty("expected_cities") List<String> expectedCities,
+            @JsonProperty("job_status") String jobStatus
+    ) {
+    }
+
+    public record WorkExperienceResponse(
+            @JsonProperty("company_name") String companyName,
+            @JsonProperty("position_name") String positionName,
+            @JsonProperty("start_date") String startDate,
+            @JsonProperty("end_date") String endDate,
+            boolean ongoing,
+            @JsonProperty("responsibility") String responsibility
+    ) {
+    }
+
+    public record WorkExperienceRequest(
+            @JsonProperty("company_name") String companyName,
+            @JsonProperty("position_name") String positionName,
+            @JsonProperty("start_date") String startDate,
+            @JsonProperty("end_date") String endDate,
+            Boolean ongoing,
+            @JsonProperty("responsibility") String responsibility
+    ) {
+    }
+
+    public record EducationExperienceResponse(
+            @JsonProperty("school_name") String schoolName,
+            @JsonProperty("major_name") String majorName,
+            @JsonProperty("start_date") String startDate,
+            @JsonProperty("end_date") String endDate,
+            boolean ongoing,
+            String degree
+    ) {
+    }
+
+    public record EducationExperienceRequest(
+            @JsonProperty("school_name") String schoolName,
+            @JsonProperty("major_name") String majorName,
+            @JsonProperty("start_date") String startDate,
+            @JsonProperty("end_date") String endDate,
+            Boolean ongoing,
+            String degree
     ) {
     }
 

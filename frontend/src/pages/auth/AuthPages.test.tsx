@@ -122,6 +122,44 @@ describe('AuthPage', () => {
     });
   });
 
+  it('routes candidate to resume creation when service says onboarding is required', async () => {
+    const user = userEvent.setup();
+    const navigate = vi.fn();
+    const fetchMock = vi.spyOn(globalThis, 'fetch');
+    fetchMock.mockResolvedValueOnce(apiOk(oidcConfig()));
+    fetchMock.mockResolvedValueOnce(apiOk(loginResponse('candidate')));
+    fetchMock.mockResolvedValueOnce(apiOk({
+      resume: { completion_percent: 20, updated_at: '', skills_summary: '' },
+      applications: { total: 0, latest_status: '暂无投递', latest_job_title: '暂无' },
+      signin: { latest_status: '暂无签到', latest_time: '' },
+      consent: {
+        consent_id: null,
+        publish_status: 'not_publishable',
+        publishable_flag: 0,
+        status_label: '资料待补充',
+        reason: '',
+        updated_at: ''
+      },
+      stats: { favorite_count: 0, subscription_count: 0, unread_notification_count: 0 },
+      features: { candidate_closure_enabled: true },
+      onboarding: {
+        onboarding_required: true,
+        onboarding_step: 'basic',
+        publish_status: 'not_publishable'
+      }
+    }));
+
+    render(<AuthPage mode="login" initialRole="candidate" onNavigate={navigate} />);
+
+    await user.type(screen.getByLabelText('账号'), 'candidate@example.com');
+    await user.type(screen.getByLabelText('密码'), 'Candidate@123456');
+    await user.click(screen.getByRole('button', { name: '立即求职者登录' }));
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/candidate/resume/create'));
+    const overviewCall = fetchMock.mock.calls.find(([url]) => String(url).includes('/api/candidate/center/overview'));
+    expect(overviewCall).toBeTruthy();
+  });
+
   it('logs in company and operator identities to their target centers', async () => {
     const user = userEvent.setup();
     const navigate = vi.fn();

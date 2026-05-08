@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +106,7 @@ class ExportApprovalFlowIT {
 
         waitUntilGenerated(exportId, company.token());
 
+        LocalDateTime beforeIssue = LocalDateTime.now();
         HttpJsonResponse downloadUrlResponse = getJson(
                 "/api/company/exports/" + exportId + "/download-url",
                 "trace-p8-download-url",
@@ -112,6 +114,15 @@ class ExportApprovalFlowIT {
         assertSuccess(downloadUrlResponse, 200, "trace-p8-download-url");
         String downloadUrl = downloadUrlResponse.body().at("/data/download_url").asText();
         assertThat(downloadUrl).isNotBlank().contains("/export-it/");
+        assertThat(downloadUrl).contains("X-Amz-Expires=5");
+        LocalDateTime persistedExpireTime = jdbcTemplate.queryForObject(
+                "SELECT expire_time FROM export_apply WHERE id = ?",
+                LocalDateTime.class,
+                exportId);
+        assertThat(persistedExpireTime)
+                .as("trace-p8-url-expired should prove LocalTalent issues only a short-lived URL")
+                .isAfterOrEqualTo(beforeIssue.plusSeconds(1))
+                .isBeforeOrEqualTo(beforeIssue.plusSeconds(10));
 
         HttpResponse<String> csvResponse = getText(downloadUrl);
         assertThat(csvResponse.statusCode()).isEqualTo(200);
@@ -130,12 +141,6 @@ class ExportApprovalFlowIT {
                 "trace-p8-download-repeat",
                 "Bearer " + company.token());
         assertError(secondIssue, 409, "EXPORT_409", "trace-p8-download-repeat");
-
-        Thread.sleep(6500L);
-        HttpResponse<String> expiredResponse = getText(downloadUrl);
-        assertThat(expiredResponse.statusCode())
-                .as("trace-p8-url-expired should prove the presigned URL expires")
-                .isGreaterThanOrEqualTo(400);
 
         long rejectedExportId = applyExport(jobId, company.token(), "trace-p8-export-reject-apply");
         HttpJsonResponse reject = postJson(

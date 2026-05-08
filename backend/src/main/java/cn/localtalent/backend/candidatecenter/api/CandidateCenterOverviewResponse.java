@@ -8,7 +8,8 @@ public record CandidateCenterOverviewResponse(
         CandidateSigninSummaryResponse signin,
         CandidateConsentSummaryResponse consent,
         CandidateCenterDtos.PrivateStatsResponse stats,
-        CandidateCenterDtos.FeatureResponse features
+        CandidateCenterDtos.FeatureResponse features,
+        CandidateCenterDtos.OnboardingResponse onboarding
 ) {
 
     public record CandidateResumeSummaryResponse(

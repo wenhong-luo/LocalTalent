@@ -18,6 +18,7 @@ import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.ResumeResp
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.ResumeSaveRequest;
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.SubscriptionCreateRequest;
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.SubscriptionPageResponse;
+import cn.localtalent.backend.candidatecenter.domain.CandidateResumeSummary;
 import cn.localtalent.backend.candidatecenter.infrastructure.CandidateClosureJdbcRepository;
 import cn.localtalent.backend.common.exception.ApiException;
 import cn.localtalent.backend.common.json.AuditJsonMapper;
@@ -76,6 +77,19 @@ public class CandidateClosureService {
 
     public CandidateCenterDtos.FeatureResponse features() {
         return new CandidateCenterDtos.FeatureResponse(phase3Features.isCandidateClosure());
+    }
+
+    public CandidateCenterDtos.OnboardingResponse onboarding(
+            long candidateId,
+            CandidateResumeSummary resumeSummary,
+            String publishStatus
+    ) {
+        if (!phase3Features.isCandidateClosure()) {
+            return new CandidateCenterDtos.OnboardingResponse(false, "center", publishStatus);
+        }
+        return repository.findOnboardingState(candidateId)
+                .map(state -> onboardingFromState(state, publishStatus))
+                .orElseGet(() -> onboardingFromLegacyResume(resumeSummary, publishStatus));
     }
 
     public ResumeResponse resume() {
@@ -223,10 +237,18 @@ public class CandidateClosureService {
                 principal.userId(),
                 resume.resumeName(),
                 toJson(resume.baseProfile()),
-                toJson(resume.education()),
-                toJson(resume.experience()),
+                toJson(resume.educationExperience().isEmpty() ? resume.education() : resume.educationExperience()),
+                toJson(resume.workExperience().isEmpty() ? resume.experience() : resume.workExperience()),
                 toJson(resume.skills()));
         recordResumeFieldRead(principal, "SELF_WRITE");
+        ResumeResponse response = repository.latestResume(principal.userId());
+        OnboardingProgress progress = onboardingProgress(resume, response.completionPercent());
+        long onboardingId = repository.upsertOnboardingState(
+                principal.userId(),
+                resumeId,
+                progress.status(),
+                progress.currentStep(),
+                response.completionPercent());
         auditService.record(
                 principal,
                 "candidate_resume",
@@ -234,7 +256,15 @@ public class CandidateClosureService {
                 "resume_save",
                 null,
                 "{\"resume_status\":\"saved\"}");
-        ResumeResponse response = repository.latestResume(principal.userId());
+        auditService.record(
+                principal,
+                "candidate_resume_onboarding",
+                onboardingId,
+                "resume_onboarding_update",
+                null,
+                "{\"onboarding_status\":\"" + progress.status() + "\",\"current_step\":\""
+                        + progress.currentStep() + "\",\"resume_id\":" + resumeId + ",\"completion_score\":"
+                        + response.completionPercent() + "}");
         return new IdempotentActionResult<>(response, "candidate_resume", resumeId);
     }
 
@@ -376,6 +406,50 @@ public class CandidateClosureService {
         }
     }
 
+    private CandidateCenterDtos.OnboardingResponse onboardingFromState(
+            CandidateClosureJdbcRepository.OnboardingState state,
+            String publishStatus
+    ) {
+        if ("completed".equals(state.onboardingStatus())) {
+            return new CandidateCenterDtos.OnboardingResponse(false, "center", publishStatus);
+        }
+        String step = "detail".equals(state.currentStep()) ? "detail" : "basic";
+        return new CandidateCenterDtos.OnboardingResponse(true, step, publishStatus);
+    }
+
+    private CandidateCenterDtos.OnboardingResponse onboardingFromLegacyResume(
+            CandidateResumeSummary resumeSummary,
+            String publishStatus
+    ) {
+        int completion = resumeSummary.completionPercent();
+        if (completion >= 80) {
+            return new CandidateCenterDtos.OnboardingResponse(false, "center", publishStatus);
+        }
+        return new CandidateCenterDtos.OnboardingResponse(true, completion < 40 ? "basic" : "detail", publishStatus);
+    }
+
+    private OnboardingProgress onboardingProgress(NormalizedResume resume, int completionPercent) {
+        if (completionPercent >= 80) {
+            return new OnboardingProgress("completed", "done");
+        }
+        if (hasDetailContent(resume)) {
+            return new OnboardingProgress("detail_saved", "detail");
+        }
+        if (completionPercent > 0) {
+            return new OnboardingProgress("basic_saved", "detail");
+        }
+        return new OnboardingProgress("not_started", "basic");
+    }
+
+    private boolean hasDetailContent(NormalizedResume resume) {
+        return !resume.workExperience().isEmpty()
+                || !resume.educationExperience().isEmpty()
+                || !resume.education().isEmpty()
+                || !resume.experience().isEmpty()
+                || !resume.skills().isEmpty()
+                || resume.baseProfile().get("self_description") instanceof String text && isPresent(text);
+    }
+
     private NormalizedResume normalizeResume(ResumeSaveRequest request) {
         if (request == null) {
             throw validation("request body is required");
@@ -390,13 +464,97 @@ public class CandidateClosureService {
             throw validation("experience_years must be between 0 and 80");
         }
         baseProfile.put("experience_years", experienceYears);
-        baseProfile.put("summary", normalize(profile == null ? null : profile.summary(), 500));
+        String selfDescription = normalize(request.selfDescription(), 1000);
+        String summary = normalize(profile == null ? null : profile.summary(), 500);
+        baseProfile.put("summary", summary.isBlank() ? selfDescription : summary);
+        baseProfile.put("gender", normalize(profile == null ? null : profile.gender(), 16));
+        baseProfile.put("birth_date", normalize(profile == null ? null : profile.birthDate(), 32));
+        baseProfile.put("highest_education", normalize(profile == null ? null : profile.highestEducation(), 32));
+        baseProfile.put("start_work_date", normalize(profile == null ? null : profile.startWorkDate(), 32));
+        baseProfile.put("no_experience", Boolean.TRUE.equals(profile == null ? null : profile.noExperience()));
+        baseProfile.put("contact_phone", normalize(profile == null ? null : profile.contactPhone(), 32));
+        baseProfile.put("contact_wechat", normalize(profile == null ? null : profile.contactWechat(), 64));
+        baseProfile.put("wechat_same_as_phone", Boolean.TRUE.equals(profile == null ? null : profile.wechatSameAsPhone()));
+        baseProfile.put("expected_positions", normalizeList(profile == null ? null : profile.expectedPositions(), 5, 80));
+        baseProfile.put("expected_salary", normalize(profile == null ? null : profile.expectedSalary(), 64));
+        baseProfile.put("expected_cities", normalizeList(profile == null ? null : profile.expectedCities(), 5, 80));
+        baseProfile.put("job_status", normalize(profile == null ? null : profile.jobStatus(), 80));
+        baseProfile.put("self_description", selfDescription);
+        List<Map<String, Object>> workExperience = normalizeWorkExperience(request.workExperience());
+        List<Map<String, Object>> educationExperience = normalizeEducationExperience(request.educationExperience());
         return new NormalizedResume(
                 defaultText(request.resumeName(), "我的简历", 120),
                 baseProfile,
-                normalizeList(request.education(), 20, 200),
-                normalizeList(request.experience(), 20, 200),
-                normalizeList(request.skills(), 20, 80));
+                educationExperience.isEmpty() ? normalizeList(request.education(), 20, 200) : summarizeEducation(educationExperience),
+                workExperience.isEmpty() ? normalizeList(request.experience(), 20, 200) : summarizeWork(workExperience),
+                normalizeList(request.skills(), 20, 80),
+                workExperience,
+                educationExperience);
+    }
+
+    private List<Map<String, Object>> normalizeWorkExperience(List<CandidateCenterDtos.WorkExperienceRequest> values) {
+        if (values == null) {
+            return List.of();
+        }
+        return values.stream()
+                .filter(value -> value != null)
+                .map(value -> {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("company_name", normalize(value.companyName(), 120));
+                    item.put("position_name", normalize(value.positionName(), 120));
+                    item.put("start_date", normalize(value.startDate(), 32));
+                    item.put("end_date", normalize(value.endDate(), 32));
+                    item.put("ongoing", Boolean.TRUE.equals(value.ongoing()));
+                    item.put("responsibility", normalize(value.responsibility(), 1000));
+                    return item;
+                })
+                .filter(item -> item.values().stream().anyMatch(value -> value instanceof String text && !text.isBlank()))
+                .limit(10)
+                .toList();
+    }
+
+    private List<Map<String, Object>> normalizeEducationExperience(List<CandidateCenterDtos.EducationExperienceRequest> values) {
+        if (values == null) {
+            return List.of();
+        }
+        return values.stream()
+                .filter(value -> value != null)
+                .map(value -> {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("school_name", normalize(value.schoolName(), 120));
+                    item.put("major_name", normalize(value.majorName(), 120));
+                    item.put("start_date", normalize(value.startDate(), 32));
+                    item.put("end_date", normalize(value.endDate(), 32));
+                    item.put("ongoing", Boolean.TRUE.equals(value.ongoing()));
+                    item.put("degree", normalize(value.degree(), 32));
+                    return item;
+                })
+                .filter(item -> item.values().stream().anyMatch(value -> value instanceof String text && !text.isBlank()))
+                .limit(10)
+                .toList();
+    }
+
+    private List<String> summarizeWork(List<Map<String, Object>> values) {
+        return values.stream()
+                .map(value -> String.join(" / ",
+                        normalize(String.valueOf(value.get("company_name")), 120),
+                        normalize(String.valueOf(value.get("position_name")), 120)))
+                .map(value -> value.replaceAll("(^ / | / $)", "").trim())
+                .filter(value -> !value.isBlank())
+                .limit(20)
+                .toList();
+    }
+
+    private List<String> summarizeEducation(List<Map<String, Object>> values) {
+        return values.stream()
+                .map(value -> String.join(" / ",
+                        normalize(String.valueOf(value.get("school_name")), 120),
+                        normalize(String.valueOf(value.get("major_name")), 120),
+                        normalize(String.valueOf(value.get("degree")), 32)))
+                .map(value -> value.replaceAll("(^ / | / $)", "").trim())
+                .filter(value -> !value.isBlank())
+                .limit(20)
+                .toList();
     }
 
     private NormalizedSubscription normalizeSubscription(SubscriptionCreateRequest request) {
@@ -469,6 +627,10 @@ public class CandidateClosureService {
         return normalized.isBlank() ? defaultValue : normalized;
     }
 
+    private boolean isPresent(String value) {
+        return value != null && !value.isBlank();
+    }
+
     private String toJson(Object value) {
         try {
             return objectMapper.writeValueAsString(value);
@@ -486,7 +648,9 @@ public class CandidateClosureService {
             Map<String, Object> baseProfile,
             List<String> education,
             List<String> experience,
-            List<String> skills
+            List<String> skills,
+            List<Map<String, Object>> workExperience,
+            List<Map<String, Object>> educationExperience
     ) {
 
         Map<String, Object> fingerprint() {
@@ -496,6 +660,8 @@ public class CandidateClosureService {
             payload.put("education", education);
             payload.put("experience", experience);
             payload.put("skills", skills);
+            payload.put("work_experience", workExperience);
+            payload.put("education_experience", educationExperience);
             return payload;
         }
     }
@@ -519,5 +685,11 @@ public class CandidateClosureService {
             payload.put("salary_max", salaryMax);
             return payload;
         }
+    }
+
+    private record OnboardingProgress(
+            String status,
+            String currentStep
+    ) {
     }
 }

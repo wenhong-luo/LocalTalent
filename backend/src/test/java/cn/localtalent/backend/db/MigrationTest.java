@@ -54,6 +54,7 @@ class MigrationTest {
                 "candidate_job_favorite",
                 "candidate_search_subscription",
                 "candidate_notification",
+                "candidate_resume_onboarding",
                 "portal_recommendation",
                 "risk_review",
                 "audit_log",
@@ -178,6 +179,19 @@ class MigrationTest {
         assertIndexesExist(jdbcTemplate, "candidate_notification", List.of(
                 "idx_candidate_notification_read",
                 "idx_candidate_notification_biz"));
+        assertColumnsExist(jdbcTemplate, "candidate_resume_onboarding", List.of(
+                "candidate_id",
+                "resume_id",
+                "onboarding_status",
+                "current_step",
+                "completion_score",
+                "started_at",
+                "completed_at",
+                "version"));
+        assertIndexesExist(jdbcTemplate, "candidate_resume_onboarding", List.of(
+                "uk_candidate_resume_onboarding_candidate",
+                "idx_candidate_resume_onboarding_status",
+                "idx_candidate_resume_onboarding_resume"));
         assertColumnsExist(jdbcTemplate, "job_application", List.of(
                 "company_stage_note",
                 "stage_changed_by",

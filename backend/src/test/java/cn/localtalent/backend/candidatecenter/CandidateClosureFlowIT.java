@@ -72,6 +72,28 @@ class CandidateClosureFlowIT {
         assertSuccess(overview, 200, "trace-p3-closure-overview");
         assertThat(overview.body().at("/data/features/candidate_closure_enabled").asBoolean()).isTrue();
         assertThat(overview.body().at("/data/stats/favorite_count").asLong()).isZero();
+        assertThat(overview.body().at("/data/onboarding/onboarding_required").asBoolean()).isTrue();
+        assertThat(overview.body().at("/data/onboarding/onboarding_step").asText()).isEqualTo("basic");
+
+        String basicResumeBody = basicResumeBody("三期闭环简历", "候选人三期");
+        HttpJsonResponse savedBasic = putJson(
+                "/api/candidate/center/resume",
+                basicResumeBody,
+                "trace-p3-resume-basic",
+                "Bearer " + candidate.token(),
+                "idem-p3-resume-basic-001");
+        assertSuccess(savedBasic, 200, "trace-p3-resume-basic");
+        assertThat(savedBasic.body().at("/data/resume_status").asText()).isEqualTo("needs_completion");
+        assertThat(onboardingValue(candidate.userId(), "onboarding_status")).isEqualTo("basic_saved");
+        assertThat(onboardingValue(candidate.userId(), "current_step")).isEqualTo("detail");
+
+        HttpJsonResponse basicOverview = getJson(
+                "/api/candidate/center/overview",
+                "trace-p3-closure-basic-overview",
+                "Bearer " + candidate.token());
+        assertSuccess(basicOverview, 200, "trace-p3-closure-basic-overview");
+        assertThat(basicOverview.body().at("/data/onboarding/onboarding_required").asBoolean()).isTrue();
+        assertThat(basicOverview.body().at("/data/onboarding/onboarding_step").asText()).isEqualTo("detail");
 
         String resumeBody = resumeBody("三期闭环简历", "候选人三期", "Java, Spring");
         HttpJsonResponse savedResume = putJson(
@@ -84,6 +106,8 @@ class CandidateClosureFlowIT {
         assertThat(savedResume.body().at("/data/resume_status").asText()).isEqualTo("complete");
         assertThat(savedResume.body().at("/data/base_profile/display_name").asText()).isEqualTo("候选人三期");
         assertNoRawCandidateData(savedResume);
+        assertThat(onboardingValue(candidate.userId(), "onboarding_status")).isEqualTo("completed");
+        assertThat(onboardingValue(candidate.userId(), "current_step")).isEqualTo("done");
 
         HttpJsonResponse repeatedResume = putJson(
                 "/api/candidate/center/resume",
@@ -92,6 +116,7 @@ class CandidateClosureFlowIT {
                 "Bearer " + candidate.token(),
                 "idem-p3-resume-001");
         assertSuccess(repeatedResume, 200, "trace-p3-resume-repeat");
+        assertThat(onboardingValue(candidate.userId(), "onboarding_status")).isEqualTo("completed");
         HttpJsonResponse conflictResume = putJson(
                 "/api/candidate/center/resume",
                 resumeBody("三期闭环简历 v2", "候选人三期", "Java"),
@@ -243,6 +268,24 @@ class CandidateClosureFlowIT {
                 .isGreaterThanOrEqualTo(5);
         assertThat(countRows("field_access_log", "biz_type = 'candidate_resume' AND operator_id = " + candidate.userId()))
                 .isGreaterThanOrEqualTo(4);
+        assertThat(countRows("audit_log", "biz_type = 'candidate_resume_onboarding' AND operator_id = " + candidate.userId()))
+                .isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
+    void overviewShouldFallbackToLegacyResumeWhenOnboardingStateIsMissing() throws Exception {
+        CandidateAccount candidate = registerAndLoginCandidate("legacy");
+        insertCompleteResume(candidate.userId());
+
+        HttpJsonResponse overview = getJson(
+                "/api/candidate/center/overview",
+                "trace-p3-closure-legacy-overview",
+                "Bearer " + candidate.token());
+
+        assertSuccess(overview, 200, "trace-p3-closure-legacy-overview");
+        assertThat(countRows("candidate_resume_onboarding", "candidate_id = " + candidate.userId())).isZero();
+        assertThat(overview.body().at("/data/onboarding/onboarding_required").asBoolean()).isFalse();
+        assertThat(overview.body().at("/data/onboarding/onboarding_step").asText()).isEqualTo("center");
     }
 
     private CandidateAccount registerAndLoginCandidate(String label) throws Exception {
@@ -354,6 +397,45 @@ class CandidateClosureFlowIT {
                 """.formatted(resumeName, displayName, skills);
     }
 
+    private String basicResumeBody(String resumeName, String displayName) {
+        return """
+                {
+                  "resume_name": "%s",
+                  "base_profile": {
+                    "display_name": "%s",
+                    "city_code": "310000",
+                    "category_code": "software",
+                    "contact_phone": "13900001234",
+                    "expected_positions": ["Java工程师"],
+                    "expected_cities": ["上海"]
+                  },
+                  "education": [],
+                  "experience": [],
+                  "skills": []
+                }
+                """.formatted(resumeName, displayName);
+    }
+
+    private void insertCompleteResume(long candidateId) {
+        jdbcTemplate.update(
+                "INSERT INTO candidate_resume "
+                        + "(candidate_id, resume_name, base_profile_json, education_json, experience_json, "
+                        + "skills_json, attachment_object_key, status) VALUES (?, 'legacy resume', ?, ?, ?, ?, ?, 1)",
+                candidateId,
+                "{\"display_name\":\"历史候选人\",\"city_code\":\"310000\",\"category_code\":\"software\"}",
+                "[\"本科\"]",
+                "[\"后端工程师\"]",
+                "[\"Java\"]",
+                "private/legacy.pdf");
+    }
+
+    private String onboardingValue(long candidateId, String columnName) {
+        return jdbcTemplate.queryForObject(
+                "SELECT " + columnName + " FROM candidate_resume_onboarding WHERE candidate_id = ?",
+                String.class,
+                candidateId);
+    }
+
     private long insertWithKey(StatementFactory statementFactory) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> statementFactory.create(connection), keyHolder);
@@ -430,7 +512,9 @@ class CandidateClosureFlowIT {
     }
 
     private void assertSuccess(HttpJsonResponse response, int expectedStatus, String traceId) {
-        assertThat(response.status()).isEqualTo(expectedStatus);
+        assertThat(response.status())
+                .withFailMessage("expected success response but got status %s and body %s", response.status(), response.body())
+                .isEqualTo(expectedStatus);
         assertThat(response.traceId()).isEqualTo(traceId);
         assertThat(response.body().at("/code").asText()).isEqualTo("0");
         assertThat(response.body().at("/trace_id").asText()).isEqualTo(traceId);

@@ -3,6 +3,7 @@ package cn.localtalent.backend.candidatecenter.application;
 import cn.localtalent.backend.auth.domain.IdentityType;
 import cn.localtalent.backend.authz.AuthzContext;
 import cn.localtalent.backend.authz.AuthzPrincipal;
+import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos;
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterOverviewResponse;
 import cn.localtalent.backend.candidatecenter.domain.CandidateApplicationSummary;
 import cn.localtalent.backend.candidatecenter.domain.CandidateConsentSummary;
@@ -30,13 +31,16 @@ public class CandidateCenterService {
             throw new ApiException(HttpStatus.FORBIDDEN, "AUTHZ_403", "candidate identity required");
         }
         long candidateId = principal.userId();
+        CandidateResumeSummary resumeSummary = repository.resumeSummary(candidateId);
+        CandidateConsentSummary consentSummary = repository.consentSummary(candidateId);
         return new CandidateCenterOverviewResponse(
-                resume(repository.resumeSummary(candidateId)),
+                resume(resumeSummary),
                 applications(repository.applicationSummary(candidateId)),
                 signin(repository.signinSummary(candidateId)),
-                consent(repository.consentSummary(candidateId)),
+                consent(consentSummary),
                 closureService.stats(candidateId),
-                closureService.features());
+                closureService.features(),
+                closureService.onboarding(candidateId, resumeSummary, consentSummary.publishStatus()));
     }
 
     private CandidateCenterOverviewResponse.CandidateResumeSummaryResponse resume(CandidateResumeSummary summary) {

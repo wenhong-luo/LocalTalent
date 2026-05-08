@@ -6,11 +6,11 @@ import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.FavoriteIt
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.NotificationItemResponse;
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.ResumeResponse;
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.SubscriptionItemResponse;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -40,6 +40,22 @@ public class CandidateClosureJdbcRepository {
 
     public long countUnreadNotifications(long candidateId) {
         return count("SELECT COUNT(*) FROM candidate_notification WHERE candidate_id = ? AND read_status = 0", candidateId);
+    }
+
+    public Optional<OnboardingState> findOnboardingState(long candidateId) {
+        return jdbcTemplate.query(
+                        "SELECT resume_id, onboarding_status, current_step, completion_score, "
+                                + "DATE_FORMAT(completed_at, '%Y-%m-%dT%H:%i:%s') AS completed_at_text "
+                                + "FROM candidate_resume_onboarding WHERE candidate_id = ? LIMIT 1",
+                        (rs, rowNum) -> new OnboardingState(
+                                rs.getObject("resume_id", Long.class),
+                                rs.getString("onboarding_status"),
+                                rs.getString("current_step"),
+                                rs.getInt("completion_score"),
+                                blankToDefault(rs.getString("completed_at_text"), "")),
+                        candidateId)
+                .stream()
+                .findFirst();
     }
 
     public ResumeResponse latestResume(long candidateId) {
@@ -107,6 +123,42 @@ public class CandidateClosureJdbcRepository {
                 resumeId,
                 candidateId);
         return resumeId;
+    }
+
+    public long upsertOnboardingState(
+            long candidateId,
+            long resumeId,
+            String onboardingStatus,
+            String currentStep,
+            int completionScore
+    ) {
+        jdbcTemplate.update(
+                "INSERT INTO candidate_resume_onboarding "
+                        + "(candidate_id, resume_id, onboarding_status, current_step, completion_score, completed_at) "
+                        + "VALUES (?, ?, ?, ?, ?, CASE WHEN ? = 'completed' THEN CURRENT_TIMESTAMP ELSE NULL END) "
+                        + "ON DUPLICATE KEY UPDATE resume_id = ?, onboarding_status = ?, current_step = ?, "
+                        + "completion_score = ?, completed_at = CASE WHEN ? = 'completed' "
+                        + "THEN COALESCE(completed_at, CURRENT_TIMESTAMP) ELSE NULL END, "
+                        + "updated_at = CURRENT_TIMESTAMP, version = version + 1",
+                candidateId,
+                resumeId,
+                onboardingStatus,
+                currentStep,
+                completionScore,
+                onboardingStatus,
+                resumeId,
+                onboardingStatus,
+                currentStep,
+                completionScore,
+                onboardingStatus);
+        Long id = jdbcTemplate.queryForObject(
+                "SELECT id FROM candidate_resume_onboarding WHERE candidate_id = ?",
+                Long.class,
+                candidateId);
+        if (id == null) {
+            throw new IllegalStateException("candidate resume onboarding id was not found");
+        }
+        return id;
     }
 
     public List<ApplicationItemResponse> listApplications(long candidateId, int page, int size) {
@@ -332,12 +384,19 @@ public class CandidateClosureJdbcRepository {
         List<String> education = textList(educationJson);
         List<String> experience = textList(experienceJson);
         List<String> skills = textList(skillsJson);
+        List<CandidateCenterDtos.WorkExperienceResponse> workExperience = workExperienceList(experienceJson);
+        List<CandidateCenterDtos.EducationExperienceResponse> educationExperience = educationExperienceList(educationJson);
+        String selfDescription = selfDescription(baseProfile);
         int completed = 0;
-        completed += isPresent(baseProfile.cityCode()) || isPresent(baseProfile.categoryCode()) ? 1 : 0;
-        completed += education.isEmpty() ? 0 : 1;
-        completed += experience.isEmpty() ? 0 : 1;
-        completed += skills.isEmpty() ? 0 : 1;
-        completed += isPresent(attachmentObjectKey) ? 1 : 0;
+        completed += isPresent(baseProfile.displayName())
+                || isPresent(baseProfile.cityCode())
+                || isPresent(baseProfile.categoryCode())
+                || isPresent(baseProfile.contactPhone()) ? 1 : 0;
+        completed += (!baseProfile.expectedPositions().isEmpty() && !baseProfile.expectedCities().isEmpty())
+                || (isPresent(baseProfile.cityCode()) && isPresent(baseProfile.categoryCode())) ? 1 : 0;
+        completed += education.isEmpty() && educationExperience.isEmpty() ? 0 : 1;
+        completed += experience.isEmpty() && workExperience.isEmpty() ? 0 : 1;
+        completed += isPresent(selfDescription) || !skills.isEmpty() || isPresent(attachmentObjectKey) ? 1 : 0;
         int completion = completed * 20;
         return new ResumeResponse(
                 resumeId,
@@ -349,6 +408,9 @@ public class CandidateClosureJdbcRepository {
                 education,
                 experience,
                 skills,
+                workExperience,
+                educationExperience,
+                selfDescription,
                 isPresent(attachmentObjectKey));
     }
 
@@ -359,10 +421,14 @@ public class CandidateClosureJdbcRepository {
                 0,
                 "",
                 "我的简历",
-                new CandidateCenterDtos.BaseProfileResponse("", "", "", null, ""),
+                new CandidateCenterDtos.BaseProfileResponse(
+                        "", "", "", null, "", "", "", "", "", false, "", "", false, List.of(), "", List.of(), ""),
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
+                List.of(),
+                "",
                 false);
     }
 
@@ -373,7 +439,19 @@ public class CandidateClosureJdbcRepository {
                 text(node, "city_code"),
                 text(node, "category_code"),
                 integer(node, "experience_years"),
-                text(node, "summary"));
+                text(node, "summary"),
+                text(node, "gender"),
+                text(node, "birth_date"),
+                text(node, "highest_education"),
+                text(node, "start_work_date"),
+                bool(node, "no_experience"),
+                text(node, "contact_phone"),
+                text(node, "contact_wechat"),
+                bool(node, "wechat_same_as_phone"),
+                textArray(node.path("expected_positions")),
+                text(node, "expected_salary"),
+                textArray(node.path("expected_cities")),
+                text(node, "job_status"));
     }
 
     private List<String> textList(String json) {
@@ -383,8 +461,18 @@ public class CandidateClosureJdbcRepository {
         try {
             JsonNode node = objectMapper.readTree(json);
             if (node.isArray()) {
-                return objectMapper.convertValue(node, new TypeReference<List<String>>() {
-                }).stream().filter(this::isPresent).map(String::trim).limit(20).toList();
+                List<String> values = new ArrayList<>();
+                node.forEach(item -> {
+                    if (item.isTextual() && isPresent(item.asText())) {
+                        values.add(item.asText().trim());
+                    } else if (item.isObject()) {
+                        String compact = compactObject(item);
+                        if (isPresent(compact)) {
+                            values.add(compact);
+                        }
+                    }
+                });
+                return values.stream().limit(20).toList();
             }
             if (node.isTextual() && isPresent(node.asText())) {
                 return List.of(node.asText().trim());
@@ -393,6 +481,55 @@ public class CandidateClosureJdbcRepository {
         } catch (Exception exception) {
             return List.of();
         }
+    }
+
+    private List<CandidateCenterDtos.WorkExperienceResponse> workExperienceList(String json) {
+        JsonNode node = readJson(json);
+        if (!node.isArray()) {
+            return List.of();
+        }
+        List<CandidateCenterDtos.WorkExperienceResponse> values = new ArrayList<>();
+        node.forEach(item -> {
+            if (item.isObject()) {
+                values.add(new CandidateCenterDtos.WorkExperienceResponse(
+                        text(item, "company_name"),
+                        text(item, "position_name"),
+                        text(item, "start_date"),
+                        text(item, "end_date"),
+                        bool(item, "ongoing"),
+                        text(item, "responsibility")));
+            }
+        });
+        return values.stream().limit(MAX_LIST_SIZE).toList();
+    }
+
+    private List<CandidateCenterDtos.EducationExperienceResponse> educationExperienceList(String json) {
+        JsonNode node = readJson(json);
+        if (!node.isArray()) {
+            return List.of();
+        }
+        List<CandidateCenterDtos.EducationExperienceResponse> values = new ArrayList<>();
+        node.forEach(item -> {
+            if (item.isObject()) {
+                values.add(new CandidateCenterDtos.EducationExperienceResponse(
+                        text(item, "school_name"),
+                        text(item, "major_name"),
+                        text(item, "start_date"),
+                        text(item, "end_date"),
+                        bool(item, "ongoing"),
+                        text(item, "degree")));
+            }
+        });
+        return values.stream().limit(MAX_LIST_SIZE).toList();
+    }
+
+    private String selfDescription(CandidateCenterDtos.BaseProfileResponse baseProfile) {
+        return isPresent(baseProfile.summary()) ? baseProfile.summary() : "";
+    }
+
+    private String compactObject(JsonNode node) {
+        List<String> parts = textArray(node);
+        return String.join(" / ", parts);
     }
 
     private JsonNode readJson(String json) {
@@ -409,6 +546,46 @@ public class CandidateClosureJdbcRepository {
     private String text(JsonNode node, String fieldName) {
         JsonNode value = node.path(fieldName);
         return value.isMissingNode() || value.isNull() ? "" : value.asText("");
+    }
+
+    private boolean bool(JsonNode node, String fieldName) {
+        JsonNode value = node.path(fieldName);
+        if (value.isBoolean()) {
+            return value.asBoolean();
+        }
+        if (value.isInt()) {
+            return value.asInt() == 1;
+        }
+        if (value.isTextual()) {
+            return "true".equalsIgnoreCase(value.asText()) || "1".equals(value.asText());
+        }
+        return false;
+    }
+
+    private List<String> textArray(JsonNode node) {
+        if (node == null || node.isMissingNode() || node.isNull()) {
+            return List.of();
+        }
+        if (node.isArray()) {
+            List<String> values = new ArrayList<>();
+            node.forEach(item -> {
+                if (item.isTextual() && isPresent(item.asText())) {
+                    values.add(item.asText().trim());
+                }
+            });
+            return values.stream().limit(MAX_LIST_SIZE).toList();
+        }
+        if (node.isObject()) {
+            List<String> values = new ArrayList<>();
+            node.fields().forEachRemaining(entry -> {
+                JsonNode value = entry.getValue();
+                if ((value.isTextual() || value.isNumber() || value.isBoolean()) && isPresent(value.asText())) {
+                    values.add(value.asText().trim());
+                }
+            });
+            return values.stream().limit(MAX_LIST_SIZE).toList();
+        }
+        return node.isTextual() && isPresent(node.asText()) ? List.of(node.asText().trim()) : List.of();
     }
 
     private Integer integer(JsonNode node, String fieldName) {
@@ -457,5 +634,14 @@ public class CandidateClosureJdbcRepository {
 
     private boolean isPresent(String value) {
         return value != null && !value.isBlank();
+    }
+
+    public record OnboardingState(
+            Long resumeId,
+            String onboardingStatus,
+            String currentStep,
+            int completionScore,
+            String completedAt
+    ) {
     }
 }

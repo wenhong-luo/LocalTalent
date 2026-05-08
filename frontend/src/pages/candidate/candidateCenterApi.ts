@@ -51,6 +51,12 @@ export type CandidateCenterFeatures = {
   candidate_closure_enabled: boolean;
 };
 
+export type CandidateOnboardingState = {
+  onboarding_required: boolean;
+  onboarding_step: 'basic' | 'detail' | 'center' | string;
+  publish_status: CandidatePublishStatus;
+};
+
 export type CandidateCenterOverview = {
   resume: CandidateResumeSummary;
   applications: CandidateApplicationSummary;
@@ -58,6 +64,25 @@ export type CandidateCenterOverview = {
   consent: CandidateConsentSummary;
   stats: CandidatePrivateStats;
   features: CandidateCenterFeatures;
+  onboarding?: CandidateOnboardingState;
+};
+
+export type CandidateWorkExperience = {
+  company_name: string;
+  position_name: string;
+  start_date: string;
+  end_date: string;
+  ongoing: boolean;
+  responsibility: string;
+};
+
+export type CandidateEducationExperience = {
+  school_name: string;
+  major_name: string;
+  start_date: string;
+  end_date: string;
+  ongoing: boolean;
+  degree: string;
 };
 
 export type CandidateResume = {
@@ -72,10 +97,25 @@ export type CandidateResume = {
     category_code: string;
     experience_years: number | null;
     summary: string;
+    gender: string;
+    birth_date: string;
+    highest_education: string;
+    start_work_date: string;
+    no_experience: boolean;
+    contact_phone: string;
+    contact_wechat: string;
+    wechat_same_as_phone: boolean;
+    expected_positions: string[];
+    expected_salary: string;
+    expected_cities: string[];
+    job_status: string;
   };
   education: string[];
   experience: string[];
   skills: string[];
+  work_experience: CandidateWorkExperience[];
+  education_experience: CandidateEducationExperience[];
+  self_description: string;
   has_attachment: boolean;
 };
 
@@ -175,6 +215,10 @@ function arrayOfRecord(value: unknown): RawRecord[] {
     : [];
 }
 
+function booleanOr(value: unknown, fallback = false): boolean {
+  return typeof value === 'boolean' ? value : fallback;
+}
+
 function publishStatus(value: unknown): CandidatePublishStatus {
   return publishStatuses.includes(value as CandidatePublishStatus)
     ? value as CandidatePublishStatus
@@ -218,8 +262,35 @@ export function toCandidateCenterOverview(raw: unknown): CandidateCenterOverview
     },
     features: {
       candidate_closure_enabled: Boolean(asRecord(payload.features).candidate_closure_enabled)
+    },
+    onboarding: {
+      onboarding_required: Boolean(asRecord(payload.onboarding).onboarding_required),
+      onboarding_step: text(asRecord(payload.onboarding).onboarding_step, 'center'),
+      publish_status: publishStatus(asRecord(payload.onboarding).publish_status)
     }
   };
+}
+
+function toWorkExperienceList(raw: unknown): CandidateWorkExperience[] {
+  return arrayOfRecord(raw).map((item) => ({
+    company_name: text(item.company_name),
+    position_name: text(item.position_name),
+    start_date: text(item.start_date),
+    end_date: text(item.end_date),
+    ongoing: booleanOr(item.ongoing),
+    responsibility: text(item.responsibility)
+  }));
+}
+
+function toEducationExperienceList(raw: unknown): CandidateEducationExperience[] {
+  return arrayOfRecord(raw).map((item) => ({
+    school_name: text(item.school_name),
+    major_name: text(item.major_name),
+    start_date: text(item.start_date),
+    end_date: text(item.end_date),
+    ongoing: booleanOr(item.ongoing),
+    degree: text(item.degree)
+  }));
 }
 
 function toCandidateResume(raw: unknown): CandidateResume {
@@ -237,11 +308,26 @@ function toCandidateResume(raw: unknown): CandidateResume {
       city_code: text(baseProfile.city_code),
       category_code: text(baseProfile.category_code),
       experience_years: nullableNumber(baseProfile.experience_years),
-      summary: text(baseProfile.summary)
+      summary: text(baseProfile.summary),
+      gender: text(baseProfile.gender),
+      birth_date: text(baseProfile.birth_date),
+      highest_education: text(baseProfile.highest_education),
+      start_work_date: text(baseProfile.start_work_date),
+      no_experience: booleanOr(baseProfile.no_experience),
+      contact_phone: text(baseProfile.contact_phone),
+      contact_wechat: text(baseProfile.contact_wechat),
+      wechat_same_as_phone: booleanOr(baseProfile.wechat_same_as_phone),
+      expected_positions: arrayOfText(baseProfile.expected_positions),
+      expected_salary: text(baseProfile.expected_salary),
+      expected_cities: arrayOfText(baseProfile.expected_cities),
+      job_status: text(baseProfile.job_status)
     },
     education: arrayOfText(payload.education),
     experience: arrayOfText(payload.experience),
     skills: arrayOfText(payload.skills),
+    work_experience: toWorkExperienceList(payload.work_experience),
+    education_experience: toEducationExperienceList(payload.education_experience),
+    self_description: text(payload.self_description),
     has_attachment: Boolean(payload.has_attachment)
   };
 }
@@ -333,6 +419,9 @@ export async function saveCandidateResume(
     education: string[];
     experience: string[];
     skills: string[];
+    work_experience?: CandidateWorkExperience[];
+    education_experience?: CandidateEducationExperience[];
+    self_description?: string;
   }
 ): Promise<ApiResult<CandidateResume>> {
   const result = await apiRequest<unknown>('/api/candidate/center/resume', {
