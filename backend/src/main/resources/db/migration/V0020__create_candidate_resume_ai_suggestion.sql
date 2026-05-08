@@ -1,0 +1,41 @@
+CREATE TABLE candidate_resume_ai_suggestion_task (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  candidate_id BIGINT UNSIGNED NOT NULL,
+  resume_id BIGINT UNSIGNED DEFAULT NULL,
+  task_status VARCHAR(32) NOT NULL DEFAULT 'generated',
+  suggestion_count INT NOT NULL DEFAULT 0,
+  applied_count INT NOT NULL DEFAULT 0,
+  dismissed_count INT NOT NULL DEFAULT 0,
+  generated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_ai_task_candidate_time (candidate_id, generated_at),
+  KEY idx_ai_task_resume (resume_id),
+  CONSTRAINT fk_ai_task_candidate FOREIGN KEY (candidate_id) REFERENCES candidate_user(id),
+  CONSTRAINT fk_ai_task_resume FOREIGN KEY (resume_id) REFERENCES candidate_resume(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE candidate_resume_ai_suggestion_item (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  task_id BIGINT UNSIGNED NOT NULL,
+  candidate_id BIGINT UNSIGNED NOT NULL,
+  resume_id BIGINT UNSIGNED DEFAULT NULL,
+  suggestion_type VARCHAR(64) NOT NULL,
+  target_field VARCHAR(96) NOT NULL,
+  title VARCHAR(160) NOT NULL,
+  reason_summary VARCHAR(500) NOT NULL,
+  before_preview VARCHAR(500) NOT NULL,
+  suggested_value VARCHAR(1000) NOT NULL,
+  can_apply TINYINT NOT NULL DEFAULT 0,
+  apply_status VARCHAR(32) NOT NULL DEFAULT 'pending',
+  applied_at DATETIME DEFAULT NULL,
+  dismissed_at DATETIME DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_ai_item_task (task_id),
+  KEY idx_ai_item_candidate_status (candidate_id, apply_status, created_at),
+  KEY idx_ai_item_resume (resume_id),
+  CONSTRAINT fk_ai_item_task FOREIGN KEY (task_id) REFERENCES candidate_resume_ai_suggestion_task(id),
+  CONSTRAINT fk_ai_item_candidate FOREIGN KEY (candidate_id) REFERENCES candidate_user(id),
+  CONSTRAINT fk_ai_item_resume FOREIGN KEY (resume_id) REFERENCES candidate_resume(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -5,10 +5,18 @@ import { type ChangeEvent, type FormEvent, useEffect, useMemo, useState } from '
 import { StateView } from '@/components/StateView';
 import { isHttpClientError } from '@/lib/httpClient';
 import {
+  applyCandidateResumeAiSuggestion,
+  dismissCandidateResumeAiSuggestion,
   fetchCandidateCenterOverview,
   fetchCandidateClosureData,
+  fetchCandidateResumeAiSuggestions,
+  fetchCandidateResumeAttachment,
+  generateCandidateResumeAiSuggestions,
   readCandidateToken,
   saveCandidateResume,
+  uploadCandidateResumeAttachment,
+  type CandidateResumeAiSuggestionTask,
+  type CandidateResumeAttachment,
   type CandidateEducationExperience,
   type CandidateResume,
   type CandidateWorkExperience
@@ -260,6 +268,12 @@ export function CandidateResumeCreate() {
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<string>();
   const [saving, setSaving] = useState(false);
+  const [attachmentEnabled, setAttachmentEnabled] = useState(false);
+  const [attachment, setAttachment] = useState<CandidateResumeAttachment>();
+  const [attachmentBusy, setAttachmentBusy] = useState(false);
+  const [aiEnabled, setAiEnabled] = useState(false);
+  const [aiTask, setAiTask] = useState<CandidateResumeAiSuggestionTask>();
+  const [aiBusy, setAiBusy] = useState(false);
 
   useEffect(() => {
     const activeToken = readCandidateToken();
@@ -279,11 +293,23 @@ export function CandidateResumeCreate() {
           }
           return;
         }
+        const uploadEnabled = overview.data.features.resume_attachment_upload_enabled;
+        const aiAssistEnabled = overview.data.features.resume_ai_assist_enabled;
         const closure = await fetchCandidateClosureData(tokenForLoad);
+        const attachmentResult = uploadEnabled
+          ? await fetchCandidateResumeAttachment(tokenForLoad)
+          : undefined;
+        const aiResult = aiAssistEnabled
+          ? await fetchCandidateResumeAiSuggestions(tokenForLoad).catch(() => undefined)
+          : undefined;
         if (!mounted) {
           return;
         }
+        setAttachmentEnabled(uploadEnabled);
+        setAiEnabled(aiAssistEnabled);
         setResume(closure.resume);
+        setAttachment(attachmentResult?.data);
+        setAiTask(aiResult?.data);
         setBasic(basicFromResume(closure.resume));
         setDetail(detailFromResume(closure.resume));
         setStep(overview.data.onboarding?.onboarding_step === 'detail' ? 'detail' : 'basic');
@@ -372,6 +398,176 @@ export function CandidateResumeCreate() {
     }
   }
 
+  async function uploadAttachment(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) {
+      return;
+    }
+    setMessage(undefined);
+    setError(undefined);
+    if (!token) {
+      setStatus('unauthorized');
+      return;
+    }
+    if (!basic.displayName.trim() || !basic.contactPhone.trim() || !basic.expectedPositions.trim() || !basic.expectedCities.trim()) {
+      setMessage('请先补充姓名、联系电话、期望职位和期望地区，再上传附件简历。');
+      return;
+    }
+
+    setAttachmentBusy(true);
+    try {
+      let currentResume = resume;
+      if (!currentResume?.resume_id) {
+        const saved = await saveCandidateResume(token, buildResumePayload(basic, emptyDetail, resume));
+        currentResume = saved.data;
+        setResume(saved.data);
+      }
+      const result = await uploadCandidateResumeAttachment(token, file);
+      setAttachment(result.data);
+      setResume(currentResume ? { ...currentResume, has_attachment: result.data.has_attachment } : currentResume);
+      setMessage('附件简历已上传到本人私有域，不会进入公开人才服务区。');
+    } catch (errorValue) {
+      setError(errorValue instanceof Error ? errorValue.message : '上传附件失败，请稍后重试。');
+    } finally {
+      setAttachmentBusy(false);
+    }
+  }
+
+  async function refreshResumeState(activeToken: string) {
+    const closure = await fetchCandidateClosureData(activeToken);
+    setResume(closure.resume);
+    setBasic(basicFromResume(closure.resume));
+    setDetail(detailFromResume(closure.resume));
+    return closure.resume;
+  }
+
+  async function generateAiSuggestions() {
+    if (!token) {
+      setStatus('unauthorized');
+      return;
+    }
+    if (!aiEnabled) {
+      setMessage('AI 优化建议当前未开启，继续展示安全占位。');
+      return;
+    }
+    setAiBusy(true);
+    setMessage(undefined);
+    setError(undefined);
+    try {
+      const saved = await saveCandidateResume(token, buildResumePayload(basic, detail, resume));
+      setResume(saved.data);
+      const result = await generateCandidateResumeAiSuggestions(token);
+      setAiTask(result.data);
+      setMessage('已生成安全规则版优化建议。建议只在本人私有域展示，需手动逐条应用。');
+    } catch (errorValue) {
+      setError(errorValue instanceof Error ? errorValue.message : '生成优化建议失败，请稍后重试。');
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
+  async function applyAiSuggestion(suggestionId: number) {
+    if (!token) {
+      setStatus('unauthorized');
+      return;
+    }
+    setAiBusy(true);
+    setMessage(undefined);
+    setError(undefined);
+    try {
+      const result = await applyCandidateResumeAiSuggestion(token, suggestionId);
+      setAiTask(result.data);
+      await refreshResumeState(token);
+      setMessage('已手动应用该条优化建议，并重新读取服务端简历状态。');
+    } catch (errorValue) {
+      setError(errorValue instanceof Error ? errorValue.message : '应用优化建议失败，请稍后重试。');
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
+  async function dismissAiSuggestion(suggestionId: number) {
+    if (!token) {
+      setStatus('unauthorized');
+      return;
+    }
+    setAiBusy(true);
+    setMessage(undefined);
+    setError(undefined);
+    try {
+      const result = await dismissCandidateResumeAiSuggestion(token, suggestionId);
+      setAiTask(result.data);
+      setMessage('已忽略该条优化建议，服务端已记录状态。');
+    } catch (errorValue) {
+      setError(errorValue instanceof Error ? errorValue.message : '忽略优化建议失败，请稍后重试。');
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
+  function renderAiSuggestions() {
+    const items = aiTask?.items ?? [];
+    return (
+      <section className={`${styles.section} ${styles.aiSection}`} aria-label="安全规则版简历优化建议">
+        <div className={styles.aiHeader}>
+          <div>
+            <h2 className={styles.sectionTitle}>智能优化建议</h2>
+            <p>
+              本功能为本地规则建议，不调用外部模型、不上传原始候选人数据；建议需本人手动逐条应用。
+            </p>
+          </div>
+          {aiEnabled ? (
+            <button className={styles.aiButton} type="button" disabled={aiBusy} onClick={generateAiSuggestions}>
+              {aiBusy ? '正在处理' : '生成优化建议'}
+            </button>
+          ) : (
+            <button className={styles.aiButtonDisabled} type="button" disabled aria-disabled="true">
+              AI 优化暂未开放
+            </button>
+          )}
+        </div>
+        {items.length > 0 ? (
+          <div className={styles.aiList}>
+            {items.map((item) => (
+              <article className={styles.aiCard} key={item.suggestion_id}>
+                <div className={styles.aiCardTop}>
+                  <strong>{item.title}</strong>
+                  <span>{item.apply_status}</span>
+                </div>
+                <p>{item.reason_summary}</p>
+                {item.before_preview ? <p className={styles.aiPreview}>当前：{item.before_preview}</p> : null}
+                {item.suggested_value ? <p className={styles.aiPreview}>建议：{item.suggested_value}</p> : null}
+                <div className={styles.aiActions}>
+                  <button
+                    className={styles.secondary}
+                    type="button"
+                    disabled={!item.can_apply || item.apply_status !== 'pending' || aiBusy}
+                    onClick={() => applyAiSuggestion(item.suggestion_id)}
+                  >
+                    手动应用
+                  </button>
+                  <button
+                    className={styles.aiGhost}
+                    type="button"
+                    disabled={item.apply_status !== 'pending' || aiBusy}
+                    onClick={() => dismissAiSuggestion(item.suggestion_id)}
+                  >
+                    忽略
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className={styles.aiEmpty}>
+            {aiEnabled ? '暂无优化建议，可先补充工作经历和自我描述后生成。' : '当前环境默认关闭 AI 优化建议，继续展示安全占位。'}
+          </p>
+        )}
+      </section>
+    );
+  }
+
   if (status === 'loading') {
     return (
       <PageChrome step="basic">
@@ -414,6 +610,9 @@ export function CandidateResumeCreate() {
             您的简历已保存到本人私有域。公开人才服务区仍只展示服务端生成的发布快照，
             原始简历、联系电话、附件和证据不会进入公开门户。
           </p>
+          <p className={styles.successMeta}>
+            附件状态：{attachment?.has_attachment ? `${attachment.file_name || '已上传附件'} · ${attachment.size_bytes ?? 0} bytes` : '暂无附件'}
+          </p>
           <div className={styles.actions}>
             <button className={styles.primary} type="button" onClick={() => setStep('detail')}>
               继续完善简历
@@ -438,11 +637,32 @@ export function CandidateResumeCreate() {
           <section className={styles.importBanner} aria-label="附件简历导入占位">
             <div>
               <h1>导入附件简历，一键完成在线简历填写</h1>
-              <p>附件导入涉及对象存储和解析能力，本轮仅做禁用占位，不接真实上传。</p>
+              <p>
+                附件只保存在求职者本人私有域，不进入公开门户、人才服务区、搜索、sitemap 或导出旁路。
+              </p>
+              {attachment?.has_attachment ? (
+                <p className={styles.attachmentMeta}>
+                  已上传：{attachment.file_name || '附件简历'} · {attachment.size_bytes ?? 0} bytes
+                </p>
+              ) : null}
             </div>
-            <button className={styles.disabledOrange} type="button" disabled aria-disabled="true">
-              一键导入占位
-            </button>
+            {attachmentEnabled ? (
+              <label className={attachmentBusy ? styles.disabledOrange : styles.uploadButton}>
+                {attachmentBusy ? '正在上传' : attachment?.has_attachment ? '替换附件' : '上传附件'}
+                <input
+                  aria-label="上传附件简历"
+                  className={styles.hiddenFile}
+                  type="file"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  disabled={attachmentBusy}
+                  onChange={uploadAttachment}
+                />
+              </label>
+            ) : (
+              <button className={styles.disabledOrange} type="button" disabled aria-disabled="true">
+                附件上传未开启
+              </button>
+            )}
           </section>
           <form className={styles.panel} aria-label="完善简历基本信息表单" onSubmit={submitBasic}>
             {message ? <p className={styles.notice}>{message}</p> : null}
@@ -549,6 +769,7 @@ export function CandidateResumeCreate() {
         </>
       ) : (
         <form className={styles.panel} aria-label="完善简历详情表单" onSubmit={submitDetail}>
+          {message ? <p className={styles.notice}>{message}</p> : null}
           {error ? <p className={styles.notice}>{error}</p> : null}
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>工作经历</h2>
@@ -577,9 +798,6 @@ export function CandidateResumeCreate() {
                 <span>工作职责</span>
                 <textarea value={detail.responsibility} onChange={(event) => updateDetail('responsibility', event.target.value)} placeholder="请描述你的工作内容和项目经验" />
               </label>
-              <button className={styles.aiButton} type="button" disabled aria-disabled="true">
-                AI一键优化占位
-              </button>
             </div>
           </section>
           <section className={styles.section}>
@@ -624,11 +842,9 @@ export function CandidateResumeCreate() {
                 <span>自我描述</span>
                 <textarea value={detail.selfDescription} onChange={(event) => updateDetail('selfDescription', event.target.value)} placeholder="请用一段话介绍你的优势、求职方向和亮点" />
               </label>
-              <button className={styles.aiButton} type="button" disabled aria-disabled="true">
-                AI一键优化占位
-              </button>
             </div>
           </section>
+          {renderAiSuggestions()}
           <div className={styles.actions}>
             <button className={styles.secondary} type="button" onClick={() => setStep('basic')}>上一步</button>
             <button className={styles.primary} type="submit" disabled={saving}>{saving ? '正在保存' : '完成'}</button>

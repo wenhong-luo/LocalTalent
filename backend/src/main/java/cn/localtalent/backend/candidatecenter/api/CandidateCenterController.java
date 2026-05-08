@@ -2,6 +2,9 @@ package cn.localtalent.backend.candidatecenter.api;
 
 import cn.localtalent.backend.authz.RequirePermission;
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.ApplicationPageResponse;
+import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.AiSuggestionTaskResponse;
+import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.AttachmentDownload;
+import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.AttachmentResponse;
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.FavoriteCreateRequest;
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.FavoritePageResponse;
 import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.NotificationPageResponse;
@@ -12,6 +15,12 @@ import cn.localtalent.backend.candidatecenter.api.CandidateCenterDtos.Subscripti
 import cn.localtalent.backend.candidatecenter.application.CandidateClosureService;
 import cn.localtalent.backend.candidatecenter.application.CandidateCenterService;
 import cn.localtalent.backend.common.api.ApiResponse;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/candidate/center")
@@ -62,6 +72,76 @@ public class CandidateCenterController {
     @RequirePermission("candidate.center.resume.read")
     public ApiResponse<ResumeResponse> preview() {
         return ApiResponse.success(candidateClosureService.preview());
+    }
+
+    @GetMapping("/resume/attachment")
+    @RequirePermission("candidate.center.resume.read")
+    public ApiResponse<AttachmentResponse> attachment() {
+        return ApiResponse.success(candidateClosureService.attachment());
+    }
+
+    @PostMapping(value = "/resume/attachment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequirePermission("candidate.center.resume.write")
+    public ApiResponse<AttachmentResponse> uploadAttachment(
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey,
+            @RequestParam("file") MultipartFile file
+    ) {
+        return ApiResponse.success(candidateClosureService.uploadAttachment(file, idempotencyKey));
+    }
+
+    @GetMapping("/resume/attachment/download")
+    @RequirePermission("candidate.center.resume.read")
+    public ResponseEntity<ByteArrayResource> downloadAttachment() {
+        AttachmentDownload download = candidateClosureService.downloadAttachment();
+        ByteArrayResource resource = new ByteArrayResource(download.content());
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(download.contentType()))
+                .contentLength(download.content().length)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
+                        .filename(download.fileName())
+                        .build()
+                        .toString())
+                .body(resource);
+    }
+
+    @DeleteMapping("/resume/attachment")
+    @RequirePermission("candidate.center.resume.write")
+    public ApiResponse<AttachmentResponse> deleteAttachment(
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey
+    ) {
+        return ApiResponse.success(candidateClosureService.deleteAttachment(idempotencyKey));
+    }
+
+    @PostMapping("/resume/ai-suggestions")
+    @RequirePermission("candidate.center.resume.write")
+    public ApiResponse<AiSuggestionTaskResponse> generateAiSuggestions(
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey
+    ) {
+        return ApiResponse.success(candidateClosureService.generateAiSuggestions(idempotencyKey));
+    }
+
+    @GetMapping("/resume/ai-suggestions/latest")
+    @RequirePermission("candidate.center.resume.read")
+    public ApiResponse<AiSuggestionTaskResponse> latestAiSuggestions() {
+        return ApiResponse.success(candidateClosureService.latestAiSuggestions());
+    }
+
+    @PostMapping("/resume/ai-suggestions/{itemId}/apply")
+    @RequirePermission("candidate.center.resume.write")
+    public ApiResponse<AiSuggestionTaskResponse> applyAiSuggestion(
+            @PathVariable long itemId,
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey
+    ) {
+        return ApiResponse.success(candidateClosureService.applyAiSuggestion(itemId, idempotencyKey));
+    }
+
+    @PostMapping("/resume/ai-suggestions/{itemId}/dismiss")
+    @RequirePermission("candidate.center.resume.write")
+    public ApiResponse<AiSuggestionTaskResponse> dismissAiSuggestion(
+            @PathVariable long itemId,
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey
+    ) {
+        return ApiResponse.success(candidateClosureService.dismissAiSuggestion(itemId, idempotencyKey));
     }
 
     @GetMapping("/applications")

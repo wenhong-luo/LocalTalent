@@ -361,6 +361,215 @@ public class CandidateClosureJdbcRepository {
                 offset(page, normalizedSize));
     }
 
+    public Optional<AttachmentState> attachmentState(long candidateId) {
+        return jdbcTemplate.query(
+                        "SELECT id, attachment_object_key, attachment_file_name, attachment_content_type, "
+                                + "attachment_size_bytes, attachment_sha256, "
+                                + "DATE_FORMAT(attachment_uploaded_at, '%Y-%m-%dT%H:%i:%s') AS uploaded_at_text "
+                                + "FROM candidate_resume WHERE candidate_id = ? AND status = 1 "
+                                + "ORDER BY id DESC LIMIT 1",
+                        (rs, rowNum) -> new AttachmentState(
+                                rs.getLong("id"),
+                                rs.getString("attachment_object_key"),
+                                rs.getString("attachment_file_name"),
+                                rs.getString("attachment_content_type"),
+                                rs.getObject("attachment_size_bytes", Long.class),
+                                rs.getString("attachment_sha256"),
+                                blankToDefault(rs.getString("uploaded_at_text"), "")),
+                        candidateId)
+                .stream()
+                .findFirst();
+    }
+
+    public void updateAttachment(
+            long candidateId,
+            long resumeId,
+            String objectKey,
+            String fileName,
+            String contentType,
+            long sizeBytes,
+            String sha256
+    ) {
+        jdbcTemplate.update(
+                "UPDATE candidate_resume SET attachment_object_key = ?, attachment_file_name = ?, "
+                        + "attachment_content_type = ?, attachment_size_bytes = ?, attachment_uploaded_at = CURRENT_TIMESTAMP, "
+                        + "attachment_sha256 = ?, updated_at = CURRENT_TIMESTAMP "
+                        + "WHERE id = ? AND candidate_id = ? AND status = 1",
+                objectKey,
+                fileName,
+                contentType,
+                sizeBytes,
+                sha256,
+                resumeId,
+                candidateId);
+    }
+
+    public void clearAttachment(long candidateId, long resumeId) {
+        jdbcTemplate.update(
+                "UPDATE candidate_resume SET attachment_object_key = NULL, attachment_file_name = NULL, "
+                        + "attachment_content_type = NULL, attachment_size_bytes = NULL, attachment_uploaded_at = NULL, "
+                        + "attachment_sha256 = NULL, updated_at = CURRENT_TIMESTAMP "
+                        + "WHERE id = ? AND candidate_id = ? AND status = 1",
+                resumeId,
+                candidateId);
+    }
+
+    public long createAiSuggestionTask(long candidateId, Long resumeId, int suggestionCount) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO candidate_resume_ai_suggestion_task "
+                            + "(candidate_id, resume_id, task_status, suggestion_count) VALUES (?, ?, 'generated', ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            statement.setLong(1, candidateId);
+            statement.setObject(2, resumeId);
+            statement.setInt(3, suggestionCount);
+            return statement;
+        }, keyHolder);
+        Number key = keyHolder.getKey();
+        if (key == null) {
+            throw new IllegalStateException("ai suggestion task id was not generated");
+        }
+        return key.longValue();
+    }
+
+    public long createAiSuggestionItem(
+            long taskId,
+            long candidateId,
+            Long resumeId,
+            String suggestionType,
+            String targetField,
+            String title,
+            String reasonSummary,
+            String beforePreview,
+            String suggestedValue,
+            boolean canApply
+    ) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO candidate_resume_ai_suggestion_item "
+                            + "(task_id, candidate_id, resume_id, suggestion_type, target_field, title, reason_summary, "
+                            + "before_preview, suggested_value, can_apply, apply_status) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')",
+                    Statement.RETURN_GENERATED_KEYS);
+            statement.setLong(1, taskId);
+            statement.setLong(2, candidateId);
+            statement.setObject(3, resumeId);
+            statement.setString(4, suggestionType);
+            statement.setString(5, targetField);
+            statement.setString(6, title);
+            statement.setString(7, reasonSummary);
+            statement.setString(8, beforePreview);
+            statement.setString(9, suggestedValue);
+            statement.setInt(10, canApply ? 1 : 0);
+            return statement;
+        }, keyHolder);
+        Number key = keyHolder.getKey();
+        if (key == null) {
+            throw new IllegalStateException("ai suggestion item id was not generated");
+        }
+        return key.longValue();
+    }
+
+    public Optional<AiSuggestionTaskRow> latestAiSuggestionTask(long candidateId) {
+        return jdbcTemplate.query(
+                        "SELECT id, resume_id, task_status, suggestion_count, applied_count, dismissed_count, "
+                                + "DATE_FORMAT(generated_at, '%Y-%m-%dT%H:%i:%s') AS generated_at_text "
+                                + "FROM candidate_resume_ai_suggestion_task WHERE candidate_id = ? "
+                                + "ORDER BY generated_at DESC, id DESC LIMIT 1",
+                        (rs, rowNum) -> new AiSuggestionTaskRow(
+                                rs.getLong("id"),
+                                rs.getObject("resume_id", Long.class),
+                                rs.getString("task_status"),
+                                rs.getInt("suggestion_count"),
+                                rs.getInt("applied_count"),
+                                rs.getInt("dismissed_count"),
+                                blankToDefault(rs.getString("generated_at_text"), "")),
+                        candidateId)
+                .stream()
+                .findFirst();
+    }
+
+    public List<AiSuggestionItemRow> listAiSuggestionItems(long taskId, long candidateId) {
+        return jdbcTemplate.query(
+                "SELECT id, task_id, candidate_id, resume_id, suggestion_type, target_field, title, reason_summary, "
+                        + "before_preview, suggested_value, can_apply, apply_status "
+                        + "FROM candidate_resume_ai_suggestion_item WHERE task_id = ? AND candidate_id = ? "
+                        + "ORDER BY id ASC",
+                (rs, rowNum) -> new AiSuggestionItemRow(
+                        rs.getLong("id"),
+                        rs.getLong("task_id"),
+                        rs.getLong("candidate_id"),
+                        rs.getObject("resume_id", Long.class),
+                        rs.getString("suggestion_type"),
+                        rs.getString("target_field"),
+                        rs.getString("title"),
+                        rs.getString("reason_summary"),
+                        rs.getString("before_preview"),
+                        rs.getString("suggested_value"),
+                        rs.getInt("can_apply") == 1,
+                        rs.getString("apply_status")),
+                taskId,
+                candidateId);
+    }
+
+    public Optional<AiSuggestionItemRow> findAiSuggestionItem(long candidateId, long itemId) {
+        return jdbcTemplate.query(
+                        "SELECT id, task_id, candidate_id, resume_id, suggestion_type, target_field, title, reason_summary, "
+                                + "before_preview, suggested_value, can_apply, apply_status "
+                                + "FROM candidate_resume_ai_suggestion_item WHERE id = ? AND candidate_id = ? LIMIT 1",
+                        (rs, rowNum) -> new AiSuggestionItemRow(
+                                rs.getLong("id"),
+                                rs.getLong("task_id"),
+                                rs.getLong("candidate_id"),
+                                rs.getObject("resume_id", Long.class),
+                                rs.getString("suggestion_type"),
+                                rs.getString("target_field"),
+                                rs.getString("title"),
+                                rs.getString("reason_summary"),
+                                rs.getString("before_preview"),
+                                rs.getString("suggested_value"),
+                                rs.getInt("can_apply") == 1,
+                                rs.getString("apply_status")),
+                        itemId,
+                        candidateId)
+                .stream()
+                .findFirst();
+    }
+
+    public boolean markAiSuggestionApplied(long candidateId, long itemId) {
+        return jdbcTemplate.update(
+                "UPDATE candidate_resume_ai_suggestion_item SET apply_status = 'applied', applied_at = CURRENT_TIMESTAMP, "
+                        + "updated_at = CURRENT_TIMESTAMP WHERE id = ? AND candidate_id = ? AND apply_status = 'pending'",
+                itemId,
+                candidateId) > 0;
+    }
+
+    public boolean markAiSuggestionDismissed(long candidateId, long itemId) {
+        return jdbcTemplate.update(
+                "UPDATE candidate_resume_ai_suggestion_item SET apply_status = 'dismissed', dismissed_at = CURRENT_TIMESTAMP, "
+                        + "updated_at = CURRENT_TIMESTAMP WHERE id = ? AND candidate_id = ? AND apply_status = 'pending'",
+                itemId,
+                candidateId) > 0;
+    }
+
+    public void incrementAiSuggestionApplied(long taskId, long candidateId) {
+        jdbcTemplate.update(
+                "UPDATE candidate_resume_ai_suggestion_task SET applied_count = applied_count + 1, updated_at = CURRENT_TIMESTAMP "
+                        + "WHERE id = ? AND candidate_id = ?",
+                taskId,
+                candidateId);
+    }
+
+    public void incrementAiSuggestionDismissed(long taskId, long candidateId) {
+        jdbcTemplate.update(
+                "UPDATE candidate_resume_ai_suggestion_task SET dismissed_count = dismissed_count + 1, updated_at = CURRENT_TIMESTAMP "
+                        + "WHERE id = ? AND candidate_id = ?",
+                taskId,
+                candidateId);
+    }
+
     private Optional<Long> latestResumeId(long candidateId) {
         return jdbcTemplate.query(
                         "SELECT id FROM candidate_resume WHERE candidate_id = ? AND status = 1 ORDER BY id DESC LIMIT 1",
@@ -642,6 +851,44 @@ public class CandidateClosureJdbcRepository {
             String currentStep,
             int completionScore,
             String completedAt
+    ) {
+    }
+
+    public record AttachmentState(
+            long resumeId,
+            String objectKey,
+            String fileName,
+            String contentType,
+            Long sizeBytes,
+            String sha256,
+            String uploadedAt
+    ) {
+    }
+
+    public record AiSuggestionTaskRow(
+            long taskId,
+            Long resumeId,
+            String taskStatus,
+            int suggestionCount,
+            int appliedCount,
+            int dismissedCount,
+            String generatedAt
+    ) {
+    }
+
+    public record AiSuggestionItemRow(
+            long itemId,
+            long taskId,
+            long candidateId,
+            Long resumeId,
+            String suggestionType,
+            String targetField,
+            String title,
+            String reasonSummary,
+            String beforePreview,
+            String suggestedValue,
+            boolean canApply,
+            String applyStatus
     ) {
     }
 }

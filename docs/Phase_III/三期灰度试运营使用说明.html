@@ -115,10 +115,12 @@ export LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS=true</code></pre>
       </table>
       <h3>私有中心</h3>
       <ul>
-        <li><code>/candidate/center</code>：简历、投递、收藏、订阅、站内通知、同意/撤回。</li>
+        <li><code>/candidate/resume/create</code>：首次完善简历 1、完善简历 2、创建完成三页；进度由服务端 <code>candidate_resume_onboarding</code> 表判断；开启 <code>LOCALTALENT_PHASE3_RESUME_ATTACHMENT_UPLOAD=true</code> 后支持本人私有简历附件上传、下载、替换、删除；开启 <code>LOCALTALENT_PHASE3_RESUME_AI_ASSIST=true</code> 后支持安全规则版简历优化建议。</li>
+        <li><code>/candidate/center</code>：简历、投递、收藏、订阅、站内通知、智能优化建议、同意/撤回。</li>
         <li><code>/company</code>：企业资料、认证、职位、投递池、面试邀约、导出申请。</li>
         <li><code>/admin</code>：审核、推荐位、风险审核、审计 trace。</li>
       </ul>
+      <p class="warn">首次完善简历属于 candidate 本人私有域；当前不做第 4 张会员中心，不做附件解析、真实外部 AI/LLM、短信、微信、小程序或 App。附件 object key 仅服务端私有保存，不返回前端、不进入公开门户、人才服务区、日志明文、sitemap、搜索或导出旁路。AI 优化建议只使用服务端规范化 DTO 和本地规则，不上传原始候选人数据、不保存完整 prompt 或模型原文、不自动发布到人才服务区。</p>
     </section>
 
     <section id="checks" class="card">

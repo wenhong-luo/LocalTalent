@@ -9,7 +9,9 @@ public final class CandidateCenterDtos {
     }
 
     public record FeatureResponse(
-            @JsonProperty("candidate_closure_enabled") boolean candidateClosureEnabled
+            @JsonProperty("candidate_closure_enabled") boolean candidateClosureEnabled,
+            @JsonProperty("resume_attachment_upload_enabled") boolean resumeAttachmentUploadEnabled,
+            @JsonProperty("resume_ai_assist_enabled") boolean resumeAiAssistEnabled
     ) {
     }
 
@@ -41,6 +43,53 @@ public final class CandidateCenterDtos {
             @JsonProperty("education_experience") List<EducationExperienceResponse> educationExperience,
             @JsonProperty("self_description") String selfDescription,
             @JsonProperty("has_attachment") boolean hasAttachment
+    ) {
+    }
+
+    public record AttachmentResponse(
+            @JsonProperty("has_attachment") boolean hasAttachment,
+            @JsonProperty("attachment_status") String attachmentStatus,
+            @JsonProperty("file_name") String fileName,
+            @JsonProperty("content_type") String contentType,
+            @JsonProperty("size_bytes") Long sizeBytes,
+            @JsonProperty("uploaded_at") String uploadedAt
+    ) {
+        public static AttachmentResponse empty() {
+            return new AttachmentResponse(false, "empty", "", "", null, "");
+        }
+    }
+
+    public record AttachmentDownload(
+            String fileName,
+            String contentType,
+            byte[] content
+    ) {
+    }
+
+    public record AiSuggestionTaskResponse(
+            @JsonProperty("task_id") Long taskId,
+            @JsonProperty("task_status") String taskStatus,
+            @JsonProperty("suggestion_count") int suggestionCount,
+            @JsonProperty("applied_count") int appliedCount,
+            @JsonProperty("dismissed_count") int dismissedCount,
+            @JsonProperty("generated_at") String generatedAt,
+            List<AiSuggestionItemResponse> items
+    ) {
+        public static AiSuggestionTaskResponse empty() {
+            return new AiSuggestionTaskResponse(null, "empty", 0, 0, 0, "", List.of());
+        }
+    }
+
+    public record AiSuggestionItemResponse(
+            @JsonProperty("suggestion_id") long suggestionId,
+            @JsonProperty("suggestion_type") String suggestionType,
+            @JsonProperty("target_field") String targetField,
+            String title,
+            @JsonProperty("reason_summary") String reasonSummary,
+            @JsonProperty("before_preview") String beforePreview,
+            @JsonProperty("suggested_value") String suggestedValue,
+            @JsonProperty("can_apply") boolean canApply,
+            @JsonProperty("apply_status") String applyStatus
     ) {
     }
 

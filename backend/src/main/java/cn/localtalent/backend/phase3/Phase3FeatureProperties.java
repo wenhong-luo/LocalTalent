@@ -13,6 +13,16 @@ public class Phase3FeatureProperties {
     private boolean candidateClosure;
 
     /**
+     * Candidate private resume attachment upload. Defaults to false in configuration.
+     */
+    private boolean resumeAttachmentUpload;
+
+    /**
+     * Candidate private rule-based resume AI assist. Defaults to false in configuration.
+     */
+    private boolean resumeAiAssist;
+
+    /**
      * Prompt 28 private company workbench. Defaults to false in configuration.
      */
     private boolean companyWorkbench;
@@ -28,6 +38,22 @@ public class Phase3FeatureProperties {
 
     public void setCandidateClosure(boolean candidateClosure) {
         this.candidateClosure = candidateClosure;
+    }
+
+    public boolean isResumeAttachmentUpload() {
+        return resumeAttachmentUpload;
+    }
+
+    public void setResumeAttachmentUpload(boolean resumeAttachmentUpload) {
+        this.resumeAttachmentUpload = resumeAttachmentUpload;
+    }
+
+    public boolean isResumeAiAssist() {
+        return resumeAiAssist;
+    }
+
+    public void setResumeAiAssist(boolean resumeAiAssist) {
+        this.resumeAiAssist = resumeAiAssist;
     }
 
     public boolean isCompanyWorkbench() {

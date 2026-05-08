@@ -147,6 +147,12 @@
 
 三期 Step1-Step6、实施蓝图和研发提示词已经完成。Prompt 25（P3-0）三期基线冻结与灰度闸门、Prompt 26（P3-1）认证与身份映射、Prompt 27（P3-2）求职者真实闭环生产化、Prompt 28（P3-3）企业招聘工作台生产化、Prompt 29（P3-4）运营后台生产化与门户运营化、Prompt 30（P3-5）审计、导出、风控与安全收口、Prompt 31（P3-6）灰度试运营工程治理与上线演练已完成，三期主线 Prompt 25-31 已收口。
 
+三期后续补丁已完成：
+
+- `V0018__create_candidate_resume_onboarding.sql` 属于 Prompt 27（P3-2）求职者真实闭环生产化的补充，用于把首次完善简历 1-3 页的 `onboarding_status/current_step/completion_score` 持久化为服务端权威状态。该补丁只服务 candidate 本人私有域，不存手机号、邮箱、简历正文、附件对象 key、AI 文本、证据或原始 JSON；不做第 4 张会员中心，不做 AI 优化、短信、微信、小程序或 App，不改变人才服务区发布快照边界。
+- `V0019__extend_candidate_resume_attachment_metadata.sql` 属于 Prompt 27（P3-2）求职者真实闭环生产化的补充，用于支持 candidate 本人私有简历附件上传、下载、替换、删除。该补丁默认由 `phase3.resume_attachment_upload=false` 关闭；附件 object key 仅服务端保存，不返回前端、不进入公开门户、人才服务区、搜索、sitemap、日志明文或导出旁路；不做企业查看附件、附件解析、AI 优化、真实短信/微信/小程序/App 或第 4 张会员中心。
+- `V0020__create_candidate_resume_ai_suggestion.sql` 属于 Prompt 27（P3-2）求职者真实闭环生产化的补充，用于支持 candidate 本人私有域内的安全规则版简历优化建议。该补丁默认由 `phase3.resume_ai_assist=false` 关闭；只使用服务端规范化 DTO 生成规则建议，由本人逐条手动应用或忽略；不接真实 LLM/外部模型，不上传原始候选人数据，不保存完整 prompt、模型原文、手机号、邮箱、附件 object key、证据或原始 JSON，不自动发布到人才服务区。
+
 ```text
 下一步：进入灰度试运营复核，或另起四期正式上线治理规划。
 ```

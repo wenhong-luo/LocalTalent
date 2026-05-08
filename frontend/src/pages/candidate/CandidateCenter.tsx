@@ -1,24 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { type FormEvent, type ReactNode, useEffect, useState } from 'react';
+import { type ChangeEvent, type FormEvent, type ReactNode, useEffect, useState } from 'react';
 import { StateView } from '@/components/StateView';
 import { isHttpClientError } from '@/lib/httpClient';
 import {
+  applyCandidateResumeAiSuggestion,
   cancelFavorite,
   cancelSubscription,
   createFavorite,
   createSubscription,
+  deleteCandidateResumeAttachment,
+  dismissCandidateResumeAiSuggestion,
+  downloadCandidateResumeAttachment,
   fetchCandidateCenterOverview,
   fetchCandidateClosureData,
+  fetchCandidateResumeAiSuggestions,
+  fetchCandidateResumeAttachment,
+  generateCandidateResumeAiSuggestions,
   markNotificationRead,
   readCandidateToken,
   revokeCandidateConsent,
   saveCandidateResume,
   submitCandidateConsent,
+  uploadCandidateResumeAttachment,
   type CandidateCenterOverview,
   type CandidateClosureData,
-  type CandidatePublishStatus
+  type CandidatePublishStatus,
+  type CandidateResumeAiSuggestionTask,
+  type CandidateResumeAttachment
 } from './candidateCenterApi';
 
 type CandidateCenterStatus = 'loading' | 'ready' | 'unauthorized' | 'error' | 'retrying';
@@ -198,6 +208,15 @@ type ClosurePanelProps = {
   onSubscriptionCreate: (event: FormEvent<HTMLFormElement>) => void;
   onSubscriptionCancel: (subscriptionId: number) => void;
   onNotificationRead: (notificationId: number) => void;
+  attachment?: CandidateResumeAttachment;
+  aiSuggestions?: CandidateResumeAiSuggestionTask;
+  aiBusy: boolean;
+  onAttachmentUpload: (event: ChangeEvent<HTMLInputElement>) => void;
+  onAttachmentDownload: () => void;
+  onAttachmentDelete: () => void;
+  onAiGenerate: () => void;
+  onAiApply: (suggestionId: number) => void;
+  onAiDismiss: (suggestionId: number) => void;
 };
 
 function CandidateClosurePanel({
@@ -211,7 +230,16 @@ function CandidateClosurePanel({
   onFavoriteCancel,
   onSubscriptionCreate,
   onSubscriptionCancel,
-  onNotificationRead
+  onNotificationRead,
+  attachment,
+  aiSuggestions,
+  aiBusy,
+  onAttachmentUpload,
+  onAttachmentDownload,
+  onAttachmentDelete,
+  onAiGenerate,
+  onAiApply,
+  onAiDismiss
 }: ClosurePanelProps) {
   if (!overview.features.candidate_closure_enabled) {
     return (
@@ -327,6 +355,105 @@ function CandidateClosurePanel({
         <p style={{ margin: '10px 0 0', color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
           展示名：{preview.base_profile.display_name || '待补充'}；技能：{preview.skills.join(' / ') || '待补充'}。
         </p>
+        {overview.features.resume_attachment_upload_enabled ? (
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px', marginTop: '16px' }}>
+            <span style={{ color: 'var(--lt-ink-muted)', fontWeight: 800 }}>
+              附件：{attachment?.has_attachment ? `${attachment.file_name || '附件简历'} · ${attachment.size_bytes ?? 0} bytes` : '暂无附件'}
+            </span>
+            <label style={secondaryButtonStyle}>
+              {attachment?.has_attachment ? '替换附件' : '上传附件'}
+              <input
+                aria-label="求职者中心上传附件简历"
+                type="file"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                style={{ display: 'none' }}
+                onChange={onAttachmentUpload}
+              />
+            </label>
+            {attachment?.has_attachment ? (
+              <>
+                <button type="button" style={secondaryButtonStyle} onClick={onAttachmentDownload}>下载附件</button>
+                <button type="button" style={primaryButtonStyle} onClick={onAttachmentDelete}>删除附件</button>
+              </>
+            ) : null}
+          </div>
+        ) : (
+          <p style={{ margin: '14px 0 0', color: 'var(--lt-ink-muted)' }}>
+            附件上传开关未开启，当前仅展示附件状态占位。
+          </p>
+        )}
+      </section>
+
+      <section style={cardStyle} aria-label="智能优化建议">
+        <h2 style={sectionTitleStyle}>智能优化建议（安全规则版）</h2>
+        <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
+          只在求职者本人私有域内基于服务端规范化简历生成规则建议；不调用外部模型，不上传原始候选人数据，建议需手动逐条应用。
+        </p>
+        {overview.features.resume_ai_assist_enabled ? (
+          <>
+            <button
+              type="button"
+              style={{ ...primaryButtonStyle, marginTop: '16px' }}
+              disabled={aiBusy}
+              onClick={onAiGenerate}
+            >
+              {aiBusy ? '正在处理建议' : '生成优化建议'}
+            </button>
+            <div style={{ display: 'grid', gap: '12px', marginTop: '16px' }}>
+              {(aiSuggestions?.items ?? []).length === 0 ? (
+                <p style={{ margin: 0, color: 'var(--lt-ink-muted)' }}>
+                  暂无优化建议。补充工作经历、自我描述或求职意向后可重新生成。
+                </p>
+              ) : aiSuggestions?.items.map((item) => (
+                <article
+                  key={item.suggestion_id}
+                  style={{
+                    border: '1px solid var(--lt-line)',
+                    borderRadius: '18px',
+                    padding: '16px',
+                    background: '#ffffff'
+                  }}
+                >
+                  <strong>{item.title}</strong>
+                  <p style={{ margin: '8px 0 0', color: 'var(--lt-ink-muted)', lineHeight: 1.7 }}>
+                    {item.reason_summary}
+                  </p>
+                  {item.before_preview ? (
+                    <p style={{ margin: '8px 0 0', color: 'var(--lt-ink-muted)' }}>当前：{item.before_preview}</p>
+                  ) : null}
+                  {item.suggested_value ? (
+                    <p style={{ margin: '8px 0 0', color: 'var(--lt-ink)' }}>建议：{item.suggested_value}</p>
+                  ) : null}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '12px' }}>
+                    <button
+                      type="button"
+                      style={secondaryButtonStyle}
+                      disabled={!item.can_apply || item.apply_status !== 'pending' || aiBusy}
+                      onClick={() => onAiApply(item.suggestion_id)}
+                    >
+                      手动应用
+                    </button>
+                    <button
+                      type="button"
+                      style={primaryButtonStyle}
+                      disabled={item.apply_status !== 'pending' || aiBusy}
+                      onClick={() => onAiDismiss(item.suggestion_id)}
+                    >
+                      忽略
+                    </button>
+                    <span style={{ color: 'var(--lt-ink-muted)', alignSelf: 'center' }}>
+                      状态：{item.apply_status}
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p style={{ margin: '14px 0 0', color: 'var(--lt-ink-muted)' }}>
+            AI 优化建议开关未开启，当前仅展示安全占位；不会调用外部模型。
+          </p>
+        )}
       </section>
 
       {privateList({
@@ -415,11 +542,18 @@ export function CandidateCenter() {
   const [closureData, setClosureData] = useState<CandidateClosureData | null>(null);
   const [closureStatus, setClosureStatus] = useState<ClosureStatus>('idle');
   const [closureMessage, setClosureMessage] = useState<string>();
+  const [attachment, setAttachment] = useState<CandidateResumeAttachment>();
+  const [aiSuggestions, setAiSuggestions] = useState<CandidateResumeAiSuggestionTask>();
+  const [aiBusy, setAiBusy] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [message, setMessage] = useState<string>();
   const [traceId, setTraceId] = useState<string>();
 
-  async function reloadClosure(activeToken = token) {
+  async function reloadClosure(
+    activeToken = token,
+    attachmentUploadEnabled = overview?.features.resume_attachment_upload_enabled ?? false,
+    aiAssistEnabled = overview?.features.resume_ai_assist_enabled ?? false
+  ) {
     if (!activeToken) {
       setClosureStatus('error');
       setClosureMessage('请先登录求职者账号后再读取三期求职者闭环。');
@@ -431,6 +565,18 @@ export function CandidateCenter() {
     try {
       const data = await fetchCandidateClosureData(activeToken);
       setClosureData(data);
+      if (attachmentUploadEnabled) {
+        const attachmentResult = await fetchCandidateResumeAttachment(activeToken);
+        setAttachment(attachmentResult.data);
+      } else {
+        setAttachment(undefined);
+      }
+      if (aiAssistEnabled) {
+        const aiResult = await fetchCandidateResumeAiSuggestions(activeToken).catch(() => undefined);
+        setAiSuggestions(aiResult?.data);
+      } else {
+        setAiSuggestions(undefined);
+      }
       setClosureStatus('ready');
     } catch (error) {
       setTraceId(isHttpClientError(error) ? error.traceId : undefined);
@@ -461,9 +607,14 @@ export function CandidateCenter() {
       );
 
       if (result.data.features.candidate_closure_enabled) {
-        await reloadClosure(activeToken);
+        await reloadClosure(
+          activeToken,
+          result.data.features.resume_attachment_upload_enabled,
+          result.data.features.resume_ai_assist_enabled
+        );
       } else {
         setClosureData(null);
+        setAiSuggestions(undefined);
         setClosureStatus('idle');
         setClosureMessage(undefined);
       }
@@ -592,6 +743,68 @@ export function CandidateCenter() {
     }));
   }
 
+  function onAttachmentUpload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) {
+      return;
+    }
+    void runCandidateWrite(async () => {
+      const result = await uploadCandidateResumeAttachment(token ?? '', file);
+      setAttachment(result.data);
+    });
+  }
+
+  function onAttachmentDownload() {
+    if (!token) {
+      setStatus('unauthorized');
+      setMessage('请先登录求职者账号后再下载附件。');
+      return;
+    }
+    void downloadCandidateResumeAttachment(token).then((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = attachment?.file_name || 'resume-attachment';
+      link.click();
+      URL.revokeObjectURL(url);
+    }).catch((error) => {
+      setClosureStatus('error');
+      setClosureMessage(error instanceof Error ? error.message : '附件下载失败，请稍后重试。');
+    });
+  }
+
+  function onAttachmentDelete() {
+    void runCandidateWrite(async () => {
+      const result = await deleteCandidateResumeAttachment(token ?? '');
+      setAttachment(result.data);
+    });
+  }
+
+  function onAiGenerate() {
+    setAiBusy(true);
+    void runCandidateWrite(async () => {
+      const result = await generateCandidateResumeAiSuggestions(token ?? '');
+      setAiSuggestions(result.data);
+    }).finally(() => setAiBusy(false));
+  }
+
+  function onAiApply(suggestionId: number) {
+    setAiBusy(true);
+    void runCandidateWrite(async () => {
+      const result = await applyCandidateResumeAiSuggestion(token ?? '', suggestionId);
+      setAiSuggestions(result.data);
+    }).finally(() => setAiBusy(false));
+  }
+
+  function onAiDismiss(suggestionId: number) {
+    setAiBusy(true);
+    void runCandidateWrite(async () => {
+      const result = await dismissCandidateResumeAiSuggestion(token ?? '', suggestionId);
+      setAiSuggestions(result.data);
+    }).finally(() => setAiBusy(false));
+  }
+
   const showState = status !== 'ready' || !overview;
   const copy = overview ? statusCopy(overview.consent.publish_status, overview.consent.reason) : null;
 
@@ -705,6 +918,15 @@ export function CandidateCenter() {
                 onSubscriptionCreate={onSubscriptionCreate}
                 onSubscriptionCancel={(subscriptionId) => void runCandidateWrite(() => cancelSubscription(token ?? '', subscriptionId))}
                 onNotificationRead={(notificationId) => void runCandidateWrite(() => markNotificationRead(token ?? '', notificationId))}
+                attachment={attachment}
+                aiSuggestions={aiSuggestions}
+                aiBusy={aiBusy}
+                onAttachmentUpload={onAttachmentUpload}
+                onAttachmentDownload={onAttachmentDownload}
+                onAttachmentDelete={onAttachmentDelete}
+                onAiGenerate={onAiGenerate}
+                onAiApply={onAiApply}
+                onAiDismiss={onAiDismiss}
               />
             </>
           )}

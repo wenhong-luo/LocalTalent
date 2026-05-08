@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { CandidateCenter } from './CandidateCenter';
 import {
   CANDIDATE_TOKEN_STORAGE_KEY,
@@ -34,7 +34,9 @@ const consentedOverview: CandidateCenterOverview = {
     unread_notification_count: 0
   },
   features: {
-    candidate_closure_enabled: false
+    candidate_closure_enabled: false,
+    resume_attachment_upload_enabled: false,
+    resume_ai_assist_enabled: false
   }
 };
 
@@ -88,12 +90,59 @@ function closureOverview(overrides: Partial<CandidateCenterOverview> = {}): Cand
     },
     features: {
       candidate_closure_enabled: true,
+      resume_attachment_upload_enabled: true,
+      resume_ai_assist_enabled: true,
       ...overrides.features
     }
   };
 }
 
+const aiTaskPayload = {
+  task_id: 90,
+  task_status: 'generated',
+  suggestion_count: 2,
+  applied_count: 0,
+  dismissed_count: 0,
+  generated_at: '2026-05-08T11:00:00',
+  items: [{
+    suggestion_id: 901,
+    suggestion_type: 'self_description',
+    target_field: 'self_description',
+    title: '补充自我描述',
+    reason_summary: '自我描述较短，建议补充交付亮点。',
+    before_preview: '暂无自我描述',
+    suggested_value: '关注稳定交付，熟悉本地人才服务合规边界。',
+    can_apply: true,
+    apply_status: 'pending'
+  }, {
+    suggestion_id: 902,
+    suggestion_type: 'guidance',
+    target_field: 'work_experience',
+    title: '完善工作职责',
+    reason_summary: '工作职责较短，可以补充项目规模和结果。',
+    before_preview: '暂无工作职责',
+    suggested_value: '建议补充项目职责、技术栈和结果指标。',
+    can_apply: false,
+    apply_status: 'pending'
+  }]
+};
+
 function closurePayload(path: string): unknown {
+  if (path.includes('/resume/ai-suggestions')) {
+    return aiTaskPayload;
+  }
+
+  if (path.includes('/resume/attachment')) {
+    return {
+      has_attachment: true,
+      attachment_status: 'uploaded',
+      file_name: 'resume.pdf',
+      content_type: 'application/pdf',
+      size_bytes: 18,
+      uploaded_at: '2026-05-08T10:10:00'
+    };
+  }
+
   if (path.includes('/resume/preview')) {
     return {
       resume_id: 5,
@@ -209,7 +258,52 @@ function mockCandidateClosureFetch(extraResume: Record<string, unknown> = {}) {
       return apiOk(closureOverview());
     }
 
+    if (init?.method === 'DELETE' && path.includes('/resume/attachment')) {
+      return apiOk({
+        has_attachment: false,
+        attachment_status: 'empty',
+        file_name: '',
+        content_type: '',
+        size_bytes: null,
+        uploaded_at: ''
+      });
+    }
+
+    if (init?.method === 'POST' && path.includes('/resume/ai-suggestions/901/apply')) {
+      return apiOk({
+        ...aiTaskPayload,
+        applied_count: 1,
+        items: aiTaskPayload.items.map((item) => item.suggestion_id === 901
+          ? { ...item, apply_status: 'applied' }
+          : item)
+      });
+    }
+
+    if (init?.method === 'POST' && path.includes('/resume/ai-suggestions/902/dismiss')) {
+      return apiOk({
+        ...aiTaskPayload,
+        dismissed_count: 1,
+        items: aiTaskPayload.items.map((item) => item.suggestion_id === 902
+          ? { ...item, apply_status: 'dismissed' }
+          : item)
+      });
+    }
+
+    if (init?.method === 'POST' && path.includes('/resume/ai-suggestions')) {
+      return apiOk(aiTaskPayload);
+    }
+
     if (init?.method === 'PUT' || init?.method === 'POST') {
+      if (path.includes('/resume/attachment')) {
+        return apiOk({
+          has_attachment: true,
+          attachment_status: 'uploaded',
+          file_name: 'resume-v2.pdf',
+          content_type: 'application/pdf',
+          size_bytes: 24,
+          uploaded_at: '2026-05-08T10:12:00'
+        });
+      }
       return apiOk({});
     }
 
@@ -372,6 +466,10 @@ describe('CandidateCenter', () => {
     expect(screen.getAllByText('职位收藏').length).toBeGreaterThan(0);
     expect(screen.getAllByText('搜索订阅').length).toBeGreaterThan(0);
     expect(screen.getAllByText('站内通知').length).toBeGreaterThan(0);
+    expect(screen.getByText('智能优化建议（安全规则版）')).toBeInTheDocument();
+    expect(screen.getByText('补充自我描述')).toBeInTheDocument();
+    expect(screen.getByText(/resume.pdf/)).toBeInTheDocument();
+    expect(screen.getByLabelText('求职者中心上传附件简历')).toBeInTheDocument();
     expect(screen.getByText('Java 工程师 · 认证科技公司')).toBeInTheDocument();
     expect(screen.getByText(/后端岗位订阅/)).toBeInTheDocument();
   });
@@ -391,6 +489,69 @@ describe('CandidateCenter', () => {
     expect(headers.get('Authorization')).toBe('Bearer candidate-token');
     expect(headers.get('X-Trace-Id')).toBeTruthy();
     expect(headers.get('X-Idempotency-Key')).toMatch(/^candidate-resume-/);
+  });
+
+  it('uploads and deletes private resume attachment from candidate center', async () => {
+    setToken();
+    const fetchMock = mockCandidateClosureFetch();
+
+    render(<CandidateCenter />);
+
+    await screen.findByText('简历编辑');
+    fireEvent.change(screen.getByLabelText('求职者中心上传附件简历'), {
+      target: {
+        files: [new File(['%PDF-1.4 LocalTalent'], 'resume-v2.pdf', { type: 'application/pdf' })]
+      }
+    });
+
+    const uploadCall = await waitFor(() => fetchMock.mock.calls.find(([input, init]) => {
+      const path = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      return path.includes('/resume/attachment') && init?.method === 'POST';
+    }));
+    expect(uploadCall).toBeTruthy();
+    const headers = uploadCall?.[1]?.headers as Headers;
+    expect(headers.get('Authorization')).toBe('Bearer candidate-token');
+    expect(headers.get('X-Idempotency-Key')).toMatch(/^candidate-resume-attachment-/);
+
+    fireEvent.click(await screen.findByRole('button', { name: '删除附件' }));
+    const deleteCall = await waitFor(() => fetchMock.mock.calls.find(([input, init]) => {
+      const path = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      return path.includes('/resume/attachment') && init?.method === 'DELETE';
+    }));
+    expect(deleteCall).toBeTruthy();
+  });
+
+  it('generates applies and dismisses private resume AI suggestions from candidate center', async () => {
+    setToken();
+    const fetchMock = mockCandidateClosureFetch();
+
+    render(<CandidateCenter />);
+
+    await screen.findByText('智能优化建议（安全规则版）');
+    fireEvent.click(screen.getByRole('button', { name: '生成优化建议' }));
+
+    const generateCall = await waitFor(() => fetchMock.mock.calls.find(([input, init]) => {
+      const path = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      return path.includes('/resume/ai-suggestions') && init?.method === 'POST' && !path.includes('/apply') && !path.includes('/dismiss');
+    }));
+    expect(generateCall).toBeTruthy();
+    expect((generateCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toMatch(/^candidate-ai-generate-/);
+
+    fireEvent.click(screen.getAllByRole('button', { name: '手动应用' })[0]);
+    const applyCall = await waitFor(() => fetchMock.mock.calls.find(([input, init]) => {
+      const path = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      return path.includes('/resume/ai-suggestions/901/apply') && init?.method === 'POST';
+    }));
+    expect(applyCall).toBeTruthy();
+    expect((applyCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toMatch(/^candidate-ai-apply-/);
+
+    fireEvent.click(screen.getAllByRole('button', { name: '忽略' })[1]);
+    const dismissCall = await waitFor(() => fetchMock.mock.calls.find(([input, init]) => {
+      const path = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      return path.includes('/resume/ai-suggestions/902/dismiss') && init?.method === 'POST';
+    }));
+    expect(dismissCall).toBeTruthy();
+    expect((dismissCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toMatch(/^candidate-ai-dismiss-/);
   });
 
   it('does not render raw candidate fields from phase 3 private responses', async () => {

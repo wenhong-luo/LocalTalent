@@ -60,6 +60,7 @@ class CandidateClosureDisabledIT {
         assertThat(overview.status()).isEqualTo(200);
         assertThat(overview.body().at("/code").asText()).isEqualTo("0");
         assertThat(overview.body().at("/data/features/candidate_closure_enabled").asBoolean()).isFalse();
+        assertThat(overview.body().at("/data/features/resume_ai_assist_enabled").asBoolean()).isFalse();
 
         HttpJsonResponse resume = getJson(
                 "/api/candidate/center/resume",
@@ -68,6 +69,24 @@ class CandidateClosureDisabledIT {
         assertThat(resume.status()).isEqualTo(403);
         assertThat(resume.body().at("/code").asText()).isEqualTo("FEATURE_DISABLED_403");
         assertThat(resume.body().at("/trace_id").asText()).isEqualTo("trace-p3-disabled-resume");
+
+        HttpJsonResponse attachment = getJson(
+                "/api/candidate/center/resume/attachment",
+                "trace-p3-disabled-attachment",
+                "Bearer " + token);
+        assertThat(attachment.status()).isEqualTo(403);
+        assertThat(attachment.body().at("/code").asText()).isEqualTo("FEATURE_DISABLED_403");
+        assertThat(attachment.body().at("/trace_id").asText()).isEqualTo("trace-p3-disabled-attachment");
+
+        HttpJsonResponse aiSuggestions = postJson(
+                "/api/candidate/center/resume/ai-suggestions",
+                "{}",
+                "trace-p3-disabled-ai",
+                "Bearer " + token,
+                "idem-p3-disabled-ai-001");
+        assertThat(aiSuggestions.status()).isEqualTo(403);
+        assertThat(aiSuggestions.body().at("/code").asText()).isEqualTo("FEATURE_DISABLED_403");
+        assertThat(aiSuggestions.body().at("/trace_id").asText()).isEqualTo("trace-p3-disabled-ai");
     }
 
     private String registerAndLoginCandidate() throws Exception {

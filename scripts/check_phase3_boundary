@@ -67,6 +67,8 @@ flag_keys=(
   "phase3.oidc_login"
   "phase3.local_jwt_fallback"
   "phase3.candidate_closure"
+  "phase3.resume_attachment_upload"
+  "phase3.resume_ai_assist"
   "phase3.company_workbench"
   "phase3.operator_portal_ops"
   "phase3.audit_security_gate"
@@ -85,6 +87,8 @@ env_flag_keys=(
   "PHASE3_FEATURE_OIDC_LOGIN=off"
   "PHASE3_FEATURE_LOCAL_JWT_FALLBACK=off"
   "PHASE3_FEATURE_CANDIDATE_CLOSURE=off"
+  "PHASE3_FEATURE_RESUME_ATTACHMENT_UPLOAD=off"
+  "PHASE3_FEATURE_RESUME_AI_ASSIST=off"
   "PHASE3_FEATURE_COMPANY_WORKBENCH=off"
   "PHASE3_FEATURE_OPERATOR_PORTAL_OPS=off"
   "PHASE3_FEATURE_AUDIT_SECURITY_GATE=off"
@@ -94,6 +98,22 @@ env_flag_keys=(
 for env_flag_key in "${env_flag_keys[@]}"; do
   if ! grep -Fq "$env_flag_key" "$ENV_TEMPLATE"; then
     echo "FAIL: Phase III env template missing default-off flag: $env_flag_key"
+    exit 1
+  fi
+done
+
+runtime_flag_keys=(
+  "LOCALTALENT_PHASE3_CANDIDATE_CLOSURE=false"
+  "LOCALTALENT_PHASE3_RESUME_ATTACHMENT_UPLOAD=false"
+  "LOCALTALENT_PHASE3_RESUME_AI_ASSIST=false"
+  "LOCALTALENT_PHASE3_COMPANY_WORKBENCH=false"
+  "LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS=false"
+  "LOCALTALENT_PHASE3_GRAY_OPS=false"
+)
+
+for runtime_flag_key in "${runtime_flag_keys[@]}"; do
+  if ! grep -Fq "$runtime_flag_key" "$ENV_TEMPLATE"; then
+    echo "FAIL: Phase III env template missing safe runtime default: $runtime_flag_key"
     exit 1
   fi
 done

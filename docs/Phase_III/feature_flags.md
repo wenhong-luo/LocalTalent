@@ -19,6 +19,8 @@
 | `phase3.oidc_login` | off | P3-1 | OIDC/SSO 登录、回调、登出、身份映射 | TBD | 关闭 OIDC，回到 dev/test 本地 JWT fallback | 不把授权交给 IdP claim |
 | `phase3.local_jwt_fallback` | off | P3-1 | 本地开发与测试账号登录兜底 | TBD | 关闭 fallback，仅允许 OIDC | gray/prod 默认关闭或白名单应急 |
 | `phase3.candidate_closure` | off | P3-2 | 求职者简历、投递、收藏、订阅、站内通知、同意/撤回 | TBD | 关闭三期求职者增强，回到一期 overview | 公开层仍只展示发布快照 |
+| `phase3.resume_attachment_upload` | off | P3-2 补充 | 求职者本人私有简历附件上传、下载、替换、删除 | TBD | 关闭附件上传入口，保留安全占位 | 附件只进本人私有域；不返回对象 key、预签名 URL 或文件内容到公开层 |
+| `phase3.resume_ai_assist` | off | P3-2 补充 | Candidate 本人私有域内的安全规则版简历优化建议、逐条手动应用和忽略 | TBD | 关闭优化建议入口，回到“AI 优化暂未开放”占位 | 不接真实 LLM/外部模型；不上传原始候选人数据；建议不得自动发布到人才服务区 |
 | `phase3.company_workbench` | off | P3-3 | 企业资料、认证材料、职位、投递池、面试邀约、导出申请 | TBD | 关闭企业增强入口，保留二期企业页 | 企业只能访问本企业数据 |
 | `phase3.operator_portal_ops` | off | P3-4 | 运营审核、内容活动、推荐位、风险审核、门户状态驱动 | TBD | 关闭运营配置入口，回到二期静态演示 | auditor 只读，operator 写审计 |
 | `phase3.audit_security_gate` | off | P3-5 | 审计 trace、导出审批回归、撤回下线传播、字段黑名单、IDOR/BOLA | TBD | 阻断灰度入口，回退到上一个安全版本 | 不得放宽字段黑名单 |

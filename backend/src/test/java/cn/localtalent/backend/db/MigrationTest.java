@@ -55,6 +55,8 @@ class MigrationTest {
                 "candidate_search_subscription",
                 "candidate_notification",
                 "candidate_resume_onboarding",
+                "candidate_resume_ai_suggestion_task",
+                "candidate_resume_ai_suggestion_item",
                 "portal_recommendation",
                 "risk_review",
                 "audit_log",
@@ -192,6 +194,43 @@ class MigrationTest {
                 "uk_candidate_resume_onboarding_candidate",
                 "idx_candidate_resume_onboarding_status",
                 "idx_candidate_resume_onboarding_resume"));
+        assertColumnsExist(jdbcTemplate, "candidate_resume", List.of(
+                "attachment_object_key",
+                "attachment_file_name",
+                "attachment_content_type",
+                "attachment_size_bytes",
+                "attachment_uploaded_at",
+                "attachment_sha256"));
+        assertIndexesExist(jdbcTemplate, "candidate_resume", List.of("idx_candidate_resume_attachment_time"));
+        assertColumnsExist(jdbcTemplate, "candidate_resume_ai_suggestion_task", List.of(
+                "candidate_id",
+                "resume_id",
+                "task_status",
+                "suggestion_count",
+                "applied_count",
+                "dismissed_count",
+                "generated_at"));
+        assertIndexesExist(jdbcTemplate, "candidate_resume_ai_suggestion_task", List.of(
+                "idx_ai_task_candidate_time",
+                "idx_ai_task_resume"));
+        assertColumnsExist(jdbcTemplate, "candidate_resume_ai_suggestion_item", List.of(
+                "task_id",
+                "candidate_id",
+                "resume_id",
+                "suggestion_type",
+                "target_field",
+                "title",
+                "reason_summary",
+                "before_preview",
+                "suggested_value",
+                "can_apply",
+                "apply_status",
+                "applied_at",
+                "dismissed_at"));
+        assertIndexesExist(jdbcTemplate, "candidate_resume_ai_suggestion_item", List.of(
+                "idx_ai_item_task",
+                "idx_ai_item_candidate_status",
+                "idx_ai_item_resume"));
         assertColumnsExist(jdbcTemplate, "job_application", List.of(
                 "company_stage_note",
                 "stage_changed_by",

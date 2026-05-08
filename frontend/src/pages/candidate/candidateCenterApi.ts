@@ -49,6 +49,8 @@ export type CandidatePrivateStats = {
 
 export type CandidateCenterFeatures = {
   candidate_closure_enabled: boolean;
+  resume_attachment_upload_enabled: boolean;
+  resume_ai_assist_enabled: boolean;
 };
 
 export type CandidateOnboardingState = {
@@ -117,6 +119,37 @@ export type CandidateResume = {
   education_experience: CandidateEducationExperience[];
   self_description: string;
   has_attachment: boolean;
+};
+
+export type CandidateResumeAttachment = {
+  has_attachment: boolean;
+  attachment_status: string;
+  file_name: string;
+  content_type: string;
+  size_bytes: number | null;
+  uploaded_at: string;
+};
+
+export type CandidateResumeAiSuggestionItem = {
+  suggestion_id: number;
+  suggestion_type: string;
+  target_field: string;
+  title: string;
+  reason_summary: string;
+  before_preview: string;
+  suggested_value: string;
+  can_apply: boolean;
+  apply_status: string;
+};
+
+export type CandidateResumeAiSuggestionTask = {
+  task_id: number | null;
+  task_status: string;
+  suggestion_count: number;
+  applied_count: number;
+  dismissed_count: number;
+  generated_at: string;
+  items: CandidateResumeAiSuggestionItem[];
 };
 
 export type CandidateApplicationItem = {
@@ -261,13 +294,55 @@ export function toCandidateCenterOverview(raw: unknown): CandidateCenterOverview
       unread_notification_count: numberOr(asRecord(payload.stats).unread_notification_count, 0)
     },
     features: {
-      candidate_closure_enabled: Boolean(asRecord(payload.features).candidate_closure_enabled)
+      candidate_closure_enabled: Boolean(asRecord(payload.features).candidate_closure_enabled),
+      resume_attachment_upload_enabled: Boolean(asRecord(payload.features).resume_attachment_upload_enabled),
+      resume_ai_assist_enabled: Boolean(asRecord(payload.features).resume_ai_assist_enabled)
     },
     onboarding: {
       onboarding_required: Boolean(asRecord(payload.onboarding).onboarding_required),
       onboarding_step: text(asRecord(payload.onboarding).onboarding_step, 'center'),
       publish_status: publishStatus(asRecord(payload.onboarding).publish_status)
     }
+  };
+}
+
+function toCandidateResumeAttachment(raw: unknown): CandidateResumeAttachment {
+  const payload = asRecord(raw);
+  return {
+    has_attachment: Boolean(payload.has_attachment),
+    attachment_status: text(payload.attachment_status, 'empty'),
+    file_name: text(payload.file_name),
+    content_type: text(payload.content_type),
+    size_bytes: nullableNumber(payload.size_bytes),
+    uploaded_at: text(payload.uploaded_at)
+  };
+}
+
+function toCandidateResumeAiSuggestionItem(raw: unknown): CandidateResumeAiSuggestionItem {
+  const payload = asRecord(raw);
+  return {
+    suggestion_id: numberOr(payload.suggestion_id, 0),
+    suggestion_type: text(payload.suggestion_type, 'guidance'),
+    target_field: text(payload.target_field),
+    title: text(payload.title, '简历优化建议'),
+    reason_summary: text(payload.reason_summary),
+    before_preview: text(payload.before_preview),
+    suggested_value: text(payload.suggested_value),
+    can_apply: Boolean(payload.can_apply),
+    apply_status: text(payload.apply_status, 'pending')
+  };
+}
+
+function toCandidateResumeAiSuggestionTask(raw: unknown): CandidateResumeAiSuggestionTask {
+  const payload = asRecord(raw);
+  return {
+    task_id: nullableNumber(payload.task_id),
+    task_status: text(payload.task_status, 'empty'),
+    suggestion_count: numberOr(payload.suggestion_count, 0),
+    applied_count: numberOr(payload.applied_count, 0),
+    dismissed_count: numberOr(payload.dismissed_count, 0),
+    generated_at: text(payload.generated_at),
+    items: arrayOfRecord(payload.items).map(toCandidateResumeAiSuggestionItem)
   };
 }
 
@@ -433,6 +508,108 @@ export async function saveCandidateResume(
 
   return {
     data: toCandidateResume(result.data),
+    traceId: result.traceId
+  };
+}
+
+export async function fetchCandidateResumeAttachment(token: string): Promise<ApiResult<CandidateResumeAttachment>> {
+  const result = await apiGet<unknown>('/api/candidate/center/resume/attachment', { token });
+  return {
+    data: toCandidateResumeAttachment(result.data),
+    traceId: result.traceId
+  };
+}
+
+export async function uploadCandidateResumeAttachment(
+  token: string,
+  file: File
+): Promise<ApiResult<CandidateResumeAttachment>> {
+  const formData = new FormData();
+  formData.set('file', file);
+  const result = await apiRequest<unknown>('/api/candidate/center/resume/attachment', {
+    method: 'POST',
+    token,
+    body: formData,
+    idempotencyKey: createIdempotencyKey('candidate-resume-attachment')
+  });
+  return {
+    data: toCandidateResumeAttachment(result.data),
+    traceId: result.traceId
+  };
+}
+
+export async function deleteCandidateResumeAttachment(token: string): Promise<ApiResult<CandidateResumeAttachment>> {
+  const result = await apiRequest<unknown>('/api/candidate/center/resume/attachment', {
+    method: 'DELETE',
+    token,
+    idempotencyKey: createIdempotencyKey('candidate-resume-attachment-delete')
+  });
+  return {
+    data: toCandidateResumeAttachment(result.data),
+    traceId: result.traceId
+  };
+}
+
+export async function downloadCandidateResumeAttachment(token: string): Promise<Blob> {
+  const traceId = createIdempotencyKey('candidate-resume-attachment-download');
+  const response = await fetch('/api/candidate/center/resume/attachment/download', {
+    method: 'GET',
+    headers: {
+      Accept: 'application/octet-stream',
+      Authorization: `Bearer ${token}`,
+      'X-Trace-Id': traceId
+    },
+    cache: 'no-store'
+  });
+  if (!response.ok) {
+    throw new Error('附件下载失败，请稍后重试。');
+  }
+  return response.blob();
+}
+
+export async function fetchCandidateResumeAiSuggestions(token: string): Promise<ApiResult<CandidateResumeAiSuggestionTask>> {
+  const result = await apiGet<unknown>('/api/candidate/center/resume/ai-suggestions/latest', { token });
+  return {
+    data: toCandidateResumeAiSuggestionTask(result.data),
+    traceId: result.traceId
+  };
+}
+
+export async function generateCandidateResumeAiSuggestions(token: string): Promise<ApiResult<CandidateResumeAiSuggestionTask>> {
+  const result = await apiPost('/api/candidate/center/resume/ai-suggestions', {}, {
+    token,
+    idempotencyKey: createIdempotencyKey('candidate-ai-generate')
+  });
+  return {
+    data: toCandidateResumeAiSuggestionTask(result.data),
+    traceId: result.traceId
+  };
+}
+
+export async function applyCandidateResumeAiSuggestion(
+  token: string,
+  suggestionId: number
+): Promise<ApiResult<CandidateResumeAiSuggestionTask>> {
+  const result = await apiPost(`/api/candidate/center/resume/ai-suggestions/${suggestionId}/apply`, {}, {
+    token,
+    idempotencyKey: createIdempotencyKey('candidate-ai-apply')
+  });
+  return {
+    data: toCandidateResumeAiSuggestionTask(result.data),
+    traceId: result.traceId
+  };
+}
+
+export async function dismissCandidateResumeAiSuggestion(
+  token: string,
+  suggestionId: number
+): Promise<ApiResult<CandidateResumeAiSuggestionTask>> {
+  const result = await apiPost(`/api/candidate/center/resume/ai-suggestions/${suggestionId}/dismiss`, {}, {
+    token,
+    idempotencyKey: createIdempotencyKey('candidate-ai-dismiss')
+  });
+  return {
+    data: toCandidateResumeAiSuggestionTask(result.data),
     traceId: result.traceId
   };
 }

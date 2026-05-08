@@ -44,7 +44,9 @@ const overviewPayload = {
     unread_notification_count: 0
   },
   features: {
-    candidate_closure_enabled: true
+    candidate_closure_enabled: true,
+    resume_attachment_upload_enabled: true,
+    resume_ai_assist_enabled: false
   },
   onboarding: {
     onboarding_required: true,
@@ -87,9 +89,57 @@ const resumePayload = {
   has_attachment: false
 };
 
-function closurePayload(path: string): unknown {
+const aiTaskPayload = {
+  task_id: 80,
+  task_status: 'generated',
+  suggestion_count: 2,
+  applied_count: 0,
+  dismissed_count: 0,
+  generated_at: '2026-05-08T11:00:00',
+  items: [{
+    suggestion_id: 801,
+    suggestion_type: 'self_description',
+    target_field: 'self_description',
+    title: '补充自我描述',
+    reason_summary: '自我描述较短，建议补充交付亮点。',
+    before_preview: '暂无自我描述',
+    suggested_value: '关注稳定交付，熟悉本地人才服务合规边界。',
+    can_apply: true,
+    apply_status: 'pending'
+  }, {
+    suggestion_id: 802,
+    suggestion_type: 'guidance',
+    target_field: 'work_experience',
+    title: '完善工作职责',
+    reason_summary: '工作职责较短，可以补充项目规模和结果。',
+    before_preview: '暂无工作职责',
+    suggested_value: '建议补充项目职责、技术栈和结果指标。',
+    can_apply: false,
+    apply_status: 'pending'
+  }]
+};
+
+function closurePayload(path: string, overview = overviewPayload): unknown {
   if (path.includes('/api/candidate/center/overview')) {
-    return overviewPayload;
+    return overview;
+  }
+
+  if (path.includes('/resume/ai-suggestions')) {
+    return {
+      ...aiTaskPayload,
+      items: []
+    };
+  }
+
+  if (path.includes('/resume/attachment')) {
+    return {
+      has_attachment: false,
+      attachment_status: 'empty',
+      file_name: '',
+      content_type: '',
+      size_bytes: null,
+      uploaded_at: ''
+    };
   }
 
   if (path.includes('/resume/preview') || path.includes('/resume')) {
@@ -115,9 +165,47 @@ function closurePayload(path: string): unknown {
   return {};
 }
 
-function mockResumeCreateFetch(extraResume: Record<string, unknown> = {}) {
+function mockResumeCreateFetch(
+  extraResume: Record<string, unknown> = {},
+  overview = overviewPayload
+) {
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
     const path = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+
+    if (init?.method === 'POST' && path.includes('/resume/ai-suggestions/801/apply')) {
+      return apiOk({
+        ...aiTaskPayload,
+        applied_count: 1,
+        items: aiTaskPayload.items.map((item) => item.suggestion_id === 801
+          ? { ...item, apply_status: 'applied' }
+          : item)
+      });
+    }
+
+    if (init?.method === 'POST' && path.includes('/resume/ai-suggestions/')) {
+      return apiOk({
+        ...aiTaskPayload,
+        dismissed_count: 1,
+        items: aiTaskPayload.items.map((item) => item.suggestion_id === 802
+          ? { ...item, apply_status: 'dismissed' }
+          : item)
+      });
+    }
+
+    if (init?.method === 'POST' && path.includes('/resume/ai-suggestions')) {
+      return apiOk(aiTaskPayload);
+    }
+
+    if (init?.method === 'POST' && path.includes('/resume/attachment')) {
+      return apiOk({
+        has_attachment: true,
+        attachment_status: 'uploaded',
+        file_name: 'resume.pdf',
+        content_type: 'application/pdf',
+        size_bytes: 18,
+        uploaded_at: '2026-05-08T10:10:00'
+      });
+    }
 
     if (init?.method === 'PUT') {
       return apiOk({
@@ -130,7 +218,7 @@ function mockResumeCreateFetch(extraResume: Record<string, unknown> = {}) {
       });
     }
 
-    return apiOk(closurePayload(path));
+    return apiOk(closurePayload(path, overview));
   });
 }
 
@@ -140,7 +228,7 @@ describe('CandidateResumeCreate', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders first resume completion page with disabled import placeholder', async () => {
+  it('renders first resume completion page with private attachment upload', async () => {
     window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
     mockResumeCreateFetch();
 
@@ -148,7 +236,7 @@ describe('CandidateResumeCreate', () => {
 
     expect(await screen.findByLabelText('完善简历基本信息表单')).toBeInTheDocument();
     expect(screen.getByText('导入附件简历，一键完成在线简历填写')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '一键导入占位' })).toBeDisabled();
+    expect(screen.getByLabelText('上传附件简历')).toBeInTheDocument();
     expect(screen.getByLabelText('简历创建进度')).toHaveTextContent('1基本信息2完善简历3创建完成');
     expect(screen.getByPlaceholderText('请填写姓名')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('请输入期望职位，最多 5 个，用逗号分隔')).toBeInTheDocument();
@@ -168,8 +256,7 @@ describe('CandidateResumeCreate', () => {
     await user.click(screen.getByRole('button', { name: '下一步' }));
 
     expect(await screen.findByLabelText('完善简历详情表单')).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: 'AI一键优化占位' })).toHaveLength(2);
-    expect(screen.getAllByRole('button', { name: 'AI一键优化占位' })[0]).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'AI 优化暂未开放' })).toBeDisabled();
 
     await user.type(screen.getByPlaceholderText('请填写公司名称'), 'LocalTalent 科技');
     await user.type(screen.getByPlaceholderText('请填写职位名称'), '后端工程师');
@@ -219,6 +306,32 @@ describe('CandidateResumeCreate', () => {
     });
   });
 
+  it('uploads resume attachment after saving basic profile into private domain', async () => {
+    const user = userEvent.setup();
+    window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
+    const fetchMock = mockResumeCreateFetch();
+
+    render(<CandidateResumeCreate />);
+
+    await user.type(await screen.findByPlaceholderText('请填写姓名'), '林同学');
+    await user.type(screen.getByPlaceholderText('请填写联系电话'), '13900001234');
+    await user.type(screen.getByPlaceholderText('请输入期望职位，最多 5 个，用逗号分隔'), 'Java工程师');
+    await user.type(screen.getByPlaceholderText('请输入期望地区，最多 5 个，用逗号分隔'), '上海');
+    await user.upload(screen.getByLabelText('上传附件简历'), new File(['%PDF-1.4 LocalTalent'], 'resume.pdf', { type: 'application/pdf' }));
+
+    expect(await screen.findByText(/附件简历已上传到本人私有域/)).toBeInTheDocument();
+    expect(screen.getByText(/已上传：resume.pdf/)).toBeInTheDocument();
+    const uploadCall = fetchMock.mock.calls.find(([input, init]) => {
+      const path = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      return path.includes('/resume/attachment') && init?.method === 'POST';
+    });
+    expect(uploadCall).toBeTruthy();
+    const headers = uploadCall?.[1]?.headers as Headers;
+    expect(headers.get('Authorization')).toBe('Bearer candidate-token');
+    expect(headers.get('X-Trace-Id')).toBeTruthy();
+    expect(headers.get('X-Idempotency-Key')).toMatch(/^candidate-resume-attachment-/);
+  });
+
   it('does not render raw candidate field names or injected sensitive values', async () => {
     window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
     mockResumeCreateFetch({
@@ -253,13 +366,13 @@ describe('CandidateResumeCreate', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('keeps external QR, AI and import abilities as disabled placeholders only', async () => {
+  it('keeps external QR and AI abilities as disabled placeholders when AI flag is off', async () => {
     window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
     mockResumeCreateFetch();
 
     render(<CandidateResumeCreate />);
     await screen.findByLabelText('完善简历基本信息表单');
-    expect(screen.getByRole('button', { name: '一键导入占位' })).toBeDisabled();
+    expect(screen.getByLabelText('上传附件简历')).toBeInTheDocument();
 
     fireEvent.change(screen.getByPlaceholderText('请填写姓名'), { target: { value: '林同学' } });
     fireEvent.change(screen.getByPlaceholderText('请填写联系电话'), { target: { value: '13900001234' } });
@@ -268,12 +381,50 @@ describe('CandidateResumeCreate', () => {
     fireEvent.click(screen.getByRole('button', { name: '下一步' }));
 
     await screen.findByLabelText('完善简历详情表单');
-    screen.getAllByRole('button', { name: 'AI一键优化占位' }).forEach((button) => {
-      expect(button).toBeDisabled();
-    });
+    expect(screen.getByRole('button', { name: 'AI 优化暂未开放' })).toBeDisabled();
 
     fireEvent.click(screen.getByRole('button', { name: '完成' }));
     await waitFor(() => expect(screen.getByText(/微信扫码关注公众号为占位展示/)).toBeInTheDocument());
     expect(screen.queryByRole('link', { name: /微信|小程序|App/ })).not.toBeInTheDocument();
+  });
+
+  it('generates and manually applies safe rule-based suggestions when AI flag is on', async () => {
+    const user = userEvent.setup();
+    window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
+    const fetchMock = mockResumeCreateFetch({}, {
+      ...overviewPayload,
+      features: {
+        ...overviewPayload.features,
+        resume_ai_assist_enabled: true
+      }
+    });
+
+    render(<CandidateResumeCreate />);
+
+    await user.type(await screen.findByPlaceholderText('请填写姓名'), '林同学');
+    await user.type(screen.getByPlaceholderText('请填写联系电话'), '13900001234');
+    await user.type(screen.getByPlaceholderText('请输入期望职位，最多 5 个，用逗号分隔'), 'Java工程师');
+    await user.type(screen.getByPlaceholderText('请输入期望地区，最多 5 个，用逗号分隔'), '上海');
+    await user.click(screen.getByRole('button', { name: '下一步' }));
+
+    expect(await screen.findByRole('button', { name: '生成优化建议' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '生成优化建议' }));
+
+    expect(await screen.findByText('补充自我描述')).toBeInTheDocument();
+    expect(screen.getByText(/本地规则建议/)).toBeInTheDocument();
+    await user.click(screen.getAllByRole('button', { name: '手动应用' })[0]);
+
+    await waitFor(() => {
+      const applyCall = fetchMock.mock.calls.find(([input, init]) => {
+        const path = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+        return path.includes('/resume/ai-suggestions/801/apply') && init?.method === 'POST';
+      });
+      expect(applyCall).toBeTruthy();
+      const headers = applyCall?.[1]?.headers as Headers;
+      expect(headers.get('Authorization')).toBe('Bearer candidate-token');
+      expect(headers.get('X-Idempotency-Key')).toMatch(/^candidate-ai-apply-/);
+    });
+
+    expect(await screen.findByText('applied')).toBeInTheDocument();
   });
 });

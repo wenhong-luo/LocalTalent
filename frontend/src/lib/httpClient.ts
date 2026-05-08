@@ -90,7 +90,8 @@ export async function apiRequest<T>(path: string, init: ApiRequestInit = {}): Pr
   }
 
   const hasBody = typeof init.body !== 'undefined';
-  if (hasBody) {
+  const isFormDataBody = typeof FormData !== 'undefined' && init.body instanceof FormData;
+  if (hasBody && !isFormDataBody) {
     headers.set('Content-Type', 'application/json');
   }
 
@@ -101,7 +102,7 @@ export async function apiRequest<T>(path: string, init: ApiRequestInit = {}): Pr
       method: init.method ?? 'GET',
       headers,
       signal: init?.signal,
-      body: hasBody ? JSON.stringify(init.body) : undefined,
+      body: hasBody ? (isFormDataBody ? init.body as BodyInit : JSON.stringify(init.body)) : undefined,
       cache: 'no-store'
     });
   } catch (error) {

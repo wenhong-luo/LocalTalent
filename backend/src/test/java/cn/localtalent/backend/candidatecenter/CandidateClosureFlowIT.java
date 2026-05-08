@@ -13,8 +13,11 @@ import java.sql.Statement;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -25,6 +28,12 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import cn.localtalent.backend.candidatecenter.infrastructure.CandidateResumeAttachmentStorageService;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @Testcontainers
 @SpringBootTest(
@@ -32,7 +41,9 @@ import org.testcontainers.utility.DockerImageName;
         properties = {
                 "localtalent.auth.jwt.secret=candidate-closure-flow-secret-change-me",
                 "localtalent.auth.jwt.ttl-seconds=3600",
-                "localtalent.phase3.candidate-closure=true"
+                "localtalent.phase3.candidate-closure=true",
+                "localtalent.phase3.resume-attachment-upload=true",
+                "localtalent.phase3.resume-ai-assist=true"
         })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class CandidateClosureFlowIT {
@@ -52,11 +63,23 @@ class CandidateClosureFlowIT {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private CandidateResumeAttachmentStorageService attachmentStorageService;
+
     @DynamicPropertySource
     static void datasourceProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
         registry.add("spring.datasource.username", MYSQL::getUsername);
         registry.add("spring.datasource.password", MYSQL::getPassword);
+    }
+
+    @TestConfiguration
+    static class AttachmentStorageTestConfiguration {
+        @Bean
+        @Primary
+        CandidateResumeAttachmentStorageService candidateResumeAttachmentStorageService() {
+            return mock(CandidateResumeAttachmentStorageService.class);
+        }
     }
 
     @Test
@@ -71,6 +94,7 @@ class CandidateClosureFlowIT {
                 "Bearer " + candidate.token());
         assertSuccess(overview, 200, "trace-p3-closure-overview");
         assertThat(overview.body().at("/data/features/candidate_closure_enabled").asBoolean()).isTrue();
+        assertThat(overview.body().at("/data/features/resume_ai_assist_enabled").asBoolean()).isTrue();
         assertThat(overview.body().at("/data/stats/favorite_count").asLong()).isZero();
         assertThat(overview.body().at("/data/onboarding/onboarding_required").asBoolean()).isTrue();
         assertThat(overview.body().at("/data/onboarding/onboarding_step").asText()).isEqualTo("basic");
@@ -288,6 +312,215 @@ class CandidateClosureFlowIT {
         assertThat(overview.body().at("/data/onboarding/onboarding_step").asText()).isEqualTo("center");
     }
 
+    @Test
+    void candidateShouldUploadDownloadReplaceAndDeletePrivateResumeAttachment() throws Exception {
+        CandidateAccount candidate = registerAndLoginCandidate("attachment");
+        String resumeBody = resumeBody("附件简历", "附件候选人", "Java");
+        HttpJsonResponse savedResume = putJson(
+                "/api/candidate/center/resume",
+                resumeBody,
+                "trace-p3-attachment-resume",
+                "Bearer " + candidate.token(),
+                "idem-p3-attachment-resume");
+        assertSuccess(savedResume, 200, "trace-p3-attachment-resume");
+
+        HttpJsonResponse emptyAttachment = getJson(
+                "/api/candidate/center/resume/attachment",
+                "trace-p3-attachment-empty",
+                "Bearer " + candidate.token());
+        assertSuccess(emptyAttachment, 200, "trace-p3-attachment-empty");
+        assertThat(emptyAttachment.body().at("/data/has_attachment").asBoolean()).isFalse();
+
+        byte[] firstFile = "%PDF-1.4\nlocaltalent".getBytes();
+        HttpJsonResponse uploaded = postMultipart(
+                "/api/candidate/center/resume/attachment",
+                "resume.pdf",
+                "application/pdf",
+                firstFile,
+                "trace-p3-attachment-upload",
+                "Bearer " + candidate.token(),
+                "idem-p3-attachment-upload");
+        assertSuccess(uploaded, 200, "trace-p3-attachment-upload");
+        assertThat(uploaded.body().at("/data/has_attachment").asBoolean()).isTrue();
+        assertThat(uploaded.body().at("/data/file_name").asText()).isEqualTo("resume.pdf");
+        assertNoRawCandidateData(uploaded);
+        assertThat(uploaded.body().toString()).doesNotContain("candidate-resume-attachments");
+
+        byte[] replacementFile = "%PDF-1.4\nreplacement".getBytes();
+        HttpJsonResponse replaced = postMultipart(
+                "/api/candidate/center/resume/attachment",
+                "resume-v2.pdf",
+                "application/pdf",
+                replacementFile,
+                "trace-p3-attachment-replace",
+                "Bearer " + candidate.token(),
+                "idem-p3-attachment-replace");
+        assertSuccess(replaced, 200, "trace-p3-attachment-replace");
+        assertThat(replaced.body().at("/data/file_name").asText()).isEqualTo("resume-v2.pdf");
+
+        when(attachmentStorageService.get(anyString())).thenReturn(replacementFile);
+        HttpResponse<byte[]> download = httpClient.send(
+                HttpRequest.newBuilder(uri("/api/candidate/center/resume/attachment/download"))
+                        .header("X-Trace-Id", "trace-p3-attachment-download")
+                        .header("Authorization", "Bearer " + candidate.token())
+                        .GET()
+                        .build(),
+                HttpResponse.BodyHandlers.ofByteArray());
+        assertThat(download.statusCode()).isEqualTo(200);
+        assertThat(download.body()).isEqualTo(replacementFile);
+        assertThat(download.headers().firstValue("Content-Disposition")).hasValueSatisfying(value ->
+                assertThat(value).contains("resume-v2.pdf"));
+
+        HttpJsonResponse invalid = postMultipart(
+                "/api/candidate/center/resume/attachment",
+                "unsafe.txt",
+                "text/plain",
+                "raw".getBytes(),
+                "trace-p3-attachment-invalid",
+                "Bearer " + candidate.token(),
+                "idem-p3-attachment-invalid");
+        assertError(invalid, 400, "VALID_400", "trace-p3-attachment-invalid");
+
+        HttpJsonResponse companyDenied = getJson(
+                "/api/candidate/center/resume/attachment",
+                "trace-p3-company-attachment-denied",
+                "Bearer " + registerAndLoginCompany());
+        assertError(companyDenied, 403, "AUTHZ_403", "trace-p3-company-attachment-denied");
+
+        HttpJsonResponse deleted = deleteJson(
+                "/api/candidate/center/resume/attachment",
+                "trace-p3-attachment-delete",
+                "Bearer " + candidate.token(),
+                "idem-p3-attachment-delete");
+        assertSuccess(deleted, 200, "trace-p3-attachment-delete");
+        assertThat(deleted.body().at("/data/has_attachment").asBoolean()).isFalse();
+
+        verify(attachmentStorageService).get(anyString());
+        assertThat(countRows("audit_log", "action_type IN ('resume_attachment_upload','resume_attachment_delete')"))
+                .isGreaterThanOrEqualTo(3);
+        assertThat(countRows("field_access_log", "field_name = 'resume_attachment' AND operator_id = " + candidate.userId()))
+                .isGreaterThanOrEqualTo(3);
+    }
+
+    @Test
+    void candidateShouldGenerateApplyAndDismissPrivateRuleBasedResumeAiSuggestions() throws Exception {
+        CandidateAccount candidate = registerAndLoginCandidate("ai");
+        CandidateAccount otherCandidate = registerAndLoginCandidate("ai-other");
+        HttpJsonResponse savedResume = putJson(
+                "/api/candidate/center/resume",
+                """
+                        {
+                          "resume_name": "AI 建议简历",
+                          "base_profile": {
+                            "display_name": "AI 候选人",
+                            "city_code": "310000",
+                            "category_code": "software",
+                            "experience_years": 3,
+                            "expected_positions": [],
+                            "expected_cities": [],
+                            "job_status": ""
+                          },
+                          "skills": ["Java"],
+                          "work_experience": [
+                            {
+                              "company_name": "本地科技",
+                              "position_name": "后端工程师",
+                              "start_date": "2022-01",
+                              "end_date": "",
+                              "ongoing": true,
+                              "responsibility": "开发"
+                            }
+                          ],
+                          "education_experience": [],
+                          "self_description": ""
+                        }
+                        """,
+                "trace-p3-ai-resume",
+                "Bearer " + candidate.token(),
+                "idem-p3-ai-resume");
+        assertSuccess(savedResume, 200, "trace-p3-ai-resume");
+
+        HttpJsonResponse generated = postJson(
+                "/api/candidate/center/resume/ai-suggestions",
+                "{}",
+                "trace-p3-ai-generate",
+                "Bearer " + candidate.token(),
+                "idem-p3-ai-generate");
+        assertSuccess(generated, 200, "trace-p3-ai-generate");
+        assertThat(generated.body().at("/data/suggestion_count").asInt()).isGreaterThanOrEqualTo(3);
+        assertThat(generated.body().at("/data/items").isArray()).isTrue();
+        assertNoRawCandidateData(generated);
+        long firstApplicableId = 0;
+        long guidanceId = 0;
+        for (JsonNode item : generated.body().at("/data/items")) {
+            if (firstApplicableId == 0 && item.at("/can_apply").asBoolean()) {
+                firstApplicableId = item.at("/suggestion_id").asLong();
+            }
+            if (guidanceId == 0 && !item.at("/can_apply").asBoolean()) {
+                guidanceId = item.at("/suggestion_id").asLong();
+            }
+        }
+        assertThat(firstApplicableId).isPositive();
+        assertThat(guidanceId).isPositive();
+
+        HttpJsonResponse latest = getJson(
+                "/api/candidate/center/resume/ai-suggestions/latest",
+                "trace-p3-ai-latest",
+                "Bearer " + candidate.token());
+        assertSuccess(latest, 200, "trace-p3-ai-latest");
+        assertThat(latest.body().at("/data/task_id").asLong()).isEqualTo(generated.body().at("/data/task_id").asLong());
+
+        HttpJsonResponse otherApply = postJson(
+                "/api/candidate/center/resume/ai-suggestions/" + firstApplicableId + "/apply",
+                "{}",
+                "trace-p3-ai-other-apply",
+                "Bearer " + otherCandidate.token(),
+                "idem-p3-ai-other-apply");
+        assertError(otherApply, 404, "NOT_FOUND_404", "trace-p3-ai-other-apply");
+
+        HttpJsonResponse applied = postJson(
+                "/api/candidate/center/resume/ai-suggestions/" + firstApplicableId + "/apply",
+                "{}",
+                "trace-p3-ai-apply",
+                "Bearer " + candidate.token(),
+                "idem-p3-ai-apply");
+        assertSuccess(applied, 200, "trace-p3-ai-apply");
+        assertThat(applied.body().at("/data/applied_count").asInt()).isEqualTo(1);
+
+        HttpJsonResponse dismissed = postJson(
+                "/api/candidate/center/resume/ai-suggestions/" + guidanceId + "/dismiss",
+                "{}",
+                "trace-p3-ai-dismiss",
+                "Bearer " + candidate.token(),
+                "idem-p3-ai-dismiss");
+        assertSuccess(dismissed, 200, "trace-p3-ai-dismiss");
+        assertThat(dismissed.body().at("/data/dismissed_count").asInt()).isEqualTo(1);
+
+        HttpJsonResponse resume = getJson(
+                "/api/candidate/center/resume",
+                "trace-p3-ai-resume-after",
+                "Bearer " + candidate.token());
+        assertSuccess(resume, 200, "trace-p3-ai-resume-after");
+        assertNoRawCandidateData(resume);
+        assertThat(resume.body().at("/data/self_description").asText()
+                + resume.body().at("/data/base_profile/summary").asText()
+                + resume.body().at("/data/skills").toString())
+                .contains("稳定交付");
+
+        HttpJsonResponse companyDenied = postJson(
+                "/api/candidate/center/resume/ai-suggestions",
+                "{}",
+                "trace-p3-company-ai-denied",
+                "Bearer " + registerAndLoginCompany(),
+                "idem-p3-company-ai-denied");
+        assertError(companyDenied, 403, "AUTHZ_403", "trace-p3-company-ai-denied");
+
+        assertThat(countRows("audit_log", "action_type IN ('resume_ai_suggestions_generate','resume_ai_suggestion_apply','resume_ai_suggestion_dismiss')"))
+                .isGreaterThanOrEqualTo(3);
+        assertThat(countRows("field_access_log", "access_type = 'SELF_AI_ASSIST' AND operator_id = " + candidate.userId()))
+                .isGreaterThanOrEqualTo(2);
+    }
+
     private CandidateAccount registerAndLoginCandidate(String label) throws Exception {
         String suffix = UUID.randomUUID().toString().replace("-", "");
         String email = "p3-candidate-" + label + "-" + suffix + "@example.com";
@@ -495,6 +728,56 @@ class CandidateClosureFlowIT {
                 .GET();
         if (authorization != null) {
             builder.header("Authorization", authorization);
+        }
+        return send(builder.build());
+    }
+
+    private HttpJsonResponse deleteJson(
+            String path,
+            String traceId,
+            String authorization,
+            String idempotencyKey
+    ) throws Exception {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri(path))
+                .header("X-Trace-Id", traceId)
+                .DELETE();
+        if (authorization != null) {
+            builder.header("Authorization", authorization);
+        }
+        if (idempotencyKey != null) {
+            builder.header("X-Idempotency-Key", idempotencyKey);
+        }
+        return send(builder.build());
+    }
+
+    private HttpJsonResponse postMultipart(
+            String path,
+            String fileName,
+            String contentType,
+            byte[] content,
+            String traceId,
+            String authorization,
+            String idempotencyKey
+    ) throws Exception {
+        String boundary = "----localtalent-" + UUID.randomUUID();
+        byte[] prefix = (
+                "--" + boundary + "\r\n"
+                        + "Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"\r\n"
+                        + "Content-Type: " + contentType + "\r\n\r\n").getBytes();
+        byte[] suffix = ("\r\n--" + boundary + "--\r\n").getBytes();
+        byte[] body = new byte[prefix.length + content.length + suffix.length];
+        System.arraycopy(prefix, 0, body, 0, prefix.length);
+        System.arraycopy(content, 0, body, prefix.length, content.length);
+        System.arraycopy(suffix, 0, body, prefix.length + content.length, suffix.length);
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri(path))
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .header("X-Trace-Id", traceId)
+                .POST(HttpRequest.BodyPublishers.ofByteArray(body));
+        if (authorization != null) {
+            builder.header("Authorization", authorization);
+        }
+        if (idempotencyKey != null) {
+            builder.header("X-Idempotency-Key", idempotencyKey);
         }
         return send(builder.build());
     }
