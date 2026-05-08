@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { type ChangeEvent, type FormEvent, type ReactNode, useEffect, useState } from 'react';
 import { StateView } from '@/components/StateView';
 import { isHttpClientError } from '@/lib/httpClient';
+import styles from './CandidateCenter.module.css';
 import {
   applyCandidateResumeAiSuggestion,
   cancelFavorite,
@@ -33,25 +34,6 @@ import {
 
 type CandidateCenterStatus = 'loading' | 'ready' | 'unauthorized' | 'error' | 'retrying';
 type ClosureStatus = 'idle' | 'loading' | 'ready' | 'error';
-
-const shellStyle = {
-  minHeight: '100vh',
-  padding: '32px 18px 56px',
-  background: 'linear-gradient(140deg, #f8fbf8 0%, #eef8f4 45%, #f7f1e4 100%)'
-};
-
-const frameStyle = {
-  maxWidth: '1120px',
-  margin: '0 auto'
-};
-
-const heroStyle = {
-  border: '1px solid var(--lt-line)',
-  borderRadius: '34px',
-  background: 'rgba(255, 255, 255, 0.92)',
-  boxShadow: 'var(--lt-shadow)',
-  padding: '34px'
-};
 
 const gridStyle = {
   display: 'grid',
@@ -106,12 +88,6 @@ const secondaryButtonStyle = {
   background: '#0f766e'
 };
 
-const mutedButtonStyle = {
-  ...primaryButtonStyle,
-  background: '#6b7280',
-  cursor: 'not-allowed'
-};
-
 function statusCopy(status: CandidatePublishStatus, reason: string) {
   switch (status) {
     case 'consented':
@@ -140,6 +116,287 @@ function statusCopy(status: CandidatePublishStatus, reason: string) {
         description: reason || '状态来源：接口返回 publish_status=unavailable，请稍后重试。'
       };
   }
+}
+
+function maskPhone(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length < 7) {
+    return value ? '已绑定联系方式' : '未绑定联系方式';
+  }
+  return `${digits.slice(0, 3)}****${digits.slice(-4)}`;
+}
+
+function profileName(closureData: CandidateClosureData | null): string {
+  return closureData?.resume.base_profile.display_name || closureData?.resume.resume_name || '求职者';
+}
+
+function profileMeta(closureData: CandidateClosureData | null): string[] {
+  const profile = closureData?.resume.base_profile;
+  const items = [
+    profile?.gender,
+    profile?.highest_education,
+    profile?.experience_years != null ? `${profile.experience_years}年经验` : undefined
+  ].filter((item): item is string => Boolean(item));
+
+  return items.length > 0 ? items : ['资料待完善'];
+}
+
+function expectedText(values: string[], fallback: string): string {
+  return values.length > 0 ? values.join('、') : fallback;
+}
+
+function latestUpdate(overview: CandidateCenterOverview, closureData: CandidateClosureData | null): string {
+  return closureData?.resume.updated_at || overview.resume.updated_at || '待同步';
+}
+
+function MemberUtilityBar() {
+  return (
+    <div className={styles.utilityBar}>
+      <div className={styles.utilityInner}>
+        <nav aria-label="求职者快捷导航" className={styles.utilityLinks}>
+          <Link href="/">网站首页</Link>
+          <Link href="/jobs">搜职位</Link>
+          <Link href="/portal/talent-service-area">人才服务区</Link>
+          <Link href="/help">使用帮助</Link>
+        </nav>
+        <div className={styles.utilityLinks} aria-label="求职者账号入口">
+          <span>欢迎回来</span>
+          <Link href="/candidate/center">会员中心</Link>
+          <Link href="/">返回首页</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MemberSearchHeader() {
+  return (
+    <header className={styles.searchHeader}>
+      <Link href="/" className={styles.brand} aria-label="LocalTalent 首页">
+        <span className={styles.brandMark}>LT</span>
+        <span>
+          <strong>LocalTalent</strong>
+          <small>地方人才网</small>
+        </span>
+      </Link>
+      <form className={styles.searchBox} action="/jobs">
+        <select name="scope" aria-label="搜索范围" defaultValue="jobs">
+          <option value="jobs">职位信息</option>
+        </select>
+        <input name="keyword" placeholder="请输入搜索关键字" />
+        <button type="submit">搜索</button>
+      </form>
+      <div className={styles.headerActions}>
+        <span aria-label="通知消息">通知消息</span>
+        <Link href="/">返回首页</Link>
+      </div>
+    </header>
+  );
+}
+
+function MemberProfileHero({
+  overview,
+  closureData
+}: {
+  overview: CandidateCenterOverview;
+  closureData: CandidateClosureData | null;
+}) {
+  const resume = closureData?.resume;
+  const profile = resume?.base_profile;
+  const interviewCount = closureData?.applications.filter((item) => item.status_label.includes('面试')).length ?? 0;
+  const stats = [
+    { label: '我的足迹', value: '0' },
+    { label: '对我感兴趣', value: '0' },
+    { label: '面试邀请', value: String(interviewCount) },
+    { label: '我的投递', value: String(overview.applications.total) }
+  ];
+
+  return (
+    <section className={styles.profileHero} aria-label="求职者个人信息横幅">
+      <div className={styles.profileInner}>
+        <div className={styles.avatarCard} aria-hidden="true">
+          <span>{profileName(closureData).slice(0, 1)}</span>
+        </div>
+        <div className={styles.profileCopy}>
+          <p className={styles.kicker}>求职者个人中心</p>
+          <h1>{profileName(closureData)}</h1>
+          <p>{profileMeta(closureData).join(' | ')}</p>
+          <p className={styles.phoneLine}>{maskPhone(profile?.contact_phone ?? '')}</p>
+        </div>
+        <div className={styles.heroStats} aria-label="求职者服务统计">
+          {stats.map((item) => (
+            <article key={item.label}>
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CandidateSideNav({ overview }: { overview: CandidateCenterOverview }) {
+  const items = [
+    ['会员首页', '#member-home'],
+    ['我的简历', '#resume-card'],
+    ['我的职聊', '#service-chat'],
+    ['求职管理', '#candidate-closure'],
+    ['收藏关注', '#candidate-closure'],
+    ['智能推荐', '#job-recommendations'],
+    ['增值服务', '#preferred-services'],
+    ['我的积分', '#preferred-services'],
+    ['隐私设置', '#resume-card'],
+    ['账号管理', '#member-home']
+  ] as const;
+
+  return (
+    <aside className={styles.sideColumn} aria-label="求职者中心菜单">
+      <div className={styles.pointsCard}>
+        <span className={styles.trophy} aria-hidden="true">★</span>
+        <strong>{Math.max(overview.resume.completion_percent, 0)}</strong>
+        <span>积分</span>
+        <em>未签到</em>
+      </div>
+      <nav className={styles.sideNav}>
+        {items.map(([label, href]) => (
+          <a href={href} key={label}>{label}</a>
+        ))}
+      </nav>
+      <div className={styles.qrCard}>
+        <div className={styles.qrBox} aria-hidden="true">QR</div>
+        <strong>手机找工作</strong>
+        <span>微信/小程序入口暂未开放</span>
+      </div>
+    </aside>
+  );
+}
+
+function ResumeStatusCard({
+  overview,
+  closureData,
+  copy,
+  onConsent,
+  onRevoke
+}: {
+  overview: CandidateCenterOverview;
+  closureData: CandidateClosureData | null;
+  copy: ReturnType<typeof statusCopy> | null;
+  onConsent: () => void;
+  onRevoke: () => void;
+}) {
+  const resume = closureData?.resume;
+  const profile = resume?.base_profile;
+  const completion = resume?.completion_percent ?? overview.resume.completion_percent;
+  const publishStatus = overview.consent.publish_status === 'consented' ? '已公开' : '未公开';
+
+  return (
+    <section id="resume-card" className={styles.dashboardCard} aria-label="我的简历">
+      <div className={styles.cardHeader}>
+        <div>
+          <h2>我的简历 <Link href="/candidate/resume/create">预览简历</Link></h2>
+          <p>更新时间：{latestUpdate(overview, closureData)}</p>
+        </div>
+        <div className={styles.actionGroup}>
+          <Link href="/candidate/resume/create" className={styles.blueButton}>修改简历</Link>
+          <button type="button" className={styles.blueButton}>刷新简历</button>
+          {overview.consent.publish_status === 'consented' ? (
+            <button type="button" className={styles.outlineButton} onClick={onRevoke}>撤回同意</button>
+          ) : overview.consent.publish_status === 'not_publishable' ? (
+            <button type="button" className={styles.disabledButton} disabled>暂不可同意发布</button>
+          ) : (
+            <button type="button" className={styles.outlineButton} onClick={onConsent}>重新同意发布</button>
+          )}
+        </div>
+      </div>
+
+      <div className={styles.resumeGrid}>
+        <div className={styles.resumeFacts}>
+          <p>期望职位：{expectedText(profile?.expected_positions ?? [], profile?.category_code || '待补充')}</p>
+          <p>期望地区：{expectedText(profile?.expected_cities ?? [], profile?.city_code || '待补充')}</p>
+          <p>期望薪资：{profile?.expected_salary || '待补充'}</p>
+          <p>求职状态：{profile?.job_status || '待补充'}</p>
+        </div>
+        <div className={styles.resumeStamp}>
+          <span>{publishStatus}</span>
+        </div>
+      </div>
+
+      <div className={styles.completionRow}>
+        <span>简历完整度：</span>
+        <div className={styles.progressTrack}>
+          <div style={{ width: `${Math.min(Math.max(completion, 0), 100)}%` }} />
+        </div>
+        <strong>{completion}% 完成</strong>
+        {completion < 80 ? (
+          <Link href="/candidate/resume/create">立即完善</Link>
+        ) : (
+          <span>状态良好</span>
+        )}
+      </div>
+
+      <div className={styles.noticeLine}>
+        <span>{copy?.title}</span>
+        <small>{copy?.description}</small>
+      </div>
+    </section>
+  );
+}
+
+function PreferredServices({ overview }: { overview: CandidateCenterOverview }) {
+  const services = [
+    { title: '简历置顶', desc: '灰度占位，暂未开放', status: '暂未开放', tone: 'gold' },
+    { title: '醒目标签', desc: '灰度占位，不接商业化标签', status: '暂未开放', tone: 'green' },
+    { title: '职位订阅', desc: `${overview.stats.subscription_count} 条订阅，站内保存条件`, status: '可用', tone: 'blue' },
+    { title: '委托投递', desc: '灰度占位，不做自动投递', status: '暂未开放', tone: 'orange' },
+    { title: '隐私设置', desc: overview.consent.status_label || '由服务端返回发布状态', status: '可查看', tone: 'purple' },
+    { title: '我的积分', desc: '仅展示占位，不接积分兑换', status: '占位', tone: 'teal' }
+  ];
+
+  return (
+    <section id="preferred-services" className={styles.dashboardCard} aria-label="优选服务">
+      <h2>优选服务</h2>
+      <div className={styles.serviceGrid}>
+        {services.map((item) => (
+          <article key={item.title} className={styles.serviceCard} data-tone={item.tone}>
+            <span aria-hidden="true">{item.title.slice(0, 1)}</span>
+            <strong>{item.title}</strong>
+            <p>{item.desc}</p>
+            <em>{item.status}</em>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function JobRecommendations({ closureData }: { closureData: CandidateClosureData | null }) {
+  const recommended = closureData?.favorites.slice(0, 3) ?? [];
+
+  return (
+    <section id="job-recommendations" className={styles.dashboardCard} aria-label="职位推荐">
+      <div className={styles.cardHeader}>
+        <h2>职位推荐</h2>
+        <span>仅展示公开职位白名单字段</span>
+      </div>
+      {recommended.length === 0 ? (
+        <div className={styles.emptyState}>
+          <span aria-hidden="true">▦</span>
+          <p>没有数据了</p>
+          <small>后续可由公开职位接口补充推荐，不读取原始候选人数据。</small>
+        </div>
+      ) : (
+        <div className={styles.recommendationList}>
+          {recommended.map((item) => (
+            <Link href={`/jobs/${item.job_id}`} key={item.favorite_id}>
+              <strong>{item.job_title}</strong>
+              <span>{item.company_name} · {item.city_code || '城市待同步'}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
 }
 
 function SummaryCard({ title, value, helper }: { title: string; value: string; helper: string }) {
@@ -809,129 +1066,98 @@ export function CandidateCenter() {
   const copy = overview ? statusCopy(overview.consent.publish_status, overview.consent.reason) : null;
 
   return (
-    <main aria-label="求职者中心" style={shellStyle}>
-      <div style={frameStyle}>
-        <section style={heroStyle}>
-          <p style={{ margin: 0, color: 'var(--lt-accent-strong)', fontWeight: 900 }}>求职者中心</p>
-          <h1 style={{ maxWidth: '760px', margin: '14px 0', fontSize: 'clamp(2.1rem, 5vw, 4.2rem)', lineHeight: 1 }}>
-            简历、投递、签到、同意与撤回，一处看清。
-          </h1>
-          <p style={{ maxWidth: '760px', margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.9 }}>
-            本页状态完全以接口返回为准，不在前端推断同意状态；手机号、邮箱、简历正文、附件、证据材料不会进入本页展示。
-          </p>
-        </section>
+    <main aria-label="求职者中心" className={styles.memberShell}>
+      <MemberUtilityBar />
+      <MemberSearchHeader />
 
-        <section style={{ marginTop: '24px' }}>
-          {showState ? (
-            <StateView
-              variant={status === 'ready' ? 'loading' : status}
-              title={
-                status === 'unauthorized'
-                  ? '无权限访问求职者中心'
-                  : status === 'error'
-                    ? '求职者中心暂时不可用'
-                    : status === 'retrying'
-                      ? '正在重新读取求职者中心'
-                      : '正在读取求职者中心'
-              }
-              description={message ?? '请稍候，系统正在读取最新状态。'}
-              retryLabel="重新读取"
-              onRetry={status === 'loading' || status === 'retrying' ? undefined : () => loadOverview('retrying')}
-            />
-          ) : (
-            <>
-              <article style={{ ...cardStyle, borderColor: 'rgba(15, 118, 110, 0.35)' }}>
-                <p style={{ margin: 0, color: 'var(--lt-accent-strong)', fontWeight: 900 }}>
-                  同意与撤回状态
-                </p>
-                <h2 style={{ margin: '12px 0 8px', fontSize: '1.55rem' }}>{copy?.title}</h2>
-                <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>{copy?.description}</p>
-                {overview.consent.status_label ? (
-                  <p style={{ margin: '12px 0 0', color: 'var(--lt-ink-muted)' }}>
-                    服务端状态：{overview.consent.status_label}
-                  </p>
-                ) : null}
-                {traceId ? (
-                  <p style={{ margin: '8px 0 0', color: 'var(--lt-ink-muted)' }}>trace_id：{traceId}</p>
-                ) : null}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '20px' }}>
-                  {overview.consent.publish_status === 'consented' ? (
-                    <button type="button" style={primaryButtonStyle} onClick={onRevoke}>
-                      撤回同意
-                    </button>
-                  ) : null}
-                  {overview.consent.publish_status === 'revoked' || overview.consent.publish_status === 'unavailable' ? (
-                    <button type="button" style={primaryButtonStyle} onClick={onConsent}>
-                      重新同意发布
-                    </button>
-                  ) : null}
-                  {overview.consent.publish_status === 'not_publishable' ? (
-                    <button type="button" style={mutedButtonStyle} disabled>
-                      暂不可同意发布
-                    </button>
-                  ) : null}
+      {showState ? (
+        <section className={styles.memberFrame}>
+          <StateView
+            variant={status === 'ready' ? 'loading' : status}
+            title={
+              status === 'unauthorized'
+                ? '无权限访问求职者中心'
+                : status === 'error'
+                  ? '求职者中心暂时不可用'
+                  : status === 'retrying'
+                    ? '正在重新读取求职者中心'
+                    : '正在读取求职者中心'
+            }
+            description={message ?? '请稍候，系统正在读取最新状态。'}
+            retryLabel="重新读取"
+            onRetry={status === 'loading' || status === 'retrying' ? undefined : () => loadOverview('retrying')}
+          />
+        </section>
+      ) : (
+        <>
+          <MemberProfileHero overview={overview} closureData={closureData} />
+          <section id="member-home" className={styles.memberFrame}>
+            {overview.onboarding?.onboarding_required ? (
+              <article className={styles.onboardingAlert}>
+                <div>
+                  <strong>首次登录资料待完善</strong>
+                  <p>服务端判断当前简历尚未完成。请先完成基本信息和简历详情，再进入完整个人中心体验。</p>
                 </div>
+                <Link href="/candidate/resume/create">去完善简历</Link>
               </article>
+            ) : null}
 
-              <section aria-label="求职者摘要" style={gridStyle}>
-                <SummaryCard
-                  title="简历"
-                  value={`${overview.resume.completion_percent}% 完成`}
-                  helper={`技能摘要：${overview.resume.skills_summary || '待补充'}；更新时间：${overview.resume.updated_at || '未知'}`}
+            <div className={styles.dashboardLayout}>
+              <CandidateSideNav overview={overview} />
+              <div className={styles.mainColumn}>
+                <ResumeStatusCard
+                  overview={overview}
+                  closureData={closureData}
+                  copy={copy}
+                  onConsent={onConsent}
+                  onRevoke={onRevoke}
                 />
-                <SummaryCard
-                  title="投递"
-                  value={`${overview.applications.total} 条投递`}
-                  helper={`最近职位：${overview.applications.latest_job_title}；状态：${overview.applications.latest_status}`}
-                />
-                <SummaryCard
-                  title="签到"
-                  value={overview.signin.latest_status}
-                  helper={`最近签到时间：${overview.signin.latest_time || '暂无'}`}
-                />
-              </section>
-
-              {overview.onboarding?.onboarding_required ? (
-                <article style={{ ...cardStyle, marginTop: '18px', borderColor: 'rgba(37, 99, 235, 0.28)' }}>
-                  <h2 style={sectionTitleStyle}>首次登录资料待完善</h2>
-                  <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
-                    服务端判断当前简历尚未完成。请先完成基本信息和简历详情，再进入完整会员中心体验。
-                  </p>
-                  <Link
-                    href="/candidate/resume/create"
-                    style={{ ...primaryButtonStyle, display: 'inline-flex', marginTop: '16px', textDecoration: 'none' }}
-                  >
-                    去完善简历
-                  </Link>
-                </article>
-              ) : null}
-
-              <CandidateClosurePanel
-                overview={overview}
-                closureData={closureData}
-                closureStatus={closureStatus}
-                closureMessage={closureMessage}
-                onRetry={() => void reloadClosure()}
-                onResumeSave={onResumeSave}
-                onFavoriteCreate={onFavoriteCreate}
-                onFavoriteCancel={(favoriteId) => void runCandidateWrite(() => cancelFavorite(token ?? '', favoriteId))}
-                onSubscriptionCreate={onSubscriptionCreate}
-                onSubscriptionCancel={(subscriptionId) => void runCandidateWrite(() => cancelSubscription(token ?? '', subscriptionId))}
-                onNotificationRead={(notificationId) => void runCandidateWrite(() => markNotificationRead(token ?? '', notificationId))}
-                attachment={attachment}
-                aiSuggestions={aiSuggestions}
-                aiBusy={aiBusy}
-                onAttachmentUpload={onAttachmentUpload}
-                onAttachmentDownload={onAttachmentDownload}
-                onAttachmentDelete={onAttachmentDelete}
-                onAiGenerate={onAiGenerate}
-                onAiApply={onAiApply}
-                onAiDismiss={onAiDismiss}
-              />
-            </>
-          )}
-        </section>
-      </div>
+                {traceId ? (
+                  <p className={styles.traceLine}>trace_id：{traceId}</p>
+                ) : null}
+                <PreferredServices overview={overview} />
+                <JobRecommendations closureData={closureData} />
+                <section id="candidate-closure" className={styles.detailSection}>
+                  <CandidateClosurePanel
+                    overview={overview}
+                    closureData={closureData}
+                    closureStatus={closureStatus}
+                    closureMessage={closureMessage}
+                    onRetry={() => void reloadClosure()}
+                    onResumeSave={onResumeSave}
+                    onFavoriteCreate={onFavoriteCreate}
+                    onFavoriteCancel={(favoriteId) => void runCandidateWrite(() => cancelFavorite(token ?? '', favoriteId))}
+                    onSubscriptionCreate={onSubscriptionCreate}
+                    onSubscriptionCancel={(subscriptionId) => void runCandidateWrite(() => cancelSubscription(token ?? '', subscriptionId))}
+                    onNotificationRead={(notificationId) => void runCandidateWrite(() => markNotificationRead(token ?? '', notificationId))}
+                    attachment={attachment}
+                    aiSuggestions={aiSuggestions}
+                    aiBusy={aiBusy}
+                    onAttachmentUpload={onAttachmentUpload}
+                    onAttachmentDownload={onAttachmentDownload}
+                    onAttachmentDelete={onAttachmentDelete}
+                    onAiGenerate={onAiGenerate}
+                    onAiApply={onAiApply}
+                    onAiDismiss={onAiDismiss}
+                  />
+                </section>
+              </div>
+            </div>
+          </section>
+          <button type="button" className={styles.floatChat} aria-label="在线客服占位">
+            …
+          </button>
+          <footer className={styles.memberFooter}>
+            <nav aria-label="会员中心页脚">
+              <Link href="/jobs">找工作</Link>
+              <Link href="/companies">找企业</Link>
+              <Link href="/job-fairs">招聘会</Link>
+              <Link href="/help">帮助中心</Link>
+            </nav>
+            <p>LocalTalent 求职者个人中心 · 私有页面 noindex · 不接真实微信/小程序/App</p>
+          </footer>
+        </>
+      )}
     </main>
   );
 }

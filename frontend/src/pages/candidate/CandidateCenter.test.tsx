@@ -474,6 +474,33 @@ describe('CandidateCenter', () => {
     expect(screen.getByText(/后端岗位订阅/)).toBeInTheDocument();
   });
 
+  it('renders high fidelity member center layout without commercial capabilities', async () => {
+    setToken();
+    mockCandidateClosureFetch();
+
+    render(<CandidateCenter />);
+
+    expect(await screen.findByRole('region', { name: '求职者个人信息横幅' })).toBeInTheDocument();
+    expect(screen.getByRole('complementary', { name: '求职者中心菜单' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: '我的简历' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: '优选服务' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: '职位推荐' })).toBeInTheDocument();
+    expect(screen.getByText('会员首页')).toBeInTheDocument();
+    expect(screen.getByText('我的职聊')).toBeInTheDocument();
+    expect(screen.getByText('求职管理')).toBeInTheDocument();
+    expect(screen.getByText('简历置顶')).toBeInTheDocument();
+    expect(screen.getByText('醒目标签')).toBeInTheDocument();
+    expect(screen.getByText('委托投递')).toBeInTheDocument();
+    expect(screen.getByText('仅展示公开职位白名单字段')).toBeInTheDocument();
+
+    const body = document.body.textContent ?? '';
+    expect(body).not.toContain('联系解锁');
+    expect(body).not.toContain('真实支付');
+    expect(body).not.toContain('付费会员');
+    expect(body).not.toContain('会员权益');
+    expect(body).not.toContain('公共简历库');
+  });
+
   it('sends token trace and idempotency key for candidate private writes then reloads server state', async () => {
     setToken();
     const fetchMock = mockCandidateClosureFetch();

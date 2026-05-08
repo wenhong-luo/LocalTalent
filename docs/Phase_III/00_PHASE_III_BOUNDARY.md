@@ -152,6 +152,7 @@
 - `V0018__create_candidate_resume_onboarding.sql` 属于 Prompt 27（P3-2）求职者真实闭环生产化的补充，用于把首次完善简历 1-3 页的 `onboarding_status/current_step/completion_score` 持久化为服务端权威状态。该补丁只服务 candidate 本人私有域，不存手机号、邮箱、简历正文、附件对象 key、AI 文本、证据或原始 JSON；不做第 4 张会员中心，不做 AI 优化、短信、微信、小程序或 App，不改变人才服务区发布快照边界。
 - `V0019__extend_candidate_resume_attachment_metadata.sql` 属于 Prompt 27（P3-2）求职者真实闭环生产化的补充，用于支持 candidate 本人私有简历附件上传、下载、替换、删除。该补丁默认由 `phase3.resume_attachment_upload=false` 关闭；附件 object key 仅服务端保存，不返回前端、不进入公开门户、人才服务区、搜索、sitemap、日志明文或导出旁路；不做企业查看附件、附件解析、AI 优化、真实短信/微信/小程序/App 或第 4 张会员中心。
 - `V0020__create_candidate_resume_ai_suggestion.sql` 属于 Prompt 27（P3-2）求职者真实闭环生产化的补充，用于支持 candidate 本人私有域内的安全规则版简历优化建议。该补丁默认由 `phase3.resume_ai_assist=false` 关闭；只使用服务端规范化 DTO 生成规则建议，由本人逐条手动应用或忽略；不接真实 LLM/外部模型，不上传原始候选人数据，不保存完整 prompt、模型原文、手机号、邮箱、附件 object key、证据或原始 JSON，不自动发布到人才服务区。
+- `/candidate/center` 求职者个人中心首页高保真增强属于 Prompt 27（P3-2）求职者真实闭环生产化的补充，用于把截图 `docs/page/4、会员中心.png` 收口为 LocalTalent 私有个人中心首页。该补丁不新增迁移或后端业务能力，只复用 candidate 私有 overview、resume、attachment、AI 建议、收藏、订阅、通知等接口；“会员中心”仅作为视觉参考，不代表会员商业化、真实支付、联系解锁、公共简历库或真实短信/微信/小程序/App，页面继续 `noindex`，不得进入公开门户、人才服务区、搜索、sitemap 或导出旁路。
 
 ```text
 下一步：进入灰度试运营复核，或另起四期正式上线治理规划。
