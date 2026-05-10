@@ -21,6 +21,10 @@ import {
   type CandidateResume,
   type CandidateWorkExperience
 } from './candidateCenterApi';
+import { ExpectedPositionPicker } from './ExpectedPositionPicker';
+import { categoryCodeForExpectedPosition } from './expectedPositionCatalog';
+import { ExpectedRegionPicker } from './ExpectedRegionPicker';
+import { cityCodeForExpectedRegion } from './expectedRegionCatalog';
 import styles from './CandidateResumeCreate.module.css';
 
 type Step = 'basic' | 'detail' | 'done';
@@ -37,8 +41,10 @@ type BasicForm = {
   contactWechat: string;
   wechatSameAsPhone: boolean;
   expectedPositions: string;
+  expectedCategoryCode: string;
   expectedSalary: string;
   expectedCities: string;
+  expectedCityCode: string;
   jobStatus: string;
 };
 
@@ -69,8 +75,10 @@ const emptyBasic: BasicForm = {
   contactWechat: '',
   wechatSameAsPhone: false,
   expectedPositions: '',
+  expectedCategoryCode: '',
   expectedSalary: '',
   expectedCities: '',
+  expectedCityCode: '',
   jobStatus: '我目前已离职，可快速到岗'
 };
 
@@ -97,7 +105,7 @@ function splitList(value: string): string[] {
     .split(/[，,\n]/)
     .map((item) => item.trim())
     .filter(Boolean)
-    .slice(0, 5);
+    .slice(0, 6);
 }
 
 function joinList(value: string[]): string {
@@ -127,8 +135,10 @@ function basicFromResume(resume?: CandidateResume): BasicForm {
     contactWechat: resume.base_profile.contact_wechat,
     wechatSameAsPhone: resume.base_profile.wechat_same_as_phone,
     expectedPositions: joinList(resume.base_profile.expected_positions),
+    expectedCategoryCode: resume.base_profile.category_code,
     expectedSalary: resume.base_profile.expected_salary,
     expectedCities: joinList(resume.base_profile.expected_cities),
+    expectedCityCode: resume.base_profile.city_code,
     jobStatus: resume.base_profile.job_status || emptyBasic.jobStatus
   };
 }
@@ -206,7 +216,15 @@ function PageChrome({ step, children }: { step: Step; children: React.ReactNode 
 
 function buildResumePayload(basic: BasicForm, detail: DetailForm, previous?: CandidateResume) {
   const expectedPositions = splitList(basic.expectedPositions);
+  const expectedCategoryCode = basic.expectedCategoryCode
+    || categoryCodeForExpectedPosition(expectedPositions[0] ?? '')
+    || previous?.base_profile.category_code
+    || '';
   const expectedCities = splitList(basic.expectedCities);
+  const expectedCityCode = basic.expectedCityCode
+    || cityCodeForExpectedRegion(expectedCities[0] ?? '')
+    || previous?.base_profile.city_code
+    || '';
   const workExperience: CandidateWorkExperience[] = detail.companyName || detail.positionName || detail.responsibility
     ? [{
       company_name: detail.companyName,
@@ -232,8 +250,8 @@ function buildResumePayload(basic: BasicForm, detail: DetailForm, previous?: Can
     resume_name: previous?.resume_name || `${basic.displayName || '我的'}的简历`,
     base_profile: {
       display_name: basic.displayName,
-      city_code: expectedCities[0] ?? previous?.base_profile.city_code ?? '',
-      category_code: expectedPositions[0] ?? previous?.base_profile.category_code ?? '',
+      city_code: expectedCityCode,
+      category_code: expectedCategoryCode,
       experience_years: previous?.base_profile.experience_years ?? null,
       summary: detail.selfDescription,
       gender: basic.gender,
@@ -339,6 +357,22 @@ export function CandidateResumeCreate() {
 
   function updateBasic(field: keyof BasicForm, value: string | boolean) {
     setBasic((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateExpectedPositions(positions: string[], categoryCode: string) {
+    setBasic((current) => ({
+      ...current,
+      expectedPositions: joinList(positions),
+      expectedCategoryCode: categoryCode
+    }));
+  }
+
+  function updateExpectedRegions(regions: string[], cityCode: string) {
+    setBasic((current) => ({
+      ...current,
+      expectedCities: joinList(regions),
+      expectedCityCode: cityCode
+    }));
   }
 
   function updateDetail(field: keyof DetailForm, value: string | boolean) {
@@ -735,7 +769,11 @@ export function CandidateResumeCreate() {
               <div className={styles.formGrid}>
                 <label className={styles.field}>
                   <span><span className={styles.required}>*</span> 期望职位</span>
-                  <input value={basic.expectedPositions} onChange={(event) => updateBasic('expectedPositions', event.target.value)} placeholder="请输入期望职位，最多 5 个，用逗号分隔" />
+                  <ExpectedPositionPicker
+                    selectedPositions={splitList(basic.expectedPositions)}
+                    selectedCategoryCode={basic.expectedCategoryCode}
+                    onSave={({ positions, categoryCode }) => updateExpectedPositions(positions, categoryCode)}
+                  />
                 </label>
                 <label className={styles.field}>
                   <span>期望薪资</span>
@@ -749,7 +787,11 @@ export function CandidateResumeCreate() {
                 </label>
                 <label className={styles.field}>
                   <span><span className={styles.required}>*</span> 期望地区</span>
-                  <input value={basic.expectedCities} onChange={(event) => updateBasic('expectedCities', event.target.value)} placeholder="请输入期望地区，最多 5 个，用逗号分隔" />
+                  <ExpectedRegionPicker
+                    selectedRegions={splitList(basic.expectedCities)}
+                    selectedCityCode={basic.expectedCityCode}
+                    onSave={({ regions, cityCode }) => updateExpectedRegions(regions, cityCode)}
+                  />
                 </label>
                 <label className={styles.field}>
                   <span>求职状态</span>

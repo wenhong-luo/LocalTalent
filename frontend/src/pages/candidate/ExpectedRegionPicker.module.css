@@ -1,0 +1,382 @@
+.trigger {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  border: 1px solid #dbe3ef;
+  border-radius: 4px;
+  padding: 11px 14px;
+  background: #ffffff;
+  color: #1f2937;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.placeholder {
+  color: #9aa4b2;
+}
+
+.summary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  color: #94a3b8;
+  font-weight: 900;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 82;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.56);
+}
+
+.dialog {
+  display: flex;
+  width: min(760px, calc(100vw - 32px));
+  height: min(680px, calc(100vh - 48px));
+  max-height: calc(100vh - 48px);
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px 14px;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  color: #1f2937;
+}
+
+.hint {
+  margin: 10px 0 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.close {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.body {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: 0 22px 16px;
+}
+
+.selectedInput {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.selectedInputText {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: #1f2937;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedInputPlaceholder {
+  min-width: 0;
+  flex: 1;
+  color: #9aa4b2;
+}
+
+.clearButton {
+  flex: none;
+  border: 1px solid #facc15;
+  border-radius: 3px;
+  padding: 6px 12px;
+  background: #ffffff;
+  color: #334155;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.clearButton:hover {
+  border-color: #eab308;
+  background: #fefce8;
+}
+
+.searchWrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.search {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 11px 40px 11px 14px;
+  color: #1f2937;
+  font: inherit;
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  color: #b5bdca;
+  transform: translateY(-50%);
+}
+
+.selector {
+  display: grid;
+  grid-template-columns: 180px 160px minmax(0, 1fr);
+  min-height: 0;
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.provinces,
+.cities {
+  min-width: 0;
+  overflow: auto;
+  border-right: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.districts {
+  min-width: 0;
+  overflow: auto;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.navButton,
+.navButtonActive,
+.choiceButton,
+.choiceButtonChecked {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: none;
+  padding: 10px 12px;
+  background: transparent;
+  color: #334155;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.navButton strong,
+.navButtonActive strong {
+  display: inline-grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #2563eb;
+  font-size: 12px;
+}
+
+.navButtonActive {
+  background: #f1f5f9;
+  color: #2563eb;
+  font-weight: 900;
+}
+
+.choiceButton,
+.choiceButtonChecked {
+  margin-bottom: 8px;
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+.choiceButton:hover,
+.choiceButtonChecked {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.choiceButton:disabled,
+.districtButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.districtGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(110px, 1fr));
+  gap: 10px 14px;
+}
+
+.districtButton,
+.districtButtonChecked {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  border: none;
+  border-radius: 4px;
+  padding: 7px 8px;
+  background: transparent;
+  color: #475467;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.35;
+  text-align: left;
+  word-break: keep-all;
+}
+
+.districtButton span,
+.districtButtonChecked span {
+  display: inline-grid;
+  width: 14px;
+  height: 14px;
+  place-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 2px;
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.districtButtonChecked {
+  color: #2563eb;
+  font-weight: 900;
+}
+
+.districtButtonChecked span {
+  border-color: #2f8dfb;
+  background: #2f8dfb;
+}
+
+.selectedBar {
+  display: flex;
+  max-height: 78px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-top: 14px;
+  overflow: auto;
+  color: #667085;
+  font-size: 13px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.chip button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.footer {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px 22px 22px;
+  border-top: 1px solid #eef2f7;
+}
+
+.save,
+.cancel {
+  min-width: 88px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 10px 24px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.save {
+  background: #2f8dfb;
+  color: #ffffff;
+}
+
+.cancel {
+  border-color: #dbe3ef;
+  background: #ffffff;
+  color: #475467;
+}
+
+.empty {
+  margin: 64px 0;
+  color: #8a94a6;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .dialog {
+    height: min(720px, calc(100vh - 24px));
+    width: calc(100vw - 20px);
+  }
+
+  .selector {
+    grid-template-columns: 1fr;
+  }
+
+  .provinces,
+  .cities {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .districtGrid {
+    grid-template-columns: repeat(2, minmax(110px, 1fr));
+  }
+}

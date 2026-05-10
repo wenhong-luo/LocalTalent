@@ -153,9 +153,11 @@ function closurePayload(path: string): unknown {
       base_profile: {
         display_name: '林同学',
         city_code: '310000',
-        category_code: 'software',
+        category_code: 'network_communication_electronics',
         experience_years: 5,
-        summary: '服务端返回的预览摘要'
+        summary: '服务端返回的预览摘要',
+        expected_positions: ['Java工程师'],
+        expected_cities: ['浦东新区']
       },
       education: ['本科'],
       experience: ['后端服务建设'],
@@ -174,9 +176,11 @@ function closurePayload(path: string): unknown {
       base_profile: {
         display_name: '林同学',
         city_code: '310000',
-        category_code: 'software',
+        category_code: 'network_communication_electronics',
         experience_years: 5,
-        summary: '只在本人私有域展示'
+        summary: '只在本人私有域展示',
+        expected_positions: ['Java工程师'],
+        expected_cities: ['浦东新区']
       },
       education: ['本科'],
       experience: ['后端服务建设'],
@@ -516,6 +520,14 @@ describe('CandidateCenter', () => {
     expect(headers.get('Authorization')).toBe('Bearer candidate-token');
     expect(headers.get('X-Trace-Id')).toBeTruthy();
     expect(headers.get('X-Idempotency-Key')).toMatch(/^candidate-resume-/);
+    expect(JSON.parse(String(putCall?.[1]?.body))).toMatchObject({
+      base_profile: {
+        city_code: '310000',
+        category_code: 'network_communication_electronics',
+        expected_positions: ['Java工程师'],
+        expected_cities: ['浦东新区']
+      }
+    });
   });
 
   it('uploads and deletes private resume attachment from candidate center', async () => {

@@ -5,6 +5,10 @@ import { type ChangeEvent, type FormEvent, type ReactNode, useEffect, useState }
 import { StateView } from '@/components/StateView';
 import { isHttpClientError } from '@/lib/httpClient';
 import styles from './CandidateCenter.module.css';
+import { ExpectedPositionPicker } from './ExpectedPositionPicker';
+import { categoryCodeForExpectedPosition } from './expectedPositionCatalog';
+import { ExpectedRegionPicker } from './ExpectedRegionPicker';
+import { cityCodeForExpectedRegion } from './expectedRegionCatalog';
 import {
   applyCandidateResumeAiSuggestion,
   cancelFavorite,
@@ -498,6 +502,28 @@ function CandidateClosurePanel({
   onAiApply,
   onAiDismiss
 }: ClosurePanelProps) {
+  const activeResume = closureData?.resume;
+  const [selectedExpectedPositions, setSelectedExpectedPositions] = useState<string[]>([]);
+  const [selectedExpectedCategoryCode, setSelectedExpectedCategoryCode] = useState('');
+  const [selectedExpectedRegions, setSelectedExpectedRegions] = useState<string[]>([]);
+  const [selectedExpectedCityCode, setSelectedExpectedCityCode] = useState('');
+
+  useEffect(() => {
+    if (!activeResume) {
+      return;
+    }
+    setSelectedExpectedPositions(activeResume.base_profile.expected_positions ?? []);
+    setSelectedExpectedCategoryCode(activeResume.base_profile.category_code ?? '');
+    setSelectedExpectedRegions(activeResume.base_profile.expected_cities ?? []);
+    setSelectedExpectedCityCode(activeResume.base_profile.city_code ?? '');
+  }, [
+    activeResume?.resume_id,
+    activeResume?.base_profile.category_code,
+    activeResume?.base_profile.city_code,
+    (activeResume?.base_profile.expected_positions ?? []).join('|'),
+    (activeResume?.base_profile.expected_cities ?? []).join('|')
+  ]);
+
   if (!overview.features.candidate_closure_enabled) {
     return (
       <section style={{ ...cardStyle, marginTop: '20px', borderStyle: 'dashed' }}>
@@ -563,12 +589,30 @@ function CandidateClosurePanel({
               <input name="display_name" defaultValue={resume.base_profile.display_name} style={fieldStyle} />
             </label>
             <label style={labelStyle}>
-              城市
-              <input name="city_code" defaultValue={resume.base_profile.city_code} style={fieldStyle} />
+              期望地区
+              <ExpectedRegionPicker
+                selectedRegions={selectedExpectedRegions}
+                selectedCityCode={selectedExpectedCityCode}
+                onSave={({ regions, cityCode }) => {
+                  setSelectedExpectedRegions(regions);
+                  setSelectedExpectedCityCode(cityCode);
+                }}
+              />
+              <input type="hidden" name="city_code" value={selectedExpectedCityCode} />
+              <input type="hidden" name="expected_cities" value={selectedExpectedRegions.join('，')} />
             </label>
             <label style={labelStyle}>
-              职类
-              <input name="category_code" defaultValue={resume.base_profile.category_code} style={fieldStyle} />
+              期望职位
+              <ExpectedPositionPicker
+                selectedPositions={selectedExpectedPositions}
+                selectedCategoryCode={selectedExpectedCategoryCode}
+                onSave={({ positions, categoryCode }) => {
+                  setSelectedExpectedPositions(positions);
+                  setSelectedExpectedCategoryCode(categoryCode);
+                }}
+              />
+              <input type="hidden" name="category_code" value={selectedExpectedCategoryCode} />
+              <input type="hidden" name="expected_positions" value={selectedExpectedPositions.join('，')} />
             </label>
             <label style={labelStyle}>
               经验年限
@@ -948,26 +992,37 @@ export function CandidateCenter() {
   function onResumeSave(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const currentResume = closureData?.resume;
+    const expectedPositions = formLines(formData, 'expected_positions');
+    const categoryCode = formText(formData, 'category_code')
+      || categoryCodeForExpectedPosition(expectedPositions[0] ?? '')
+      || currentResume?.base_profile.category_code
+      || '';
+    const expectedCities = formLines(formData, 'expected_cities');
+    const cityCode = formText(formData, 'city_code')
+      || cityCodeForExpectedRegion(expectedCities[0] ?? '')
+      || currentResume?.base_profile.city_code
+      || '';
     void runCandidateWrite(() => saveCandidateResume(token ?? '', {
       resume_name: formText(formData, 'resume_name'),
       base_profile: {
         display_name: formText(formData, 'display_name'),
-        city_code: formText(formData, 'city_code'),
-        category_code: formText(formData, 'category_code'),
+        city_code: cityCode,
+        category_code: categoryCode,
         experience_years: formNumber(formData, 'experience_years'),
         summary: formText(formData, 'summary'),
-        gender: '',
-        birth_date: '',
-        highest_education: '',
-        start_work_date: '',
-        no_experience: false,
-        contact_phone: '',
-        contact_wechat: '',
-        wechat_same_as_phone: false,
-        expected_positions: [],
-        expected_salary: '',
-        expected_cities: [],
-        job_status: ''
+        gender: currentResume?.base_profile.gender ?? '',
+        birth_date: currentResume?.base_profile.birth_date ?? '',
+        highest_education: currentResume?.base_profile.highest_education ?? '',
+        start_work_date: currentResume?.base_profile.start_work_date ?? '',
+        no_experience: currentResume?.base_profile.no_experience ?? false,
+        contact_phone: currentResume?.base_profile.contact_phone ?? '',
+        contact_wechat: currentResume?.base_profile.contact_wechat ?? '',
+        wechat_same_as_phone: currentResume?.base_profile.wechat_same_as_phone ?? false,
+        expected_positions: expectedPositions,
+        expected_salary: currentResume?.base_profile.expected_salary ?? '',
+        expected_cities: expectedCities,
+        job_status: currentResume?.base_profile.job_status ?? ''
       },
       education: formLines(formData, 'education'),
       experience: formLines(formData, 'experience'),

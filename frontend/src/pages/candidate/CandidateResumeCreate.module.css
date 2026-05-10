@@ -264,12 +264,28 @@
 }
 
 .checkLine {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
+  justify-self: start;
+  align-self: start;
   margin-top: 8px;
   color: #64748b;
   font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.checkLine input[type="checkbox"] {
+  flex: 0 0 14px;
+  width: 14px;
+  min-width: 14px;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 2px;
+  accent-color: #2563eb;
 }
 
 .actions {

@@ -119,6 +119,23 @@ const aiTaskPayload = {
   }]
 };
 
+async function chooseJavaEngineer(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: /请选择期望职位/ }));
+  expect(await screen.findByRole('dialog', { name: '期望职位' })).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: '网络 | 通信 | 电子' }));
+  await user.click(screen.getByLabelText('Java工程师'));
+  await user.click(screen.getByRole('button', { name: '保存' }));
+}
+
+async function chooseWenxiRegion(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: /请选择期望地区/ }));
+  expect(await screen.findByRole('dialog', { name: '期望地区' })).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: '山西' }));
+  await user.click(screen.getByRole('button', { name: '运城' }));
+  await user.click(screen.getByRole('button', { name: '闻喜县' }));
+  await user.click(screen.getByRole('button', { name: '保存' }));
+}
+
 function closurePayload(path: string, overview = overviewPayload): unknown {
   if (path.includes('/api/candidate/center/overview')) {
     return overview;
@@ -239,7 +256,138 @@ describe('CandidateResumeCreate', () => {
     expect(screen.getByLabelText('上传附件简历')).toBeInTheDocument();
     expect(screen.getByLabelText('简历创建进度')).toHaveTextContent('1基本信息2完善简历3创建完成');
     expect(screen.getByPlaceholderText('请填写姓名')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('请输入期望职位，最多 5 个，用逗号分隔')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /请选择期望职位，最多6个/ })).toBeInTheDocument();
+  });
+
+  it('opens professional expected position picker and limits selection to six positions', async () => {
+    const user = userEvent.setup();
+    window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
+    mockResumeCreateFetch();
+
+    render(<CandidateResumeCreate />);
+
+    await user.click(await screen.findByRole('button', { name: /请选择期望职位/ }));
+    expect(screen.getByRole('dialog', { name: '期望职位' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '生活 | 服务业' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '人力 | 行政 | 管理' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '网络 | 通信 | 电子' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '保存' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '取消' })).toBeInTheDocument();
+    expect(screen.getByLabelText('已选期望职位输入框')).toHaveTextContent('请选择期望职位，最多6个');
+
+    await user.click(screen.getByRole('button', { name: '网络 | 通信 | 电子' }));
+    expect(screen.getByText('计算机/互联网/通信')).toBeInTheDocument();
+    expect(screen.getByText('电子/电气')).toBeInTheDocument();
+    await user.click(screen.getAllByLabelText('不限')[0]);
+    expect(screen.getByLabelText('已选期望职位输入框')).toHaveTextContent('计算机/互联网/通信不限');
+    expect(screen.getByLabelText('移除计算机/互联网/通信不限')).toBeInTheDocument();
+    await user.click(screen.getByLabelText('Java工程师'));
+    expect(screen.getByLabelText('已选期望职位输入框')).toHaveTextContent('Java工程师');
+    expect(screen.queryByLabelText('移除计算机/互联网/通信不限')).not.toBeInTheDocument();
+
+    for (const position of ['前端工程师', '后端工程师', 'Python工程师', '测试工程师', '运维工程师']) {
+      await user.click(screen.getByLabelText(position));
+    }
+    expect(screen.getByText('已选 6/6')).toBeInTheDocument();
+    expect(screen.getByLabelText('产品经理')).toBeDisabled();
+
+    await user.type(screen.getByLabelText('搜索期望职位'), '护士');
+    expect(screen.getByRole('button', { name: '医疗 | 制药 | 环保' })).toBeInTheDocument();
+    await user.clear(screen.getByLabelText('搜索期望职位'));
+    await user.click(screen.getByLabelText('移除Java工程师'));
+    expect(screen.getByText('已选 5/6')).toBeInTheDocument();
+  });
+
+  it('shows selected positions inside the picker and persists them only after save', async () => {
+    const user = userEvent.setup();
+    window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
+    mockResumeCreateFetch();
+
+    render(<CandidateResumeCreate />);
+
+    const trigger = await screen.findByRole('button', { name: /请选择期望职位/ });
+    await user.click(trigger);
+    await user.click(screen.getByRole('button', { name: '网络 | 通信 | 电子' }));
+    await user.click(screen.getByLabelText('Java工程师'));
+
+    expect(screen.getByLabelText('已选期望职位输入框')).toHaveTextContent('Java工程师');
+    expect(screen.getByLabelText('移除Java工程师')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '清空' }));
+    expect(screen.getByLabelText('已选期望职位输入框')).toHaveTextContent('请选择期望职位，最多6个');
+    expect(screen.queryByLabelText('移除Java工程师')).not.toBeInTheDocument();
+
+    await user.click(screen.getByLabelText('Java工程师'));
+    expect(screen.getByLabelText('已选期望职位输入框')).toHaveTextContent('Java工程师');
+
+    await user.click(screen.getByRole('button', { name: '取消' }));
+    expect(screen.queryByRole('dialog', { name: '期望职位' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /请选择期望职位，最多6个/ })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /请选择期望职位/ }));
+    await user.click(screen.getByRole('button', { name: '网络 | 通信 | 电子' }));
+    await user.click(screen.getByLabelText('Java工程师'));
+    await user.click(screen.getByRole('button', { name: '保存' }));
+
+    expect(screen.queryByRole('dialog', { name: '期望职位' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '期望职位：Java工程师' })).toHaveTextContent('Java工程师');
+  });
+
+  it('opens expected region picker and persists selected districts only after save', async () => {
+    const user = userEvent.setup();
+    window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
+    mockResumeCreateFetch();
+
+    render(<CandidateResumeCreate />);
+
+    const trigger = await screen.findByRole('button', { name: /请选择期望地区/ });
+    await user.click(trigger);
+    expect(screen.getByRole('dialog', { name: '期望地区' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '山西' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '上海' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '保存' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '取消' })).toBeInTheDocument();
+    expect(screen.getByLabelText('已选期望地区输入框')).toHaveTextContent('请选择期望地区，最多6个');
+
+    await user.click(screen.getByRole('button', { name: '山西' }));
+    await user.click(screen.getByRole('button', { name: '运城' }));
+    await user.click(screen.getByRole('button', { name: '闻喜县' }));
+    expect(screen.getByLabelText('已选期望地区输入框')).toHaveTextContent('闻喜县');
+    expect(screen.getByLabelText('移除闻喜县')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '清空' }));
+    expect(screen.getByLabelText('已选期望地区输入框')).toHaveTextContent('请选择期望地区，最多6个');
+    expect(screen.queryByLabelText('移除闻喜县')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '闻喜县' }));
+    await user.click(screen.getByRole('button', { name: '取消' }));
+    expect(screen.queryByRole('dialog', { name: '期望地区' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /请选择期望地区，最多6个/ })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /请选择期望地区/ }));
+    await user.click(screen.getByRole('button', { name: '山西' }));
+    await user.click(screen.getByRole('button', { name: '运城' }));
+    await user.click(screen.getByRole('button', { name: '闻喜县' }));
+    await user.click(screen.getByRole('button', { name: '万荣县' }));
+    expect(screen.getByLabelText('已选期望地区输入框')).toHaveTextContent('闻喜县');
+    expect(screen.getByLabelText('已选期望地区输入框')).toHaveTextContent('万荣县');
+
+    await user.click(screen.getByRole('button', { name: '选择全运城' }));
+    expect(screen.getByLabelText('已选期望地区输入框')).toHaveTextContent('全运城');
+    expect(screen.queryByLabelText('移除闻喜县')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '闻喜县' }));
+    expect(screen.getByLabelText('已选期望地区输入框')).toHaveTextContent('闻喜县');
+    expect(screen.queryByLabelText('移除全运城')).not.toBeInTheDocument();
+
+    for (const district of ['盐湖区', '临猗县', '万荣县', '稷山县', '新绛县']) {
+      await user.click(screen.getByRole('button', { name: district }));
+    }
+    expect(screen.getByText('已选 6/6')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '绛县' })).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: '保存' }));
+    expect(screen.queryByRole('dialog', { name: '期望地区' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /期望地区：/ })).toHaveTextContent('闻喜县');
   });
 
   it('moves through step two and success page while saving with token trace and idempotency key', async () => {
@@ -251,8 +399,8 @@ describe('CandidateResumeCreate', () => {
 
     await user.type(await screen.findByPlaceholderText('请填写姓名'), '林同学');
     await user.type(screen.getByPlaceholderText('请填写联系电话'), '13900001234');
-    await user.type(screen.getByPlaceholderText('请输入期望职位，最多 5 个，用逗号分隔'), 'Java工程师');
-    await user.type(screen.getByPlaceholderText('请输入期望地区，最多 5 个，用逗号分隔'), '上海');
+    await chooseJavaEngineer(user);
+    await chooseWenxiRegion(user);
     await user.click(screen.getByRole('button', { name: '下一步' }));
 
     expect(await screen.findByLabelText('完善简历详情表单')).toBeInTheDocument();
@@ -276,8 +424,10 @@ describe('CandidateResumeCreate', () => {
       base_profile: {
         display_name: '林同学',
         contact_phone: '13900001234',
+        city_code: '140823',
+        category_code: 'network_communication_electronics',
         expected_positions: ['Java工程师'],
-        expected_cities: ['上海']
+        expected_cities: ['闻喜县']
       },
       work_experience: [],
       education_experience: []
@@ -291,8 +441,10 @@ describe('CandidateResumeCreate', () => {
       base_profile: {
         display_name: '林同学',
         contact_phone: '13900001234',
+        city_code: '140823',
+        category_code: 'network_communication_electronics',
         expected_positions: ['Java工程师'],
-        expected_cities: ['上海']
+        expected_cities: ['闻喜县']
       },
       work_experience: [{
         company_name: 'LocalTalent 科技',
@@ -315,8 +467,8 @@ describe('CandidateResumeCreate', () => {
 
     await user.type(await screen.findByPlaceholderText('请填写姓名'), '林同学');
     await user.type(screen.getByPlaceholderText('请填写联系电话'), '13900001234');
-    await user.type(screen.getByPlaceholderText('请输入期望职位，最多 5 个，用逗号分隔'), 'Java工程师');
-    await user.type(screen.getByPlaceholderText('请输入期望地区，最多 5 个，用逗号分隔'), '上海');
+    await chooseJavaEngineer(user);
+    await chooseWenxiRegion(user);
     await user.upload(screen.getByLabelText('上传附件简历'), new File(['%PDF-1.4 LocalTalent'], 'resume.pdf', { type: 'application/pdf' }));
 
     expect(await screen.findByText(/附件简历已上传到本人私有域/)).toBeInTheDocument();
@@ -376,8 +528,15 @@ describe('CandidateResumeCreate', () => {
 
     fireEvent.change(screen.getByPlaceholderText('请填写姓名'), { target: { value: '林同学' } });
     fireEvent.change(screen.getByPlaceholderText('请填写联系电话'), { target: { value: '13900001234' } });
-    fireEvent.change(screen.getByPlaceholderText('请输入期望职位，最多 5 个，用逗号分隔'), { target: { value: 'Java工程师' } });
-    fireEvent.change(screen.getByPlaceholderText('请输入期望地区，最多 5 个，用逗号分隔'), { target: { value: '上海' } });
+    fireEvent.click(screen.getByRole('button', { name: /请选择期望职位/ }));
+    fireEvent.click(await screen.findByRole('button', { name: '网络 | 通信 | 电子' }));
+    fireEvent.click(screen.getByLabelText('Java工程师'));
+    fireEvent.click(screen.getByRole('button', { name: '保存' }));
+    fireEvent.click(screen.getByRole('button', { name: /请选择期望地区/ }));
+    fireEvent.click(await screen.findByRole('button', { name: '山西' }));
+    fireEvent.click(screen.getByRole('button', { name: '运城' }));
+    fireEvent.click(screen.getByRole('button', { name: '闻喜县' }));
+    fireEvent.click(screen.getByRole('button', { name: '保存' }));
     fireEvent.click(screen.getByRole('button', { name: '下一步' }));
 
     await screen.findByLabelText('完善简历详情表单');
@@ -403,8 +562,8 @@ describe('CandidateResumeCreate', () => {
 
     await user.type(await screen.findByPlaceholderText('请填写姓名'), '林同学');
     await user.type(screen.getByPlaceholderText('请填写联系电话'), '13900001234');
-    await user.type(screen.getByPlaceholderText('请输入期望职位，最多 5 个，用逗号分隔'), 'Java工程师');
-    await user.type(screen.getByPlaceholderText('请输入期望地区，最多 5 个，用逗号分隔'), '上海');
+    await chooseJavaEngineer(user);
+    await chooseWenxiRegion(user);
     await user.click(screen.getByRole('button', { name: '下一步' }));
 
     expect(await screen.findByRole('button', { name: '生成优化建议' })).toBeInTheDocument();
