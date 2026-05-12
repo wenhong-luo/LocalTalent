@@ -1,6 +1,7 @@
 package cn.localtalent.backend.job.domain;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record JobPostRow(
         long jobId,
@@ -8,11 +9,34 @@ public record JobPostRow(
         String companyName,
         int companyAuthStatus,
         String title,
+        String jobNatureCode,
         String categoryCode,
+        String categoryName,
+        String experienceCode,
+        String educationCode,
+        Integer recruitCount,
         String cityCode,
+        String workRegionPath,
+        String address,
         Integer salaryMin,
         Integer salaryMax,
+        boolean salaryNegotiable,
         String jobDesc,
+        List<String> welfareCodes,
+        String departmentName,
+        Integer ageMin,
+        Integer ageMax,
+        boolean ageUnlimited,
+        String recruitmentTimeCode,
+        String contactMode,
+        String contactName,
+        String contactMobile,
+        String contactPhone,
+        String contactEmail,
+        String contactWechat,
+        boolean contactHidden,
+        boolean notifyEnabled,
+        boolean resumeSubscriptionEnabled,
         int status,
         int auditStatus,
         String reviewMemo,

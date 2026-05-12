@@ -201,6 +201,34 @@ const workbenchJobs = {
     {
       job_id: 501,
       title: '三期招聘顾问',
+      job_nature_code: 'full_time',
+      category_code: 'software',
+      category_name: '互联网/电子商务',
+      experience_code: '1_3_years',
+      education_code: 'college',
+      recruit_count: 3,
+      city_code: '310000',
+      work_region_path: '上海 / 上海市 / 浦东新区',
+      address: '上海市浦东新区演示大道 100 号',
+      salary_min: 12000,
+      salary_max: 22000,
+      salary_negotiable: false,
+      welfare_codes: ['five_insurance', 'weekend_double'],
+      department_name: '招聘运营部',
+      age_min: null,
+      age_max: null,
+      age_unlimited: true,
+      recruitment_time_code: 'long_term',
+      contact_mode: 'company_profile',
+      contact_name: '',
+      contact_mobile: '',
+      contact_phone: '',
+      contact_email: '',
+      contact_wechat: '',
+      contact_hidden: true,
+      notify_enabled: false,
+      resume_subscription_enabled: false,
+      job_desc: '负责本地人才服务平台灰度试运营支持。',
       status: 1,
       audit_status: 1,
       reject_reason: '',
@@ -437,6 +465,17 @@ function latestWorkbenchProfilePayload(fetchMock: ReturnType<typeof vi.spyOn>): 
   return JSON.parse(String(call[1]?.body ?? '{}')) as Record<string, unknown>;
 }
 
+function latestWorkbenchJobPayload(fetchMock: ReturnType<typeof vi.spyOn>): Record<string, unknown> {
+  const call = [...fetchMock.mock.calls].reverse().find(([input, init]) => {
+    const url = String(input);
+    return url.endsWith('/api/company/workbench/jobs') && init?.method === 'POST';
+  });
+  if (!call) {
+    throw new Error('workbench job payload not found');
+  }
+  return JSON.parse(String(call[1]?.body ?? '{}')) as Record<string, unknown>;
+}
+
 function expectNoSensitiveCandidateOrCompanyFields() {
   const body = bodyText();
   expect(body).not.toContain('13900001234');
@@ -501,6 +540,128 @@ describe('CompanyDashboard', () => {
     expect(screen.getByRole('button', { name: '创建站内面试邀约' })).toBeInTheDocument();
     expect(screen.getByText('张* / 310000')).toBeInTheDocument();
     expect(screen.getByText('Java, Spring')).toBeInTheDocument();
+    expectNoSensitiveCandidateOrCompanyFields();
+  });
+
+  it('renders the employer member home dashboard with safe placeholders', async () => {
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'company-token');
+    installCompanyFetchMock();
+
+    render(<CompanyDashboard />);
+
+    expect(await screen.findByText('我的公司')).toBeInTheDocument();
+    expect(screen.getByText('我的人才')).toBeInTheDocument();
+    expect(screen.getByText('我的机会')).toBeInTheDocument();
+    expect(screen.getByText('招聘岗位')).toBeInTheDocument();
+    expect(screen.getAllByText('我的套餐').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('人才推荐')).toBeInTheDocument();
+    expect(screen.getByText('我的信息')).toBeInTheDocument();
+    expect(screen.getByText('我的会员')).toBeInTheDocument();
+    expect(screen.getByText('快捷菜单')).toBeInTheDocument();
+    expect(screen.getByText('专属客服')).toBeInTheDocument();
+    expect(screen.getByText(/会员商业化、真实支付、发票与订单暂未开放/)).toBeInTheDocument();
+    expect(screen.getByText(/不开放公共简历库、联系解锁或候选人搜索/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('button', { name: '编辑资料' })[0]);
+    expect(await screen.findByText('企业资料')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /^会员首页$/ }));
+    expect(await screen.findByText('我的公司')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^发布职位$/ }));
+    expect(await screen.findByText('职位工作台')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /^会员首页$/ }));
+    expect(await screen.findByText('我的公司')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /收到投递/ }));
+    expect(await screen.findByText('投递池')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /^会员首页$/ }));
+    expect(await screen.findByText('我的公司')).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole('button', { name: /^搜索人才$/ })[0]);
+    expect(await screen.findByText('搜索简历：风险池占位')).toBeInTheDocument();
+    expect(bodyText()).not.toContain('支付链接');
+    expect(bodyText()).not.toContain('联系解锁入口');
+    expectNoSensitiveCandidateOrCompanyFields();
+  });
+
+  it('renders high fidelity job management tabs with safe promotion placeholders', async () => {
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'company-token');
+    const fetchMock = installCompanyFetchMock();
+
+    render(<CompanyDashboard />);
+
+    expect(await screen.findByText('企业会员首页')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^职位管理$/ }));
+
+    expect(await screen.findByText('管理职位')).toBeInTheDocument();
+    expect(screen.getByText('职位工作台')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /\+ 发布职位/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /发布中/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /审核中/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /已下线/ })).toBeInTheDocument();
+    expect(screen.getByText('招聘情况')).toBeInTheDocument();
+    expect(screen.getByText('收到简历')).toBeInTheDocument();
+    expect(screen.getByText('简历订阅')).toBeInTheDocument();
+    expect(screen.getByText('职位推广')).toBeInTheDocument();
+    expect(screen.getByText(/不产生真实套餐权益/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: /审核中/ }));
+    expect(await screen.findByText('三期招聘顾问')).toBeInTheDocument();
+    expect(screen.getByText((_, element) => element?.textContent === '被投递 1 次')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '职位置顶' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '智能刷新' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '紧急招聘' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '一键分享（占位）' })).toBeDisabled();
+
+    fireEvent.click(screen.getByLabelText('选择职位 三期招聘顾问'));
+    expect(screen.getByRole('button', { name: '关闭所选' })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: '刷新职位（占位）' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '删除职位（占位）' })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /\+ 发布职位/ }));
+    expect(screen.getByText('发布职位（基础草稿）')).toBeInTheDocument();
+    expect(screen.getByText(/职位字段会保存到数据库/)).toBeInTheDocument();
+    expect(screen.getByText('职位性质')).toBeInTheDocument();
+    expect(screen.getByText('经验要求')).toBeInTheDocument();
+    expect(screen.getByText('学历要求')).toBeInTheDocument();
+    expect(screen.getByText('岗位福利')).toBeInTheDocument();
+    expect(screen.getByText('联系方式配置')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('职位标题'), { target: { value: '全量字段测试工程师' } });
+    fireEvent.change(screen.getByLabelText('职位类别名称'), { target: { value: '互联网/电子商务' } });
+    fireEvent.change(screen.getByLabelText('工作地区'), { target: { value: '山西 / 大同 / 云冈区' } });
+    fireEvent.change(screen.getByLabelText('联系手机'), { target: { value: '18877776666' } });
+    fireEvent.change(screen.getByLabelText('联系邮箱'), { target: { value: 'hr-job@example.local' } });
+    fireEvent.click(screen.getByRole('button', { name: '创建职位草稿' }));
+    await waitFor(() => {
+      expect(latestWorkbenchJobPayload(fetchMock).title).toBe('全量字段测试工程师');
+    });
+    const jobPayload = latestWorkbenchJobPayload(fetchMock);
+    expect(jobPayload).toMatchObject({
+      job_nature_code: 'full_time',
+      category_code: 'software',
+      category_name: '互联网/电子商务',
+      experience_code: '1_3_years',
+      education_code: 'college',
+      recruit_count: 3,
+      city_code: '310000',
+      work_region_path: '山西 / 大同 / 云冈区',
+      address: '上海市浦东新区演示大道 100 号',
+      salary_min: 12000,
+      salary_max: 22000,
+      salary_negotiable: false,
+      department_name: '招聘运营部',
+      age_unlimited: true,
+      recruitment_time_code: 'long_term',
+      contact_mode: 'company_profile',
+      contact_mobile: '18877776666',
+      contact_email: 'hr-job@example.local',
+      contact_hidden: true,
+      notify_enabled: false,
+      resume_subscription_enabled: false
+    });
+    expect(jobPayload.welfare_codes).toEqual(['five_insurance', 'weekend_double']);
+    expect(bodyText()).not.toContain('支付链接');
+    expect(bodyText()).not.toContain('联系解锁入口');
     expectNoSensitiveCandidateOrCompanyFields();
   });
 

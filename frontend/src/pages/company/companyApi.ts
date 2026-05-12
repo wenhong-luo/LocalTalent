@@ -21,10 +21,38 @@ export type CompanyApplyPayload = {
 export type CompanyJob = {
   job_id: number;
   title: string;
+  job_nature_code: string;
   status: number;
   audit_status: number;
   reject_reason: string;
   updated_at: string;
+  category_code: string;
+  category_name: string;
+  experience_code: string;
+  education_code: string;
+  recruit_count: number | null;
+  city_code: string;
+  work_region_path: string;
+  address: string;
+  salary_min: number | null;
+  salary_max: number | null;
+  salary_negotiable: boolean;
+  welfare_codes: string[];
+  department_name: string;
+  age_min: number | null;
+  age_max: number | null;
+  age_unlimited: boolean;
+  recruitment_time_code: string;
+  contact_mode: string;
+  contact_name: string;
+  contact_mobile: string;
+  contact_phone: string;
+  contact_email: string;
+  contact_wechat: string;
+  contact_hidden: boolean;
+  notify_enabled: boolean;
+  resume_subscription_enabled: boolean;
+  job_desc: string;
 };
 
 export type CompanyJobPage = {
@@ -205,10 +233,33 @@ export type WorkbenchCertificationPayload = WorkbenchProfilePayload & {
 
 export type WorkbenchJobPayload = {
   title: string;
+  job_nature_code?: string;
   category_code?: string;
+  category_name?: string;
+  experience_code?: string;
+  education_code?: string;
+  recruit_count?: number;
   city_code?: string;
+  work_region_path?: string;
+  address?: string;
   salary_min?: number;
   salary_max?: number;
+  salary_negotiable?: boolean;
+  welfare_codes?: string[];
+  department_name?: string;
+  age_min?: number;
+  age_max?: number;
+  age_unlimited?: boolean;
+  recruitment_time_code?: string;
+  contact_mode?: string;
+  contact_name?: string;
+  contact_mobile?: string;
+  contact_phone?: string;
+  contact_email?: string;
+  contact_wechat?: string;
+  contact_hidden?: boolean;
+  notify_enabled?: boolean;
+  resume_subscription_enabled?: boolean;
   job_desc: string;
 };
 
@@ -242,10 +293,38 @@ function toJob(raw: unknown): CompanyJob {
   return {
     job_id: numberOr(row.job_id),
     title: text(row.title, '未命名职位'),
+    job_nature_code: text(row.job_nature_code),
     status: numberOr(row.status, 1),
     audit_status: numberOr(row.audit_status, 1),
     reject_reason: text(row.reject_reason),
-    updated_at: text(row.updated_at)
+    updated_at: text(row.updated_at),
+    category_code: text(row.category_code),
+    category_name: text(row.category_name),
+    experience_code: text(row.experience_code),
+    education_code: text(row.education_code),
+    recruit_count: row.recruit_count == null ? null : numberOr(row.recruit_count),
+    city_code: text(row.city_code),
+    work_region_path: text(row.work_region_path),
+    address: text(row.address),
+    salary_min: row.salary_min == null ? null : numberOr(row.salary_min),
+    salary_max: row.salary_max == null ? null : numberOr(row.salary_max),
+    salary_negotiable: row.salary_negotiable === true,
+    welfare_codes: textArray(row.welfare_codes),
+    department_name: text(row.department_name),
+    age_min: row.age_min == null ? null : numberOr(row.age_min),
+    age_max: row.age_max == null ? null : numberOr(row.age_max),
+    age_unlimited: row.age_unlimited === true,
+    recruitment_time_code: text(row.recruitment_time_code),
+    contact_mode: text(row.contact_mode),
+    contact_name: text(row.contact_name),
+    contact_mobile: text(row.contact_mobile),
+    contact_phone: text(row.contact_phone),
+    contact_email: text(row.contact_email),
+    contact_wechat: text(row.contact_wechat),
+    contact_hidden: row.contact_hidden !== false,
+    notify_enabled: row.notify_enabled === true,
+    resume_subscription_enabled: row.resume_subscription_enabled === true,
+    job_desc: text(row.job_desc)
   };
 }
 

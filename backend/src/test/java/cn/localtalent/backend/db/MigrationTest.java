@@ -110,12 +110,36 @@ class MigrationTest {
                 "auth_submit_time"));
         assertIndexesExist(jdbcTemplate, "company", List.of("idx_company_portal_search"));
         assertColumnsExist(jdbcTemplate, "job_post", List.of(
+                "job_nature_code",
+                "category_name",
+                "experience_code",
+                "education_code",
+                "recruit_count",
+                "salary_negotiable",
+                "work_region_path",
+                "address",
+                "welfare_codes",
+                "department_name",
+                "age_min",
+                "age_max",
+                "age_unlimited",
+                "recruitment_time_code",
+                "contact_mode",
+                "contact_name",
+                "contact_mobile",
+                "contact_phone",
+                "contact_email",
+                "contact_wechat",
+                "contact_hidden",
+                "notify_enabled",
+                "resume_subscription_enabled",
                 "review_memo",
                 "reject_reason",
                 "review_user_id",
                 "review_time",
                 "offline_reason",
                 "status_changed_at"));
+        assertIndexesExist(jdbcTemplate, "job_post", List.of("idx_job_post_publish_profile"));
         assertColumnsExist(jdbcTemplate, "interview_session", List.of(
                 "application_id",
                 "signin_code_hash",

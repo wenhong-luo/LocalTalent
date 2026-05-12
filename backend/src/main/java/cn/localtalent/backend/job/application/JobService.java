@@ -19,6 +19,7 @@ import cn.localtalent.backend.job.api.JobUpdateRequest;
 import cn.localtalent.backend.job.domain.JobPostRow;
 import cn.localtalent.backend.job.infrastructure.JobJdbcRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -72,7 +73,7 @@ public class JobService {
         JobCreateRequest normalized = normalizeCreate(request);
         long jobId = jobRepository.create(principal.companyId(), normalized);
         JobPostRow after = requireJob(jobId);
-        auditService.record(principal, "job_post", jobId, "job_create", null, json(after));
+        auditService.record(principal, "job_post", jobId, "job_create", null, json(jobAuditSnapshot(after)));
         return response(after);
     }
 
@@ -90,7 +91,9 @@ public class JobService {
         JobUpdateRequest normalized = normalizeUpdate(request);
         jobRepository.update(jobId, normalized);
         JobPostRow after = requireJob(jobId);
-        auditService.record(principal, "job_post", jobId, "job_update", json(before), json(after));
+        auditService.record(principal, "job_post", jobId, "job_update",
+                json(jobAuditSnapshot(before)),
+                json(jobAuditSnapshot(after)));
         return response(after);
     }
 
@@ -103,13 +106,17 @@ public class JobService {
         if ("submit_review".equals(action)) {
             jobRepository.submitReview(jobId);
             JobPostRow after = requireJob(jobId);
-            auditService.record(principal, "job_post", jobId, "job_submit_review", json(before), json(after));
+            auditService.record(principal, "job_post", jobId, "job_submit_review",
+                    json(jobAuditSnapshot(before)),
+                    json(jobAuditSnapshot(after)));
             return reviewResult(after);
         }
         if ("offline".equals(action)) {
             jobRepository.offline(jobId, reason);
             JobPostRow after = requireJob(jobId);
-            auditService.record(principal, "job_post", jobId, "job_offline", json(before), json(after));
+            auditService.record(principal, "job_post", jobId, "job_offline",
+                    json(jobAuditSnapshot(before)),
+                    json(jobAuditSnapshot(after)));
             return reviewResult(after);
         }
         throw validation("action must be submit_review or offline");
@@ -162,8 +169,8 @@ public class JobService {
                 "job_post",
                 jobId,
                 auditStatus == AUDIT_APPROVED ? "job_review_pass" : "job_review_reject",
-                json(before),
-                json(after));
+                json(jobAuditSnapshot(before)),
+                json(jobAuditSnapshot(after)));
         return reviewResult(after);
     }
 
@@ -205,12 +212,43 @@ public class JobService {
         if (request == null) {
             throw validation("request body is required");
         }
+        boolean salaryNegotiable = Boolean.TRUE.equals(request.salaryNegotiable());
+        Integer salaryMin = salaryNegotiable ? null : normalizedMoney(request.salaryMin(), "salary_min");
+        Integer salaryMax = salaryNegotiable ? null : normalizedMoney(request.salaryMax(), "salary_max");
+        assertOrderedRange(salaryMin, salaryMax, "salary range");
+        boolean ageUnlimited = Boolean.TRUE.equals(request.ageUnlimited());
+        Integer ageMin = ageUnlimited ? null : normalizedRangeValue(request.ageMin(), "age_min", 16, 80);
+        Integer ageMax = ageUnlimited ? null : normalizedRangeValue(request.ageMax(), "age_max", 16, 80);
+        assertOrderedRange(ageMin, ageMax, "age range");
         return new JobCreateRequest(
                 required(request.title(), "title", 150),
+                normalizeNullable(request.jobNatureCode(), 32),
                 normalizeNullable(request.categoryCode(), 64),
+                normalizeNullable(request.categoryName(), 100),
+                normalizeNullable(request.experienceCode(), 32),
+                normalizeNullable(request.educationCode(), 32),
+                normalizedRangeValue(request.recruitCount(), "recruit_count", 1, 9999),
                 normalizeNullable(request.cityCode(), 32),
-                request.salaryMin(),
-                request.salaryMax(),
+                normalizeNullable(request.workRegionPath(), 160),
+                normalizeNullable(request.address(), 255),
+                salaryMin,
+                salaryMax,
+                salaryNegotiable,
+                normalizeStringList(request.welfareCodes(), 20, 64),
+                normalizeNullable(request.departmentName(), 100),
+                ageMin,
+                ageMax,
+                ageUnlimited,
+                normalizeNullable(request.recruitmentTimeCode(), 32),
+                normalizeNullable(request.contactMode(), 32),
+                normalizeNullable(request.contactName(), 80),
+                normalizeNullable(request.contactMobile(), 32),
+                normalizeNullable(request.contactPhone(), 64),
+                normalizeNullable(request.contactEmail(), 120),
+                normalizeNullable(request.contactWechat(), 64),
+                !Boolean.FALSE.equals(request.contactHidden()),
+                Boolean.TRUE.equals(request.notifyEnabled()),
+                Boolean.TRUE.equals(request.resumeSubscriptionEnabled()),
                 required(request.jobDesc(), "job_desc", 5000));
     }
 
@@ -218,12 +256,43 @@ public class JobService {
         if (request == null) {
             throw validation("request body is required");
         }
+        boolean salaryNegotiable = Boolean.TRUE.equals(request.salaryNegotiable());
+        Integer salaryMin = salaryNegotiable ? null : normalizedMoney(request.salaryMin(), "salary_min");
+        Integer salaryMax = salaryNegotiable ? null : normalizedMoney(request.salaryMax(), "salary_max");
+        assertOrderedRange(salaryMin, salaryMax, "salary range");
+        boolean ageUnlimited = Boolean.TRUE.equals(request.ageUnlimited());
+        Integer ageMin = ageUnlimited ? null : normalizedRangeValue(request.ageMin(), "age_min", 16, 80);
+        Integer ageMax = ageUnlimited ? null : normalizedRangeValue(request.ageMax(), "age_max", 16, 80);
+        assertOrderedRange(ageMin, ageMax, "age range");
         return new JobUpdateRequest(
                 required(request.title(), "title", 150),
+                normalizeNullable(request.jobNatureCode(), 32),
                 normalizeNullable(request.categoryCode(), 64),
+                normalizeNullable(request.categoryName(), 100),
+                normalizeNullable(request.experienceCode(), 32),
+                normalizeNullable(request.educationCode(), 32),
+                normalizedRangeValue(request.recruitCount(), "recruit_count", 1, 9999),
                 normalizeNullable(request.cityCode(), 32),
-                request.salaryMin(),
-                request.salaryMax(),
+                normalizeNullable(request.workRegionPath(), 160),
+                normalizeNullable(request.address(), 255),
+                salaryMin,
+                salaryMax,
+                salaryNegotiable,
+                normalizeStringList(request.welfareCodes(), 20, 64),
+                normalizeNullable(request.departmentName(), 100),
+                ageMin,
+                ageMax,
+                ageUnlimited,
+                normalizeNullable(request.recruitmentTimeCode(), 32),
+                normalizeNullable(request.contactMode(), 32),
+                normalizeNullable(request.contactName(), 80),
+                normalizeNullable(request.contactMobile(), 32),
+                normalizeNullable(request.contactPhone(), 64),
+                normalizeNullable(request.contactEmail(), 120),
+                normalizeNullable(request.contactWechat(), 64),
+                !Boolean.FALSE.equals(request.contactHidden()),
+                Boolean.TRUE.equals(request.notifyEnabled()),
+                Boolean.TRUE.equals(request.resumeSubscriptionEnabled()),
                 required(request.jobDesc(), "job_desc", 5000));
     }
 
@@ -232,10 +301,33 @@ public class JobService {
                 row.jobId(),
                 row.companyId(),
                 row.title(),
+                row.jobNatureCode(),
                 row.categoryCode(),
+                row.categoryName(),
+                row.experienceCode(),
+                row.educationCode(),
+                row.recruitCount(),
                 row.cityCode(),
+                row.workRegionPath(),
+                row.address(),
                 row.salaryMin(),
                 row.salaryMax(),
+                row.salaryNegotiable(),
+                row.welfareCodes(),
+                row.departmentName(),
+                row.ageMin(),
+                row.ageMax(),
+                row.ageUnlimited(),
+                row.recruitmentTimeCode(),
+                row.contactMode(),
+                row.contactName(),
+                row.contactMobile(),
+                row.contactPhone(),
+                row.contactEmail(),
+                row.contactWechat(),
+                row.contactHidden(),
+                row.notifyEnabled(),
+                row.resumeSubscriptionEnabled(),
                 row.jobDesc(),
                 row.status(),
                 row.auditStatus(),
@@ -275,6 +367,77 @@ public class JobService {
         }
         String normalized = value.trim();
         return normalized.length() > maxLength ? normalized.substring(0, maxLength) : normalized;
+    }
+
+    private Integer normalizedMoney(Integer value, String fieldName) {
+        return normalizedRangeValue(value, fieldName, 0, 1_000_000_000);
+    }
+
+    private Integer normalizedRangeValue(Integer value, String fieldName, int min, int max) {
+        if (value == null) {
+            return null;
+        }
+        if (value < min || value > max) {
+            throw validation(fieldName + " is out of range");
+        }
+        return value;
+    }
+
+    private void assertOrderedRange(Integer min, Integer max, String label) {
+        if (min != null && max != null && min > max) {
+            throw validation(label + " is invalid");
+        }
+    }
+
+    private List<String> normalizeStringList(List<String> values, int maxItems, int maxLength) {
+        if (values == null || values.isEmpty()) {
+            return List.of();
+        }
+        return values.stream()
+                .map((value) -> normalizeNullable(value, maxLength))
+                .filter((value) -> value != null)
+                .distinct()
+                .limit(maxItems)
+                .toList();
+    }
+
+    private Map<String, Object> jobAuditSnapshot(JobPostRow row) {
+        Map<String, Object> snapshot = new LinkedHashMap<>();
+        snapshot.put("job_id", row.jobId());
+        snapshot.put("company_id", row.companyId());
+        snapshot.put("title", row.title());
+        snapshot.put("job_nature_code", row.jobNatureCode());
+        snapshot.put("category_code", row.categoryCode());
+        snapshot.put("category_name", row.categoryName());
+        snapshot.put("experience_code", row.experienceCode());
+        snapshot.put("education_code", row.educationCode());
+        snapshot.put("recruit_count", row.recruitCount());
+        snapshot.put("city_code", row.cityCode());
+        snapshot.put("work_region_path", row.workRegionPath());
+        snapshot.put("salary_min", row.salaryMin());
+        snapshot.put("salary_max", row.salaryMax());
+        snapshot.put("salary_negotiable", row.salaryNegotiable());
+        snapshot.put("welfare_count", row.welfareCodes() == null ? 0 : row.welfareCodes().size());
+        snapshot.put("department_present", row.departmentName() != null);
+        snapshot.put("age_min", row.ageMin());
+        snapshot.put("age_max", row.ageMax());
+        snapshot.put("age_unlimited", row.ageUnlimited());
+        snapshot.put("recruitment_time_code", row.recruitmentTimeCode());
+        snapshot.put("contact_mode", row.contactMode());
+        snapshot.put("contact_name_present", row.contactName() != null);
+        snapshot.put("contact_mobile_present", row.contactMobile() != null);
+        snapshot.put("contact_phone_present", row.contactPhone() != null);
+        snapshot.put("contact_email_present", row.contactEmail() != null);
+        snapshot.put("contact_wechat_present", row.contactWechat() != null);
+        snapshot.put("contact_hidden", row.contactHidden());
+        snapshot.put("notify_enabled", row.notifyEnabled());
+        snapshot.put("resume_subscription_enabled", row.resumeSubscriptionEnabled());
+        snapshot.put("job_desc_present", row.jobDesc() != null);
+        snapshot.put("status", row.status());
+        snapshot.put("audit_status", row.auditStatus());
+        snapshot.put("reject_reason", row.rejectReason());
+        snapshot.put("reject_reason_present", row.rejectReason() != null);
+        return snapshot;
     }
 
     private String json(Object value) {

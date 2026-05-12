@@ -3,7 +3,10 @@ package cn.localtalent.backend.job.infrastructure;
 import cn.localtalent.backend.job.api.JobCreateRequest;
 import cn.localtalent.backend.job.api.JobUpdateRequest;
 import cn.localtalent.backend.job.api.PortalJobSearchCriteria;
+import cn.localtalent.backend.common.json.AuditJsonMapper;
 import cn.localtalent.backend.job.domain.JobPostRow;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Repository;
 public class JobJdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ObjectMapper objectMapper = AuditJsonMapper.create();
 
     public JobJdbcRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -31,25 +35,44 @@ public class JobJdbcRepository {
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(
                     "INSERT INTO job_post "
-                            + "(company_id, source_type, title, category_code, city_code, salary_min, salary_max, "
-                            + "job_desc, status, audit_status, status_changed_at) "
-                            + "VALUES (?, 1, ?, ?, ?, ?, ?, ?, 1, 1, CURRENT_TIMESTAMP)",
+                            + "(company_id, source_type, title, job_nature_code, category_code, category_name, "
+                            + "experience_code, education_code, recruit_count, city_code, work_region_path, address, "
+                            + "salary_min, salary_max, salary_negotiable, job_desc, welfare_codes, department_name, "
+                            + "age_min, age_max, age_unlimited, recruitment_time_code, contact_mode, contact_name, "
+                            + "contact_mobile, contact_phone, contact_email, contact_wechat, contact_hidden, "
+                            + "notify_enabled, resume_subscription_enabled, status, audit_status, status_changed_at) "
+                            + "VALUES (?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CAST(? AS JSON), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, CURRENT_TIMESTAMP)",
                     Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, companyId);
             statement.setString(2, request.title());
-            statement.setString(3, request.categoryCode());
-            statement.setString(4, request.cityCode());
-            if (request.salaryMin() == null) {
-                statement.setObject(5, null);
-            } else {
-                statement.setInt(5, request.salaryMin());
-            }
-            if (request.salaryMax() == null) {
-                statement.setObject(6, null);
-            } else {
-                statement.setInt(6, request.salaryMax());
-            }
-            statement.setString(7, request.jobDesc());
+            statement.setString(3, request.jobNatureCode());
+            statement.setString(4, request.categoryCode());
+            statement.setString(5, request.categoryName());
+            statement.setString(6, request.experienceCode());
+            statement.setString(7, request.educationCode());
+            setNullableInt(statement, 8, request.recruitCount());
+            statement.setString(9, request.cityCode());
+            statement.setString(10, request.workRegionPath());
+            statement.setString(11, request.address());
+            setNullableInt(statement, 12, request.salaryMin());
+            setNullableInt(statement, 13, request.salaryMax());
+            statement.setBoolean(14, Boolean.TRUE.equals(request.salaryNegotiable()));
+            statement.setString(15, request.jobDesc());
+            statement.setString(16, toJsonArray(request.welfareCodes()));
+            statement.setString(17, request.departmentName());
+            setNullableInt(statement, 18, request.ageMin());
+            setNullableInt(statement, 19, request.ageMax());
+            statement.setBoolean(20, Boolean.TRUE.equals(request.ageUnlimited()));
+            statement.setString(21, request.recruitmentTimeCode());
+            statement.setString(22, request.contactMode());
+            statement.setString(23, request.contactName());
+            statement.setString(24, request.contactMobile());
+            statement.setString(25, request.contactPhone());
+            statement.setString(26, request.contactEmail());
+            statement.setString(27, request.contactWechat());
+            statement.setBoolean(28, !Boolean.FALSE.equals(request.contactHidden()));
+            statement.setBoolean(29, Boolean.TRUE.equals(request.notifyEnabled()));
+            statement.setBoolean(30, Boolean.TRUE.equals(request.resumeSubscriptionEnabled()));
             return statement;
         }, keyHolder);
         Number key = keyHolder.getKey();
@@ -84,16 +107,45 @@ public class JobJdbcRepository {
 
     public void update(long jobId, JobUpdateRequest request) {
         jdbcTemplate.update(
-                "UPDATE job_post SET title = ?, category_code = ?, city_code = ?, salary_min = ?, salary_max = ?, "
-                        + "job_desc = ?, status = 1, audit_status = 1, review_memo = NULL, reject_reason = NULL, "
+                "UPDATE job_post SET title = ?, job_nature_code = ?, category_code = ?, category_name = ?, "
+                        + "experience_code = ?, education_code = ?, recruit_count = ?, city_code = ?, "
+                        + "work_region_path = ?, address = ?, salary_min = ?, salary_max = ?, salary_negotiable = ?, "
+                        + "job_desc = ?, welfare_codes = CAST(? AS JSON), department_name = ?, age_min = ?, age_max = ?, "
+                        + "age_unlimited = ?, recruitment_time_code = ?, contact_mode = ?, contact_name = ?, "
+                        + "contact_mobile = ?, contact_phone = ?, contact_email = ?, contact_wechat = ?, contact_hidden = ?, "
+                        + "notify_enabled = ?, resume_subscription_enabled = ?, status = 1, audit_status = 1, "
+                        + "review_memo = NULL, reject_reason = NULL, "
                         + "review_user_id = NULL, review_time = NULL, published_at = NULL, status_changed_at = CURRENT_TIMESTAMP "
                         + "WHERE id = ?",
                 request.title(),
+                request.jobNatureCode(),
                 request.categoryCode(),
+                request.categoryName(),
+                request.experienceCode(),
+                request.educationCode(),
+                request.recruitCount(),
                 request.cityCode(),
+                request.workRegionPath(),
+                request.address(),
                 request.salaryMin(),
                 request.salaryMax(),
+                Boolean.TRUE.equals(request.salaryNegotiable()),
                 request.jobDesc(),
+                toJsonArray(request.welfareCodes()),
+                request.departmentName(),
+                request.ageMin(),
+                request.ageMax(),
+                Boolean.TRUE.equals(request.ageUnlimited()),
+                request.recruitmentTimeCode(),
+                request.contactMode(),
+                request.contactName(),
+                request.contactMobile(),
+                request.contactPhone(),
+                request.contactEmail(),
+                request.contactWechat(),
+                !Boolean.FALSE.equals(request.contactHidden()),
+                Boolean.TRUE.equals(request.notifyEnabled()),
+                Boolean.TRUE.equals(request.resumeSubscriptionEnabled()),
                 jobId);
     }
 
@@ -242,7 +294,12 @@ public class JobJdbcRepository {
 
     private String baseSelect() {
         return "SELECT j.id, j.company_id, c.company_name, c.auth_status AS company_auth_status, "
-                + "j.title, j.category_code, j.city_code, j.salary_min, j.salary_max, j.job_desc, "
+                + "j.title, j.job_nature_code, j.category_code, j.category_name, j.experience_code, "
+                + "j.education_code, j.recruit_count, j.city_code, j.work_region_path, j.address, "
+                + "j.salary_min, j.salary_max, j.salary_negotiable, j.job_desc, CAST(j.welfare_codes AS CHAR) AS welfare_codes, "
+                + "j.department_name, j.age_min, j.age_max, j.age_unlimited, j.recruitment_time_code, "
+                + "j.contact_mode, j.contact_name, j.contact_mobile, j.contact_phone, j.contact_email, "
+                + "j.contact_wechat, j.contact_hidden, j.notify_enabled, j.resume_subscription_enabled, "
                 + "j.status, j.audit_status, j.review_memo, j.reject_reason, j.review_user_id, "
                 + "j.review_time, j.published_at, j.offline_reason, j.status_changed_at, j.updated_at "
                 + "FROM job_post j JOIN company c ON c.id = j.company_id";
@@ -255,11 +312,34 @@ public class JobJdbcRepository {
                 rs.getString("company_name"),
                 rs.getInt("company_auth_status"),
                 rs.getString("title"),
+                rs.getString("job_nature_code"),
                 rs.getString("category_code"),
+                rs.getString("category_name"),
+                rs.getString("experience_code"),
+                rs.getString("education_code"),
+                rs.getObject("recruit_count", Integer.class),
                 rs.getString("city_code"),
+                rs.getString("work_region_path"),
+                rs.getString("address"),
                 rs.getObject("salary_min", Integer.class),
                 rs.getObject("salary_max", Integer.class),
+                rs.getBoolean("salary_negotiable"),
                 rs.getString("job_desc"),
+                readStringList(rs.getString("welfare_codes")),
+                rs.getString("department_name"),
+                rs.getObject("age_min", Integer.class),
+                rs.getObject("age_max", Integer.class),
+                rs.getBoolean("age_unlimited"),
+                rs.getString("recruitment_time_code"),
+                rs.getString("contact_mode"),
+                rs.getString("contact_name"),
+                rs.getString("contact_mobile"),
+                rs.getString("contact_phone"),
+                rs.getString("contact_email"),
+                rs.getString("contact_wechat"),
+                rs.getBoolean("contact_hidden"),
+                rs.getBoolean("notify_enabled"),
+                rs.getBoolean("resume_subscription_enabled"),
                 rs.getInt("status"),
                 rs.getInt("audit_status"),
                 rs.getString("review_memo"),
@@ -270,6 +350,34 @@ public class JobJdbcRepository {
                 rs.getString("offline_reason"),
                 rs.getTimestamp("status_changed_at") == null ? null : rs.getTimestamp("status_changed_at").toLocalDateTime(),
                 rs.getTimestamp("updated_at") == null ? null : rs.getTimestamp("updated_at").toLocalDateTime());
+    }
+
+    private void setNullableInt(PreparedStatement statement, int parameterIndex, Integer value) throws SQLException {
+        if (value == null) {
+            statement.setObject(parameterIndex, null);
+        } else {
+            statement.setInt(parameterIndex, value);
+        }
+    }
+
+    private String toJsonArray(List<String> values) {
+        try {
+            return objectMapper.writeValueAsString(values == null ? List.of() : values);
+        } catch (Exception exception) {
+            return "[]";
+        }
+    }
+
+    private List<String> readStringList(String value) {
+        if (value == null || value.isBlank()) {
+            return List.of();
+        }
+        try {
+            return objectMapper.readValue(value, new TypeReference<List<String>>() {
+            });
+        } catch (Exception exception) {
+            return List.of();
+        }
     }
 
     private record QueryParts(String sql, List<Object> args) {

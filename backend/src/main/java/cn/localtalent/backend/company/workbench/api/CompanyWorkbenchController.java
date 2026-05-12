@@ -24,6 +24,7 @@ import cn.localtalent.backend.job.api.JobCreateRequest;
 import cn.localtalent.backend.job.api.JobPageResponse;
 import cn.localtalent.backend.job.api.JobResponse;
 import cn.localtalent.backend.job.api.JobStatusRequest;
+import cn.localtalent.backend.job.api.JobUpdateRequest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -192,18 +193,9 @@ public class CompanyWorkbenchController {
     public ApiResponse<JobResponse> updateJob(
             @PathVariable long id,
             @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey,
-            @RequestBody JobCreateRequest request
+            @RequestBody JobUpdateRequest request
     ) {
-        return ApiResponse.success(service.updateJob(
-                id,
-                new cn.localtalent.backend.job.api.JobUpdateRequest(
-                        request.title(),
-                        request.categoryCode(),
-                        request.cityCode(),
-                        request.salaryMin(),
-                        request.salaryMax(),
-                        request.jobDesc()),
-                idempotencyKey));
+        return ApiResponse.success(service.updateJob(id, request, idempotencyKey));
     }
 
     @PostMapping("/jobs/{id}/submit-review")

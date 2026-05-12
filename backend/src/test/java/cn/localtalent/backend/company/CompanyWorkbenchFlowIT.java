@@ -280,6 +280,11 @@ class CompanyWorkbenchFlowIT {
                 "idem-p28-job-create-001");
         assertSuccess(draftJob, 200, "trace-p28-job-create");
         long jobId = draftJob.body().at("/data/job_id").asLong();
+        assertThat(draftJob.body().at("/data/job_nature_code").asText()).isEqualTo("full_time");
+        assertThat(draftJob.body().at("/data/category_name").asText()).isEqualTo("互联网/电子商务");
+        assertThat(draftJob.body().at("/data/work_region_path").asText()).isEqualTo("上海 / 上海市 / 浦东新区");
+        assertThat(draftJob.body().at("/data/welfare_codes/1").asText()).isEqualTo("weekend_double");
+        assertThat(draftJob.body().at("/data/contact_mobile").asText()).isEqualTo("18877776666");
 
         HttpJsonResponse blockedReview = postJson(
                 "/api/company/workbench/jobs/" + jobId + "/submit-review",
@@ -298,6 +303,21 @@ class CompanyWorkbenchFlowIT {
                 "idem-p28-review-submit-001");
         assertSuccess(submitReview, 200, "trace-p28-review-submit");
         jdbcTemplate.update("UPDATE job_post SET status = 2, audit_status = 2, published_at = CURRENT_TIMESTAMP WHERE id = ?", jobId);
+
+        HttpJsonResponse publicJob = getJson(
+                "/api/portal/jobs/" + jobId,
+                "trace-p28-public-job",
+                null);
+        assertSuccess(publicJob, 200, "trace-p28-public-job");
+        assertThat(publicJob.rawBody())
+                .doesNotContain("contact_mobile")
+                .doesNotContain("contact_email")
+                .doesNotContain("contact_wechat")
+                .doesNotContain("notify_enabled")
+                .doesNotContain("resume_subscription_enabled")
+                .doesNotContain("18877776666")
+                .doesNotContain("hr-job@example.local")
+                .doesNotContain("job-wechat");
 
         long candidateId = insertCandidate();
         long resumeId = insertResume(candidateId);
@@ -406,8 +426,17 @@ class CompanyWorkbenchFlowIT {
                 "Bearer " + registerAndLoginCandidate());
         assertError(companyDenied, 403, "AUTHZ_403", "trace-p28-candidate-denied");
 
-        assertThat(countRows("audit_log", "action_type IN ('company_logo_upload','company_logo_delete','company_style_image_upload','company_style_image_order','company_style_image_delete','company_profile_save','company_certification_submit','application_stage_change','workbench_interview_invite','export_apply')"))
+        assertThat(countRows("audit_log", "action_type IN ('company_logo_upload','company_logo_delete','company_style_image_upload','company_style_image_order','company_style_image_delete','company_profile_save','company_certification_submit','job_create','job_submit_review','application_stage_change','workbench_interview_invite','export_apply')"))
                 .isGreaterThanOrEqualTo(10);
+        String jobAudit = jdbcTemplate.queryForObject(
+                "SELECT CAST(after_json AS CHAR) FROM audit_log WHERE action_type = 'job_create' AND biz_id = ? ORDER BY id DESC LIMIT 1",
+                String.class,
+                jobId);
+        assertThat(jobAudit)
+                .contains("contact_mobile_present")
+                .doesNotContain("18877776666")
+                .doesNotContain("hr-job@example.local")
+                .doesNotContain("job-wechat");
         assertThat(countRows("field_access_log", "biz_type = 'job_application' AND access_type = 'COMPANY_APPLICATION_DETAIL'"))
                 .isGreaterThanOrEqualTo(1);
         assertThat(countRows("field_access_log", "biz_type = 'company_style_image' AND access_type = 'COMPANY_STYLE_IMAGE_READ'"))
@@ -482,10 +511,33 @@ class CompanyWorkbenchFlowIT {
         return """
                 {
                   "title": "%s",
+                  "job_nature_code": "full_time",
                   "category_code": "software",
+                  "category_name": "互联网/电子商务",
+                  "experience_code": "1_3_years",
+                  "education_code": "college",
+                  "recruit_count": 3,
                   "city_code": "310000",
+                  "work_region_path": "上海 / 上海市 / 浦东新区",
+                  "address": "上海市浦东新区演示大道 100 号",
                   "salary_min": 15000,
                   "salary_max": 25000,
+                  "salary_negotiable": false,
+                  "welfare_codes": ["five_insurance", "weekend_double"],
+                  "department_name": "研发部",
+                  "age_min": 22,
+                  "age_max": 40,
+                  "age_unlimited": false,
+                  "recruitment_time_code": "long_term",
+                  "contact_mode": "custom",
+                  "contact_name": "王招聘",
+                  "contact_mobile": "18877776666",
+                  "contact_phone": "021-88889999",
+                  "contact_email": "hr-job@example.local",
+                  "contact_wechat": "job-wechat",
+                  "contact_hidden": true,
+                  "notify_enabled": true,
+                  "resume_subscription_enabled": true,
                   "job_desc": "企业工作台职位描述，不含联系方式。"
                 }
                 """.formatted(title);
