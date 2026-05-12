@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   EXPECTED_REGION_PROVINCES,
   MAX_EXPECTED_REGIONS,
@@ -11,8 +11,9 @@ import {
   type RegionCity,
   type RegionDistrict,
   type RegionProvince
-} from './expectedRegionCatalog';
-import styles from './ExpectedRegionPicker.module.css';
+} from '@/shared/catalogs/regionCatalog';
+import styles from './RegionCascadePicker.module.css';
+import { useOutsidePointerDown } from './useOutsidePointerDown';
 
 type ExpectedRegionPickerProps = {
   selectedRegions: string[];
@@ -95,6 +96,149 @@ function makeDistrictSelection(
     regionCode: district.code,
     regionName: district.name
   };
+}
+
+export function regionLabelForCode(code: string, placeholder = '请选择'): string {
+  if (!code) {
+    return placeholder;
+  }
+  for (const province of EXPECTED_REGION_PROVINCES) {
+    if (province.code === code) {
+      return province.name;
+    }
+    for (const city of province.cities) {
+      if (city.code === code) {
+        return `${province.name} / ${city.name}`;
+      }
+      const district = city.districts.find((item) => item.code === code);
+      if (district) {
+        return `${province.name} / ${city.name} / ${district.name}`;
+      }
+    }
+  }
+  return code;
+}
+
+function findRegionPathByCode(code: string): { province: RegionProvince; city: RegionCity } | null {
+  if (!code) {
+    return null;
+  }
+  for (const province of EXPECTED_REGION_PROVINCES) {
+    if (province.code === code) {
+      return { province, city: province.cities[0] };
+    }
+    for (const city of province.cities) {
+      if (city.code === code || city.districts.some((district) => district.code === code)) {
+        return { province, city };
+      }
+    }
+  }
+  return null;
+}
+
+export function RegionCascadePicker({
+  label,
+  value,
+  onChange,
+  placeholder = '请选择',
+  dialogLabel
+}: {
+  mode: 'single';
+  label: string;
+  value: string;
+  onChange: (code: string) => void;
+  placeholder?: string;
+  dialogLabel?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLLabelElement>(null);
+  const currentSelection = findRegionPathByCode(value);
+  const [activeProvinceCode, setActiveProvinceCode] = useState(
+    currentSelection?.province.code ?? EXPECTED_REGION_PROVINCES[0].code
+  );
+  const activeProvince = EXPECTED_REGION_PROVINCES.find((province) => province.code === activeProvinceCode)
+    ?? EXPECTED_REGION_PROVINCES[0];
+  const [activeCityCode, setActiveCityCode] = useState(
+    currentSelection?.city.code ?? activeProvince.cities[0]?.code ?? ''
+  );
+  const activeCity = activeProvince.cities.find((city) => city.code === activeCityCode) ?? activeProvince.cities[0];
+
+  useEffect(() => {
+    const next = findRegionPathByCode(value);
+    if (!next) {
+      return;
+    }
+    setActiveProvinceCode(next.province.code);
+    setActiveCityCode(next.city.code);
+  }, [value]);
+
+  const displayLabel = regionLabelForCode(value, placeholder);
+  useOutsidePointerDown(rootRef, open, () => setOpen(false));
+
+  return (
+    <label className={styles.singleField} ref={rootRef}>
+      <span className={styles.singleLabel}>{label}</span>
+      <button
+        type="button"
+        className={open ? styles.singleTriggerOpen : styles.singleTrigger}
+        aria-label={`${label} ${displayLabel}`}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen((currentOpen) => !currentOpen)}
+      >
+        <span className={value ? styles.singleValue : styles.singlePlaceholder}>{displayLabel}</span>
+        <span aria-hidden="true" className={styles.singleArrow}>⌃</span>
+      </button>
+      {open ? (
+        <div className={styles.singleRegionPanel} role="dialog" aria-label={dialogLabel ?? `${label}选择`}>
+          <div className={styles.singleRegionColumn} aria-label="省份">
+            {EXPECTED_REGION_PROVINCES.map((province) => (
+              <button
+                key={province.code}
+                type="button"
+                className={province.code === activeProvince.code ? styles.singleRegionOptionActive : styles.singleRegionOption}
+                onClick={() => {
+                  setActiveProvinceCode(province.code);
+                  setActiveCityCode(province.cities[0]?.code ?? '');
+                }}
+              >
+                <span>{province.name}</span>
+                <span aria-hidden="true">›</span>
+              </button>
+            ))}
+          </div>
+          <div className={styles.singleRegionColumn} aria-label="城市">
+            {activeProvince.cities.map((city) => (
+              <button
+                key={city.code}
+                type="button"
+                className={city.code === activeCity.code ? styles.singleRegionOptionActive : styles.singleRegionOption}
+                onClick={() => setActiveCityCode(city.code)}
+              >
+                <span>{city.name}</span>
+                <span aria-hidden="true">›</span>
+              </button>
+            ))}
+          </div>
+          <div className={styles.singleRegionColumn} aria-label="区县">
+            {activeCity.districts.map((district) => (
+              <button
+                key={district.code}
+                type="button"
+                className={value === district.code ? styles.singleRegionOptionActive : styles.singleRegionOption}
+                onClick={() => {
+                  onChange(district.code);
+                  setOpen(false);
+                }}
+              >
+                {district.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </label>
+  );
 }
 
 export function ExpectedRegionPicker({
@@ -224,7 +368,14 @@ export function ExpectedRegionPicker({
         <span className={styles.chevron} aria-hidden="true">⌕</span>
       </button>
       {open ? (
-        <div className={styles.backdrop}>
+        <div
+          className={styles.backdrop}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              resetDraftAndClose();
+            }
+          }}
+        >
           <section className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="expected-region-title">
             <header className={styles.header}>
               <div>

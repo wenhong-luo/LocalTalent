@@ -5,6 +5,12 @@ import cn.localtalent.backend.common.api.ApiResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ApplicationPageResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ApplicationStageRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CertificationSubmitRequest;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyLogoDownload;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyLogoResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyStyleImageDownload;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyStyleImageOrderRequest;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyStyleImagePageResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyStyleImageResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyProfileResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyProfileSaveRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.InterviewSessionPageResponse;
@@ -18,6 +24,12 @@ import cn.localtalent.backend.job.api.JobCreateRequest;
 import cn.localtalent.backend.job.api.JobPageResponse;
 import cn.localtalent.backend.job.api.JobResponse;
 import cn.localtalent.backend.job.api.JobStatusRequest;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/company/workbench")
@@ -66,6 +79,88 @@ public class CompanyWorkbenchController {
             @RequestBody CertificationSubmitRequest request
     ) {
         return ApiResponse.success(service.submitCertification(request, idempotencyKey));
+    }
+
+    @GetMapping("/logo")
+    @RequirePermission("company.workbench.read")
+    public ApiResponse<CompanyLogoResponse> logo() {
+        return ApiResponse.success(service.logo());
+    }
+
+    @PostMapping(value = "/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequirePermission("company.workbench.write")
+    public ApiResponse<CompanyLogoResponse> uploadLogo(
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey,
+            @RequestParam("file") MultipartFile file
+    ) {
+        return ApiResponse.success(service.uploadLogo(file, idempotencyKey));
+    }
+
+    @GetMapping("/logo/content")
+    @RequirePermission("company.workbench.read")
+    public ResponseEntity<ByteArrayResource> logoContent() {
+        CompanyLogoDownload download = service.logoContent();
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(download.contentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline()
+                        .filename(download.fileName())
+                        .build()
+                        .toString())
+                .body(new ByteArrayResource(download.content()));
+    }
+
+    @DeleteMapping("/logo")
+    @RequirePermission("company.workbench.write")
+    public ApiResponse<CompanyLogoResponse> deleteLogo(
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey
+    ) {
+        return ApiResponse.success(service.deleteLogo(idempotencyKey));
+    }
+
+    @GetMapping("/style-images")
+    @RequirePermission("company.workbench.read")
+    public ApiResponse<CompanyStyleImagePageResponse> styleImages() {
+        return ApiResponse.success(service.styleImages());
+    }
+
+    @PostMapping(value = "/style-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequirePermission("company.workbench.write")
+    public ApiResponse<CompanyStyleImageResponse> uploadStyleImage(
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey,
+            @RequestParam("file") MultipartFile file
+    ) {
+        return ApiResponse.success(service.uploadStyleImage(file, idempotencyKey));
+    }
+
+    @GetMapping("/style-images/{id}/content")
+    @RequirePermission("company.workbench.read")
+    public ResponseEntity<ByteArrayResource> styleImageContent(@PathVariable long id) {
+        CompanyStyleImageDownload download = service.styleImageContent(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(download.contentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline()
+                        .filename(download.fileName())
+                        .build()
+                        .toString())
+                .body(new ByteArrayResource(download.content()));
+    }
+
+    @PutMapping("/style-images/order")
+    @RequirePermission("company.workbench.write")
+    public ApiResponse<CompanyStyleImagePageResponse> saveStyleImageOrder(
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey,
+            @RequestBody CompanyStyleImageOrderRequest request
+    ) {
+        return ApiResponse.success(service.saveStyleImageOrder(request, idempotencyKey));
+    }
+
+    @DeleteMapping("/style-images/{id}")
+    @RequirePermission("company.workbench.write")
+    public ApiResponse<CompanyStyleImagePageResponse> deleteStyleImage(
+            @PathVariable long id,
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey
+    ) {
+        return ApiResponse.success(service.deleteStyleImage(id, idempotencyKey));
     }
 
     @GetMapping("/jobs")

@@ -22,6 +22,8 @@
 | `phase3.resume_attachment_upload` | off | P3-2 补充 | 求职者本人私有简历附件上传、下载、替换、删除 | TBD | 关闭附件上传入口，保留安全占位 | 附件只进本人私有域；不返回对象 key、预签名 URL 或文件内容到公开层 |
 | `phase3.resume_ai_assist` | off | P3-2 补充 | Candidate 本人私有域内的安全规则版简历优化建议、逐条手动应用和忽略 | TBD | 关闭优化建议入口，回到“AI 优化暂未开放”占位 | 不接真实 LLM/外部模型；不上传原始候选人数据；建议不得自动发布到人才服务区 |
 | `phase3.company_workbench` | off | P3-3 | 企业资料、认证材料、职位、投递池、面试邀约、导出申请 | TBD | 关闭企业增强入口，保留二期企业页 | 企业只能访问本企业数据 |
+| `phase3.company_style_upload` | off | P3-3 补充 | 企业风采图片私有上传、预览、排序、删除 | TBD | 关闭风采上传入口，回到安全占位 | 只限企业私有域；不进入公开企业主页、推荐位、搜索、sitemap 或导出旁路 |
+| `phase3.company_logo_upload` | off | P3-3 补充 | 企业基本资料 Logo 私有上传、预览、替换、删除 | TBD | 关闭 Logo 上传入口，回到安全占位 | 只限企业后台私有域；不返回 object key、预签名 URL，不进入公开企业页、推荐位、搜索、sitemap 或导出旁路 |
 | `phase3.operator_portal_ops` | off | P3-4 | 运营审核、内容活动、推荐位、风险审核、门户状态驱动 | TBD | 关闭运营配置入口，回到二期静态演示 | auditor 只读，operator 写审计 |
 | `phase3.audit_security_gate` | off | P3-5 | 审计 trace、导出审批回归、撤回下线传播、字段黑名单、IDOR/BOLA | TBD | 阻断灰度入口，回退到上一个安全版本 | 不得放宽字段黑名单 |
 | `phase3.gray_ops` | off | P3-6 | 预发/灰度配置、备份恢复、监控告警、容量烟测、上线演练 | TBD | 关闭灰度流量并执行暂停/回滚 Runbook | 不代表公网正式上线 |

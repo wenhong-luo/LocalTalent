@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiRequest, type ApiResult, createIdempotencyKey } from '@/lib/httpClient';
+import { apiGet, apiPost, apiRequest, type ApiResult, createIdempotencyKey, createTraceId } from '@/lib/httpClient';
 
 type RawRecord = Record<string, unknown>;
 
@@ -67,6 +67,8 @@ export type CompanyExportApplyPayload = {
 
 export type CompanyWorkbenchFeature = {
   company_workbench_enabled: boolean;
+  company_style_upload_enabled: boolean;
+  company_logo_upload_enabled: boolean;
 };
 
 export type CompanyWorkbenchProfile = {
@@ -78,6 +80,18 @@ export type CompanyWorkbenchProfile = {
   city_code: string;
   address: string;
   company_profile: string;
+  registered_capital_amount: string;
+  registered_capital_unit: string;
+  website_url: string;
+  benefit_codes: string[];
+  contact_name: string;
+  contact_mobile: string;
+  contact_mobile_hidden: boolean;
+  contact_wechat: string;
+  contact_wechat_same_mobile: boolean;
+  contact_phone: string;
+  contact_email: string;
+  contact_qq: string;
   auth_status: number;
   reject_reason: string;
   certification_material_summary: Record<string, unknown>;
@@ -96,6 +110,33 @@ export type CompanyWorkbenchOverview = {
   profile: CompanyWorkbenchProfile;
   stats: CompanyWorkbenchStats;
   features: CompanyWorkbenchFeature;
+};
+
+export type CompanyStyleImage = {
+  image_id: number;
+  file_name: string;
+  content_type: string;
+  size_bytes: number;
+  display_order: number;
+  status: number;
+  review_status: number;
+  uploaded_at: string;
+  content_url: string;
+};
+
+export type CompanyStyleImagePage = {
+  image_list: CompanyStyleImage[];
+  total: number;
+};
+
+export type CompanyLogo = {
+  has_logo: boolean;
+  logo_status: string;
+  file_name: string;
+  content_type: string;
+  size_bytes: number | null;
+  uploaded_at: string;
+  content_url: string;
 };
 
 export type CompanyWorkbenchApplication = {
@@ -143,6 +184,18 @@ export type WorkbenchProfilePayload = {
   city_code?: string;
   address?: string;
   company_profile?: string;
+  registered_capital_amount?: string;
+  registered_capital_unit?: string;
+  website_url?: string;
+  benefit_codes?: string[];
+  contact_name?: string;
+  contact_mobile?: string;
+  contact_mobile_hidden?: boolean;
+  contact_wechat?: string;
+  contact_wechat_same_mobile?: boolean;
+  contact_phone?: string;
+  contact_email?: string;
+  contact_qq?: string;
 };
 
 export type WorkbenchCertificationPayload = WorkbenchProfilePayload & {
@@ -165,6 +218,10 @@ function asRecord(value: unknown): RawRecord {
 
 function text(value: unknown, fallback = ''): string {
   return typeof value === 'string' ? value : fallback;
+}
+
+function textArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 }
 
 function numberOr(value: unknown, fallback = 0): number {
@@ -229,6 +286,18 @@ function toWorkbenchProfile(raw: unknown): CompanyWorkbenchProfile {
     city_code: text(row.city_code),
     address: text(row.address),
     company_profile: text(row.company_profile),
+    registered_capital_amount: text(row.registered_capital_amount),
+    registered_capital_unit: text(row.registered_capital_unit, 'cny_10k'),
+    website_url: text(row.website_url),
+    benefit_codes: textArray(row.benefit_codes),
+    contact_name: text(row.contact_name),
+    contact_mobile: text(row.contact_mobile),
+    contact_mobile_hidden: row.contact_mobile_hidden !== false,
+    contact_wechat: text(row.contact_wechat),
+    contact_wechat_same_mobile: row.contact_wechat_same_mobile === true,
+    contact_phone: text(row.contact_phone),
+    contact_email: text(row.contact_email),
+    contact_qq: text(row.contact_qq),
     auth_status: numberOr(row.auth_status, 1),
     reject_reason: text(row.reject_reason),
     certification_material_summary: asRecord(row.certification_material_summary),
@@ -277,6 +346,34 @@ function toInterviewSession(raw: unknown): CompanyInterviewSession {
     session_name: text(row.session_name, '面试邀约'),
     session_time: text(row.session_time),
     location: text(row.location)
+  };
+}
+
+function toStyleImage(raw: unknown): CompanyStyleImage {
+  const row = asRecord(raw);
+  return {
+    image_id: numberOr(row.image_id),
+    file_name: text(row.file_name, '企业风采图片'),
+    content_type: text(row.content_type, 'image/jpeg'),
+    size_bytes: numberOr(row.size_bytes),
+    display_order: numberOr(row.display_order),
+    status: numberOr(row.status, 1),
+    review_status: numberOr(row.review_status),
+    uploaded_at: text(row.uploaded_at),
+    content_url: text(row.content_url)
+  };
+}
+
+function toCompanyLogo(raw: unknown): CompanyLogo {
+  const row = asRecord(raw);
+  return {
+    has_logo: row.has_logo === true,
+    logo_status: text(row.logo_status, 'empty'),
+    file_name: text(row.file_name),
+    content_type: text(row.content_type, 'image/png'),
+    size_bytes: typeof row.size_bytes === 'number' ? row.size_bytes : null,
+    uploaded_at: text(row.uploaded_at),
+    content_url: text(row.content_url, '/api/company/workbench/logo/content')
   };
 }
 
@@ -350,8 +447,126 @@ export async function fetchCompanyWorkbenchOverview(token: string): Promise<ApiR
     data: {
       profile: toWorkbenchProfile(payload.profile),
       stats: toWorkbenchStats(payload.stats),
-      features: { company_workbench_enabled: asRecord(payload.features).company_workbench_enabled === true }
+      features: {
+        company_workbench_enabled: asRecord(payload.features).company_workbench_enabled === true,
+        company_style_upload_enabled: asRecord(payload.features).company_style_upload_enabled === true,
+        company_logo_upload_enabled: asRecord(payload.features).company_logo_upload_enabled === true
+      }
     },
+    traceId: result.traceId
+  };
+}
+
+export async function fetchCompanyLogo(token: string): Promise<ApiResult<CompanyLogo>> {
+  const result = await apiGet<unknown>('/api/company/workbench/logo', { token });
+  return { data: toCompanyLogo(result.data), traceId: result.traceId };
+}
+
+export async function uploadCompanyLogo(token: string, file: File): Promise<ApiResult<CompanyLogo>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const result = await apiRequest<unknown>('/api/company/workbench/logo', {
+    method: 'POST',
+    token,
+    idempotencyKey: createIdempotencyKey('company-logo'),
+    body: formData
+  });
+  return { data: toCompanyLogo(result.data), traceId: result.traceId };
+}
+
+export async function fetchCompanyLogoBlob(token: string, logo: CompanyLogo): Promise<Blob> {
+  const traceId = createTraceId();
+  const response = await fetch(logo.content_url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'X-Trace-Id': traceId,
+      Accept: logo.content_type
+    },
+    cache: 'no-store'
+  });
+  if (!response.ok) {
+    throw new Error('企业 Logo 读取失败');
+  }
+  return response.blob();
+}
+
+export async function deleteCompanyLogo(token: string): Promise<ApiResult<CompanyLogo>> {
+  const result = await apiRequest<unknown>('/api/company/workbench/logo', {
+    method: 'DELETE',
+    token,
+    idempotencyKey: createIdempotencyKey('company-logo-delete')
+  });
+  return { data: toCompanyLogo(result.data), traceId: result.traceId };
+}
+
+export async function fetchCompanyStyleImages(token: string): Promise<ApiResult<CompanyStyleImagePage>> {
+  const result = await apiGet<unknown>('/api/company/workbench/style-images', { token });
+  const payload = asRecord(result.data);
+  const rows = Array.isArray(payload.image_list) ? payload.image_list : [];
+  return {
+    data: {
+      image_list: rows.map(toStyleImage),
+      total: numberOr(payload.total, rows.length)
+    },
+    traceId: result.traceId
+  };
+}
+
+export async function uploadCompanyStyleImage(token: string, file: File): Promise<ApiResult<CompanyStyleImage>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const result = await apiRequest<unknown>('/api/company/workbench/style-images', {
+    method: 'POST',
+    token,
+    idempotencyKey: createIdempotencyKey('company-style-image'),
+    body: formData
+  });
+  return { data: toStyleImage(result.data), traceId: result.traceId };
+}
+
+export async function fetchCompanyStyleImageBlob(token: string, image: CompanyStyleImage): Promise<Blob> {
+  const traceId = createTraceId();
+  const response = await fetch(image.content_url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'X-Trace-Id': traceId,
+      Accept: image.content_type
+    },
+    cache: 'no-store'
+  });
+  if (!response.ok) {
+    throw new Error('企业风采图片读取失败');
+  }
+  return response.blob();
+}
+
+export async function saveCompanyStyleImageOrder(token: string, imageIds: number[]): Promise<ApiResult<CompanyStyleImagePage>> {
+  const result = await apiRequest<unknown>('/api/company/workbench/style-images/order', {
+    method: 'PUT',
+    token,
+    idempotencyKey: createIdempotencyKey('company-style-image-order'),
+    body: { image_ids: imageIds }
+  });
+  const payload = asRecord(result.data);
+  const rows = Array.isArray(payload.image_list) ? payload.image_list : [];
+  return {
+    data: { image_list: rows.map(toStyleImage), total: numberOr(payload.total, rows.length) },
+    traceId: result.traceId
+  };
+}
+
+export async function deleteCompanyStyleImage(token: string, imageId: number): Promise<ApiResult<CompanyStyleImagePage>> {
+  const result = await apiRequest<unknown>(`/api/company/workbench/style-images/${imageId}`, {
+    method: 'DELETE',
+    token,
+    idempotencyKey: createIdempotencyKey('company-style-image-delete')
+  });
+  const payload = asRecord(result.data);
+  const rows = Array.isArray(payload.image_list) ? payload.image_list : [];
+  return {
+    data: { image_list: rows.map(toStyleImage), total: numberOr(payload.total, rows.length) },
     traceId: result.traceId
   };
 }

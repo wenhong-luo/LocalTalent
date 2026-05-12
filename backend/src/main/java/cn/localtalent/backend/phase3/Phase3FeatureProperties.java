@@ -28,6 +28,18 @@ public class Phase3FeatureProperties {
     private boolean companyWorkbench;
 
     /**
+     * Private company style image upload inside the company workbench.
+     * Defaults to false in configuration.
+     */
+    private boolean companyStyleUpload;
+
+    /**
+     * Private company logo upload inside the company workbench.
+     * Defaults to false in configuration.
+     */
+    private boolean companyLogoUpload;
+
+    /**
      * Prompt 29 operator/auditor portal operations. Defaults to false in configuration.
      */
     private boolean operatorPortalOps;
@@ -62,6 +74,22 @@ public class Phase3FeatureProperties {
 
     public void setCompanyWorkbench(boolean companyWorkbench) {
         this.companyWorkbench = companyWorkbench;
+    }
+
+    public boolean isCompanyStyleUpload() {
+        return companyStyleUpload;
+    }
+
+    public void setCompanyStyleUpload(boolean companyStyleUpload) {
+        this.companyStyleUpload = companyStyleUpload;
+    }
+
+    public boolean isCompanyLogoUpload() {
+        return companyLogoUpload;
+    }
+
+    public void setCompanyLogoUpload(boolean companyLogoUpload) {
+        this.companyLogoUpload = companyLogoUpload;
     }
 
     public boolean isOperatorPortalOps() {

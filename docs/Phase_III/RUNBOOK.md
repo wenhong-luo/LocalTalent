@@ -5,7 +5,7 @@
 ## 1. 当前阶段
 
 - 三期目标：小范围真实试运营。
-- 当前轮次：Prompt 31（P3-6）灰度试运营工程治理与上线演练已完成，三期主线 Prompt 25-31 已收口；Prompt 27（P3-2）后续补丁 `V0018`、`V0019`、`V0020` 和求职者个人中心首页高保真增强已完成。
+- 当前轮次：Prompt 31（P3-6）灰度试运营工程治理与上线演练已完成，三期主线 Prompt 25-31 已收口；Prompt 27（P3-2）后续补丁 `V0018`、`V0019`、`V0020` 和求职者个人中心首页高保真增强已完成；Prompt 28（P3-3）补充完成企业风采私有真实图片上传和企业基本资料 Logo 私有上传。
 - 当前能力：三期文档、配置模板、feature flag 注册表、静态闸门脚本、OIDC/SSO、candidate 私有闭环、首次完善简历 onboarding 状态持久化、candidate 本人私有简历附件上传、candidate 本人私有安全规则版简历优化建议、求职者个人中心首页高保真布局、company 私有工作台、operator/auditor 运营后台、推荐位/风险审核、审计/导出/风控安全收口、灰度 smoke/load、备份恢复演练和灰度记录模板。
 - 当前非目标：不宣布公网正式上线；不接真实短信、微信、小程序、App、地图、视频、直播、支付、ATS/RPA；不开放公共简历库、受控找人才、联系解锁或会员商业化。
 
@@ -34,6 +34,8 @@
 | `V0018__create_candidate_resume_onboarding.sql` | Prompt 27（P3-2）求职者真实闭环生产化 | 新增 `candidate_resume_onboarding`，将首次完善简历 1-3 页的 `not_started/basic_saved/detail_saved/completed` 与 `basic/detail/done` 状态落为服务端权威状态；无记录时兼容旧 `candidate_resume` 完整度。 | 只存流程状态；不存手机号、邮箱、简历正文、附件 key、AI 文本或原始 JSON；该迁移不包含个人中心首页 UI（后续已由独立补丁完成），不做 AI、短信、微信、小程序或 App。 |
 | `V0019__extend_candidate_resume_attachment_metadata.sql` | Prompt 27（P3-2）求职者真实闭环生产化 | 扩展 `candidate_resume` 私有附件元数据，配合 `phase3.resume_attachment_upload` 支持本人私有简历附件上传、下载、替换、删除。 | 只支持 candidate 本人私有附件；object key 仅服务端保存，不返回前端、不进入公开门户、人才服务区、搜索、sitemap、日志明文或导出旁路；不做企业查看附件、附件解析、AI 优化，也不改变已完成的个人中心首页布局。 |
 | `V0020__create_candidate_resume_ai_suggestion.sql` | Prompt 27（P3-2）求职者真实闭环生产化 | 新增 candidate 私有简历优化建议任务与建议项表，配合 `phase3.resume_ai_assist` 支持本地规则生成、最近任务读取、逐条手动应用和忽略。 | 只做安全规则版建议；不接真实 LLM/外部模型，不保存完整 prompt、模型原文、手机号、邮箱、附件 object key、证据或原始 JSON；建议不会自动发布到人才服务区。 |
+| `V0021__create_company_style_image.sql` | Prompt 28（P3-3）企业招聘工作台生产化 | 新增企业风采私有图片表，配合 `phase3.company_style_upload` 支持本企业图片上传、鉴权预览、排序和删除。 | 只在 `/company` 企业管理 > 企业风采私有域可见；object key 仅服务端保存，不返回前端、不进入公开企业主页、推荐位、搜索、sitemap、导出旁路或日志明文；公开展示待后续图片审核专项。 |
+| `V0022__create_company_logo_asset.sql` | Prompt 28（P3-3）企业招聘工作台生产化 | 新增企业 Logo 私有资产表，配合 `phase3.company_logo_upload` 支持基本资料页 Logo 上传、鉴权预览、替换和删除。 | 只在 `/company` 企业管理 > 基本资料私有域可见；object key 仅服务端保存，不返回前端、不进入公开企业列表、公开主页、推荐位、搜索、sitemap、导出旁路或日志明文；公开展示待后续图片审核专项。 |
 | 求职者个人中心首页高保真增强 | Prompt 27（P3-2）求职者真实闭环生产化 | 增强 `/candidate/center` 为接近 `docs/page/4、会员中心.png` 的个人中心首页，包含个人横幅、统计卡、左侧菜单、简历状态卡、优选服务占位、职位推荐区、底部栏和右侧客服占位。 | 不新增迁移和后端业务能力；“会员中心”只作为个人中心视觉参考，不实现会员商业化、真实支付、联系解锁、公共简历库或真实短信/微信/小程序/App；页面继续 `noindex`，只复用 candidate 本人私有接口。 |
 
 ## 3. 环境模板

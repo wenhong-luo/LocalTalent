@@ -21,10 +21,10 @@ import {
   type CandidateResume,
   type CandidateWorkExperience
 } from './candidateCenterApi';
-import { ExpectedPositionPicker } from './ExpectedPositionPicker';
-import { categoryCodeForExpectedPosition } from './expectedPositionCatalog';
-import { ExpectedRegionPicker } from './ExpectedRegionPicker';
-import { cityCodeForExpectedRegion } from './expectedRegionCatalog';
+import { ExpectedPositionPicker } from '@/components/selectors/ExpectedPositionPicker';
+import { ExpectedRegionPicker } from '@/components/selectors/RegionCascadePicker';
+import { categoryCodeForExpectedPosition } from '@/shared/catalogs/positionCatalog';
+import { cityCodeForExpectedRegion } from '@/shared/catalogs/regionCatalog';
 import styles from './CandidateResumeCreate.module.css';
 
 type Step = 'basic' | 'detail' | 'done';

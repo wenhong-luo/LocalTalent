@@ -1,21 +1,37 @@
 'use client';
 
-import { type CSSProperties, type FormEvent, useEffect, useState } from 'react';
+import { type CSSProperties, type FormEvent, useEffect, useRef, useState } from 'react';
 import { ExportDownloadAction } from '@/components/backoffice/ExportDownloadAction';
 import { ReviewTable } from '@/components/backoffice/ReviewTable';
 import { RouteGuard, type GuardContext } from '@/components/backoffice/RouteGuard';
 import { StatusBadge, statusLabel } from '@/components/backoffice/StatusBadge';
+import { DictionaryMultiSelect, DictionarySelect, dictionaryOptionLabel } from '@/components/selectors/DictionarySelect';
+import { RegionCascadePicker } from '@/components/selectors/RegionCascadePicker';
+import { useOutsidePointerDown } from '@/components/selectors/useOutsidePointerDown';
 import { StateView } from '@/components/StateView';
 import { isHttpClientError } from '@/lib/httpClient';
+import {
+  companyBenefitOptions,
+  companyCapitalUnitOptions,
+  companyIndustryOptions,
+  companyNatureOptions,
+  companyScaleOptions
+} from '@/shared/catalogs/companyProfileOptions';
 import {
   applyCompanyExport,
   applyCompanyWorkbenchExport,
   changeCompanyWorkbenchApplicationStage,
   createCompanyWorkbenchInterviewSession,
   createCompanyWorkbenchJob,
+  deleteCompanyLogo,
+  deleteCompanyStyleImage,
   fetchCompanyApplications,
   fetchCompanyExportDetail,
   fetchCompanyJobs,
+  fetchCompanyLogo,
+  fetchCompanyLogoBlob,
+  fetchCompanyStyleImageBlob,
+  fetchCompanyStyleImages,
   fetchCompanyWorkbenchApplications,
   fetchCompanyWorkbenchInterviewSessions,
   fetchCompanyWorkbenchJobs,
@@ -23,20 +39,40 @@ import {
   issueCompanyExportDownloadUrl,
   offlineCompanyWorkbenchJob,
   saveCompanyWorkbenchProfile,
+  saveCompanyStyleImageOrder,
   submitCompanyApply,
   submitCompanyWorkbenchCertification,
   submitCompanyWorkbenchJobReview,
+  uploadCompanyLogo,
+  uploadCompanyStyleImage,
   type CompanyApplication,
   type CompanyExportApply,
   type CompanyInterviewSession,
   type CompanyJob,
+  type CompanyLogo,
+  type CompanyStyleImage,
   type CompanyStatus,
   type CompanyWorkbenchApplication,
   type CompanyWorkbenchOverview
 } from './companyApi';
+import styles from './CompanyDashboard.module.css';
 
 type LoadStatus = 'loading' | 'ready' | 'error' | 'retrying';
 type WorkbenchMode = 'unknown' | 'enabled' | 'disabled';
+type CompanySection =
+  | 'home'
+  | 'jobs'
+  | 'talentSearch'
+  | 'chat'
+  | 'applications'
+  | 'services'
+  | 'profile'
+  | 'style'
+  | 'recommend'
+  | 'jobfair'
+  | 'account'
+  | 'exports'
+  | 'interviews';
 
 const cardStyle: CSSProperties = {
   border: '1px solid var(--lt-line)',
@@ -92,6 +128,68 @@ function Field({
   );
 }
 
+function CapitalAmountField({
+  amount,
+  unit,
+  onAmountChange,
+  onUnitChange
+}: {
+  amount: string;
+  unit: string;
+  onAmountChange: (value: string) => void;
+  onUnitChange: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLLabelElement>(null);
+  const unitLabel = dictionaryOptionLabel(companyCapitalUnitOptions, unit);
+  useOutsidePointerDown(rootRef, open, () => setOpen(false));
+
+  return (
+    <label className={styles.capitalField} ref={rootRef}>
+      <span className={styles.capitalLabel}>注册资金</span>
+      <span className={open ? styles.capitalControlOpen : styles.capitalControl}>
+        <input
+          aria-label="注册资金"
+          className={styles.capitalInput}
+          value={amount}
+          onChange={(event) => onAmountChange(event.target.value)}
+          placeholder="请输入注册资金"
+        />
+        <button
+          type="button"
+          className={styles.capitalUnitButton}
+          aria-label={`注册资金单位 ${unitLabel}`}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          onClick={() => setOpen((current) => !current)}
+        >
+          <span>{unit ? unitLabel : '请选择'}</span>
+          <span aria-hidden="true" className={styles.capitalArrow}>⌃</span>
+        </button>
+      </span>
+      {open ? (
+        <div className={styles.capitalMenu} role="listbox">
+          {companyCapitalUnitOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="option"
+              aria-selected={unit === option.value}
+              className={unit === option.value ? styles.capitalOptionActive : styles.capitalOption}
+              onClick={() => {
+                onUnitChange(option.value);
+                setOpen(false);
+              }}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </label>
+  );
+}
+
 function TextAreaField({
   label,
   value,
@@ -109,6 +207,23 @@ function TextAreaField({
         {label}
       </span>
       <textarea value={value} onChange={(event) => onChange(event.target.value)} rows={rows} style={inputStyle} />
+    </label>
+  );
+}
+
+function CheckboxField({
+  label,
+  checked,
+  onChange
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className={styles.checkboxField}>
+      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
+      <span>{label}</span>
     </label>
   );
 }
@@ -131,6 +246,38 @@ function errorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
+function hasText(value: string | null | undefined): boolean {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+const COMPANY_PROFILE_REQUIRED_FIELDS: Array<{
+  label: string;
+  value: (profile: CompanyWorkbenchOverview['profile']) => string | null | undefined;
+}> = [
+  { label: '企业名称', value: (profile) => profile.company_name },
+  { label: '企业性质', value: (profile) => profile.nature_code },
+  { label: '企业规模', value: (profile) => profile.scale_code },
+  { label: '所属行业', value: (profile) => profile.industry_code },
+  { label: '所在地区', value: (profile) => profile.city_code },
+  { label: '详细地址', value: (profile) => profile.address },
+  { label: '企业简介', value: (profile) => profile.company_profile },
+  { label: '联系人', value: (profile) => profile.contact_name },
+  { label: '联系电话', value: (profile) => profile.contact_mobile }
+];
+
+function getMissingCompanyProfileFields(profile: CompanyWorkbenchOverview['profile'] | null | undefined): string[] {
+  if (!profile) {
+    return COMPANY_PROFILE_REQUIRED_FIELDS.map((field) => field.label);
+  }
+  return COMPANY_PROFILE_REQUIRED_FIELDS
+    .filter((field) => !hasText(field.value(profile)))
+    .map((field) => field.label);
+}
+
+function isBasicProfileComplete(profile: CompanyWorkbenchOverview['profile'] | null | undefined): boolean {
+  return getMissingCompanyProfileFields(profile).length === 0;
+}
+
 export function CompanyDashboard() {
   return (
     <RouteGuard allowedIdentities={['company']} title="正在进入企业后台">
@@ -145,9 +292,21 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   const [cityCode, setCityCode] = useState('310000');
   const [industryCode, setIndustryCode] = useState('software');
   const [natureCode, setNatureCode] = useState('private');
-  const [scaleCode, setScaleCode] = useState('50-150');
+  const [scaleCode, setScaleCode] = useState('50-200');
   const [address, setAddress] = useState('上海市示例园区');
   const [companyProfile, setCompanyProfile] = useState('用于灰度试运营的企业资料摘要，公开展示仍以服务端裁剪字段为准。');
+  const [registeredCapitalAmount, setRegisteredCapitalAmount] = useState('');
+  const [registeredCapitalUnit, setRegisteredCapitalUnit] = useState('cny_10k');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [benefitCodes, setBenefitCodes] = useState<string[]>([]);
+  const [contactName, setContactName] = useState('');
+  const [contactMobile, setContactMobile] = useState('');
+  const [contactMobileHidden, setContactMobileHidden] = useState(true);
+  const [contactWechat, setContactWechat] = useState('');
+  const [contactWechatSameMobile, setContactWechatSameMobile] = useState(false);
+  const [contactPhone, setContactPhone] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactQq, setContactQq] = useState('');
   const [materialSummary, setMaterialSummary] = useState('统一社会信用代码已核验；联系人已由企业账号持有人确认。');
   const [jobTitle, setJobTitle] = useState('三期招聘顾问');
   const [jobCityCode, setJobCityCode] = useState('310000');
@@ -156,6 +315,8 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   const [stageNote, setStageNote] = useState('企业已查看投递，进入面试沟通流程。');
   const [exportReason, setExportReason] = useState('导出本企业投递池候选人摘要，用于招聘流程复核。');
   const [exportIdInput, setExportIdInput] = useState('');
+  const [activeSection, setActiveSection] = useState<CompanySection>('home');
+  const [showProfileGateModal, setShowProfileGateModal] = useState(false);
 
   const [workbenchMode, setWorkbenchMode] = useState<WorkbenchMode>('unknown');
   const [overview, setOverview] = useState<CompanyWorkbenchOverview | null>(null);
@@ -164,6 +325,12 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   const [legacyApplications, setLegacyApplications] = useState<CompanyApplication[]>([]);
   const [workbenchApplications, setWorkbenchApplications] = useState<CompanyWorkbenchApplication[]>([]);
   const [interviewSessions, setInterviewSessions] = useState<CompanyInterviewSession[]>([]);
+  const [companyLogo, setCompanyLogo] = useState<CompanyLogo | null>(null);
+  const [companyLogoUrl, setCompanyLogoUrl] = useState('');
+  const [companyLogoMessage, setCompanyLogoMessage] = useState('');
+  const [styleImages, setStyleImages] = useState<CompanyStyleImage[]>([]);
+  const [styleImageUrls, setStyleImageUrls] = useState<Record<number, string>>({});
+  const [styleUploadMessage, setStyleUploadMessage] = useState('');
   const [exportApply, setExportApply] = useState<CompanyExportApply | null>(null);
   const [status, setStatus] = useState<LoadStatus>('loading');
   const [message, setMessage] = useState('正在读取企业后台数据。');
@@ -203,12 +370,92 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     setScaleCode(profile.scale_code || scaleCode);
     setAddress(profile.address || address);
     setCompanyProfile(profile.company_profile || companyProfile);
+    setRegisteredCapitalAmount(profile.registered_capital_amount || '');
+    setRegisteredCapitalUnit(profile.registered_capital_unit || 'cny_10k');
+    setWebsiteUrl(profile.website_url || '');
+    setBenefitCodes(profile.benefit_codes ?? []);
+    setContactName(profile.contact_name || '');
+    setContactMobile(profile.contact_mobile || '');
+    setContactMobileHidden(profile.contact_mobile_hidden !== false);
+    setContactWechat(profile.contact_wechat || '');
+    setContactWechatSameMobile(profile.contact_wechat_same_mobile === true);
+    setContactPhone(profile.contact_phone || '');
+    setContactEmail(profile.contact_email || '');
+    setContactQq(profile.contact_qq || '');
     setJobs(jobResult.data.job_list);
     setWorkbenchApplications(applicationResult.data.application_list);
     setInterviewSessions(sessionResult.data.session_list);
     setLegacyApplications([]);
     setWorkbenchMode('enabled');
     setTraceId(sessionResult.traceId || applicationResult.traceId || jobResult.traceId || overviewResult.traceId);
+    if (overviewResult.data.features.company_logo_upload_enabled) {
+      await loadCompanyLogo();
+    } else {
+      setCompanyLogo(null);
+      setCompanyLogoUrl('');
+      setCompanyLogoMessage('企业 Logo 上传暂未开放。');
+    }
+    if (overviewResult.data.features.company_style_upload_enabled) {
+      await loadStyleImages();
+    } else {
+      setStyleImages([]);
+      setStyleImageUrls({});
+      setStyleUploadMessage('企业风采上传暂未开放。');
+    }
+  }
+
+  async function loadCompanyLogo() {
+    const result = await fetchCompanyLogo(context.token);
+    setCompanyLogo(result.data);
+    setTraceId(result.traceId);
+    await hydrateCompanyLogoUrl(result.data);
+  }
+
+  async function hydrateCompanyLogoUrl(logo: CompanyLogo) {
+    if (!logo.has_logo || !logo.content_url) {
+      setCompanyLogoUrl((previous) => {
+        if (previous) URL.revokeObjectURL(previous);
+        return '';
+      });
+      return;
+    }
+    try {
+      const blob = await fetchCompanyLogoBlob(context.token, logo);
+      const nextUrl = URL.createObjectURL(blob);
+      setCompanyLogoUrl((previous) => {
+        if (previous) URL.revokeObjectURL(previous);
+        return nextUrl;
+      });
+    } catch {
+      setCompanyLogoUrl((previous) => {
+        if (previous) URL.revokeObjectURL(previous);
+        return '';
+      });
+    }
+  }
+
+  async function loadStyleImages() {
+    const result = await fetchCompanyStyleImages(context.token);
+    setStyleImages(result.data.image_list);
+    setTraceId(result.traceId);
+    await hydrateStyleImageUrls(result.data.image_list);
+  }
+
+  async function hydrateStyleImageUrls(images: CompanyStyleImage[]) {
+    const entries = await Promise.all(images.map(async (image) => {
+      try {
+        const blob = await fetchCompanyStyleImageBlob(context.token, image);
+        return [image.image_id, URL.createObjectURL(blob)] as const;
+      } catch {
+        return [image.image_id, ''] as const;
+      }
+    }));
+    setStyleImageUrls((previous) => {
+      Object.values(previous).forEach((url) => {
+        if (url) URL.revokeObjectURL(url);
+      });
+      return Object.fromEntries(entries.filter(([, url]) => Boolean(url)));
+    });
   }
 
   async function load() {
@@ -237,6 +484,25 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     void load();
   }, []);
 
+  useEffect(() => () => {
+    Object.values(styleImageUrls).forEach((url) => {
+      if (url) URL.revokeObjectURL(url);
+    });
+  }, [styleImageUrls]);
+
+  useEffect(() => () => {
+    if (companyLogoUrl) URL.revokeObjectURL(companyLogoUrl);
+  }, [companyLogoUrl]);
+
+  useEffect(() => {
+    if (workbenchMode !== 'enabled' || !overview || isBasicProfileComplete(overview.profile)) {
+      return;
+    }
+    if (activeSection !== 'profile' && activeSection !== 'style') {
+      setActiveSection('profile');
+    }
+  }, [activeSection, overview, workbenchMode]);
+
   async function runAction(description: string, action: () => Promise<void>) {
     setStatus('retrying');
     setMessage(description);
@@ -247,6 +513,40 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
       setStatus('error');
       setTraceId(isHttpClientError(error) ? error.traceId : undefined);
       setMessage(errorMessage(error, description));
+    }
+  }
+
+  async function runStyleAction(description: string, action: () => Promise<void>) {
+    setStatus('retrying');
+    setStyleUploadMessage(description);
+    try {
+      await action();
+      await loadStyleImages();
+      setStatus('ready');
+      setMessage('');
+    } catch (error) {
+      setStatus('error');
+      setTraceId(isHttpClientError(error) ? error.traceId : undefined);
+      const fallback = errorMessage(error, description);
+      setMessage(fallback);
+      setStyleUploadMessage(fallback);
+    }
+  }
+
+  async function runLogoAction(description: string, action: () => Promise<void>) {
+    setStatus('retrying');
+    setCompanyLogoMessage(description);
+    try {
+      await action();
+      await loadCompanyLogo();
+      setStatus('ready');
+      setMessage('');
+    } catch (error) {
+      setStatus('error');
+      setTraceId(isHttpClientError(error) ? error.traceId : undefined);
+      const fallback = errorMessage(error, description);
+      setMessage(fallback);
+      setCompanyLogoMessage(fallback);
     }
   }
 
@@ -275,7 +575,19 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
         scale_code: scaleCode,
         city_code: cityCode,
         address,
-        company_profile: companyProfile
+        company_profile: companyProfile,
+        registered_capital_amount: registeredCapitalAmount,
+        registered_capital_unit: registeredCapitalUnit,
+        website_url: websiteUrl,
+        benefit_codes: benefitCodes,
+        contact_name: contactName,
+        contact_mobile: contactMobile,
+        contact_mobile_hidden: contactMobileHidden,
+        contact_wechat: contactWechatSameMobile ? contactMobile : contactWechat,
+        contact_wechat_same_mobile: contactWechatSameMobile,
+        contact_phone: contactPhone,
+        contact_email: contactEmail,
+        contact_qq: contactQq
       });
     });
   }
@@ -291,11 +603,71 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
         city_code: cityCode,
         address,
         company_profile: companyProfile,
+        registered_capital_amount: registeredCapitalAmount,
+        registered_capital_unit: registeredCapitalUnit,
+        website_url: websiteUrl,
+        benefit_codes: benefitCodes,
+        contact_name: contactName,
+        contact_mobile: contactMobile,
+        contact_mobile_hidden: contactMobileHidden,
+        contact_wechat: contactWechatSameMobile ? contactMobile : contactWechat,
+        contact_wechat_same_mobile: contactWechatSameMobile,
+        contact_phone: contactPhone,
+        contact_email: contactEmail,
+        contact_qq: contactQq,
         certification_material_summary: {
           material_summary: materialSummary,
           submitted_by: 'company_account'
         }
       });
+    });
+  }
+
+  async function onUploadStyleImage(file: File | undefined) {
+    if (!file) {
+      return;
+    }
+    await runStyleAction('正在上传企业风采图片。', async () => {
+      await uploadCompanyStyleImage(context.token, file);
+      setStyleUploadMessage('企业风采图片已上传，仅在企业私有域可见。');
+    });
+  }
+
+  async function onUploadCompanyLogo(file: File | undefined) {
+    if (!file) {
+      return;
+    }
+    await runLogoAction('正在上传企业 Logo。', async () => {
+      await uploadCompanyLogo(context.token, file);
+      setCompanyLogoMessage('企业 Logo 已上传，仅在企业私有域可见。');
+    });
+  }
+
+  async function onDeleteCompanyLogo() {
+    await runLogoAction('正在删除企业 Logo。', async () => {
+      await deleteCompanyLogo(context.token);
+      setCompanyLogoMessage('企业 Logo 已删除。');
+    });
+  }
+
+  async function onDeleteStyleImage(imageId: number) {
+    await runStyleAction('正在删除企业风采图片。', async () => {
+      await deleteCompanyStyleImage(context.token, imageId);
+      setStyleUploadMessage('企业风采图片已删除。');
+    });
+  }
+
+  async function onMoveStyleImage(imageId: number, direction: -1 | 1) {
+    const index = styleImages.findIndex((image) => image.image_id === imageId);
+    const targetIndex = index + direction;
+    if (index < 0 || targetIndex < 0 || targetIndex >= styleImages.length) {
+      return;
+    }
+    const next = [...styleImages];
+    [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+    await runStyleAction('正在保存企业风采排序。', async () => {
+      await saveCompanyStyleImageOrder(context.token, next.map((image) => image.image_id));
+      setStyleUploadMessage('企业风采排序已保存。');
     });
   }
 
@@ -387,155 +759,441 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
 
   const workbenchEnabled = workbenchMode === 'enabled';
   const applicationRows = workbenchEnabled ? workbenchApplications : legacyApplications;
+  const profile = overview?.profile ?? null;
+  const missingProfileFields = workbenchEnabled ? getMissingCompanyProfileFields(profile) : [];
+  const basicProfileComplete = !workbenchEnabled || missingProfileFields.length === 0;
+  const gateLocked = workbenchEnabled && Boolean(overview) && !basicProfileComplete;
 
-  return (
-    <main style={{ minHeight: '100vh', padding: '32px 18px 56px' }}>
-      <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
-        <section style={{ ...cardStyle, borderRadius: '34px' }}>
-          <p style={{ margin: 0, color: 'var(--lt-accent-strong)', fontWeight: 900 }}>企业中心</p>
-          <h1 style={{ margin: '12px 0', fontSize: 'clamp(2rem, 4vw, 4rem)' }}>
-            企业招聘工作台，服务端状态驱动。
-          </h1>
-          <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
-            当前账号：{context.identity.display_name ?? '企业账号'}。企业公开主页与企业中心隔离，页面只展示本企业私有流程摘要。
-            {traceId ? <span> trace_id：{traceId}</span> : null}
-          </p>
-        </section>
+  const menuItems: Array<{
+    id: CompanySection;
+    label: string;
+    disabledWhenLocked?: boolean;
+    risk?: boolean;
+    children?: Array<{ id: CompanySection; label: string; disabledWhenLocked?: boolean }>;
+  }> = [
+    { id: 'home', label: '会员首页', disabledWhenLocked: true },
+    { id: 'jobs', label: '职位管理', disabledWhenLocked: true },
+    { id: 'talentSearch', label: '搜索简历', disabledWhenLocked: true, risk: true },
+    { id: 'chat', label: '我的职聊', disabledWhenLocked: true, risk: true },
+    { id: 'applications', label: '简历管理', disabledWhenLocked: true },
+    { id: 'services', label: '会员服务', disabledWhenLocked: true, risk: true },
+    {
+      id: 'profile',
+      label: '企业管理',
+      children: [
+        { id: 'profile', label: '基本资料' },
+        { id: 'style', label: '企业风采' }
+      ]
+    },
+    { id: 'recommend', label: '智能推荐', disabledWhenLocked: true, risk: true },
+    { id: 'jobfair', label: '招聘会', disabledWhenLocked: true, risk: true },
+    { id: 'account', label: '账号管理', disabledWhenLocked: true, risk: true }
+  ];
 
-        {status === 'error' ? (
-          <section style={{ marginTop: '18px' }}>
-            <StateView variant="error" title="企业工作台操作失败" description={message} retryLabel="重新读取" onRetry={load} />
-          </section>
-        ) : status === 'retrying' || status === 'loading' ? (
-          <section style={{ marginTop: '18px' }}>
-            <StateView variant={status === 'loading' ? 'loading' : 'retrying'} title="企业工作台处理中" description={message} />
-          </section>
-        ) : null}
+  function canOpenSection(section: CompanySection, disabledWhenLocked = true): boolean {
+    if (!gateLocked) {
+      return true;
+    }
+    if (section === 'profile' || section === 'style') {
+      return true;
+    }
+    return !disabledWhenLocked;
+  }
 
-        {workbenchMode === 'disabled' ? (
-          <section style={{ ...cardStyle, marginTop: '18px', borderStyle: 'dashed' }}>
-            <h2 style={{ marginTop: 0 }}>三期企业工作台未开启</h2>
-            <p style={{ color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
-              服务端返回 company_workbench_enabled=false，本页保留二期企业后台摘要。企业资料维护、职位工作台、投递阶段流转和站内面试邀约需要灰度开关开启后使用。
-            </p>
-          </section>
-        ) : null}
+  function chooseSection(section: CompanySection, disabledWhenLocked = true) {
+    if (!canOpenSection(section, disabledWhenLocked)) {
+      setActiveSection('profile');
+      setShowProfileGateModal(true);
+      return;
+    }
+    setActiveSection(section);
+  }
 
-        {workbenchEnabled && overview ? (
-          <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '14px', marginTop: '18px' }}>
-            <StatCard label="职位总数" value={overview.stats.job_total} helper="本企业私有职位工作台统计。" />
-            <StatCard label="投递总数" value={overview.stats.application_total} helper="仅包含本企业职位产生的投递。" />
-            <StatCard label="待处理投递" value={overview.stats.pending_application_total} helper="状态由服务端返回，不由前端推断。" />
-            <StatCard label="面试邀约" value={overview.stats.interview_total} helper="站内流程记录，不接外部推送。" />
-          </section>
-        ) : null}
-
-        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '18px', marginTop: '22px' }}>
-          <form style={cardStyle} onSubmit={workbenchEnabled ? onSaveProfile : onLegacyApply}>
-            <h2 style={{ marginTop: 0 }}>企业资料与认证</h2>
-            <p style={{ color: 'var(--lt-ink-muted)', lineHeight: 1.7 }}>
-              认证状态以服务端返回为准。未认证企业可保存草稿，但不得提交审核或上线职位。
-            </p>
-            {companyStatus ? (
-              <p>
-                <StatusBadge kind="company_auth" value={companyStatus.auth_status} />
-                {companyStatus.reject_reason ? <span> 驳回原因：{companyStatus.reject_reason}</span> : null}
-              </p>
-            ) : null}
-            <div style={{ display: 'grid', gap: '12px' }}>
-              <Field label="企业名称" value={companyName} onChange={setCompanyName} />
-              <Field label="统一社会信用代码" value={licenseNo} onChange={setLicenseNo} />
-              <Field label="行业代码" value={industryCode} onChange={setIndustryCode} />
-              <Field label="企业性质代码" value={natureCode} onChange={setNatureCode} />
-              <Field label="规模代码" value={scaleCode} onChange={setScaleCode} />
-              <Field label="城市代码" value={cityCode} onChange={setCityCode} />
-              {workbenchEnabled ? (
-                <>
-                  <Field label="企业地址（私有域）" value={address} onChange={setAddress} />
-                  <TextAreaField label="企业资料摘要" value={companyProfile} onChange={setCompanyProfile} />
-                  <TextAreaField label="认证材料摘要（不含附件 key）" value={materialSummary} onChange={setMaterialSummary} />
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <button type="submit" style={buttonStyle}>保存企业资料</button>
-                    <button type="button" style={secondaryButtonStyle} onClick={() => void submitCertification()}>
-                      提交认证材料
-                    </button>
+  function renderMenu() {
+    return (
+      <aside className={styles.sidebar} aria-label="企业会员中心菜单">
+        <div className={styles.sidebarHeader}>
+          <strong>企业会员中心</strong>
+          <span>{context.identity.display_name ?? '招聘者账号'}</span>
+        </div>
+        <nav className={styles.menu}>
+          {menuItems.map((item) => {
+            const itemLocked = !canOpenSection(item.id, item.disabledWhenLocked);
+            const isParentActive = item.children
+              ? item.children.some((child) => child.id === activeSection)
+              : item.id === activeSection;
+            return (
+              <div key={item.label}>
+                <button
+                  type="button"
+                  className={[
+                    styles.menuItem,
+                    isParentActive ? styles.menuItemActive : '',
+                    itemLocked ? styles.menuItemLocked : ''
+                  ].join(' ')}
+                  aria-disabled={itemLocked}
+                  onClick={() => chooseSection(item.id, item.disabledWhenLocked)}
+                >
+                  <span>{item.label}</span>
+                  {itemLocked ? <span className={styles.lock}>锁定</span> : item.risk ? <span className={styles.lock}>占位</span> : null}
+                </button>
+                {item.children ? (
+                  <div className={styles.submenu}>
+                    {item.children.map((child) => (
+                      <button
+                        key={child.id}
+                        type="button"
+                        className={[
+                          styles.submenuItem,
+                          activeSection === child.id ? styles.submenuItemActive : ''
+                        ].join(' ')}
+                        onClick={() => chooseSection(child.id, child.disabledWhenLocked)}
+                      >
+                        {child.label}
+                      </button>
+                    ))}
                   </div>
-                </>
-              ) : (
-                <button type="submit" style={buttonStyle}>提交认证资料</button>
-              )}
-            </div>
-          </form>
+                ) : null}
+              </div>
+            );
+          })}
+        </nav>
+      </aside>
+    );
+  }
 
-          <form style={cardStyle} onSubmit={onCreateExport}>
-            <h2 style={{ marginTop: 0 }}>导出申请入口</h2>
-            <p style={{ color: 'var(--lt-ink-muted)', lineHeight: 1.7 }}>
-              企业端只提交申请与查看状态；未审批前不显示下载入口，后端仍拒绝未审批下载。
-            </p>
-            <TextAreaField label="申请原因" value={exportReason} onChange={setExportReason} />
-            <button type="submit" style={{ ...buttonStyle, marginTop: '12px' }}>提交导出申请</button>
-          </form>
+  function renderStatusView() {
+    if (status === 'error') {
+      return (
+        <section className={styles.card}>
+          <StateView variant="error" title="企业工作台操作失败" description={message} retryLabel="重新读取" onRetry={load} />
         </section>
+      );
+    }
+    if (status === 'retrying' || status === 'loading') {
+      return (
+        <section className={styles.card}>
+          <StateView variant={status === 'loading' ? 'loading' : 'retrying'} title="企业工作台处理中" description={message} />
+        </section>
+      );
+    }
+    return null;
+  }
 
+  function renderProfileForm() {
+    const logoUploadEnabled = overview?.features.company_logo_upload_enabled === true;
+    return (
+      <section className={styles.card}>
+        <div className={styles.cardTitle}>
+          <div>
+            <h2>企业资料</h2>
+            <p className={styles.muted}>
+              请先完善基本资料。保存后页面会重新读取服务端 profile，只有服务端返回完整资料后才解锁其它菜单。
+            </p>
+          </div>
+          {companyStatus ? (
+            <p style={{ margin: 0 }}>
+              <StatusBadge kind="company_auth" value={companyStatus.auth_status} />
+            </p>
+          ) : null}
+        </div>
+
+        {gateLocked ? (
+          <div className={styles.noticeBar}>
+            根据相关法律法规要求，需要您完善企业基本资料后才能使用职位、投递、面试等企业中心功能。
+          </div>
+        ) : null}
+
+        <form onSubmit={workbenchEnabled ? onSaveProfile : onLegacyApply} className={styles.profileGrid}>
+          <div className={styles.logoPanel}>
+            {companyLogo?.has_logo && companyLogoUrl ? (
+              <img src={companyLogoUrl} alt="企业 Logo" className={styles.logoImagePreview} />
+            ) : (
+              <div className={styles.logoPreview}>{(companyName || '企').slice(0, 1)}</div>
+            )}
+            <label className={styles.logoUploadButton}>
+              <span>{companyLogo?.has_logo ? '替换 logo' : '+ 上传logo'}</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                disabled={!logoUploadEnabled}
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0];
+                  event.currentTarget.value = '';
+                  void onUploadCompanyLogo(file);
+                }}
+              />
+            </label>
+            {companyLogo?.has_logo ? (
+              <button type="button" className={styles.placeholderButton} onClick={() => void onDeleteCompanyLogo()}>
+                删除 Logo
+              </button>
+            ) : null}
+            <button type="button" className={styles.placeholderButton} disabled style={{ marginTop: 10 }}>
+              生成 LOGO（占位）
+            </button>
+            <button type="button" className={styles.placeholderButton} disabled>
+              扫码上传（占位）
+            </button>
+            <p className={styles.muted} style={{ marginBottom: 0 }}>
+              建议尺寸 120×120。Logo 仅在企业私有域预览，不进入公开企业主页。
+            </p>
+            {companyLogoMessage ? <p className={styles.muted}>{companyLogoMessage}</p> : null}
+          </div>
+
+          <div>
+            <div className={styles.formGrid}>
+              <div className={styles.formSectionTitle}>基本信息</div>
+              <div className={styles.formWide}>
+                <Field label="企业名称 *" value={companyName} onChange={setCompanyName} />
+              </div>
+              <DictionarySelect
+                label="企业性质 *"
+                value={natureCode}
+                options={companyNatureOptions}
+                onChange={setNatureCode}
+              />
+              <DictionarySelect
+                label="企业规模 *"
+                value={scaleCode}
+                options={companyScaleOptions}
+                onChange={setScaleCode}
+              />
+              <DictionarySelect
+                label="所属行业 *"
+                value={industryCode}
+                options={companyIndustryOptions}
+                onChange={setIndustryCode}
+              />
+              <CapitalAmountField
+                amount={registeredCapitalAmount}
+                unit={registeredCapitalUnit}
+                onAmountChange={setRegisteredCapitalAmount}
+                onUnitChange={setRegisteredCapitalUnit}
+              />
+              <div className={styles.formWide}>
+                <Field label="企业网址" value={websiteUrl} onChange={setWebsiteUrl} placeholder="http://" />
+              </div>
+              <div className={styles.formWide}>
+                <DictionaryMultiSelect
+                  label="企业福利"
+                  values={benefitCodes}
+                  options={companyBenefitOptions}
+                  onChange={setBenefitCodes}
+                  placeholder="请选择企业福利"
+                  max={12}
+                />
+              </div>
+              <RegionCascadePicker
+                mode="single"
+                label="所在地区 *"
+                value={cityCode}
+                onChange={setCityCode}
+                dialogLabel="所在地选择"
+              />
+              <div className={styles.addressWithMap}>
+                <Field label="详细地址 *" value={address} onChange={setAddress} />
+                <button type="button" className={styles.mapPlaceholderButton} disabled>标注（地图占位）</button>
+              </div>
+              <div className={styles.formWide}>
+                <TextAreaField label="企业简介 *" value={companyProfile} onChange={setCompanyProfile} rows={5} />
+                <button type="button" className={styles.aiPlaceholderButton} disabled>AI一键优化（占位）</button>
+              </div>
+
+              <div className={styles.formSectionTitle}>联系方式</div>
+              <Field label="联系人 *" value={contactName} onChange={setContactName} placeholder="请输入联系人" />
+              <div>
+                <Field label="联系电话 *" value={contactMobile} onChange={setContactMobile} placeholder="请输入联系电话" />
+                <CheckboxField label="不对外显示，仅接收站内通知" checked={contactMobileHidden} onChange={setContactMobileHidden} />
+              </div>
+              <div>
+                <Field
+                  label="联系微信"
+                  value={contactWechatSameMobile ? contactMobile : contactWechat}
+                  onChange={setContactWechat}
+                  placeholder="请输入联系微信"
+                />
+                <CheckboxField label="同手机号" checked={contactWechatSameMobile} onChange={setContactWechatSameMobile} />
+              </div>
+              <Field label="联系固话" value={contactPhone} onChange={setContactPhone} placeholder="如 021-88889999" />
+              <Field label="联系邮箱" value={contactEmail} onChange={setContactEmail} placeholder="hr@example.com" />
+              <Field label="联系 QQ" value={contactQq} onChange={setContactQq} placeholder="请输入联系 QQ" />
+
+              <div className={styles.formSectionTitle}>认证资料</div>
+              <div className={styles.formWide}>
+                <Field label="统一社会信用代码" value={licenseNo} onChange={setLicenseNo} />
+              </div>
+              {workbenchEnabled ? (
+                <div className={styles.formWide}>
+                  <TextAreaField label="认证摘要（不含附件 key）" value={materialSummary} onChange={setMaterialSummary} rows={3} />
+                </div>
+              ) : null}
+            </div>
+            <div className={styles.actionRow}>
+              <button type="submit" className={styles.primaryButton}>{workbenchEnabled ? '保存企业资料' : '提交认证资料'}</button>
+              {workbenchEnabled ? (
+                <button type="button" className={styles.secondaryButton} onClick={() => void submitCertification()}>
+                  提交认证摘要
+                </button>
+              ) : null}
+              {companyStatus?.reject_reason ? <span className={styles.muted}>驳回原因：{companyStatus.reject_reason}</span> : null}
+            </div>
+          </div>
+        </form>
+      </section>
+    );
+  }
+
+  function renderCompanyStyle() {
+    const styleUploadEnabled = overview?.features.company_style_upload_enabled === true;
+    const canUploadMoreStyleImages = styleImages.length < 6;
+    return (
+      <section className={styles.card}>
+        <div className={styles.cardTitle}>
+          <div>
+            <h2>企业风采</h2>
+            <p className={styles.muted}>
+              最多可上传 6 张企业风采图片。当前仅在企业私有域管理，不进入公开企业主页、推荐位、搜索或 sitemap。
+            </p>
+          </div>
+          <span className={styleUploadEnabled ? styles.enabledTag : styles.disabledTag}>
+            {styleUploadEnabled ? '私有上传已开启' : '暂未开放'}
+          </span>
+        </div>
+        <div className={`${styles.noticeBar} ${styles.styleNoticeBar}`}>
+          <span>最多可上传 6 张企业风采图片</span>
+          <span>手机扫码上传待后续开放</span>
+        </div>
+        {styleUploadMessage ? <p className={styles.muted}>{styleUploadMessage}</p> : null}
+        <div className={styles.styleUploadGrid}>
+          {styleImages.map((image, index) => (
+            <div className={`${styles.styleUploadCard} ${styles.styleImageCard}`} key={image.image_id}>
+              {styleImageUrls[image.image_id] ? (
+                <img src={styleImageUrls[image.image_id]} alt={`企业风采 ${index + 1}`} className={styles.styleImagePreview} />
+              ) : (
+                <div className={styles.styleImagePlaceholder}>预览读取中</div>
+              )}
+              <div className={styles.styleImageMeta}>
+                <strong>{image.file_name}</strong>
+                <span>{Math.ceil(image.size_bytes / 1024)} KB · {image.content_type}</span>
+                <span>审核状态：私有待审</span>
+              </div>
+              <div className={styles.styleImageActions}>
+                <button type="button" onClick={() => void onMoveStyleImage(image.image_id, -1)} disabled={index === 0}>上移</button>
+                <button type="button" onClick={() => void onMoveStyleImage(image.image_id, 1)} disabled={index === styleImages.length - 1}>下移</button>
+                <button type="button" onClick={() => void onDeleteStyleImage(image.image_id)}>删除</button>
+              </div>
+            </div>
+          ))}
+          {canUploadMoreStyleImages ? (
+            <label className={`${styles.styleUploadCard} ${styles.styleUploadInput}`}>
+              <strong>+ 上传风采</strong>
+              <span>{styleUploadEnabled ? '支持 JPG / PNG / WebP，5MiB 内' : '上传暂未开放'}</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                disabled={!styleUploadEnabled}
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0];
+                  event.currentTarget.value = '';
+                  void onUploadStyleImage(file);
+                }}
+              />
+            </label>
+          ) : (
+            <p className={styles.styleFullHint}>已上传 6 张企业风采图片。如需新增，请先删除或替换已有图片。</p>
+          )}
+        </div>
+        <p className={styles.muted}>
+          安全边界：前端仅通过后端鉴权代理读取图片，不接收 MinIO object key 或预签名 URL；公开展示和图片审核属于后续专项。
+        </p>
+      </section>
+    );
+  }
+
+  function renderHome() {
+    return (
+      <>
+        {workbenchEnabled && overview ? (
+          <section className={styles.card}>
+            <div className={styles.cardTitle}>
+              <div>
+                <h2>企业会员首页</h2>
+                <p className={styles.muted}>当前账号：{context.identity.display_name ?? '企业账号'}。trace_id：{traceId || '等待服务端返回'}</p>
+              </div>
+              <StatusBadge kind="company_auth" value={overview.profile.auth_status} />
+            </div>
+            <div className={styles.statGrid}>
+              <div className={styles.statCard}><span>职位总数</span><strong>{overview.stats.job_total}</strong><p className={styles.muted}>本企业私有职位统计。</p></div>
+              <div className={styles.statCard}><span>投递总数</span><strong>{overview.stats.application_total}</strong><p className={styles.muted}>仅包含本企业职位产生的投递。</p></div>
+              <div className={styles.statCard}><span>待处理投递</span><strong>{overview.stats.pending_application_total}</strong><p className={styles.muted}>状态由服务端返回。</p></div>
+              <div className={styles.statCard}><span>面试邀约</span><strong>{overview.stats.interview_total}</strong><p className={styles.muted}>站内流程，不接外部推送。</p></div>
+            </div>
+          </section>
+        ) : null}
+        {workbenchMode === 'disabled' ? (
+          <>
+            <section className={styles.card}>
+              <h2>三期企业工作台未开启</h2>
+              <p className={styles.muted}>
+                服务端返回 company_workbench_enabled=false，本页保留二期企业后台摘要。企业资料维护、职位工作台、投递阶段流转和站内面试邀约需要灰度开关开启后使用。
+              </p>
+            </section>
+            {renderJobs()}
+            {renderApplications()}
+          </>
+        ) : null}
+        <section className={styles.card}>
+          <div className={styles.cardTitle}>
+            <h3>快捷入口</h3>
+          </div>
+          <div className={styles.serviceGrid}>
+            <button type="button" className={styles.serviceCard} onClick={() => chooseSection('profile')}>
+              <strong>完善企业资料</strong>
+              <span className={styles.muted}>企业管理 / 基本资料</span>
+            </button>
+            <button type="button" className={styles.serviceCard} onClick={() => chooseSection('jobs')}>
+              <strong>职位管理</strong>
+              <span className={styles.muted}>创建、送审、下线</span>
+            </button>
+            <button type="button" className={styles.serviceCard} onClick={() => chooseSection('applications')}>
+              <strong>投递池</strong>
+              <span className={styles.muted}>处理本企业投递</span>
+            </button>
+            <button type="button" className={styles.serviceCard} onClick={() => chooseSection('exports')}>
+              <strong>导出申请</strong>
+              <span className={styles.muted}>继续走审批链</span>
+            </button>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  function renderJobs() {
+    return (
+      <>
         {workbenchEnabled ? (
-          <section style={{ ...cardStyle, marginTop: '18px' }}>
-            <h2 style={{ marginTop: 0 }}>职位管理</h2>
-            <form onSubmit={onCreateJob} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '12px' }}>
+          <section className={styles.card}>
+            <div className={styles.cardTitle}><h2>职位管理</h2></div>
+            <form onSubmit={onCreateJob} className={styles.formGrid}>
               <Field label="职位标题" value={jobTitle} onChange={setJobTitle} />
               <Field label="职类代码" value={jobCategoryCode} onChange={setJobCategoryCode} />
               <Field label="城市代码" value={jobCityCode} onChange={setJobCityCode} />
-              <TextAreaField label="职位描述" value={jobDesc} onChange={setJobDesc} rows={3} />
-              <div style={{ display: 'flex', alignItems: 'end', gap: '10px', flexWrap: 'wrap' }}>
-                <button type="submit" style={buttonStyle}>创建职位草稿</button>
-                <button type="button" style={secondaryButtonStyle} onClick={() => void onSubmitFirstJobReview()} disabled={jobs.length === 0}>
-                  提交首个职位审核
-                </button>
-                <button type="button" style={{ ...secondaryButtonStyle, background: '#475569' }} onClick={() => void onOfflineFirstJob()} disabled={jobs.length === 0}>
-                  下线首个职位
-                </button>
+              <div className={styles.formWide}>
+                <TextAreaField label="职位描述" value={jobDesc} onChange={setJobDesc} rows={3} />
+              </div>
+              <div className={styles.formWide}>
+                <div className={styles.actionRow}>
+                  <button type="submit" className={styles.primaryButton}>创建职位草稿</button>
+                  <button type="button" className={styles.secondaryButton} onClick={() => void onSubmitFirstJobReview()} disabled={jobs.length === 0}>提交首个职位审核</button>
+                  <button type="button" className={styles.plainButton} onClick={() => void onOfflineFirstJob()} disabled={jobs.length === 0}>下线首个职位</button>
+                </div>
               </div>
             </form>
           </section>
         ) : null}
-
-        <section style={{ ...cardStyle, marginTop: '18px' }}>
-          <h2 style={{ marginTop: 0 }}>导出详情与下载入口</h2>
-          <form onSubmit={onLoadExportDetail} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'end' }}>
-            <label>
-              <span style={{ display: 'block', marginBottom: '7px', color: 'var(--lt-ink-muted)', fontWeight: 800 }}>导出编号</span>
-              <input value={exportIdInput} onChange={(event) => setExportIdInput(event.target.value)} style={inputStyle} />
-            </label>
-            <button type="submit" style={buttonStyle}>查询导出详情</button>
-          </form>
-          {exportApply ? (
-            <div style={{ marginTop: '14px', display: 'grid', gap: '10px' }}>
-              <div>导出 #{exportApply.export_id}：{exportApply.reason || '无申请原因'}</div>
-              <ExportDownloadAction exportApply={exportApply} onIssueDownloadUrl={issueDownloadUrl} />
-            </div>
-          ) : (
-            <p style={{ color: 'var(--lt-ink-muted)' }}>暂无导出详情。</p>
-          )}
-        </section>
-
-        {workbenchEnabled ? (
-          <section style={{ ...cardStyle, marginTop: '18px' }}>
-            <h2 style={{ marginTop: 0 }}>投递阶段流转与面试邀约</h2>
-            <p style={{ color: 'var(--lt-ink-muted)', lineHeight: 1.7 }}>
-              投递池仅处理本企业职位产生的投递，不提供跨库检索或联系方式入口。
-            </p>
-            <TextAreaField label="企业处理备注（本企业私有域）" value={stageNote} onChange={setStageNote} rows={3} />
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '12px' }}>
-              <button type="button" style={buttonStyle} onClick={() => void onChangeFirstApplicationStage()} disabled={workbenchApplications.length === 0}>
-                邀约首个投递
-              </button>
-              <button type="button" style={secondaryButtonStyle} onClick={() => void onCreateInterviewSession()} disabled={workbenchApplications.length === 0}>
-                创建站内面试邀约
-              </button>
-            </div>
-          </section>
-        ) : null}
-
-        <div style={{ display: 'grid', gap: '18px', marginTop: '18px' }}>
+        <section className={styles.card}>
           <ReviewTable<CompanyJob>
             title={workbenchEnabled ? '职位工作台' : '职位状态'}
             rows={jobs}
@@ -547,49 +1205,225 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
               { key: 'reject', header: '说明', render: (row) => row.reject_reason || statusLabel('job_status', row.status) }
             ]}
           />
-          {workbenchEnabled ? (
-            <>
-              <ReviewTable<CompanyWorkbenchApplication>
-                title="投递池"
-                rows={workbenchApplications}
-                columns={[
-                  { key: 'id', header: '投递编号', render: (row) => row.application_id },
-                  { key: 'job', header: '职位', render: (row) => row.job_title },
-                  { key: 'candidate', header: '候选人摘要', render: (row) => `${row.display_name_masked} / ${row.city_code || '未知城市'}` },
-                  { key: 'skills', header: '技能摘要', render: (row) => row.skills_summary || '暂无摘要' },
-                  { key: 'experience', header: '经验', render: (row) => (row.experience_years === null ? '未知' : `${row.experience_years}年`) },
-                  { key: 'status', header: '阶段', render: (row) => row.status_label || statusLabel('application_status', row.application_status) },
-                  { key: 'note', header: '备注', render: (row) => row.company_stage_note || '暂无' }
-                ]}
-              />
-              <ReviewTable<CompanyInterviewSession>
-                title="面试邀约"
-                rows={interviewSessions}
-                columns={[
-                  { key: 'id', header: '场次编号', render: (row) => row.session_id },
-                  { key: 'application', header: '投递编号', render: (row) => row.application_id },
-                  { key: 'job', header: '职位', render: (row) => row.job_title },
-                  { key: 'name', header: '场次', render: (row) => row.session_name },
-                  { key: 'time', header: '时间', render: (row) => row.session_time || '待确认' },
-                  { key: 'location', header: '地点', render: (row) => row.location || '站内邀约' }
-                ]}
-              />
-            </>
-          ) : (
-            <ReviewTable<CompanyApplication>
-              title="投递池最小列表"
-              rows={applicationRows as CompanyApplication[]}
+        </section>
+      </>
+    );
+  }
+
+  function renderApplications() {
+    return (
+      <section className={styles.card}>
+        {workbenchEnabled ? (
+          <>
+            <ReviewTable<CompanyWorkbenchApplication>
+              title="投递池"
+              rows={workbenchApplications}
               columns={[
                 { key: 'id', header: '投递编号', render: (row) => row.application_id },
                 { key: 'job', header: '职位', render: (row) => row.job_title },
-                { key: 'status', header: '投递状态', render: (row) => <StatusBadge kind="application_status" value={row.status} /> },
-                { key: 'company', header: '企业', render: (row) => row.company_name },
-                { key: 'time', header: '投递时间', render: (row) => row.apply_time || '未知' }
+                { key: 'candidate', header: '候选人摘要', render: (row) => `${row.display_name_masked} / ${row.city_code || '未知城市'}` },
+                { key: 'skills', header: '技能摘要', render: (row) => row.skills_summary || '暂无摘要' },
+                { key: 'experience', header: '经验', render: (row) => (row.experience_years === null ? '未知' : `${row.experience_years}年`) },
+                { key: 'status', header: '阶段', render: (row) => row.status_label || statusLabel('application_status', row.application_status) },
+                { key: 'note', header: '备注', render: (row) => row.company_stage_note || '暂无' }
               ]}
             />
+            <div style={{ marginTop: 16 }}>
+              <TextAreaField label="企业处理备注（本企业私有域）" value={stageNote} onChange={setStageNote} rows={3} />
+              <div className={styles.actionRow}>
+                <button type="button" className={styles.primaryButton} onClick={() => void onChangeFirstApplicationStage()} disabled={workbenchApplications.length === 0}>邀约首个投递</button>
+                <button type="button" className={styles.secondaryButton} onClick={() => void onCreateInterviewSession()} disabled={workbenchApplications.length === 0}>创建站内面试邀约</button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <ReviewTable<CompanyApplication>
+            title="投递池最小列表"
+            rows={applicationRows as CompanyApplication[]}
+            columns={[
+              { key: 'id', header: '投递编号', render: (row) => row.application_id },
+              { key: 'job', header: '职位', render: (row) => row.job_title },
+              { key: 'status', header: '投递状态', render: (row) => <StatusBadge kind="application_status" value={row.status} /> },
+              { key: 'company', header: '企业', render: (row) => row.company_name },
+              { key: 'time', header: '投递时间', render: (row) => row.apply_time || '未知' }
+            ]}
+          />
+        )}
+      </section>
+    );
+  }
+
+  function renderInterviews() {
+    return (
+      <>
+        {workbenchEnabled ? (
+          <section className={styles.card}>
+            <div className={styles.cardTitle}><h2>投递阶段流转与面试邀约</h2></div>
+            <p className={styles.muted}>投递池仅处理本企业职位产生的投递，不提供跨库检索或联系方式入口。</p>
+            <TextAreaField label="企业处理备注（本企业私有域）" value={stageNote} onChange={setStageNote} rows={3} />
+            <div className={styles.actionRow}>
+              <button type="button" className={styles.primaryButton} onClick={() => void onChangeFirstApplicationStage()} disabled={workbenchApplications.length === 0}>邀约首个投递</button>
+              <button type="button" className={styles.secondaryButton} onClick={() => void onCreateInterviewSession()} disabled={workbenchApplications.length === 0}>创建站内面试邀约</button>
+            </div>
+          </section>
+        ) : null}
+        <section className={styles.card}>
+          <ReviewTable<CompanyInterviewSession>
+            title="面试邀约"
+            rows={interviewSessions}
+            columns={[
+              { key: 'id', header: '场次编号', render: (row) => row.session_id },
+              { key: 'application', header: '投递编号', render: (row) => row.application_id },
+              { key: 'job', header: '职位', render: (row) => row.job_title },
+              { key: 'name', header: '场次', render: (row) => row.session_name },
+              { key: 'time', header: '时间', render: (row) => row.session_time || '待确认' },
+              { key: 'location', header: '地点', render: (row) => row.location || '站内邀约' }
+            ]}
+          />
+        </section>
+      </>
+    );
+  }
+
+  function renderExports() {
+    return (
+      <>
+        <form className={styles.card} onSubmit={onCreateExport}>
+          <div className={styles.cardTitle}><h2>导出申请入口</h2></div>
+          <p className={styles.muted}>企业端只提交申请与查看状态；未审批前不显示下载入口，后端仍拒绝未审批下载。</p>
+          <TextAreaField label="申请原因" value={exportReason} onChange={setExportReason} />
+          <button type="submit" className={styles.primaryButton} style={{ marginTop: '12px' }}>提交导出申请</button>
+        </form>
+        <section className={styles.card}>
+          <div className={styles.cardTitle}><h2>导出详情与下载入口</h2></div>
+          <form onSubmit={onLoadExportDetail} className={styles.actionRow}>
+            <label>
+              <span style={{ display: 'block', marginBottom: '7px', color: 'var(--lt-ink-muted)', fontWeight: 800 }}>导出编号</span>
+              <input value={exportIdInput} onChange={(event) => setExportIdInput(event.target.value)} style={inputStyle} />
+            </label>
+            <button type="submit" className={styles.primaryButton}>查询导出详情</button>
+          </form>
+          {exportApply ? (
+            <div style={{ marginTop: '14px', display: 'grid', gap: '10px' }}>
+              <div>导出 #{exportApply.export_id}：{exportApply.reason || '无申请原因'}</div>
+              <ExportDownloadAction exportApply={exportApply} onIssueDownloadUrl={issueDownloadUrl} />
+            </div>
+          ) : (
+            <p className={styles.muted}>暂无导出详情。</p>
           )}
+        </section>
+      </>
+    );
+  }
+
+  function renderRiskPlaceholder(title: string) {
+    return (
+      <section className={styles.riskPlaceholder}>
+        <h2 style={{ marginTop: 0 }}>{title}</h2>
+        <p>
+          该入口当前仅作为企业会员中心菜单占位。后续如需开放，必须单独走风险准入、权限设计、字段白名单和审计验收。
+        </p>
+      </section>
+    );
+  }
+
+  function renderActiveContent() {
+    const section = gateLocked && activeSection !== 'profile' && activeSection !== 'style' ? 'profile' : activeSection;
+    if (section === 'profile') return renderProfileForm();
+    if (section === 'style') return renderCompanyStyle();
+    if (section === 'jobs') return renderJobs();
+    if (section === 'applications') return renderApplications();
+    if (section === 'interviews') return renderInterviews();
+    if (section === 'exports') return renderExports();
+    if (section === 'talentSearch') return renderRiskPlaceholder('搜索简历：风险池占位');
+    if (section === 'chat') return renderRiskPlaceholder('我的职聊：站内沟通占位');
+    if (section === 'services') return renderRiskPlaceholder('会员服务：灰度占位');
+    if (section === 'recommend') return renderRiskPlaceholder('智能推荐：风险池占位');
+    if (section === 'jobfair') return renderRiskPlaceholder('招聘会：公开报名能力暂未开放');
+    if (section === 'account') return renderRiskPlaceholder('账号管理：后续安全专项开放');
+    return renderHome();
+  }
+
+  return (
+    <main className={styles.page}>
+      <div className={styles.utilityBar}>
+        <div className={styles.utilityInner}>
+          <span>总站 [切换城市]</span>
+          <nav className={styles.utilityLinks} aria-label="企业中心辅助入口">
+            <span>企业会员登录</span>
+            <span>使用帮助</span>
+            <span>网站导航</span>
+          </nav>
         </div>
       </div>
+
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          <div className={styles.brand}>
+            <div className={styles.brandMark}>LT</div>
+            <div>
+              <h1 className={styles.brandTitle}>企业会员管理中心</h1>
+              <p className={styles.brandSub}>LocalTalent 招聘者工作台</p>
+            </div>
+          </div>
+          <div className={styles.searchBox}>
+            <input aria-label="企业中心搜索占位" placeholder="搜索职位、投递或帮助内容（占位）" disabled />
+            <span>搜索</span>
+          </div>
+          <div className={styles.headerActions}>
+            <span>通知：站内</span>
+            <a href="/">返回首页</a>
+          </div>
+        </div>
+      </header>
+
+      <div className={styles.workspace}>
+        {renderMenu()}
+        <div className={styles.content}>
+          {renderStatusView()}
+          {gateLocked ? (
+            <div className={styles.noticeBar}>请先完善企业管理中的基本资料。其它功能会在服务端确认资料完整后解锁。</div>
+          ) : null}
+          {renderActiveContent()}
+        </div>
+      </div>
+
+      <footer className={styles.footer}>
+        <div className={styles.utilityInner}>
+          <span>LocalTalent 企业会员中心</span>
+          <nav className={styles.footerLinks} aria-label="企业中心页脚">
+            <span>关于我们</span>
+            <span>帮助中心</span>
+            <span>隐私边界</span>
+            <span>人才服务区仅展示发布快照</span>
+          </nav>
+        </div>
+      </footer>
+
+      {showProfileGateModal ? (
+        <div className={styles.modalBackdrop} role="dialog" aria-modal="true" aria-labelledby="company-profile-gate-title">
+          <div className={styles.modal}>
+            <h2 id="company-profile-gate-title" className={styles.modalTitle}>系统提示</h2>
+            <p className={styles.muted}>根据相关法律法规要求，需要您完善企业认证信息。</p>
+            {missingProfileFields.length > 0 ? (
+              <p className={styles.muted}>请先完善：{missingProfileFields.join('、')}</p>
+            ) : null}
+            <div className={styles.actionRow}>
+              <button type="button" className={styles.plainButton} onClick={() => setShowProfileGateModal(false)}>取消</button>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                onClick={() => {
+                  setShowProfileGateModal(false);
+                  setActiveSection('profile');
+                }}
+              >
+                去完善
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

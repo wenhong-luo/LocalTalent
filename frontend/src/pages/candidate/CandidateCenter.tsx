@@ -5,10 +5,10 @@ import { type ChangeEvent, type FormEvent, type ReactNode, useEffect, useState }
 import { StateView } from '@/components/StateView';
 import { isHttpClientError } from '@/lib/httpClient';
 import styles from './CandidateCenter.module.css';
-import { ExpectedPositionPicker } from './ExpectedPositionPicker';
-import { categoryCodeForExpectedPosition } from './expectedPositionCatalog';
-import { ExpectedRegionPicker } from './ExpectedRegionPicker';
-import { cityCodeForExpectedRegion } from './expectedRegionCatalog';
+import { ExpectedPositionPicker } from '@/components/selectors/ExpectedPositionPicker';
+import { ExpectedRegionPicker } from '@/components/selectors/RegionCascadePicker';
+import { categoryCodeForExpectedPosition } from '@/shared/catalogs/positionCatalog';
+import { cityCodeForExpectedRegion } from '@/shared/catalogs/regionCatalog';
 import {
   applyCandidateResumeAiSuggestion,
   cancelFavorite,

@@ -10,11 +10,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 import java.util.UUID;
+import cn.localtalent.backend.company.workbench.infrastructure.CompanyStyleImageStorageService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -25,6 +30,11 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @Testcontainers
 @SpringBootTest(
@@ -32,7 +42,9 @@ import org.testcontainers.utility.DockerImageName;
         properties = {
                 "localtalent.auth.jwt.secret=company-workbench-flow-secret-change-me",
                 "localtalent.auth.jwt.ttl-seconds=3600",
-                "localtalent.phase3.company-workbench=true"
+                "localtalent.phase3.company-workbench=true",
+                "localtalent.phase3.company-style-upload=true",
+                "localtalent.phase3.company-logo-upload=true"
         })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class CompanyWorkbenchFlowIT {
@@ -52,6 +64,18 @@ class CompanyWorkbenchFlowIT {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private CompanyStyleImageStorageService styleImageStorageService;
+
+    @TestConfiguration
+    static class StyleImageStorageTestConfiguration {
+        @Bean
+        @Primary
+        CompanyStyleImageStorageService companyStyleImageStorageService() {
+            return mock(CompanyStyleImageStorageService.class);
+        }
+    }
+
     @DynamicPropertySource
     static void datasourceProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
@@ -70,6 +94,107 @@ class CompanyWorkbenchFlowIT {
                 "Bearer " + company.token());
         assertSuccess(overview, 200, "trace-p28-overview");
         assertThat(overview.body().at("/data/features/company_workbench_enabled").asBoolean()).isTrue();
+        assertThat(overview.body().at("/data/features/company_style_upload_enabled").asBoolean()).isTrue();
+        assertThat(overview.body().at("/data/features/company_logo_upload_enabled").asBoolean()).isTrue();
+
+        when(styleImageStorageService.get(anyString())).thenReturn("fake-image".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        HttpJsonResponse emptyLogo = getJson(
+                "/api/company/workbench/logo",
+                "trace-p28-logo-empty",
+                "Bearer " + company.token());
+        assertSuccess(emptyLogo, 200, "trace-p28-logo-empty");
+        assertThat(emptyLogo.body().at("/data/has_logo").asBoolean()).isFalse();
+
+        HttpJsonResponse uploadedLogo = postMultipart(
+                "/api/company/workbench/logo",
+                "file",
+                "logo.png",
+                "image/png",
+                "logo-image".getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                "trace-p28-logo-upload",
+                "Bearer " + company.token(),
+                "idem-p28-logo-upload-001");
+        assertSuccess(uploadedLogo, 200, "trace-p28-logo-upload");
+        assertThat(uploadedLogo.rawBody())
+                .contains("logo.png")
+                .contains("/api/company/workbench/logo/content")
+                .doesNotContain("object_key")
+                .doesNotContain("company-logo-assets/")
+                .doesNotContain("presigned");
+
+        HttpResponse<byte[]> logoContent = getBytes(
+                "/api/company/workbench/logo/content",
+                "trace-p28-logo-content",
+                "Bearer " + company.token());
+        assertThat(logoContent.statusCode()).isEqualTo(200);
+        assertThat(new String(logoContent.body(), java.nio.charset.StandardCharsets.UTF_8)).isEqualTo("fake-image");
+        HttpJsonResponse crossCompanyLogo = getJson(
+                "/api/company/workbench/logo/content",
+                "trace-p28-logo-cross-company",
+                "Bearer " + otherCompany.token());
+        assertError(crossCompanyLogo, 404, "NOT_FOUND_404", "trace-p28-logo-cross-company");
+        HttpJsonResponse deletedLogo = deleteJson(
+                "/api/company/workbench/logo",
+                "trace-p28-logo-delete",
+                "Bearer " + company.token(),
+                "idem-p28-logo-delete-001");
+        assertSuccess(deletedLogo, 200, "trace-p28-logo-delete");
+        assertThat(deletedLogo.body().at("/data/has_logo").asBoolean()).isFalse();
+
+        HttpJsonResponse emptyStyleImages = getJson(
+                "/api/company/workbench/style-images",
+                "trace-p28-style-empty",
+                "Bearer " + company.token());
+        assertSuccess(emptyStyleImages, 200, "trace-p28-style-empty");
+        assertThat(emptyStyleImages.body().at("/data/total").asLong()).isZero();
+
+        HttpJsonResponse uploadedStyleImage = postMultipart(
+                "/api/company/workbench/style-images",
+                "file",
+                "office.webp",
+                "image/webp",
+                "style-image".getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                "trace-p28-style-upload",
+                "Bearer " + company.token(),
+                "idem-p28-style-upload-001");
+        assertSuccess(uploadedStyleImage, 200, "trace-p28-style-upload");
+        assertThat(uploadedStyleImage.rawBody())
+                .contains("office.webp")
+                .doesNotContain("object_key")
+                .doesNotContain("company-style-images/")
+                .doesNotContain("presigned");
+        long styleImageId = uploadedStyleImage.body().at("/data/image_id").asLong();
+        verify(styleImageStorageService, org.mockito.Mockito.times(2)).put(anyString(), any(byte[].class), anyString());
+
+        HttpResponse<byte[]> styleContent = getBytes(
+                "/api/company/workbench/style-images/" + styleImageId + "/content",
+                "trace-p28-style-content",
+                "Bearer " + company.token());
+        assertThat(styleContent.statusCode()).isEqualTo(200);
+        assertThat(new String(styleContent.body(), java.nio.charset.StandardCharsets.UTF_8)).isEqualTo("fake-image");
+        HttpJsonResponse crossCompanyStyle = getJson(
+                "/api/company/workbench/style-images/" + styleImageId + "/content",
+                "trace-p28-style-cross-company",
+                "Bearer " + otherCompany.token());
+        assertError(crossCompanyStyle, 404, "NOT_FOUND_404", "trace-p28-style-cross-company");
+
+        HttpJsonResponse sortedStyleImages = putJson(
+                "/api/company/workbench/style-images/order",
+                """
+                        {
+                          "image_ids": [%d]
+                        }
+                        """.formatted(styleImageId),
+                "trace-p28-style-order",
+                "Bearer " + company.token(),
+                "idem-p28-style-order-001");
+        assertSuccess(sortedStyleImages, 200, "trace-p28-style-order");
+        HttpJsonResponse deletedStyleImage = deleteJson(
+                "/api/company/workbench/style-images/" + styleImageId,
+                "trace-p28-style-delete",
+                "Bearer " + company.token(),
+                "idem-p28-style-delete-001");
+        assertSuccess(deletedStyleImage, 200, "trace-p28-style-delete");
 
         HttpJsonResponse profile = putJson(
                 "/api/company/workbench/profile",
@@ -78,10 +203,22 @@ class CompanyWorkbenchFlowIT {
                           "company_name": "P28 生产化企业",
                           "industry_code": "internet",
                           "nature_code": "private",
-                          "scale_code": "50-100",
+                          "scale_code": "50-200",
                           "city_code": "310000",
                           "address": "仅企业私有域可见地址",
-                          "company_profile": "企业工作台私有简介。"
+                          "company_profile": "企业工作台私有简介。",
+                          "registered_capital_amount": "1000",
+                          "registered_capital_unit": "cny_10k",
+                          "website_url": "https://p28.example.local",
+                          "benefit_codes": ["five_insurance", "annual_leave", "meal_allowance"],
+                          "contact_name": "王招聘",
+                          "contact_mobile": "18877776666",
+                          "contact_mobile_hidden": true,
+                          "contact_wechat": "p28-hr",
+                          "contact_wechat_same_mobile": false,
+                          "contact_phone": "021-88889999",
+                          "contact_email": "hr-p28@example.local",
+                          "contact_qq": "123456"
                         }
                         """,
                 "trace-p28-profile",
@@ -89,6 +226,10 @@ class CompanyWorkbenchFlowIT {
                 "idem-p28-profile-001");
         assertSuccess(profile, 200, "trace-p28-profile");
         assertThat(profile.body().at("/data/company_name").asText()).isEqualTo("P28 生产化企业");
+        assertThat(profile.body().at("/data/registered_capital_amount").asText()).isEqualTo("1000");
+        assertThat(profile.body().at("/data/benefit_codes/0").asText()).isEqualTo("five_insurance");
+        assertThat(profile.body().at("/data/contact_name").asText()).isEqualTo("王招聘");
+        assertThat(profile.body().at("/data/contact_mobile_hidden").asBoolean()).isTrue();
 
         HttpJsonResponse certification = postJson(
                 "/api/company/workbench/certification",
@@ -98,10 +239,22 @@ class CompanyWorkbenchFlowIT {
                           "license_no": "P28-LIC-%s",
                           "industry_code": "internet",
                           "nature_code": "private",
-                          "scale_code": "50-100",
+                          "scale_code": "50-200",
                           "city_code": "310000",
                           "address": "认证私有地址",
                           "company_profile": "认证提交简介。",
+                          "registered_capital_amount": "1500",
+                          "registered_capital_unit": "cny_10k",
+                          "website_url": "https://cert.example.local",
+                          "benefit_codes": ["five_insurance", "weekend_double"],
+                          "contact_name": "认证联系人",
+                          "contact_mobile": "18899990000",
+                          "contact_mobile_hidden": true,
+                          "contact_wechat": "cert-hr",
+                          "contact_wechat_same_mobile": false,
+                          "contact_phone": "021-99998888",
+                          "contact_email": "cert@example.local",
+                          "contact_qq": "654321",
                           "certification_material_summary": {
                             "license_verified": "true",
                             "review_note": "仅保存材料摘要",
@@ -114,6 +267,9 @@ class CompanyWorkbenchFlowIT {
                 "idem-p28-certification-001");
         assertSuccess(certification, 200, "trace-p28-certification");
         assertThat(certification.body().at("/data/auth_status").asInt()).isEqualTo(1);
+        assertThat(certification.body().at("/data/registered_capital_amount").asText()).isEqualTo("1500");
+        assertThat(certification.body().at("/data/benefit_codes/1").asText()).isEqualTo("weekend_double");
+        assertThat(certification.body().at("/data/contact_name").asText()).isEqualTo("认证联系人");
         assertThat(certification.rawBody()).doesNotContain("must-not-store");
 
         HttpJsonResponse draftJob = postJson(
@@ -250,9 +406,13 @@ class CompanyWorkbenchFlowIT {
                 "Bearer " + registerAndLoginCandidate());
         assertError(companyDenied, 403, "AUTHZ_403", "trace-p28-candidate-denied");
 
-        assertThat(countRows("audit_log", "action_type IN ('company_profile_save','company_certification_submit','application_stage_change','workbench_interview_invite','export_apply')"))
-                .isGreaterThanOrEqualTo(5);
+        assertThat(countRows("audit_log", "action_type IN ('company_logo_upload','company_logo_delete','company_style_image_upload','company_style_image_order','company_style_image_delete','company_profile_save','company_certification_submit','application_stage_change','workbench_interview_invite','export_apply')"))
+                .isGreaterThanOrEqualTo(10);
         assertThat(countRows("field_access_log", "biz_type = 'job_application' AND access_type = 'COMPANY_APPLICATION_DETAIL'"))
+                .isGreaterThanOrEqualTo(1);
+        assertThat(countRows("field_access_log", "biz_type = 'company_style_image' AND access_type = 'COMPANY_STYLE_IMAGE_READ'"))
+                .isGreaterThanOrEqualTo(1);
+        assertThat(countRows("field_access_log", "biz_type = 'company_logo_asset' AND access_type = 'COMPANY_LOGO_READ'"))
                 .isGreaterThanOrEqualTo(1);
     }
 
@@ -407,12 +567,63 @@ class CompanyWorkbenchFlowIT {
         return send(builder.build());
     }
 
+    private HttpJsonResponse deleteJson(String path, String traceId, String authorization, String idempotencyKey)
+            throws Exception {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri(path))
+                .header("X-Trace-Id", traceId)
+                .DELETE();
+        if (authorization != null) {
+            builder.header("Authorization", authorization);
+        }
+        if (idempotencyKey != null) {
+            builder.header("X-Idempotency-Key", idempotencyKey);
+        }
+        return send(builder.build());
+    }
+
+    private HttpJsonResponse postMultipart(
+            String path,
+            String fieldName,
+            String fileName,
+            String contentType,
+            byte[] content,
+            String traceId,
+            String authorization,
+            String idempotencyKey
+    ) throws Exception {
+        String boundary = "----LocalTalentBoundary" + UUID.randomUUID();
+        byte[] prefix = (
+                "--" + boundary + "\r\n"
+                        + "Content-Disposition: form-data; name=\"" + fieldName + "\"; filename=\"" + fileName + "\"\r\n"
+                        + "Content-Type: " + contentType + "\r\n\r\n").getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        byte[] suffix = ("\r\n--" + boundary + "--\r\n").getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri(path))
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .header("X-Trace-Id", traceId)
+                .POST(HttpRequest.BodyPublishers.ofByteArrays(List.of(prefix, content, suffix)));
+        if (authorization != null) {
+            builder.header("Authorization", authorization);
+        }
+        if (idempotencyKey != null) {
+            builder.header("X-Idempotency-Key", idempotencyKey);
+        }
+        return send(builder.build());
+    }
+
     private HttpJsonResponse getJson(String path, String traceId, String authorization) throws Exception {
         HttpRequest.Builder builder = HttpRequest.newBuilder(uri(path)).header("X-Trace-Id", traceId).GET();
         if (authorization != null) {
             builder.header("Authorization", authorization);
         }
         return send(builder.build());
+    }
+
+    private HttpResponse<byte[]> getBytes(String path, String traceId, String authorization) throws Exception {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri(path)).header("X-Trace-Id", traceId).GET();
+        if (authorization != null) {
+            builder.header("Authorization", authorization);
+        }
+        return httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofByteArray());
     }
 
     private HttpJsonResponse send(HttpRequest request) throws Exception {

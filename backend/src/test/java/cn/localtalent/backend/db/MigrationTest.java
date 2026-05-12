@@ -59,6 +59,8 @@ class MigrationTest {
                 "candidate_resume_ai_suggestion_item",
                 "portal_recommendation",
                 "risk_review",
+                "company_style_image",
+                "company_logo_asset",
                 "audit_log",
                 "field_access_log",
                 "api_idempotency_record"));
@@ -90,6 +92,18 @@ class MigrationTest {
         assertColumnsExist(jdbcTemplate, "company", List.of(
                 "nature_code",
                 "certification_material_summary_json",
+                "registered_capital_amount",
+                "registered_capital_unit",
+                "website_url",
+                "benefit_codes_json",
+                "contact_name",
+                "contact_mobile",
+                "contact_mobile_hidden",
+                "contact_wechat",
+                "contact_wechat_same_mobile",
+                "contact_phone",
+                "contact_email",
+                "contact_qq",
                 "auth_reject_reason",
                 "auth_review_user_id",
                 "auth_review_time",
@@ -266,6 +280,33 @@ class MigrationTest {
                 "idx_status_severity_time",
                 "idx_target",
                 "idx_handler_time"));
+        assertColumnsExist(jdbcTemplate, "company_style_image", List.of(
+                "company_id",
+                "file_name",
+                "content_type",
+                "size_bytes",
+                "sha256",
+                "object_key",
+                "display_order",
+                "status",
+                "review_status",
+                "uploaded_at"));
+        assertIndexesExist(jdbcTemplate, "company_style_image", List.of(
+                "idx_company_style_active_order",
+                "idx_company_style_review",
+                "idx_company_style_sha"));
+        assertColumnsExist(jdbcTemplate, "company_logo_asset", List.of(
+                "company_id",
+                "file_name",
+                "content_type",
+                "size_bytes",
+                "sha256",
+                "object_key",
+                "status",
+                "uploaded_at"));
+        assertIndexesExist(jdbcTemplate, "company_logo_asset", List.of(
+                "idx_company_logo_active",
+                "idx_company_logo_sha"));
 
         int dictTypeCount = countRows(jdbcTemplate, "sys_dict_type");
         int dictItemCount = countRows(jdbcTemplate, "sys_dict_item");

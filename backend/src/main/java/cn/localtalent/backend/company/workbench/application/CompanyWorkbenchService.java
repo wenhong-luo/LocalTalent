@@ -17,12 +17,21 @@ import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.Applica
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ApplicationPageResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ApplicationStageRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CertificationSubmitRequest;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyLogoDownload;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyLogoResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyStyleImageDownload;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyStyleImageOrderRequest;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyStyleImagePageResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyStyleImageResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyProfileResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyProfileSaveRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.FeatureResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.InterviewSessionPageResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.OverviewResponse;
 import cn.localtalent.backend.company.workbench.infrastructure.CompanyWorkbenchJdbcRepository;
+import cn.localtalent.backend.company.workbench.infrastructure.CompanyWorkbenchJdbcRepository.LogoRow;
+import cn.localtalent.backend.company.workbench.infrastructure.CompanyWorkbenchJdbcRepository.StyleImageRow;
+import cn.localtalent.backend.company.workbench.infrastructure.CompanyStyleImageStorageService;
 import cn.localtalent.backend.exporting.api.ExportApplyRequest;
 import cn.localtalent.backend.exporting.api.ExportApplyResponse;
 import cn.localtalent.backend.exporting.api.ExportScopeRequest;
@@ -38,11 +47,19 @@ import cn.localtalent.backend.job.api.JobUpdateRequest;
 import cn.localtalent.backend.job.application.JobService;
 import cn.localtalent.backend.phase3.Phase3FeatureProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.security.MessageDigest;
+import java.util.HexFormat;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CompanyWorkbenchService {
@@ -56,8 +73,15 @@ public class CompanyWorkbenchService {
     private static final String APPLICATION_STAGE_API = "company.workbench.application.stage";
     private static final String INTERVIEW_CREATE_API = "company.workbench.interview.create";
     private static final String EXPORT_APPLY_API = "company.workbench.export.apply";
+    private static final String STYLE_IMAGE_UPLOAD_API = "company.workbench.style-image.upload";
+    private static final String STYLE_IMAGE_DELETE_API = "company.workbench.style-image.delete";
+    private static final String STYLE_IMAGE_ORDER_API = "company.workbench.style-image.order";
+    private static final String LOGO_UPLOAD_API = "company.workbench.logo.upload";
+    private static final String LOGO_DELETE_API = "company.workbench.logo.delete";
 
     private static final int MAX_PAGE_SIZE = 100;
+    private static final int STYLE_IMAGE_LIMIT = 6;
+    private static final Set<String> ALLOWED_STYLE_IMAGE_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
 
     private final CompanyWorkbenchJdbcRepository repository;
     private final Phase3FeatureProperties phase3Features;
@@ -68,6 +92,9 @@ public class CompanyWorkbenchService {
     private final JobService jobService;
     private final InterviewService interviewService;
     private final ExportService exportService;
+    private final CompanyStyleImageStorageService styleImageStorageService;
+    private final long maxStyleImageBytes;
+    private final long maxLogoBytes;
     private final ObjectMapper objectMapper = AuditJsonMapper.create();
 
     public CompanyWorkbenchService(
@@ -79,7 +106,10 @@ public class CompanyWorkbenchService {
             FieldAccessRecorder fieldAccessRecorder,
             JobService jobService,
             InterviewService interviewService,
-            ExportService exportService
+            ExportService exportService,
+            CompanyStyleImageStorageService styleImageStorageService,
+            @Value("${localtalent.company-style-image.max-size-bytes:5242880}") long maxStyleImageBytes,
+            @Value("${localtalent.company-logo.max-size-bytes:2097152}") long maxLogoBytes
     ) {
         this.repository = repository;
         this.phase3Features = phase3Features;
@@ -90,6 +120,9 @@ public class CompanyWorkbenchService {
         this.jobService = jobService;
         this.interviewService = interviewService;
         this.exportService = exportService;
+        this.styleImageStorageService = styleImageStorageService;
+        this.maxStyleImageBytes = maxStyleImageBytes;
+        this.maxLogoBytes = maxLogoBytes;
     }
 
     public OverviewResponse overview() {
@@ -98,13 +131,124 @@ public class CompanyWorkbenchService {
         return new OverviewResponse(
                 profileWithoutFeatureGuard(principal),
                 repository.stats(principal.companyId()),
-                new FeatureResponse(true));
+                new FeatureResponse(true, phase3Features.isCompanyStyleUpload(), phase3Features.isCompanyLogoUpload()));
     }
 
     public CompanyProfileResponse profile() {
         AuthzPrincipal principal = requireCompany();
         requireEnabled();
         return profileWithoutFeatureGuard(principal);
+    }
+
+    public CompanyLogoResponse logo() {
+        AuthzPrincipal principal = requireCompany();
+        requireLogoUploadEnabled();
+        dataScopeService.assertAccessible(principal, "company_logo_asset", ResourceOwner.company(principal.companyId()));
+        return logoResponse(repository.findActiveLogo(principal.companyId()).orElse(null));
+    }
+
+    @Transactional
+    public CompanyLogoResponse uploadLogo(MultipartFile file, String idempotencyKey) {
+        AuthzPrincipal principal = requireCompany();
+        requireLogoUploadEnabled();
+        NormalizedStyleImage image = normalizeLogoImage(file);
+        Map<String, Object> fingerprint = Map.of(
+                "file_name", image.fileName(),
+                "content_type", image.contentType(),
+                "size_bytes", image.content().length,
+                "sha256", image.sha256());
+        return idempotencyService.execute(
+                LOGO_UPLOAD_API,
+                principal,
+                idempotencyKey,
+                fingerprint,
+                CompanyLogoResponse.class,
+                () -> uploadLogoOnce(principal, image));
+    }
+
+    public CompanyLogoDownload logoContent() {
+        AuthzPrincipal principal = requireCompany();
+        requireLogoUploadEnabled();
+        LogoRow row = requireLogo(principal);
+        fieldAccessRecorder.record(principal, "company_logo_asset", row.logoId(), "image_content", "COMPANY_LOGO_READ");
+        return new CompanyLogoDownload(row.fileName(), row.contentType(), styleImageStorageService.get(row.objectKey()));
+    }
+
+    @Transactional
+    public CompanyLogoResponse deleteLogo(String idempotencyKey) {
+        AuthzPrincipal principal = requireCompany();
+        requireLogoUploadEnabled();
+        LogoRow row = repository.findActiveLogo(principal.companyId()).orElse(null);
+        long logoId = row == null ? 0 : row.logoId();
+        return idempotencyService.execute(
+                LOGO_DELETE_API,
+                principal,
+                idempotencyKey,
+                Map.of("logo_id", logoId, "action", "delete"),
+                CompanyLogoResponse.class,
+                () -> deleteLogoOnce(principal, row));
+    }
+
+    public CompanyStyleImagePageResponse styleImages() {
+        AuthzPrincipal principal = requireCompany();
+        requireStyleUploadEnabled();
+        dataScopeService.assertAccessible(principal, "company_style_image", ResourceOwner.company(principal.companyId()));
+        return styleImagePage(repository.listStyleImages(principal.companyId()));
+    }
+
+    @Transactional
+    public CompanyStyleImageResponse uploadStyleImage(MultipartFile file, String idempotencyKey) {
+        AuthzPrincipal principal = requireCompany();
+        requireStyleUploadEnabled();
+        NormalizedStyleImage image = normalizeStyleImage(file);
+        Map<String, Object> fingerprint = Map.of(
+                "file_name", image.fileName(),
+                "content_type", image.contentType(),
+                "size_bytes", image.content().length,
+                "sha256", image.sha256());
+        return idempotencyService.execute(
+                STYLE_IMAGE_UPLOAD_API,
+                principal,
+                idempotencyKey,
+                fingerprint,
+                CompanyStyleImageResponse.class,
+                () -> uploadStyleImageOnce(principal, image));
+    }
+
+    public CompanyStyleImageDownload styleImageContent(long imageId) {
+        AuthzPrincipal principal = requireCompany();
+        requireStyleUploadEnabled();
+        StyleImageRow row = requireStyleImage(principal, imageId);
+        fieldAccessRecorder.record(principal, "company_style_image", row.imageId(), "image_content", "COMPANY_STYLE_IMAGE_READ");
+        return new CompanyStyleImageDownload(row.fileName(), row.contentType(), styleImageStorageService.get(row.objectKey()));
+    }
+
+    @Transactional
+    public CompanyStyleImagePageResponse saveStyleImageOrder(CompanyStyleImageOrderRequest request, String idempotencyKey) {
+        AuthzPrincipal principal = requireCompany();
+        requireStyleUploadEnabled();
+        List<Long> ids = normalizeStyleImageOrder(request);
+        return idempotencyService.execute(
+                STYLE_IMAGE_ORDER_API,
+                principal,
+                idempotencyKey,
+                Map.of("image_ids", ids),
+                CompanyStyleImagePageResponse.class,
+                () -> saveStyleImageOrderOnce(principal, ids));
+    }
+
+    @Transactional
+    public CompanyStyleImagePageResponse deleteStyleImage(long imageId, String idempotencyKey) {
+        AuthzPrincipal principal = requireCompany();
+        requireStyleUploadEnabled();
+        long normalizedId = requirePositive(imageId, "image_id");
+        return idempotencyService.execute(
+                STYLE_IMAGE_DELETE_API,
+                principal,
+                idempotencyKey,
+                Map.of("image_id", normalizedId, "action", "delete"),
+                CompanyStyleImagePageResponse.class,
+                () -> deleteStyleImageOnce(principal, normalizedId));
     }
 
     @Transactional
@@ -307,6 +451,136 @@ public class CompanyWorkbenchService {
         return exportService.companyDetail(exportId);
     }
 
+    private IdempotentActionResult<CompanyStyleImageResponse> uploadStyleImageOnce(
+            AuthzPrincipal principal,
+            NormalizedStyleImage image
+    ) {
+        dataScopeService.assertWritable(principal, "company_style_image", ResourceOwner.company(principal.companyId()));
+        if (repository.countActiveStyleImages(principal.companyId()) >= STYLE_IMAGE_LIMIT) {
+            throw new ApiException(HttpStatus.CONFLICT, "STYLE_IMAGE_LIMIT_409", "company style image limit reached");
+        }
+        int displayOrder = repository.nextStyleImageOrder(principal.companyId());
+        String objectKey = "company-style-images/%d/%s.%s".formatted(
+                principal.companyId(),
+                UUID.randomUUID(),
+                image.extension());
+        boolean stored = false;
+        try {
+            styleImageStorageService.put(objectKey, image.content(), image.contentType());
+            stored = true;
+            long imageId = repository.insertStyleImage(
+                    principal.companyId(),
+                    image.fileName(),
+                    image.contentType(),
+                    image.content().length,
+                    image.sha256(),
+                    objectKey,
+                    displayOrder);
+            CompanyStyleImageResponse response = requireStyleImage(principal, imageId)
+                    .toResponse(styleImageContentUrl(imageId));
+            auditService.record(principal, "company_style_image", imageId, "company_style_image_upload", null,
+                    json(Map.of(
+                            "file_name", image.fileName(),
+                            "content_type", image.contentType(),
+                            "size_bytes", image.content().length,
+                            "display_order", displayOrder)));
+            return new IdempotentActionResult<>(response, "company_style_image", imageId);
+        } catch (RuntimeException exception) {
+            if (stored) {
+                styleImageStorageService.deleteQuietly(objectKey);
+            }
+            throw exception;
+        }
+    }
+
+    private IdempotentActionResult<CompanyStyleImagePageResponse> saveStyleImageOrderOnce(
+            AuthzPrincipal principal,
+            List<Long> imageIds
+    ) {
+        dataScopeService.assertWritable(principal, "company_style_image", ResourceOwner.company(principal.companyId()));
+        List<Long> activeIds = repository.listStyleImages(principal.companyId()).stream()
+                .map(StyleImageRow::imageId)
+                .toList();
+        if (!activeIds.containsAll(imageIds) || imageIds.size() != activeIds.size()) {
+            throw validation("image_ids must contain all active company style images");
+        }
+        for (int index = 0; index < imageIds.size(); index++) {
+            repository.updateStyleImageOrder(principal.companyId(), imageIds.get(index), (index + 1) * 10);
+        }
+        auditService.record(principal, "company_style_image", principal.companyId(), "company_style_image_order",
+                null,
+                json(Map.of("image_ids", imageIds)));
+        CompanyStyleImagePageResponse response = styleImagePage(repository.listStyleImages(principal.companyId()));
+        return new IdempotentActionResult<>(response, "company", principal.companyId());
+    }
+
+    private IdempotentActionResult<CompanyStyleImagePageResponse> deleteStyleImageOnce(
+            AuthzPrincipal principal,
+            long imageId
+    ) {
+        dataScopeService.assertWritable(principal, "company_style_image", ResourceOwner.company(principal.companyId()));
+        StyleImageRow row = repository.findStyleImage(principal.companyId(), imageId).orElse(null);
+        if (row != null && repository.softDeleteStyleImage(principal.companyId(), imageId)) {
+            styleImageStorageService.deleteQuietly(row.objectKey());
+            auditService.record(principal, "company_style_image", imageId, "company_style_image_delete",
+                    json(Map.of("status", row.status(), "content_type", row.contentType(), "size_bytes", row.sizeBytes())),
+                    json(Map.of("status", 0)));
+        }
+        CompanyStyleImagePageResponse response = styleImagePage(repository.listStyleImages(principal.companyId()));
+        return new IdempotentActionResult<>(response, "company_style_image", imageId);
+    }
+
+    private IdempotentActionResult<CompanyLogoResponse> uploadLogoOnce(
+            AuthzPrincipal principal,
+            NormalizedStyleImage image
+    ) {
+        dataScopeService.assertWritable(principal, "company_logo_asset", ResourceOwner.company(principal.companyId()));
+        LogoRow previous = repository.findActiveLogo(principal.companyId()).orElse(null);
+        String objectKey = "company-logo-assets/%d/%s.%s".formatted(
+                principal.companyId(),
+                UUID.randomUUID(),
+                image.extension());
+        boolean stored = false;
+        try {
+            styleImageStorageService.put(objectKey, image.content(), image.contentType());
+            stored = true;
+            long logoId = repository.insertLogo(
+                    principal.companyId(),
+                    image.fileName(),
+                    image.contentType(),
+                    image.content().length,
+                    image.sha256(),
+                    objectKey);
+            if (previous != null && repository.softDeleteLogo(principal.companyId(), previous.logoId())) {
+                styleImageStorageService.deleteQuietly(previous.objectKey());
+            }
+            CompanyLogoResponse response = logoResponse(requireLogo(principal));
+            auditService.record(principal, "company_logo_asset", logoId, "company_logo_upload", null,
+                    json(Map.of(
+                            "file_name", image.fileName(),
+                            "content_type", image.contentType(),
+                            "size_bytes", image.content().length)));
+            return new IdempotentActionResult<>(response, "company_logo_asset", logoId);
+        } catch (RuntimeException exception) {
+            if (stored) {
+                styleImageStorageService.deleteQuietly(objectKey);
+            }
+            throw exception;
+        }
+    }
+
+    private IdempotentActionResult<CompanyLogoResponse> deleteLogoOnce(AuthzPrincipal principal, LogoRow row) {
+        dataScopeService.assertWritable(principal, "company_logo_asset", ResourceOwner.company(principal.companyId()));
+        if (row != null && repository.softDeleteLogo(principal.companyId(), row.logoId())) {
+            styleImageStorageService.deleteQuietly(row.objectKey());
+            auditService.record(principal, "company_logo_asset", row.logoId(), "company_logo_delete",
+                    json(Map.of("status", row.status(), "content_type", row.contentType(), "size_bytes", row.sizeBytes())),
+                    json(Map.of("status", 0)));
+            return new IdempotentActionResult<>(emptyLogoResponse(), "company_logo_asset", row.logoId());
+        }
+        return new IdempotentActionResult<>(emptyLogoResponse(), "company_logo_asset", 0);
+    }
+
     private IdempotentActionResult<CompanyProfileResponse> saveProfileOnce(AuthzPrincipal principal, NormalizedProfile profile) {
         dataScopeService.assertWritable(principal, "company", ResourceOwner.company(principal.companyId()));
         CompanyProfileResponse before = profileWithoutFeatureGuard(principal);
@@ -318,7 +592,19 @@ public class CompanyWorkbenchService {
                 profile.scaleCode(),
                 profile.cityCode(),
                 profile.address(),
-                profile.companyProfile());
+                profile.companyProfile(),
+                profile.registeredCapitalAmount(),
+                profile.registeredCapitalUnit(),
+                profile.websiteUrl(),
+                json(profile.benefitCodes()),
+                profile.contactName(),
+                profile.contactMobile(),
+                profile.contactMobileHidden(),
+                profile.contactWechat(),
+                profile.contactWechatSameMobile(),
+                profile.contactPhone(),
+                profile.contactEmail(),
+                profile.contactQq());
         CompanyProfileResponse after = profileWithoutFeatureGuard(principal);
         auditService.record(principal, "company", principal.companyId(), "company_profile_save", safeProfileAudit(before), safeProfileAudit(after));
         return new IdempotentActionResult<>(after, "company", principal.companyId());
@@ -340,6 +626,18 @@ public class CompanyWorkbenchService {
                 certification.cityCode(),
                 certification.address(),
                 certification.companyProfile(),
+                certification.registeredCapitalAmount(),
+                certification.registeredCapitalUnit(),
+                certification.websiteUrl(),
+                json(certification.benefitCodes()),
+                certification.contactName(),
+                certification.contactMobile(),
+                certification.contactMobileHidden(),
+                certification.contactWechat(),
+                certification.contactWechatSameMobile(),
+                certification.contactPhone(),
+                certification.contactEmail(),
+                certification.contactQq(),
                 json(certification.materialSummary()));
         CompanyProfileResponse after = profileWithoutFeatureGuard(principal);
         auditService.record(principal, "company", principal.companyId(), "company_certification_submit",
@@ -390,6 +688,49 @@ public class CompanyWorkbenchService {
         }
     }
 
+    private void requireStyleUploadEnabled() {
+        requireEnabled();
+        if (!phase3Features.isCompanyStyleUpload()) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "FEATURE_DISABLED_403", "company style upload disabled");
+        }
+    }
+
+    private void requireLogoUploadEnabled() {
+        requireEnabled();
+        if (!phase3Features.isCompanyLogoUpload()) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "FEATURE_DISABLED_403", "company logo upload disabled");
+        }
+    }
+
+    private StyleImageRow requireStyleImage(AuthzPrincipal principal, long imageId) {
+        return repository.findStyleImage(principal.companyId(), requirePositive(imageId, "image_id"))
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND_404", "company style image not found"));
+    }
+
+    private LogoRow requireLogo(AuthzPrincipal principal) {
+        return repository.findActiveLogo(principal.companyId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND_404", "company logo not found"));
+    }
+
+    private CompanyStyleImagePageResponse styleImagePage(List<StyleImageRow> rows) {
+        List<CompanyStyleImageResponse> responses = rows.stream()
+                .map(row -> row.toResponse(styleImageContentUrl(row.imageId())))
+                .toList();
+        return new CompanyStyleImagePageResponse(responses, responses.size());
+    }
+
+    private String styleImageContentUrl(long imageId) {
+        return "/api/company/workbench/style-images/%d/content".formatted(imageId);
+    }
+
+    private CompanyLogoResponse logoResponse(LogoRow row) {
+        return row == null ? emptyLogoResponse() : row.toResponse("/api/company/workbench/logo/content");
+    }
+
+    private CompanyLogoResponse emptyLogoResponse() {
+        return new CompanyLogoResponse(false, "empty", null, null, null, null, null);
+    }
+
     private NormalizedProfile normalizeProfile(CompanyProfileSaveRequest request) {
         if (request == null) {
             throw validation("request body is required");
@@ -401,7 +742,19 @@ public class CompanyWorkbenchService {
                 normalizeNullable(request.scaleCode(), 64),
                 normalizeNullable(request.cityCode(), 32),
                 normalizeNullable(request.address(), 255),
-                normalizeNullable(request.companyProfile(), 2000));
+                normalizeNullable(request.companyProfile(), 2000),
+                normalizeNullable(request.registeredCapitalAmount(), 32),
+                normalizeNullable(request.registeredCapitalUnit(), 16),
+                normalizeNullable(request.websiteUrl(), 255),
+                normalizeBenefitCodes(request.benefitCodes()),
+                normalizeNullable(request.contactName(), 100),
+                normalizeNullable(request.contactMobile(), 32),
+                request.contactMobileHidden() == null || request.contactMobileHidden(),
+                normalizeNullable(request.contactWechat(), 64),
+                request.contactWechatSameMobile() != null && request.contactWechatSameMobile(),
+                normalizeNullable(request.contactPhone(), 64),
+                normalizeNullable(request.contactEmail(), 128),
+                normalizeNullable(request.contactQq(), 32));
     }
 
     private NormalizedCertification normalizeCertification(CertificationSubmitRequest request) {
@@ -417,6 +770,18 @@ public class CompanyWorkbenchService {
                 normalizeNullable(request.cityCode(), 32),
                 normalizeNullable(request.address(), 255),
                 normalizeNullable(request.companyProfile(), 2000),
+                normalizeNullable(request.registeredCapitalAmount(), 32),
+                normalizeNullable(request.registeredCapitalUnit(), 16),
+                normalizeNullable(request.websiteUrl(), 255),
+                normalizeBenefitCodes(request.benefitCodes()),
+                normalizeNullable(request.contactName(), 100),
+                normalizeNullable(request.contactMobile(), 32),
+                request.contactMobileHidden() == null || request.contactMobileHidden(),
+                normalizeNullable(request.contactWechat(), 64),
+                request.contactWechatSameMobile() != null && request.contactWechatSameMobile(),
+                normalizeNullable(request.contactPhone(), 64),
+                normalizeNullable(request.contactEmail(), 128),
+                normalizeNullable(request.contactQq(), 32),
                 materialSummary(request.certificationMaterialSummary()));
     }
 
@@ -427,6 +792,114 @@ public class CompanyWorkbenchService {
         String stage = required(request.stage(), "stage", 32);
         stageStatus(stage);
         return new NormalizedStage(stage, normalizeNullable(request.note(), 500));
+    }
+
+    private NormalizedStyleImage normalizeStyleImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw validation("file is required");
+        }
+        if (file.getSize() > maxStyleImageBytes) {
+            throw validation("file exceeds max size");
+        }
+        String originalName = safeFileName(file.getOriginalFilename(), "company-style-image");
+        String extension = extension(originalName);
+        String contentType = normalizeNullable(file.getContentType(), 120);
+        if (contentType == null || !ALLOWED_STYLE_IMAGE_TYPES.contains(contentType) || !extensionAllowed(contentType, extension)) {
+            throw validation("file type must be JPEG, PNG or WebP");
+        }
+        try {
+            byte[] content = file.getBytes();
+            if (content.length == 0 || content.length > maxStyleImageBytes) {
+                throw validation("file exceeds max size");
+            }
+            return new NormalizedStyleImage(originalName, contentType, extension, content, sha256(content));
+        } catch (ApiException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw validation("failed to read file");
+        }
+    }
+
+    private NormalizedStyleImage normalizeLogoImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw validation("file is required");
+        }
+        if (file.getSize() > maxLogoBytes) {
+            throw validation("file exceeds max size");
+        }
+        String originalName = safeFileName(file.getOriginalFilename(), "company-logo");
+        String extension = extension(originalName);
+        String contentType = normalizeNullable(file.getContentType(), 120);
+        if (contentType == null || !ALLOWED_STYLE_IMAGE_TYPES.contains(contentType) || !extensionAllowed(contentType, extension)) {
+            throw validation("file type must be JPEG, PNG or WebP");
+        }
+        try {
+            byte[] content = file.getBytes();
+            if (content.length == 0 || content.length > maxLogoBytes) {
+                throw validation("file exceeds max size");
+            }
+            return new NormalizedStyleImage(originalName, contentType, extension, content, sha256(content));
+        } catch (ApiException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw validation("failed to read file");
+        }
+    }
+
+    private List<Long> normalizeStyleImageOrder(CompanyStyleImageOrderRequest request) {
+        if (request == null || request.imageIds() == null || request.imageIds().isEmpty()) {
+            throw validation("image_ids is required");
+        }
+        List<Long> imageIds = request.imageIds().stream()
+                .map(id -> requirePositive(id == null ? 0 : id, "image_id"))
+                .distinct()
+                .toList();
+        if (imageIds.size() > STYLE_IMAGE_LIMIT) {
+            throw validation("image_ids exceeds max size");
+        }
+        return imageIds;
+    }
+
+    private boolean extensionAllowed(String contentType, String extension) {
+        return switch (contentType) {
+            case "image/jpeg" -> "jpg".equals(extension) || "jpeg".equals(extension);
+            case "image/png" -> "png".equals(extension);
+            case "image/webp" -> "webp".equals(extension);
+            default -> false;
+        };
+    }
+
+    private String extension(String fileName) {
+        int index = fileName.lastIndexOf('.');
+        if (index < 0 || index == fileName.length() - 1) {
+            throw validation("file extension is required");
+        }
+        return fileName.substring(index + 1).toLowerCase(java.util.Locale.ROOT);
+    }
+
+    private String safeFileName(String raw, String fallback) {
+        String fileName = normalizeNullable(raw, 180);
+        if (fileName == null) {
+            return fallback;
+        }
+        String normalized = fileName.replace("\\", "/");
+        int slash = normalized.lastIndexOf('/');
+        if (slash >= 0) {
+            normalized = normalized.substring(slash + 1);
+        }
+        normalized = normalized.replaceAll("[\\r\\n\\t]", "_");
+        if (normalized.isBlank() || normalized.contains("..")) {
+            return fallback;
+        }
+        return normalized;
+    }
+
+    private String sha256(byte[] content) {
+        try {
+            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(content));
+        } catch (Exception exception) {
+            throw new IllegalStateException("failed to calculate image sha256", exception);
+        }
     }
 
     private int stageStatus(String stage) {
@@ -504,6 +977,23 @@ public class CompanyWorkbenchService {
         return normalized.length() > maxLength ? normalized.substring(0, maxLength) : normalized;
     }
 
+    private List<String> normalizeBenefitCodes(List<String> values) {
+        if (values == null || values.isEmpty()) {
+            return List.of();
+        }
+        LinkedHashSet<String> normalized = new LinkedHashSet<>();
+        for (String value : values) {
+            String item = normalizeNullable(value, 64);
+            if (item != null) {
+                normalized.add(item);
+            }
+            if (normalized.size() >= 20) {
+                break;
+            }
+        }
+        return List.copyOf(normalized);
+    }
+
     private String safeProfileAudit(CompanyProfileResponse response) {
         if (response == null) {
             return null;
@@ -533,17 +1023,42 @@ public class CompanyWorkbenchService {
             String scaleCode,
             String cityCode,
             String address,
-            String companyProfile
+            String companyProfile,
+            String registeredCapitalAmount,
+            String registeredCapitalUnit,
+            String websiteUrl,
+            List<String> benefitCodes,
+            String contactName,
+            String contactMobile,
+            boolean contactMobileHidden,
+            String contactWechat,
+            boolean contactWechatSameMobile,
+            String contactPhone,
+            String contactEmail,
+            String contactQq
     ) {
         Map<String, Object> fingerprint() {
-            return Map.of(
-                    "company_name", companyName,
-                    "industry_code", industryCode == null ? "" : industryCode,
-                    "nature_code", natureCode == null ? "" : natureCode,
-                    "scale_code", scaleCode == null ? "" : scaleCode,
-                    "city_code", cityCode == null ? "" : cityCode,
-                    "address", address == null ? "" : address,
-                    "company_profile", companyProfile == null ? "" : companyProfile);
+            Map<String, Object> payload = new LinkedHashMap<>();
+            payload.put("company_name", companyName);
+            payload.put("industry_code", industryCode);
+            payload.put("nature_code", natureCode);
+            payload.put("scale_code", scaleCode);
+            payload.put("city_code", cityCode);
+            payload.put("address", address);
+            payload.put("company_profile", companyProfile);
+            payload.put("registered_capital_amount", registeredCapitalAmount);
+            payload.put("registered_capital_unit", registeredCapitalUnit);
+            payload.put("website_url", websiteUrl);
+            payload.put("benefit_codes", benefitCodes);
+            payload.put("contact_name", contactName);
+            payload.put("contact_mobile_present", contactMobile != null);
+            payload.put("contact_mobile_hidden", contactMobileHidden);
+            payload.put("contact_wechat_present", contactWechat != null);
+            payload.put("contact_wechat_same_mobile", contactWechatSameMobile);
+            payload.put("contact_phone_present", contactPhone != null);
+            payload.put("contact_email_present", contactEmail != null);
+            payload.put("contact_qq_present", contactQq != null);
+            return payload;
         }
     }
 
@@ -556,6 +1071,18 @@ public class CompanyWorkbenchService {
             String cityCode,
             String address,
             String companyProfile,
+            String registeredCapitalAmount,
+            String registeredCapitalUnit,
+            String websiteUrl,
+            List<String> benefitCodes,
+            String contactName,
+            String contactMobile,
+            boolean contactMobileHidden,
+            String contactWechat,
+            boolean contactWechatSameMobile,
+            String contactPhone,
+            String contactEmail,
+            String contactQq,
             Map<String, Object> materialSummary
     ) {
         Map<String, Object> fingerprint() {
@@ -568,11 +1095,32 @@ public class CompanyWorkbenchService {
             payload.put("city_code", cityCode);
             payload.put("address", address);
             payload.put("company_profile", companyProfile);
+            payload.put("registered_capital_amount", registeredCapitalAmount);
+            payload.put("registered_capital_unit", registeredCapitalUnit);
+            payload.put("website_url", websiteUrl);
+            payload.put("benefit_codes", benefitCodes);
+            payload.put("contact_name", contactName);
+            payload.put("contact_mobile_present", contactMobile != null);
+            payload.put("contact_mobile_hidden", contactMobileHidden);
+            payload.put("contact_wechat_present", contactWechat != null);
+            payload.put("contact_wechat_same_mobile", contactWechatSameMobile);
+            payload.put("contact_phone_present", contactPhone != null);
+            payload.put("contact_email_present", contactEmail != null);
+            payload.put("contact_qq_present", contactQq != null);
             payload.put("certification_material_summary", materialSummary);
             return payload;
         }
     }
 
     private record NormalizedStage(String stage, String note) {
+    }
+
+    private record NormalizedStyleImage(
+            String fileName,
+            String contentType,
+            String extension,
+            byte[] content,
+            String sha256
+    ) {
     }
 }

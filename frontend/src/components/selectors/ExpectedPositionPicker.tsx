@@ -7,7 +7,7 @@ import {
   normalizeExpectedPositionSelections,
   positionNameForStorage,
   type ExpectedPositionSelection
-} from './expectedPositionCatalog';
+} from '@/shared/catalogs/positionCatalog';
 import styles from './ExpectedPositionPicker.module.css';
 
 type ExpectedPositionPickerProps = {
@@ -148,7 +148,14 @@ export function ExpectedPositionPicker({
         <span className={styles.chevron} aria-hidden="true">⌕</span>
       </button>
       {open ? (
-        <div className={styles.backdrop}>
+        <div
+          className={styles.backdrop}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeAndReset();
+            }
+          }}
+        >
           <section className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="expected-position-title">
             <header className={styles.header}>
               <div>

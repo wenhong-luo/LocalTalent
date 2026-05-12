@@ -80,7 +80,8 @@ npm run dev</code></pre>
       <p>三期 flag 注册表：<code>docs/Phase_III/feature_flags.md</code>。</p>
       <pre><code>export LOCALTALENT_PHASE3_CANDIDATE_CLOSURE=true
 export LOCALTALENT_PHASE3_COMPANY_WORKBENCH=true
-export LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS=true</code></pre>
+export LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS=true
+export LOCALTALENT_PHASE3_COMPANY_STYLE_UPLOAD=true</code></pre>
       <div class="warn">gray 环境不能随意打开全部 flag，必须按白名单、比例和观察窗口逐步开启。flag 不得绕过 RBAC、数据域、字段级权限、导出审批或审计。</div>
     </section>
 
@@ -117,10 +118,10 @@ export LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS=true</code></pre>
       <ul>
         <li><code>/candidate/resume/create</code>：首次完善简历 1、完善简历 2、创建完成三页；进度由服务端 <code>candidate_resume_onboarding</code> 表判断；开启 <code>LOCALTALENT_PHASE3_RESUME_ATTACHMENT_UPLOAD=true</code> 后支持本人私有简历附件上传、下载、替换、删除；开启 <code>LOCALTALENT_PHASE3_RESUME_AI_ASSIST=true</code> 后支持安全规则版简历优化建议。</li>
         <li><code>/candidate/center</code>：已增强为接近 <code>docs/page/4、会员中心.png</code> 的求职者个人中心首页，包含个人横幅、统计卡、左侧菜单、简历状态卡、优选服务占位、职位推荐区、简历、投递、收藏、订阅、站内通知、智能优化建议、同意/撤回。</li>
-        <li><code>/company</code>：企业资料、认证、职位、投递池、面试邀约、导出申请。</li>
+        <li><code>/company</code>：企业资料、认证、职位、投递池、面试邀约、导出申请；开启 <code>LOCALTALENT_PHASE3_COMPANY_STYLE_UPLOAD=true</code> 后支持企业风采私有图片上传、鉴权预览、排序和删除；开启 <code>LOCALTALENT_PHASE3_COMPANY_LOGO_UPLOAD=true</code> 后支持企业 Logo 私有上传、预览、替换和删除。</li>
         <li><code>/admin</code>：审核、推荐位、风险审核、审计 trace。</li>
       </ul>
-      <p class="warn">首次完善简历和个人中心均属于 candidate 本人私有域；“会员中心”只作为个人中心视觉参考，不代表会员商业化、真实支付、联系解锁或公共简历库，优选服务中的商业化项均为灰度占位。当前不做附件解析、真实外部 AI/LLM、短信、微信、小程序或 App。附件 object key 仅服务端私有保存，不返回前端、不进入公开门户、人才服务区、日志明文、sitemap、搜索或导出旁路。AI 优化建议只使用服务端规范化 DTO 和本地规则，不上传原始候选人数据、不保存完整 prompt 或模型原文、不自动发布到人才服务区。</p>
+      <p class="warn">首次完善简历和个人中心均属于 candidate 本人私有域；“会员中心”只作为个人中心视觉参考，不代表会员商业化、真实支付、联系解锁或公共简历库，优选服务中的商业化项均为灰度占位。当前不做附件解析、真实外部 AI/LLM、短信、微信、小程序或 App。附件 object key 仅服务端私有保存，不返回前端、不进入公开门户、人才服务区、日志明文、sitemap、搜索或导出旁路。AI 优化建议只使用服务端规范化 DTO 和本地规则，不上传原始候选人数据、不保存完整 prompt 或模型原文、不自动发布到人才服务区。企业风采图片和企业 Logo 均只在 company 私有域可见，object key 仅服务端保存，不进入公开企业列表、企业公开主页、推荐位、搜索、sitemap 或导出旁路。</p>
     </section>
 
     <section id="checks" class="card">

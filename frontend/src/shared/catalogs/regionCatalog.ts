@@ -1,5 +1,3 @@
-'use client';
-
 export const MAX_EXPECTED_REGIONS = 6;
 
 export type RegionDistrict = {

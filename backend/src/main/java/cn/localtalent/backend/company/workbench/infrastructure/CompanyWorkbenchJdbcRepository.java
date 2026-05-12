@@ -1,6 +1,8 @@
 package cn.localtalent.backend.company.workbench.infrastructure;
 
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ApplicationItemResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyLogoResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyStyleImageResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyProfileResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.InterviewSessionItemResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.WorkbenchStatsResponse;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -32,7 +36,10 @@ public class CompanyWorkbenchJdbcRepository {
     public Optional<CompanyProfileResponse> findProfile(long companyId) {
         return jdbcTemplate.query(
                 "SELECT id, company_name, industry_code, nature_code, scale_code, city_code, address, "
-                        + "company_profile, auth_status, auth_reject_reason, certification_material_summary_json, updated_at "
+                        + "company_profile, registered_capital_amount, registered_capital_unit, website_url, benefit_codes_json, "
+                        + "contact_name, contact_mobile, contact_mobile_hidden, contact_wechat, contact_wechat_same_mobile, "
+                        + "contact_phone, contact_email, contact_qq, "
+                        + "auth_status, auth_reject_reason, certification_material_summary_json, updated_at "
                         + "FROM company WHERE id = ? LIMIT 1",
                 (rs, rowNum) -> profile(rs),
                 companyId).stream().findFirst();
@@ -54,11 +61,27 @@ public class CompanyWorkbenchJdbcRepository {
             String scaleCode,
             String cityCode,
             String address,
-            String companyProfile
+            String companyProfile,
+            String registeredCapitalAmount,
+            String registeredCapitalUnit,
+            String websiteUrl,
+            String benefitCodesJson,
+            String contactName,
+            String contactMobile,
+            boolean contactMobileHidden,
+            String contactWechat,
+            boolean contactWechatSameMobile,
+            String contactPhone,
+            String contactEmail,
+            String contactQq
     ) {
         jdbcTemplate.update(
                 "UPDATE company SET company_name = ?, industry_code = ?, nature_code = ?, scale_code = ?, "
-                        + "city_code = ?, address = ?, company_profile = ? WHERE id = ?",
+                        + "city_code = ?, address = ?, company_profile = ?, registered_capital_amount = ?, "
+                        + "registered_capital_unit = ?, website_url = ?, benefit_codes_json = CAST(? AS JSON), "
+                        + "contact_name = ?, contact_mobile = ?, contact_mobile_hidden = ?, contact_wechat = ?, "
+                        + "contact_wechat_same_mobile = ?, contact_phone = ?, contact_email = ?, contact_qq = ? "
+                        + "WHERE id = ?",
                 companyName,
                 industryCode,
                 natureCode,
@@ -66,6 +89,18 @@ public class CompanyWorkbenchJdbcRepository {
                 cityCode,
                 address,
                 companyProfile,
+                registeredCapitalAmount,
+                registeredCapitalUnit,
+                websiteUrl,
+                benefitCodesJson,
+                contactName,
+                contactMobile,
+                contactMobileHidden ? 1 : 0,
+                contactWechat,
+                contactWechatSameMobile ? 1 : 0,
+                contactPhone,
+                contactEmail,
+                contactQq,
                 companyId);
     }
 
@@ -79,11 +114,27 @@ public class CompanyWorkbenchJdbcRepository {
             String cityCode,
             String address,
             String companyProfile,
+            String registeredCapitalAmount,
+            String registeredCapitalUnit,
+            String websiteUrl,
+            String benefitCodesJson,
+            String contactName,
+            String contactMobile,
+            boolean contactMobileHidden,
+            String contactWechat,
+            boolean contactWechatSameMobile,
+            String contactPhone,
+            String contactEmail,
+            String contactQq,
             String materialSummaryJson
     ) {
         jdbcTemplate.update(
                 "UPDATE company SET company_name = ?, license_no = ?, industry_code = ?, nature_code = ?, scale_code = ?, "
-                        + "city_code = ?, address = ?, company_profile = ?, certification_material_summary_json = CAST(? AS JSON), "
+                        + "city_code = ?, address = ?, company_profile = ?, registered_capital_amount = ?, "
+                        + "registered_capital_unit = ?, website_url = ?, benefit_codes_json = CAST(? AS JSON), "
+                        + "contact_name = ?, contact_mobile = ?, contact_mobile_hidden = ?, contact_wechat = ?, "
+                        + "contact_wechat_same_mobile = ?, contact_phone = ?, contact_email = ?, contact_qq = ?, "
+                        + "certification_material_summary_json = CAST(? AS JSON), "
                         + "auth_status = 1, auth_reject_reason = NULL, auth_review_user_id = NULL, auth_review_time = NULL, "
                         + "auth_submit_time = CURRENT_TIMESTAMP WHERE id = ?",
                 companyName,
@@ -94,6 +145,18 @@ public class CompanyWorkbenchJdbcRepository {
                 cityCode,
                 address,
                 companyProfile,
+                registeredCapitalAmount,
+                registeredCapitalUnit,
+                websiteUrl,
+                benefitCodesJson,
+                contactName,
+                contactMobile,
+                contactMobileHidden ? 1 : 0,
+                contactWechat,
+                contactWechatSameMobile ? 1 : 0,
+                contactPhone,
+                contactEmail,
+                contactQq,
                 materialSummaryJson,
                 companyId);
     }
@@ -161,6 +224,133 @@ public class CompanyWorkbenchJdbcRepository {
         return count("SELECT COUNT(*) FROM interview_session WHERE company_id = ?", companyId);
     }
 
+    public List<StyleImageRow> listStyleImages(long companyId) {
+        return jdbcTemplate.query(
+                "SELECT id, company_id, file_name, content_type, size_bytes, sha256, object_key, display_order, "
+                        + "status, review_status, uploaded_at "
+                        + "FROM company_style_image "
+                        + "WHERE company_id = ? AND status = 1 ORDER BY display_order ASC, id ASC",
+                (rs, rowNum) -> styleImage(rs),
+                companyId);
+    }
+
+    public Optional<StyleImageRow> findStyleImage(long companyId, long imageId) {
+        return jdbcTemplate.query(
+                "SELECT id, company_id, file_name, content_type, size_bytes, sha256, object_key, display_order, "
+                        + "status, review_status, uploaded_at "
+                        + "FROM company_style_image WHERE company_id = ? AND id = ? AND status = 1 LIMIT 1",
+                (rs, rowNum) -> styleImage(rs),
+                companyId,
+                imageId).stream().findFirst();
+    }
+
+    public long countActiveStyleImages(long companyId) {
+        return count("SELECT COUNT(*) FROM company_style_image WHERE company_id = ? AND status = 1", companyId);
+    }
+
+    public int nextStyleImageOrder(long companyId) {
+        Integer maxOrder = jdbcTemplate.queryForObject(
+                "SELECT COALESCE(MAX(display_order), 0) FROM company_style_image WHERE company_id = ? AND status = 1",
+                Integer.class,
+                companyId);
+        return (maxOrder == null ? 0 : maxOrder) + 10;
+    }
+
+    public long insertStyleImage(
+            long companyId,
+            String fileName,
+            String contentType,
+            long sizeBytes,
+            String sha256,
+            String objectKey,
+            int displayOrder
+    ) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            java.sql.PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO company_style_image "
+                            + "(company_id, file_name, content_type, size_bytes, sha256, object_key, display_order, status, review_status) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0)",
+                    new String[] {"id"});
+            ps.setLong(1, companyId);
+            ps.setString(2, fileName);
+            ps.setString(3, contentType);
+            ps.setLong(4, sizeBytes);
+            ps.setString(5, sha256);
+            ps.setString(6, objectKey);
+            ps.setInt(7, displayOrder);
+            return ps;
+        }, keyHolder);
+        Number key = keyHolder.getKey();
+        if (key == null) {
+            throw new IllegalStateException("company style image id was not generated");
+        }
+        return key.longValue();
+    }
+
+    public boolean softDeleteStyleImage(long companyId, long imageId) {
+        return jdbcTemplate.update(
+                "UPDATE company_style_image SET status = 0, updated_at = CURRENT_TIMESTAMP "
+                        + "WHERE company_id = ? AND id = ? AND status = 1",
+                companyId,
+                imageId) == 1;
+    }
+
+    public int updateStyleImageOrder(long companyId, long imageId, int displayOrder) {
+        return jdbcTemplate.update(
+                "UPDATE company_style_image SET display_order = ?, updated_at = CURRENT_TIMESTAMP "
+                        + "WHERE company_id = ? AND id = ? AND status = 1",
+                displayOrder,
+                companyId,
+                imageId);
+    }
+
+    public Optional<LogoRow> findActiveLogo(long companyId) {
+        return jdbcTemplate.query(
+                "SELECT id, company_id, file_name, content_type, size_bytes, sha256, object_key, status, uploaded_at "
+                        + "FROM company_logo_asset WHERE company_id = ? AND status = 1 ORDER BY id DESC LIMIT 1",
+                (rs, rowNum) -> logo(rs),
+                companyId).stream().findFirst();
+    }
+
+    public long insertLogo(
+            long companyId,
+            String fileName,
+            String contentType,
+            long sizeBytes,
+            String sha256,
+            String objectKey
+    ) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            java.sql.PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO company_logo_asset "
+                            + "(company_id, file_name, content_type, size_bytes, sha256, object_key, status) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, 1)",
+                    new String[] {"id"});
+            ps.setLong(1, companyId);
+            ps.setString(2, fileName);
+            ps.setString(3, contentType);
+            ps.setLong(4, sizeBytes);
+            ps.setString(5, sha256);
+            ps.setString(6, objectKey);
+            return ps;
+        }, keyHolder);
+        Number key = keyHolder.getKey();
+        if (key == null) {
+            throw new IllegalStateException("company logo id was not generated");
+        }
+        return key.longValue();
+    }
+
+    public boolean softDeleteLogo(long companyId, long logoId) {
+        return jdbcTemplate.update(
+                "UPDATE company_logo_asset SET status = 0, updated_at = CURRENT_TIMESTAMP "
+                        + "WHERE company_id = ? AND id = ? AND status = 1",
+                companyId,
+                logoId) == 1;
+    }
+
     private QueryParts applicationQuery(long companyId, Long jobId, Integer status, boolean countOnly) {
         StringBuilder sql = new StringBuilder(countOnly ? "SELECT COUNT(*) " : applicationSelect());
         if (countOnly) {
@@ -221,6 +411,34 @@ public class CompanyWorkbenchJdbcRepository {
                 rs.getString("location"));
     }
 
+    private StyleImageRow styleImage(ResultSet rs) throws SQLException {
+        return new StyleImageRow(
+                rs.getLong("id"),
+                rs.getLong("company_id"),
+                rs.getString("file_name"),
+                rs.getString("content_type"),
+                rs.getLong("size_bytes"),
+                rs.getString("sha256"),
+                rs.getString("object_key"),
+                rs.getInt("display_order"),
+                rs.getInt("status"),
+                rs.getInt("review_status"),
+                timestamp(rs, "uploaded_at"));
+    }
+
+    private LogoRow logo(ResultSet rs) throws SQLException {
+        return new LogoRow(
+                rs.getLong("id"),
+                rs.getLong("company_id"),
+                rs.getString("file_name"),
+                rs.getString("content_type"),
+                rs.getLong("size_bytes"),
+                rs.getString("sha256"),
+                rs.getString("object_key"),
+                rs.getInt("status"),
+                timestamp(rs, "uploaded_at"));
+    }
+
     private CompanyProfileResponse profile(ResultSet rs) throws SQLException {
         return new CompanyProfileResponse(
                 rs.getLong("id"),
@@ -231,6 +449,18 @@ public class CompanyWorkbenchJdbcRepository {
                 rs.getString("city_code"),
                 rs.getString("address"),
                 rs.getString("company_profile"),
+                rs.getString("registered_capital_amount"),
+                rs.getString("registered_capital_unit"),
+                rs.getString("website_url"),
+                jsonStringList(rs.getString("benefit_codes_json")),
+                rs.getString("contact_name"),
+                rs.getString("contact_mobile"),
+                rs.getInt("contact_mobile_hidden") == 1,
+                rs.getString("contact_wechat"),
+                rs.getInt("contact_wechat_same_mobile") == 1,
+                rs.getString("contact_phone"),
+                rs.getString("contact_email"),
+                rs.getString("contact_qq"),
                 rs.getInt("auth_status"),
                 rs.getString("auth_reject_reason"),
                 jsonMap(rs.getString("certification_material_summary_json")),
@@ -254,6 +484,17 @@ public class CompanyWorkbenchJdbcRepository {
             return objectMapper.readValue(json, new TypeReference<LinkedHashMap<String, Object>>() {});
         } catch (Exception exception) {
             return Collections.emptyMap();
+        }
+    }
+
+    private List<String> jsonStringList(String json) {
+        if (json == null || json.isBlank()) {
+            return List.of();
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<String>>() {});
+        } catch (Exception exception) {
+            return List.of();
         }
     }
 
@@ -303,5 +544,48 @@ public class CompanyWorkbenchJdbcRepository {
     }
 
     private record QueryParts(String sql, List<Object> args) {
+    }
+
+    public record StyleImageRow(
+            long imageId,
+            long companyId,
+            String fileName,
+            String contentType,
+            long sizeBytes,
+            String sha256,
+            String objectKey,
+            int displayOrder,
+            int status,
+            int reviewStatus,
+            LocalDateTime uploadedAt
+    ) {
+        public CompanyStyleImageResponse toResponse(String contentUrl) {
+            return new CompanyStyleImageResponse(
+                    imageId,
+                    fileName,
+                    contentType,
+                    sizeBytes,
+                    displayOrder,
+                    status,
+                    reviewStatus,
+                    uploadedAt,
+                    contentUrl);
+        }
+    }
+
+    public record LogoRow(
+            long logoId,
+            long companyId,
+            String fileName,
+            String contentType,
+            long sizeBytes,
+            String sha256,
+            String objectKey,
+            int status,
+            LocalDateTime uploadedAt
+    ) {
+        public CompanyLogoResponse toResponse(String contentUrl) {
+            return new CompanyLogoResponse(true, "uploaded", fileName, contentType, sizeBytes, uploadedAt, contentUrl);
+        }
     }
 }

@@ -43,6 +43,12 @@ localtalent:
     resume-attachment-upload: ${LOCALTALENT_PHASE3_RESUME_ATTACHMENT_UPLOAD:false}
     resume-ai-assist: ${LOCALTALENT_PHASE3_RESUME_AI_ASSIST:false}
     company-workbench: ${LOCALTALENT_PHASE3_COMPANY_WORKBENCH:false}
+    company-style-upload: ${LOCALTALENT_PHASE3_COMPANY_STYLE_UPLOAD:false}
+    company-logo-upload: ${LOCALTALENT_PHASE3_COMPANY_LOGO_UPLOAD:false}
     operator-portal-ops: ${LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS:false}
   resume-attachment:
     max-size-bytes: ${LOCALTALENT_RESUME_ATTACHMENT_MAX_BYTES:5242880}
+  company-style-image:
+    max-size-bytes: ${LOCALTALENT_COMPANY_STYLE_IMAGE_MAX_BYTES:5242880}
+  company-logo:
+    max-size-bytes: ${LOCALTALENT_COMPANY_LOGO_MAX_BYTES:2097152}

@@ -11,7 +11,9 @@ public final class CompanyWorkbenchDtos {
     }
 
     public record FeatureResponse(
-            @JsonProperty("company_workbench_enabled") boolean companyWorkbenchEnabled
+            @JsonProperty("company_workbench_enabled") boolean companyWorkbenchEnabled,
+            @JsonProperty("company_style_upload_enabled") boolean companyStyleUploadEnabled,
+            @JsonProperty("company_logo_upload_enabled") boolean companyLogoUploadEnabled
     ) {
     }
 
@@ -40,6 +42,18 @@ public final class CompanyWorkbenchDtos {
             @JsonProperty("city_code") String cityCode,
             String address,
             @JsonProperty("company_profile") String companyProfile,
+            @JsonProperty("registered_capital_amount") String registeredCapitalAmount,
+            @JsonProperty("registered_capital_unit") String registeredCapitalUnit,
+            @JsonProperty("website_url") String websiteUrl,
+            @JsonProperty("benefit_codes") List<String> benefitCodes,
+            @JsonProperty("contact_name") String contactName,
+            @JsonProperty("contact_mobile") String contactMobile,
+            @JsonProperty("contact_mobile_hidden") boolean contactMobileHidden,
+            @JsonProperty("contact_wechat") String contactWechat,
+            @JsonProperty("contact_wechat_same_mobile") boolean contactWechatSameMobile,
+            @JsonProperty("contact_phone") String contactPhone,
+            @JsonProperty("contact_email") String contactEmail,
+            @JsonProperty("contact_qq") String contactQq,
             @JsonProperty("auth_status") int authStatus,
             @JsonProperty("reject_reason") String rejectReason,
             @JsonProperty("certification_material_summary") Map<String, Object> certificationMaterialSummary,
@@ -54,7 +68,19 @@ public final class CompanyWorkbenchDtos {
             @JsonProperty("scale_code") String scaleCode,
             @JsonProperty("city_code") String cityCode,
             String address,
-            @JsonProperty("company_profile") String companyProfile
+            @JsonProperty("company_profile") String companyProfile,
+            @JsonProperty("registered_capital_amount") String registeredCapitalAmount,
+            @JsonProperty("registered_capital_unit") String registeredCapitalUnit,
+            @JsonProperty("website_url") String websiteUrl,
+            @JsonProperty("benefit_codes") List<String> benefitCodes,
+            @JsonProperty("contact_name") String contactName,
+            @JsonProperty("contact_mobile") String contactMobile,
+            @JsonProperty("contact_mobile_hidden") Boolean contactMobileHidden,
+            @JsonProperty("contact_wechat") String contactWechat,
+            @JsonProperty("contact_wechat_same_mobile") Boolean contactWechatSameMobile,
+            @JsonProperty("contact_phone") String contactPhone,
+            @JsonProperty("contact_email") String contactEmail,
+            @JsonProperty("contact_qq") String contactQq
     ) {
     }
 
@@ -67,6 +93,18 @@ public final class CompanyWorkbenchDtos {
             @JsonProperty("city_code") String cityCode,
             String address,
             @JsonProperty("company_profile") String companyProfile,
+            @JsonProperty("registered_capital_amount") String registeredCapitalAmount,
+            @JsonProperty("registered_capital_unit") String registeredCapitalUnit,
+            @JsonProperty("website_url") String websiteUrl,
+            @JsonProperty("benefit_codes") List<String> benefitCodes,
+            @JsonProperty("contact_name") String contactName,
+            @JsonProperty("contact_mobile") String contactMobile,
+            @JsonProperty("contact_mobile_hidden") Boolean contactMobileHidden,
+            @JsonProperty("contact_wechat") String contactWechat,
+            @JsonProperty("contact_wechat_same_mobile") Boolean contactWechatSameMobile,
+            @JsonProperty("contact_phone") String contactPhone,
+            @JsonProperty("contact_email") String contactEmail,
+            @JsonProperty("contact_qq") String contactQq,
             @JsonProperty("certification_material_summary") Map<String, Object> certificationMaterialSummary
     ) {
     }
@@ -115,6 +153,55 @@ public final class CompanyWorkbenchDtos {
             @JsonProperty("session_name") String sessionName,
             @JsonProperty("session_time") LocalDateTime sessionTime,
             String location
+    ) {
+    }
+
+    public record CompanyStyleImagePageResponse(
+            @JsonProperty("image_list") List<CompanyStyleImageResponse> imageList,
+            long total
+    ) {
+    }
+
+    public record CompanyStyleImageResponse(
+            @JsonProperty("image_id") long imageId,
+            @JsonProperty("file_name") String fileName,
+            @JsonProperty("content_type") String contentType,
+            @JsonProperty("size_bytes") long sizeBytes,
+            @JsonProperty("display_order") int displayOrder,
+            int status,
+            @JsonProperty("review_status") int reviewStatus,
+            @JsonProperty("uploaded_at") LocalDateTime uploadedAt,
+            @JsonProperty("content_url") String contentUrl
+    ) {
+    }
+
+    public record CompanyStyleImageOrderRequest(
+            @JsonProperty("image_ids") List<Long> imageIds
+    ) {
+    }
+
+    public record CompanyStyleImageDownload(
+            String fileName,
+            String contentType,
+            byte[] content
+    ) {
+    }
+
+    public record CompanyLogoResponse(
+            @JsonProperty("has_logo") boolean hasLogo,
+            @JsonProperty("logo_status") String logoStatus,
+            @JsonProperty("file_name") String fileName,
+            @JsonProperty("content_type") String contentType,
+            @JsonProperty("size_bytes") Long sizeBytes,
+            @JsonProperty("uploaded_at") LocalDateTime uploadedAt,
+            @JsonProperty("content_url") String contentUrl
+    ) {
+    }
+
+    public record CompanyLogoDownload(
+            String fileName,
+            String contentType,
+            byte[] content
     ) {
     }
 }
