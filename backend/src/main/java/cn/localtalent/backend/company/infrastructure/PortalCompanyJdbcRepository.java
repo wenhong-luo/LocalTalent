@@ -50,7 +50,7 @@ public class PortalCompanyJdbcRepository {
         return jdbcTemplate.query(
                 "SELECT id, title, category_code, city_code, salary_min, salary_max, updated_at "
                         + "FROM job_post "
-                        + "WHERE company_id = ? AND status = 2 AND audit_status = 2 "
+                        + "WHERE company_id = ? AND deleted_at IS NULL AND status = 2 AND audit_status = 2 "
                         + "ORDER BY updated_at DESC, id DESC LIMIT ?",
                 (rs, rowNum) -> jobRow(rs),
                 companyId,
@@ -97,7 +97,7 @@ public class PortalCompanyJdbcRepository {
         return "SELECT c.id, c.company_name, c.city_code, c.industry_code, c.nature_code, c.scale_code, "
                 + "c.company_profile, c.updated_at, "
                 + "(SELECT COUNT(*) FROM job_post j "
-                + "WHERE j.company_id = c.id AND j.status = 2 AND j.audit_status = 2) AS open_job_count "
+                + "WHERE j.company_id = c.id AND j.deleted_at IS NULL AND j.status = 2 AND j.audit_status = 2) AS open_job_count "
                 + "FROM company c";
     }
 

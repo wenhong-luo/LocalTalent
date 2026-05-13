@@ -14,28 +14,36 @@ type ExpectedPositionPickerProps = {
   selectedPositions: string[];
   selectedCategoryCode?: string;
   onSave: (selection: { positions: string[]; categoryCode: string }) => void;
+  maxSelections?: number;
+  title?: string;
+  placeholder?: string;
+  searchPlaceholder?: string;
 };
 
 function selectionKey(selection: ExpectedPositionSelection): string {
   return `${selection.categoryCode}::${selection.groupName}::${selection.positionName}`;
 }
 
-function summarize(positions: string[]): string {
-  return positions.length > 0 ? positions.join('，') : '请选择期望职位，最多6个';
+function summarize(positions: string[], placeholder: string): string {
+  return positions.length > 0 ? positions.join('，') : placeholder;
 }
 
 export function ExpectedPositionPicker({
   selectedPositions,
   selectedCategoryCode = '',
-  onSave
+  onSave,
+  maxSelections = MAX_EXPECTED_POSITIONS,
+  title = '期望职位',
+  placeholder = '请选择期望职位，最多6个',
+  searchPlaceholder = '请输入职位类别关键词'
 }: ExpectedPositionPickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeCategoryCode, setActiveCategoryCode] = useState(EXPECTED_POSITION_CATEGORIES[0].code);
   const selectedPositionsKey = selectedPositions.join('|');
   const triggerLabel = selectedPositions.length > 0
-    ? `期望职位：${summarize(selectedPositions)}`
-    : '请选择期望职位，最多6个';
+    ? `${title}：${summarize(selectedPositions, placeholder)}`
+    : placeholder;
   const [draft, setDraft] = useState<ExpectedPositionSelection[]>(() =>
     normalizeExpectedPositionSelections(selectedPositions, selectedCategoryCode)
   );
@@ -103,7 +111,11 @@ export function ExpectedPositionPicker({
         return withoutSameCategoryUnlimited;
       }
 
-      if (withoutSameCategoryUnlimited.length >= MAX_EXPECTED_POSITIONS) {
+      if (maxSelections === 1) {
+        return [currentSelection];
+      }
+
+      if (withoutSameCategoryUnlimited.length >= maxSelections) {
         return withoutSameCategoryUnlimited;
       }
 
@@ -143,7 +155,7 @@ export function ExpectedPositionPicker({
         }}
       >
         <span className={selectedPositions.length > 0 ? styles.summary : styles.placeholder}>
-          {summarize(selectedPositions)}
+          {summarize(selectedPositions, placeholder)}
         </span>
         <span className={styles.chevron} aria-hidden="true">⌕</span>
       </button>
@@ -159,15 +171,15 @@ export function ExpectedPositionPicker({
           <section className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="expected-position-title">
             <header className={styles.header}>
               <div>
-                <h2 id="expected-position-title" className={styles.title}>期望职位</h2>
-                <p className={styles.hint}>最多选择{MAX_EXPECTED_POSITIONS}个</p>
+                <h2 id="expected-position-title" className={styles.title}>{title}</h2>
+                <p className={styles.hint}>最多选择{maxSelections}个</p>
               </div>
               <button className={styles.close} type="button" aria-label="关闭期望职位选择" onClick={closeAndReset}>×</button>
             </header>
             <div className={styles.body}>
               <div className={styles.selectedInput} aria-label="已选期望职位输入框" aria-live="polite">
                 <span className={draft.length > 0 ? styles.selectedInputText : styles.selectedInputPlaceholder}>
-                  {summarize(draft.map((item) => item.positionName))}
+                  {summarize(draft.map((item) => item.positionName), placeholder)}
                 </span>
                 {draft.length > 0 ? (
                   <button className={styles.clearButton} type="button" onClick={() => setDraft([])}>
@@ -180,7 +192,7 @@ export function ExpectedPositionPicker({
                   className={styles.search}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="请输入职位类别关键词"
+                  placeholder={searchPlaceholder}
                   aria-label="搜索期望职位"
                 />
                 <span className={styles.searchIcon} aria-hidden="true">⌕</span>
@@ -209,7 +221,7 @@ export function ExpectedPositionPicker({
                               const storedName = positionNameForStorage(group, position);
                               const key = `${activeCategory.code}::${group.name}::${storedName}`;
                               const checked = draft.some((item) => selectionKey(item) === key);
-                              const disabled = !checked && draft.length >= MAX_EXPECTED_POSITIONS;
+                              const disabled = !checked && draft.length >= maxSelections;
                               return (
                                 <label
                                   key={key}
@@ -237,7 +249,7 @@ export function ExpectedPositionPicker({
                 </div>
               </div>
               <div className={styles.selectedBar} aria-label="已选期望职位">
-                <span>已选 {draft.length}/{MAX_EXPECTED_POSITIONS}</span>
+                <span>已选 {draft.length}/{maxSelections}</span>
                 {draft.map((item) => (
                   <span className={styles.chip} key={selectionKey(item)}>
                     {item.positionName}

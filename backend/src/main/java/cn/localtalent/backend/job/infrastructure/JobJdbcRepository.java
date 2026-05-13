@@ -90,7 +90,7 @@ public class JobJdbcRepository {
 
     public List<JobPostRow> listByCompany(long companyId, int limit, int offset) {
         return jdbcTemplate.query(
-                baseSelect() + " WHERE j.company_id = ? ORDER BY j.updated_at DESC LIMIT ? OFFSET ?",
+                baseSelect() + " WHERE j.company_id = ? AND j.deleted_at IS NULL ORDER BY j.updated_at DESC LIMIT ? OFFSET ?",
                 (rs, rowNum) -> row(rs),
                 companyId,
                 limit,
@@ -99,7 +99,24 @@ public class JobJdbcRepository {
 
     public long countByCompany(long companyId) {
         Integer count = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM job_post WHERE company_id = ?",
+                "SELECT COUNT(*) FROM job_post WHERE company_id = ? AND deleted_at IS NULL",
+                Integer.class,
+                companyId);
+        return count == null ? 0 : count;
+    }
+
+    public List<JobPostRow> listDeletedByCompany(long companyId, int limit, int offset) {
+        return jdbcTemplate.query(
+                baseSelect() + " WHERE j.company_id = ? AND j.deleted_at IS NOT NULL ORDER BY j.deleted_at DESC LIMIT ? OFFSET ?",
+                (rs, rowNum) -> row(rs),
+                companyId,
+                limit,
+                offset);
+    }
+
+    public long countDeletedByCompany(long companyId) {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM job_post WHERE company_id = ? AND deleted_at IS NOT NULL",
                 Integer.class,
                 companyId);
         return count == null ? 0 : count;
@@ -116,7 +133,7 @@ public class JobJdbcRepository {
                         + "notify_enabled = ?, resume_subscription_enabled = ?, status = 1, audit_status = 1, "
                         + "review_memo = NULL, reject_reason = NULL, "
                         + "review_user_id = NULL, review_time = NULL, published_at = NULL, status_changed_at = CURRENT_TIMESTAMP "
-                        + "WHERE id = ?",
+                        + "WHERE id = ? AND deleted_at IS NULL",
                 request.title(),
                 request.jobNatureCode(),
                 request.categoryCode(),
@@ -153,15 +170,34 @@ public class JobJdbcRepository {
         jdbcTemplate.update(
                 "UPDATE job_post SET status = 1, audit_status = 1, review_memo = NULL, reject_reason = NULL, "
                         + "review_user_id = NULL, review_time = NULL, published_at = NULL, offline_reason = NULL, "
-                        + "status_changed_at = CURRENT_TIMESTAMP WHERE id = ?",
+                        + "status_changed_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL",
                 jobId);
     }
 
     public void offline(long jobId, String reason) {
         jdbcTemplate.update(
                 "UPDATE job_post SET status = 3, offline_reason = ?, published_at = NULL, "
-                        + "status_changed_at = CURRENT_TIMESTAMP WHERE id = ?",
+                        + "status_changed_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL",
                 reason,
+                jobId);
+    }
+
+    public void softDelete(long jobId, long deletedBy, String reason) {
+        jdbcTemplate.update(
+                "UPDATE job_post SET status = 3, published_at = NULL, deleted_at = COALESCE(deleted_at, CURRENT_TIMESTAMP), "
+                        + "deleted_by = COALESCE(deleted_by, ?), delete_reason = COALESCE(delete_reason, ?), "
+                        + "status_changed_at = CURRENT_TIMESTAMP WHERE id = ?",
+                deletedBy,
+                reason,
+                jobId);
+    }
+
+    public void restoreDraft(long jobId) {
+        jdbcTemplate.update(
+                "UPDATE job_post SET status = 1, audit_status = 1, review_memo = NULL, reject_reason = NULL, "
+                        + "review_user_id = NULL, review_time = NULL, published_at = NULL, offline_reason = NULL, "
+                        + "deleted_at = NULL, deleted_by = NULL, delete_reason = NULL, "
+                        + "status_changed_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NOT NULL",
                 jobId);
     }
 
@@ -171,7 +207,7 @@ public class JobJdbcRepository {
                         + "review_user_id = ?, review_time = CURRENT_TIMESTAMP, "
                         + "published_at = CASE WHEN ? = 2 THEN CURRENT_TIMESTAMP ELSE NULL END, "
                         + "offline_reason = CASE WHEN ? = 2 THEN NULL ELSE offline_reason END, "
-                        + "status_changed_at = CURRENT_TIMESTAMP WHERE id = ?",
+                        + "status_changed_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL",
                 auditStatus,
                 status,
                 memo,
@@ -185,13 +221,13 @@ public class JobJdbcRepository {
     public List<JobPostRow> listForReview(Integer auditStatus, int limit, int offset) {
         if (auditStatus == null) {
             return jdbcTemplate.query(
-                    baseSelect() + " ORDER BY j.updated_at DESC LIMIT ? OFFSET ?",
+                    baseSelect() + " WHERE j.deleted_at IS NULL ORDER BY j.updated_at DESC LIMIT ? OFFSET ?",
                     (rs, rowNum) -> row(rs),
                     limit,
                     offset);
         }
         return jdbcTemplate.query(
-                baseSelect() + " WHERE j.audit_status = ? ORDER BY j.updated_at DESC LIMIT ? OFFSET ?",
+                baseSelect() + " WHERE j.deleted_at IS NULL AND j.audit_status = ? ORDER BY j.updated_at DESC LIMIT ? OFFSET ?",
                 (rs, rowNum) -> row(rs),
                 auditStatus,
                 limit,
@@ -201,10 +237,10 @@ public class JobJdbcRepository {
     public long countForReview(Integer auditStatus) {
         Integer count;
         if (auditStatus == null) {
-            count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM job_post", Integer.class);
+            count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM job_post WHERE deleted_at IS NULL", Integer.class);
         } else {
             count = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM job_post WHERE audit_status = ?",
+                    "SELECT COUNT(*) FROM job_post WHERE deleted_at IS NULL AND audit_status = ?",
                     Integer.class,
                     auditStatus);
         }
@@ -230,7 +266,7 @@ public class JobJdbcRepository {
     public Optional<JobPostRow> findVisibleById(long jobId) {
         return jdbcTemplate.query(
                 baseSelect()
-                        + " WHERE j.id = ? AND j.status = 2 AND j.audit_status = 2 AND c.auth_status = 2 LIMIT 1",
+                        + " WHERE j.id = ? AND j.deleted_at IS NULL AND j.status = 2 AND j.audit_status = 2 AND c.auth_status = 2 LIMIT 1",
                 (rs, rowNum) -> row(rs),
                 jobId).stream().findFirst();
     }
@@ -240,7 +276,7 @@ public class JobJdbcRepository {
         if (countOnly) {
             sql.append("FROM job_post j JOIN company c ON c.id = j.company_id ");
         }
-        sql.append(" WHERE j.status = 2 AND j.audit_status = 2 AND c.auth_status = 2");
+        sql.append(" WHERE j.deleted_at IS NULL AND j.status = 2 AND j.audit_status = 2 AND c.auth_status = 2");
         List<Object> args = new ArrayList<>();
         if (criteria == null) {
             return new QueryParts(sql.toString(), args);
@@ -301,7 +337,8 @@ public class JobJdbcRepository {
                 + "j.contact_mode, j.contact_name, j.contact_mobile, j.contact_phone, j.contact_email, "
                 + "j.contact_wechat, j.contact_hidden, j.notify_enabled, j.resume_subscription_enabled, "
                 + "j.status, j.audit_status, j.review_memo, j.reject_reason, j.review_user_id, "
-                + "j.review_time, j.published_at, j.offline_reason, j.status_changed_at, j.updated_at "
+                + "j.review_time, j.published_at, j.offline_reason, j.status_changed_at, j.updated_at, "
+                + "j.deleted_at, j.deleted_by, j.delete_reason "
                 + "FROM job_post j JOIN company c ON c.id = j.company_id";
     }
 
@@ -349,7 +386,10 @@ public class JobJdbcRepository {
                 rs.getTimestamp("published_at") == null ? null : rs.getTimestamp("published_at").toLocalDateTime(),
                 rs.getString("offline_reason"),
                 rs.getTimestamp("status_changed_at") == null ? null : rs.getTimestamp("status_changed_at").toLocalDateTime(),
-                rs.getTimestamp("updated_at") == null ? null : rs.getTimestamp("updated_at").toLocalDateTime());
+                rs.getTimestamp("updated_at") == null ? null : rs.getTimestamp("updated_at").toLocalDateTime(),
+                rs.getTimestamp("deleted_at") == null ? null : rs.getTimestamp("deleted_at").toLocalDateTime(),
+                rs.getObject("deleted_by", Long.class),
+                rs.getString("delete_reason"));
     }
 
     private void setNullableInt(PreparedStatement statement, int parameterIndex, Integer value) throws SQLException {

@@ -16,7 +16,8 @@
 .utilityInner,
 .headerInner,
 .workspace {
-  width: min(1220px, calc(100vw - 32px));
+  width: calc(100vw - 48px);
+  max-width: none;
   margin: 0 auto;
 }
 
@@ -43,7 +44,7 @@
 
 .headerInner {
   display: grid;
-  grid-template-columns: minmax(220px, 300px) minmax(260px, 1fr) auto;
+  grid-template-columns: minmax(220px, 320px) minmax(420px, 1fr) auto;
   gap: 24px;
   align-items: center;
   padding: 28px 0;
@@ -108,7 +109,7 @@
 .workspace {
   display: grid;
   grid-template-columns: 232px minmax(0, 1fr);
-  gap: 20px;
+  gap: 24px;
   padding: 22px 0 42px;
 }
 
@@ -1298,6 +1299,137 @@
   padding: 18px;
 }
 
+.jobPublishForm {
+  display: grid;
+  gap: 16px;
+  margin: 14px 26px 22px;
+  border: 1px solid #dbe7f5;
+  border-radius: 12px;
+  background: #f7faff;
+  padding: 16px;
+}
+
+.jobPublishHeader,
+.jobPublishActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 16px 18px;
+}
+
+.jobPublishHeader h3 {
+  margin: 2px 0 6px;
+  font-size: 20px;
+}
+
+.jobPublishHeader span {
+  color: #64748b;
+}
+
+.jobPublishSection {
+  border: 1px solid #e5edf6;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.jobPublishSection h4 {
+  margin: 0 0 16px;
+  border-left: 4px solid #2563eb;
+  padding-left: 10px;
+  font-size: 17px;
+}
+
+.jobPublishGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+}
+
+.selectorField,
+.salaryField,
+.ageField {
+  display: grid;
+  gap: 7px;
+}
+
+.selectorLabel {
+  color: var(--lt-ink-muted);
+  font-weight: 800;
+}
+
+.salaryCustomRow,
+.ageSelectRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.salaryCustomRow input {
+  width: 104px;
+  border: 1px solid var(--lt-line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--lt-ink);
+}
+
+.salaryCustomRow input:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+.ageSelectRow > label {
+  min-width: 150px;
+}
+
+.jobFormTip {
+  margin: 8px 0 0;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.jobSwitchPanel {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 12px 14px;
+}
+
+.jobSwitchPanel p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.wechatNoticePlaceholder {
+  grid-column: 1 / -1;
+  border: 1px dashed #bfdbfe;
+  border-radius: 14px;
+  background: #eff6ff;
+  padding: 16px;
+  color: #1e3a8a;
+}
+
+.wechatNoticePlaceholder strong,
+.wechatNoticePlaceholder span {
+  display: block;
+}
+
+.wechatNoticePlaceholder span {
+  margin-top: 6px;
+  color: #475569;
+}
+
+.jobPublishActions {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .jobBulkBar {
   display: flex;
   align-items: center;
@@ -1330,7 +1462,7 @@
 
 .jobTable {
   width: 100%;
-  min-width: 1040px;
+  min-width: 980px;
   border-collapse: collapse;
 }
 
@@ -1515,6 +1647,12 @@
 }
 
 @media (max-width: 900px) {
+  .utilityInner,
+  .headerInner,
+  .workspace {
+    width: calc(100vw - 24px);
+  }
+
   .headerInner {
     grid-template-columns: 1fr;
   }

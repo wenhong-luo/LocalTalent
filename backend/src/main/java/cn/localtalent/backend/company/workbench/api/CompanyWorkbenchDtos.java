@@ -204,4 +204,14 @@ public final class CompanyWorkbenchDtos {
             byte[] content
     ) {
     }
+
+    public record JobDeleteRequest(
+            @JsonProperty("reason") String reason
+    ) {
+    }
+
+    public record JobRestoreRequest(
+            @JsonProperty("reason") String reason
+    ) {
+    }
 }

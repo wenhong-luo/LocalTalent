@@ -138,8 +138,14 @@ class MigrationTest {
                 "review_user_id",
                 "review_time",
                 "offline_reason",
-                "status_changed_at"));
-        assertIndexesExist(jdbcTemplate, "job_post", List.of("idx_job_post_publish_profile"));
+                "status_changed_at",
+                "deleted_at",
+                "deleted_by",
+                "delete_reason"));
+        assertIndexesExist(jdbcTemplate, "job_post", List.of(
+                "idx_job_post_publish_profile",
+                "idx_job_post_company_deleted_updated",
+                "idx_job_post_public_deleted_visible"));
         assertColumnsExist(jdbcTemplate, "interview_session", List.of(
                 "application_id",
                 "signin_code_hash",

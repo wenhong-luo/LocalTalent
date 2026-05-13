@@ -39,6 +39,8 @@ public record JobResponse(
         int status,
         @JsonProperty("audit_status") int auditStatus,
         @JsonProperty("reject_reason") String rejectReason,
-        @JsonProperty("updated_at") LocalDateTime updatedAt
+        @JsonProperty("updated_at") LocalDateTime updatedAt,
+        @JsonProperty("deleted_at") LocalDateTime deletedAt,
+        @JsonProperty("delete_reason") String deleteReason
 ) {
 }

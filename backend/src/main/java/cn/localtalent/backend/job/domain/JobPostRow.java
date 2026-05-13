@@ -46,6 +46,12 @@ public record JobPostRow(
         LocalDateTime publishedAt,
         String offlineReason,
         LocalDateTime statusChangedAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        LocalDateTime deletedAt,
+        Long deletedBy,
+        String deleteReason
 ) {
+    public boolean deleted() {
+        return deletedAt != null;
+    }
 }

@@ -27,6 +27,8 @@ import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.Company
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyProfileSaveRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.FeatureResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.InterviewSessionPageResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.JobDeleteRequest;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.JobRestoreRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.OverviewResponse;
 import cn.localtalent.backend.company.workbench.infrastructure.CompanyWorkbenchJdbcRepository;
 import cn.localtalent.backend.company.workbench.infrastructure.CompanyWorkbenchJdbcRepository.LogoRow;
@@ -70,6 +72,8 @@ public class CompanyWorkbenchService {
     private static final String JOB_UPDATE_API = "company.workbench.job.update";
     private static final String JOB_SUBMIT_REVIEW_API = "company.workbench.job.submit-review";
     private static final String JOB_OFFLINE_API = "company.workbench.job.offline";
+    private static final String JOB_DELETE_API = "company.workbench.job.delete";
+    private static final String JOB_RESTORE_DRAFT_API = "company.workbench.job.restore-draft";
     private static final String APPLICATION_STAGE_API = "company.workbench.application.stage";
     private static final String INTERVIEW_CREATE_API = "company.workbench.interview.create";
     private static final String EXPORT_APPLY_API = "company.workbench.export.apply";
@@ -284,6 +288,11 @@ public class CompanyWorkbenchService {
         return jobService.listCompanyJobs(page, size);
     }
 
+    public JobPageResponse deletedJobs(int page, int size) {
+        requireEnabled();
+        return jobService.listDeletedCompanyJobs(page, size);
+    }
+
     @Transactional
     public JobResponse createJob(JobCreateRequest request, String idempotencyKey) {
         AuthzPrincipal principal = requireCompany();
@@ -329,7 +338,7 @@ public class CompanyWorkbenchService {
         AuthzPrincipal principal = requireCompany();
         requireEnabled();
         if (repository.authStatus(principal.companyId()) != CompanyService.AUTH_APPROVED) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "AUTHZ_403", "company is not certified");
+            throw new ApiException(HttpStatus.FORBIDDEN, "AUTHZ_403", "企业认证通过后才能提交职位审核");
         }
         return idempotencyService.execute(
                 JOB_SUBMIT_REVIEW_API,
@@ -358,6 +367,40 @@ public class CompanyWorkbenchService {
                         jobService.changeCompanyStatus(jobId, new JobStatusRequest("offline", reason)),
                         "job_post",
                         jobId));
+    }
+
+    @Transactional
+    public Object deleteJob(long jobId, JobDeleteRequest request, String idempotencyKey) {
+        AuthzPrincipal principal = requireCompany();
+        requireEnabled();
+        String reason = normalizeNullable(request == null ? null : request.reason(), 500);
+        return idempotencyService.execute(
+                JOB_DELETE_API,
+                principal,
+                idempotencyKey,
+                Map.of("job_id", jobId, "action", "delete", "reason", reason == null ? "" : reason),
+                Object.class,
+                () -> new IdempotentActionResult<>(
+                        jobService.deleteCompanyJob(jobId, reason),
+                        "job_post",
+                        jobId));
+    }
+
+    @Transactional
+    public JobResponse restoreJobDraft(long jobId, JobRestoreRequest request, String idempotencyKey) {
+        AuthzPrincipal principal = requireCompany();
+        requireEnabled();
+        String reason = normalizeNullable(request == null ? null : request.reason(), 500);
+        return idempotencyService.execute(
+                JOB_RESTORE_DRAFT_API,
+                principal,
+                idempotencyKey,
+                Map.of("job_id", jobId, "action", "restore_draft", "reason", reason == null ? "" : reason),
+                JobResponse.class,
+                () -> {
+                    JobResponse response = jobService.restoreCompanyJobDraft(jobId, reason);
+                    return new IdempotentActionResult<>(response, "job_post", response.jobId());
+                });
     }
 
     public ApplicationPageResponse applications(Long jobId, Integer status, int page, int size) {

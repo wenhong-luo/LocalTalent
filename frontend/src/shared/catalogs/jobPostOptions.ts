@@ -39,3 +39,19 @@ export const jobContactModeOptions: CompanyProfileOption[] = [
   { value: 'custom', label: '使用本职位联系方式' },
   { value: 'hidden', label: '不公开联系方式' }
 ];
+
+export const jobSalaryPresetOptions: CompanyProfileOption[] = [
+  { value: 'custom', label: '自定义' },
+  { value: '1000-2000', label: '1000-2000' },
+  { value: '2000-3000', label: '2000-3000' },
+  { value: '3000-5000', label: '3000-5000' },
+  { value: '5000-8000', label: '5000-8000' },
+  { value: '8000-12000', label: '8000-12000' },
+  { value: '12000-15000', label: '12000-15000' },
+  { value: '15000+', label: '15000以上' }
+];
+
+export const jobAgeOptions: CompanyProfileOption[] = Array.from({ length: 49 }, (_, index) => {
+  const age = index + 16;
+  return { value: String(age), label: `${age}岁` };
+});

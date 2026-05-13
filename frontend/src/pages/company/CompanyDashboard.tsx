@@ -6,7 +6,8 @@ import { ReviewTable } from '@/components/backoffice/ReviewTable';
 import { RouteGuard, type GuardContext } from '@/components/backoffice/RouteGuard';
 import { StatusBadge, statusLabel } from '@/components/backoffice/StatusBadge';
 import { DictionaryMultiSelect, DictionarySelect, dictionaryOptionLabel } from '@/components/selectors/DictionarySelect';
-import { RegionCascadePicker } from '@/components/selectors/RegionCascadePicker';
+import { ExpectedPositionPicker } from '@/components/selectors/ExpectedPositionPicker';
+import { RegionCascadePicker, regionLabelForCode } from '@/components/selectors/RegionCascadePicker';
 import { useOutsidePointerDown } from '@/components/selectors/useOutsidePointerDown';
 import { StateView } from '@/components/StateView';
 import { isHttpClientError } from '@/lib/httpClient';
@@ -21,8 +22,10 @@ import {
   jobContactModeOptions,
   jobEducationOptions,
   jobExperienceOptions,
+  jobAgeOptions,
   jobNatureOptions,
-  jobRecruitmentTimeOptions
+  jobRecruitmentTimeOptions,
+  jobSalaryPresetOptions
 } from '@/shared/catalogs/jobPostOptions';
 import {
   applyCompanyExport,
@@ -32,6 +35,8 @@ import {
   createCompanyWorkbenchJob,
   deleteCompanyLogo,
   deleteCompanyStyleImage,
+  deleteCompanyWorkbenchJob,
+  fetchDeletedCompanyWorkbenchJobs,
   fetchCompanyApplications,
   fetchCompanyExportDetail,
   fetchCompanyJobs,
@@ -45,11 +50,13 @@ import {
   fetchCompanyWorkbenchOverview,
   issueCompanyExportDownloadUrl,
   offlineCompanyWorkbenchJob,
+  restoreCompanyWorkbenchJobDraft,
   saveCompanyWorkbenchProfile,
   saveCompanyStyleImageOrder,
   submitCompanyApply,
   submitCompanyWorkbenchCertification,
   submitCompanyWorkbenchJobReview,
+  updateCompanyWorkbenchJob,
   uploadCompanyLogo,
   uploadCompanyStyleImage,
   type CompanyApplication,
@@ -66,7 +73,7 @@ import styles from './CompanyDashboard.module.css';
 
 type LoadStatus = 'loading' | 'ready' | 'error' | 'retrying';
 type WorkbenchMode = 'unknown' | 'enabled' | 'disabled';
-type JobTab = 'published' | 'reviewing' | 'offline';
+type JobTab = 'published' | 'reviewing' | 'offline' | 'deleted';
 type CompanySection =
   | 'home'
   | 'jobs'
@@ -118,7 +125,8 @@ const secondaryButtonStyle: CSSProperties = {
 const jobTabs: Array<{ id: JobTab; label: string; hint: string }> = [
   { id: 'published', label: '发布中', hint: '在线且审核通过' },
   { id: 'reviewing', label: '审核中', hint: '草稿、待审核或驳回' },
-  { id: 'offline', label: '已下线', hint: '企业主动关闭' }
+  { id: 'offline', label: '已下线', hint: '企业主动关闭' },
+  { id: 'deleted', label: '已删除', hint: '回收站职位' }
 ];
 
 function Field({
@@ -293,6 +301,9 @@ function isBasicProfileComplete(profile: CompanyWorkbenchOverview['profile'] | n
 }
 
 function jobMatchesTab(job: CompanyJob, tab: JobTab): boolean {
+  if (tab === 'deleted') {
+    return Boolean(job.deleted_at);
+  }
   if (tab === 'published') {
     return job.status === 2 && job.audit_status === 2;
   }
@@ -319,6 +330,17 @@ function optionalNumber(value: string): number | undefined {
   }
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function salaryPresetFromRange(min: number | null, max: number | null, negotiable: boolean): string {
+  if (negotiable) {
+    return 'custom';
+  }
+  if (min == null || max == null) {
+    return 'custom';
+  }
+  const preset = `${min}-${max}`;
+  return jobSalaryPresetOptions.some((option) => option.value === preset) ? preset : 'custom';
 }
 
 export function CompanyDashboard() {
@@ -364,6 +386,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   const [jobSalaryMin, setJobSalaryMin] = useState('12000');
   const [jobSalaryMax, setJobSalaryMax] = useState('22000');
   const [jobSalaryNegotiable, setJobSalaryNegotiable] = useState(false);
+  const [jobSalaryPreset, setJobSalaryPreset] = useState('custom');
   const [jobWelfareCodes, setJobWelfareCodes] = useState<string[]>(['five_insurance', 'weekend_double']);
   const [jobDepartmentName, setJobDepartmentName] = useState('招聘运营部');
   const [jobAgeMin, setJobAgeMin] = useState('');
@@ -388,11 +411,13 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   const [jobTab, setJobTab] = useState<JobTab>('published');
   const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
   const [showJobCreateForm, setShowJobCreateForm] = useState(false);
+  const [editingJobId, setEditingJobId] = useState<number | null>(null);
 
   const [workbenchMode, setWorkbenchMode] = useState<WorkbenchMode>('unknown');
   const [overview, setOverview] = useState<CompanyWorkbenchOverview | null>(null);
   const [companyStatus, setCompanyStatus] = useState<CompanyStatus | null>(null);
   const [jobs, setJobs] = useState<CompanyJob[]>([]);
+  const [deletedJobs, setDeletedJobs] = useState<CompanyJob[]>([]);
   const [legacyApplications, setLegacyApplications] = useState<CompanyApplication[]>([]);
   const [workbenchApplications, setWorkbenchApplications] = useState<CompanyWorkbenchApplication[]>([]);
   const [interviewSessions, setInterviewSessions] = useState<CompanyInterviewSession[]>([]);
@@ -406,6 +431,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   const [status, setStatus] = useState<LoadStatus>('loading');
   const [message, setMessage] = useState('正在读取企业后台数据。');
   const [traceId, setTraceId] = useState<string>();
+  const [jobOperationNotice, setJobOperationNotice] = useState('');
 
   async function loadLegacy() {
     const [jobResult, applicationResult] = await Promise.all([
@@ -413,6 +439,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
       fetchCompanyApplications(context.token)
     ]);
     setJobs(jobResult.data.job_list);
+    setDeletedJobs([]);
     setLegacyApplications(applicationResult.data.application_list);
     setWorkbenchApplications([]);
     setInterviewSessions([]);
@@ -421,8 +448,9 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
 
   async function loadWorkbench() {
     const overviewResult = await fetchCompanyWorkbenchOverview(context.token);
-    const [jobResult, applicationResult, sessionResult] = await Promise.all([
+    const [jobResult, deletedJobResult, applicationResult, sessionResult] = await Promise.all([
       fetchCompanyWorkbenchJobs(context.token),
+      fetchDeletedCompanyWorkbenchJobs(context.token),
       fetchCompanyWorkbenchApplications(context.token),
       fetchCompanyWorkbenchInterviewSessions(context.token)
     ]);
@@ -454,11 +482,12 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     setContactEmail(profile.contact_email || '');
     setContactQq(profile.contact_qq || '');
     setJobs(jobResult.data.job_list);
+    setDeletedJobs(deletedJobResult.data.job_list);
     setWorkbenchApplications(applicationResult.data.application_list);
     setInterviewSessions(sessionResult.data.session_list);
     setLegacyApplications([]);
     setWorkbenchMode('enabled');
-    setTraceId(sessionResult.traceId || applicationResult.traceId || jobResult.traceId || overviewResult.traceId);
+    setTraceId(sessionResult.traceId || applicationResult.traceId || deletedJobResult.traceId || jobResult.traceId || overviewResult.traceId);
     if (overviewResult.data.features.company_logo_upload_enabled) {
       await loadCompanyLogo();
     } else {
@@ -575,19 +604,24 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   }, [activeSection, overview, workbenchMode]);
 
   useEffect(() => {
-    setSelectedJobIds((current) => current.filter((jobId) => jobs.some((job) => job.job_id === jobId)));
-  }, [jobs]);
+    setSelectedJobIds((current) => current.filter((jobId) => {
+      const source = jobTab === 'deleted' ? deletedJobs : jobs;
+      return source.some((job) => job.job_id === jobId);
+    }));
+  }, [deletedJobs, jobTab, jobs]);
 
-  async function runAction(description: string, action: () => Promise<void>) {
+  async function runAction(description: string, action: () => Promise<void>): Promise<boolean> {
     setStatus('retrying');
     setMessage(description);
     try {
       await action();
       await load();
+      return true;
     } catch (error) {
       setStatus('error');
       setTraceId(isHttpClientError(error) ? error.traceId : undefined);
       setMessage(errorMessage(error, description));
+      return false;
     }
   }
 
@@ -781,6 +815,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   }
 
   function loadJobIntoForm(job: CompanyJob) {
+    setEditingJobId(job.job_id);
     setJobTitle(job.title);
     setJobNatureCode(job.job_nature_code || 'full_time');
     setJobCategoryCode(job.category_code || 'software');
@@ -794,6 +829,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     setJobSalaryMin(job.salary_min == null ? '' : String(job.salary_min));
     setJobSalaryMax(job.salary_max == null ? '' : String(job.salary_max));
     setJobSalaryNegotiable(job.salary_negotiable);
+    setJobSalaryPreset(salaryPresetFromRange(job.salary_min, job.salary_max, job.salary_negotiable));
     setJobWelfareCodes(job.welfare_codes ?? []);
     setJobDepartmentName(job.department_name || '');
     setJobAgeMin(job.age_min == null ? '' : String(job.age_min));
@@ -812,21 +848,81 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     setJobDesc(job.job_desc || jobDesc);
   }
 
-  async function onCreateJob(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    await runAction('正在创建企业职位草稿。', async () => {
-      await createCompanyWorkbenchJob(context.token, jobPayload());
+  function resetJobDraft() {
+    setEditingJobId(null);
+    setJobTitle('三期招聘顾问');
+    setJobNatureCode('full_time');
+    setJobCategoryCode('software');
+    setJobCategoryName('互联网/电子商务');
+    setJobExperienceCode('1_3_years');
+    setJobEducationCode('college');
+    setJobRecruitCount('3');
+    setJobCityCode('310000');
+    setJobWorkRegionPath('上海 / 上海市 / 浦东新区');
+    setJobAddress('上海市浦东新区演示大道 100 号');
+    setJobSalaryMin('12000');
+    setJobSalaryMax('22000');
+    setJobSalaryNegotiable(false);
+    setJobSalaryPreset('custom');
+    setJobWelfareCodes(['five_insurance', 'weekend_double']);
+    setJobDepartmentName('招聘运营部');
+    setJobAgeMin('');
+    setJobAgeMax('');
+    setJobAgeUnlimited(true);
+    setJobRecruitmentTimeCode('long_term');
+    setJobContactMode('company_profile');
+    setJobContactName('');
+    setJobContactMobile('');
+    setJobContactPhone('');
+    setJobContactEmail('');
+    setJobContactWechat('');
+    setJobContactHidden(true);
+    setJobNotifyEnabled(false);
+    setJobResumeSubscriptionEnabled(false);
+    setJobDesc('负责本地人才服务平台灰度试运营支持。');
+  }
+
+  async function saveJob({ submitReview }: { submitReview: boolean }) {
+    let savedJobId: number | null = null;
+    const succeeded = await runAction(submitReview ? '正在保存并提交职位审核。' : '正在保存企业职位草稿。', async () => {
+      const result = editingJobId
+        ? await updateCompanyWorkbenchJob(context.token, editingJobId, jobPayload())
+        : await createCompanyWorkbenchJob(context.token, jobPayload());
+      savedJobId = result.data.job_id;
+      setTraceId(result.traceId);
+      if (submitReview && result.data.job_id) {
+        const reviewResult = await submitCompanyWorkbenchJobReview(context.token, result.data.job_id);
+        savedJobId = reviewResult.data.job_id;
+        setTraceId(reviewResult.traceId || result.traceId);
+      }
     });
-    setJobTab('reviewing');
+    if (!succeeded) {
+      return;
+    }
+    if (savedJobId) {
+      setEditingJobId(savedJobId);
+    }
+    setJobTab(submitReview ? 'reviewing' : 'reviewing');
+    setJobOperationNotice(submitReview ? '职位已提交审核，审核通过后将上线。' : '职位草稿已保存，提交审核通过后才会公开展示。');
+  }
+
+  async function onSaveJobDraft(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await saveJob({ submitReview: false });
   }
 
   async function onSubmitJobReview(jobId: number) {
     if (!jobId) {
       return;
     }
-    await runAction('正在提交职位审核。', async () => {
+    const succeeded = await runAction('正在提交职位审核。', async () => {
       await submitCompanyWorkbenchJobReview(context.token, jobId);
     });
+    if (!succeeded) {
+      return;
+    }
+    setJobTab('reviewing');
+    setJobOperationNotice('职位已重新提交审核，审核通过后将上线。');
   }
 
   async function onOfflineJob(jobId: number) {
@@ -855,8 +951,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     await onOfflineJob(firstJob.job_id);
   }
 
-  async function onOfflineSelectedJobs() {
-    const jobIds = selectedJobIds.filter((jobId) => jobs.some((job) => job.job_id === jobId));
+  async function onOfflineSelectedJobs(jobIds: number[]) {
     if (jobIds.length === 0) {
       return;
     }
@@ -867,6 +962,64 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     });
     setSelectedJobIds([]);
     setJobTab('offline');
+  }
+
+  async function onDeleteJob(jobId: number) {
+    if (!jobId) {
+      return;
+    }
+    if (!window.confirm('确认删除该职位？删除后将不在职位列表和公开门户展示，历史投递、面试和审计记录会保留。')) {
+      return;
+    }
+    await runAction('正在删除职位。', async () => {
+      await deleteCompanyWorkbenchJob(context.token, jobId, '企业工作台软删除职位。');
+    });
+    setSelectedJobIds((current) => current.filter((id) => id !== jobId));
+  }
+
+  async function onDeleteSelectedJobs(jobIds: number[]) {
+    if (jobIds.length === 0) {
+      return;
+    }
+    if (!window.confirm(`确认删除已选 ${jobIds.length} 个职位？删除后默认不在企业列表和公开门户展示。`)) {
+      return;
+    }
+    await runAction('正在批量删除所选职位。', async () => {
+      for (const jobId of jobIds) {
+        await deleteCompanyWorkbenchJob(context.token, jobId, '企业工作台批量软删除职位。');
+      }
+    });
+    setSelectedJobIds([]);
+  }
+
+  async function onRestoreJobDraft(jobId: number) {
+    if (!jobId) {
+      return;
+    }
+    if (!window.confirm('确认恢复该职位为草稿？恢复后需要重新提交审核，审核通过前不会公开展示。')) {
+      return;
+    }
+    await runAction('正在恢复职位为草稿。', async () => {
+      await restoreCompanyWorkbenchJobDraft(context.token, jobId, '企业工作台从回收站恢复为草稿。');
+    });
+    setSelectedJobIds((current) => current.filter((id) => id !== jobId));
+    setJobTab('reviewing');
+  }
+
+  async function onRestoreSelectedJobs(jobIds: number[]) {
+    if (jobIds.length === 0) {
+      return;
+    }
+    if (!window.confirm(`确认恢复已选 ${jobIds.length} 个职位为草稿？恢复后仍需重新提交审核。`)) {
+      return;
+    }
+    await runAction('正在批量恢复职位为草稿。', async () => {
+      for (const jobId of jobIds) {
+        await restoreCompanyWorkbenchJobDraft(context.token, jobId, '企业工作台批量从回收站恢复为草稿。');
+      }
+    });
+    setSelectedJobIds([]);
+    setJobTab('reviewing');
   }
 
   async function onChangeFirstApplicationStage() {
@@ -1584,7 +1737,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
       );
     }
 
-    const visibleJobs = jobs.filter((job) => jobMatchesTab(job, jobTab));
+    const visibleJobs = jobTab === 'deleted' ? deletedJobs : jobs.filter((job) => jobMatchesTab(job, jobTab));
     const selectedVisibleIds = visibleJobs.filter((job) => selectedJobIds.includes(job.job_id)).map((job) => job.job_id);
     const allVisibleSelected = visibleJobs.length > 0 && selectedVisibleIds.length === visibleJobs.length;
     const publishedCount = jobs.filter((job) => jobMatchesTab(job, 'published')).length;
@@ -1593,7 +1746,8 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     const tabCounts: Record<JobTab, number> = {
       published: publishedCount,
       reviewing: reviewingCount,
-      offline: offlineCount
+      offline: offlineCount,
+      deleted: deletedJobs.length
     };
     const guardedJobTotal = publishedCount + reviewingCount;
 
@@ -1623,6 +1777,16 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
       });
     }
 
+    const companyCanSubmitJobReview = overview?.profile.auth_status === 2;
+
+    function canSubmitJobReview(job: CompanyJob): boolean {
+      return companyCanSubmitJobReview && !(job.status === 2 && job.audit_status === 2) && job.audit_status !== 1;
+    }
+
+    function submitReviewButtonLabel(job: CompanyJob): string {
+      return job.status === 3 ? '重新提交审核' : '提交审核';
+    }
+
     return (
       <section className={`${styles.card} ${styles.jobManagementCard}`}>
         <div className={styles.jobToolbar}>
@@ -1634,7 +1798,15 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
           <button
             type="button"
             className={styles.primaryButton}
-            onClick={() => setShowJobCreateForm((value) => !value)}
+            onClick={() => {
+              if (showJobCreateForm) {
+                setShowJobCreateForm(false);
+                resetJobDraft();
+                return;
+              }
+              resetJobDraft();
+              setShowJobCreateForm(true);
+            }}
           >
             + 发布职位
           </button>
@@ -1651,6 +1823,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
               onClick={() => {
                 setJobTab(tab.id);
                 setSelectedJobIds([]);
+                setJobOperationNotice('');
               }}
             >
               <strong>{tab.label}</strong>
@@ -1665,52 +1838,227 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
           <span>现已占用 {guardedJobTotal} 个名额（包含审核中和未通过职位）；本提示仅为灰度演示，不产生真实套餐权益。</span>
         </div>
 
+        {!companyCanSubmitJobReview ? (
+          <div className={styles.noticeBar}>
+            企业认证通过后才能提交职位审核。你仍可以保存草稿、编辑职位、下线或删除本企业职位。
+          </div>
+        ) : null}
+
+        {jobTab === 'offline' && companyCanSubmitJobReview ? (
+          <div className={styles.noticeBar}>
+            下线职位需要重新提交审核，审核通过后才会重新公开展示。
+          </div>
+        ) : null}
+
+        {jobOperationNotice ? (
+          <div className={styles.noticeBar}>{jobOperationNotice}</div>
+        ) : null}
+
         {showJobCreateForm ? (
-          <form onSubmit={onCreateJob} className={`${styles.formGrid} ${styles.jobQuickForm}`}>
-            <div className={styles.formWide}>
-              <div className={styles.cardTitle}>
-                <h3>发布职位（基础草稿）</h3>
-                <button type="button" className={styles.plainButton} onClick={() => setShowJobCreateForm(false)}>收起</button>
+          <form onSubmit={onSaveJobDraft} className={styles.jobPublishForm}>
+            <div className={styles.jobPublishHeader}>
+              <div>
+                <p className={styles.eyebrow}>发布职位</p>
+                <h3>{editingJobId ? '编辑职位' : '发布职位'}</h3>
+                <span>完整字段会保存到数据库；提交审核后仍由服务端状态机决定是否公开。</span>
               </div>
-              <p className={styles.muted}>职位字段会保存到数据库；地图标注、AI 生成、职位推广和短信微信通知仍为占位或站内配置。</p>
+              <button
+                type="button"
+                className={styles.plainButton}
+                onClick={() => {
+                  setShowJobCreateForm(false);
+                  resetJobDraft();
+                }}
+              >
+                收起
+              </button>
             </div>
-            <Field label="职位标题" value={jobTitle} onChange={setJobTitle} />
-            <DictionarySelect label="职位性质" value={jobNatureCode} options={jobNatureOptions} onChange={setJobNatureCode} />
-            <Field label="职类代码" value={jobCategoryCode} onChange={setJobCategoryCode} />
-            <Field label="职位类别名称" value={jobCategoryName} onChange={setJobCategoryName} />
-            <DictionarySelect label="经验要求" value={jobExperienceCode} options={jobExperienceOptions} onChange={setJobExperienceCode} />
-            <DictionarySelect label="学历要求" value={jobEducationCode} options={jobEducationOptions} onChange={setJobEducationCode} />
-            <Field label="招聘人数" value={jobRecruitCount} onChange={setJobRecruitCount} />
-            <Field label="城市代码" value={jobCityCode} onChange={setJobCityCode} />
-            <Field label="工作地区" value={jobWorkRegionPath} onChange={setJobWorkRegionPath} />
-            <Field label="详细地址" value={jobAddress} onChange={setJobAddress} />
-            <Field label="最低薪资" value={jobSalaryMin} onChange={setJobSalaryMin} />
-            <Field label="最高薪资" value={jobSalaryMax} onChange={setJobSalaryMax} />
-            <CheckboxField label="薪资面议" checked={jobSalaryNegotiable} onChange={setJobSalaryNegotiable} />
-            <DictionaryMultiSelect label="岗位福利" values={jobWelfareCodes} options={companyBenefitOptions} onChange={setJobWelfareCodes} max={10} />
-            <Field label="所属部门" value={jobDepartmentName} onChange={setJobDepartmentName} />
-            <Field label="最低年龄" value={jobAgeMin} onChange={setJobAgeMin} />
-            <Field label="最高年龄" value={jobAgeMax} onChange={setJobAgeMax} />
-            <CheckboxField label="年龄不限" checked={jobAgeUnlimited} onChange={setJobAgeUnlimited} />
-            <DictionarySelect label="招聘时间" value={jobRecruitmentTimeCode} options={jobRecruitmentTimeOptions} onChange={setJobRecruitmentTimeCode} />
-            <DictionarySelect label="联系方式配置" value={jobContactMode} options={jobContactModeOptions} onChange={setJobContactMode} />
-            <Field label="联系人" value={jobContactName} onChange={setJobContactName} />
-            <Field label="联系手机" value={jobContactMobile} onChange={setJobContactMobile} />
-            <Field label="联系固话" value={jobContactPhone} onChange={setJobContactPhone} />
-            <Field label="联系邮箱" value={jobContactEmail} onChange={setJobContactEmail} />
-            <Field label="联系微信" value={jobContactWechat} onChange={setJobContactWechat} />
-            <CheckboxField label="联系方式保密" checked={jobContactHidden} onChange={setJobContactHidden} />
-            <CheckboxField label="站内接收通知" checked={jobNotifyEnabled} onChange={setJobNotifyEnabled} />
-            <CheckboxField label="开启简历订阅（站内配置）" checked={jobResumeSubscriptionEnabled} onChange={setJobResumeSubscriptionEnabled} />
-            <div className={styles.formWide}>
-              <TextAreaField label="职位描述" value={jobDesc} onChange={setJobDesc} rows={3} />
-            </div>
-            <div className={styles.formWide}>
-              <div className={styles.actionRow}>
-                <button type="submit" className={styles.primaryButton}>创建职位草稿</button>
-                <button type="button" className={styles.secondaryButton} onClick={() => void onSubmitFirstJobReview()} disabled={jobs.length === 0}>提交首个职位审核</button>
-                <button type="button" className={styles.plainButton} onClick={() => void onOfflineFirstJob()} disabled={jobs.length === 0}>下线首个职位</button>
+
+            <section className={styles.jobPublishSection}>
+              <h4>基本信息</h4>
+              <div className={styles.jobPublishGrid}>
+                <Field label="职位名称 *" value={jobTitle} onChange={setJobTitle} placeholder="请输入职位名称" />
+                <DictionarySelect label="职位性质 *" value={jobNatureCode} options={jobNatureOptions} onChange={setJobNatureCode} />
+                <label className={styles.selectorField}>
+                  <span className={styles.selectorLabel}>职位类别 *</span>
+                  <ExpectedPositionPicker
+                    title="职位类别"
+                    placeholder="请选择职位类别"
+                    searchPlaceholder="请输入职位类别关键词"
+                    maxSelections={1}
+                    selectedPositions={jobCategoryName ? [jobCategoryName] : []}
+                    selectedCategoryCode={jobCategoryCode}
+                    onSave={({ positions, categoryCode }) => {
+                      setJobCategoryName(positions[0] ?? '');
+                      setJobCategoryCode(categoryCode);
+                    }}
+                  />
+                </label>
+                <DictionarySelect label="经验要求 *" value={jobExperienceCode} options={jobExperienceOptions} onChange={setJobExperienceCode} />
+                <DictionarySelect label="学历要求 *" value={jobEducationCode} options={jobEducationOptions} onChange={setJobEducationCode} />
+                <Field label="招聘人数 *" value={jobRecruitCount} onChange={setJobRecruitCount} placeholder="请输入招聘人数" />
+                <div className={styles.salaryField}>
+                  <DictionarySelect
+                    label="薪资待遇 *"
+                    value={jobSalaryPreset}
+                    options={jobSalaryPresetOptions}
+                    onChange={(value) => {
+                      setJobSalaryPreset(value);
+                      setJobSalaryNegotiable(false);
+                      if (value === 'custom') {
+                        return;
+                      }
+                      if (value === '15000+') {
+                        setJobSalaryMin('15000');
+                        setJobSalaryMax('');
+                        return;
+                      }
+                      const [min, max] = value.split('-');
+                      setJobSalaryMin(min ?? '');
+                      setJobSalaryMax(max ?? '');
+                    }}
+                  />
+                  <div className={styles.salaryCustomRow}>
+                    <input
+                      aria-label="最低薪资"
+                      value={jobSalaryMin}
+                      disabled={jobSalaryNegotiable}
+                      onChange={(event) => {
+                        setJobSalaryPreset('custom');
+                        setJobSalaryMin(event.target.value);
+                      }}
+                      placeholder="最低"
+                    />
+                    <span>-</span>
+                    <input
+                      aria-label="最高薪资"
+                      value={jobSalaryMax}
+                      disabled={jobSalaryNegotiable}
+                      onChange={(event) => {
+                        setJobSalaryPreset('custom');
+                        setJobSalaryMax(event.target.value);
+                      }}
+                      placeholder="最高"
+                    />
+                    <CheckboxField
+                      label="不限/面议"
+                      checked={jobSalaryNegotiable}
+                      onChange={(checked) => {
+                        setJobSalaryNegotiable(checked);
+                        if (checked) {
+                          setJobSalaryPreset('custom');
+                          setJobSalaryMin('');
+                          setJobSalaryMax('');
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+                <RegionCascadePicker
+                  mode="single"
+                  label="工作地区 *"
+                  value={jobCityCode}
+                  onChange={(code) => {
+                    setJobCityCode(code);
+                    setJobWorkRegionPath(regionLabelForCode(code, ''));
+                  }}
+                  dialogLabel="工作地区选择"
+                />
+                <div className={styles.addressWithMap}>
+                  <Field label="详细地址" value={jobAddress} onChange={setJobAddress} placeholder="请填写详细地址" />
+                  <button type="button" className={styles.mapPlaceholderButton} disabled>标注（地图占位）</button>
+                </div>
+                <div className={styles.formWide}>
+                  <TextAreaField label="职位描述 *" value={jobDesc} onChange={setJobDesc} rows={5} />
+                  <p className={styles.jobFormTip}>禁止填写歧视、面议、虚假、收费类信息。</p>
+                  <button type="button" className={styles.aiPlaceholderButton} disabled>AI一键生成（占位）</button>
+                </div>
               </div>
+            </section>
+
+            <section className={styles.jobPublishSection}>
+              <h4>其他信息</h4>
+              <div className={styles.jobPublishGrid}>
+                <div className={styles.formWide}>
+                  <DictionaryMultiSelect label="岗位福利" values={jobWelfareCodes} options={companyBenefitOptions} onChange={setJobWelfareCodes} max={18} />
+                </div>
+                <Field label="部门" value={jobDepartmentName} onChange={setJobDepartmentName} placeholder="请填写部门" />
+                <div className={styles.ageField}>
+                  <span className={styles.selectorLabel}>年龄要求</span>
+                  <div className={styles.ageSelectRow}>
+                    <DictionarySelect label="最低年龄" value={jobAgeMin} options={jobAgeOptions} onChange={(value) => {
+                      setJobAgeUnlimited(false);
+                      setJobAgeMin(value);
+                    }} />
+                    <span>-</span>
+                    <DictionarySelect label="最高年龄" value={jobAgeMax} options={jobAgeOptions} onChange={(value) => {
+                      setJobAgeUnlimited(false);
+                      setJobAgeMax(value);
+                    }} />
+                    <CheckboxField label="不限" checked={jobAgeUnlimited} onChange={(checked) => {
+                      setJobAgeUnlimited(checked);
+                      if (checked) {
+                        setJobAgeMin('');
+                        setJobAgeMax('');
+                      }
+                    }} />
+                  </div>
+                </div>
+                <DictionarySelect label="招聘时间" value={jobRecruitmentTimeCode} options={jobRecruitmentTimeOptions} onChange={setJobRecruitmentTimeCode} />
+              </div>
+            </section>
+
+            <section className={styles.jobPublishSection}>
+              <h4>联系方式</h4>
+              <div className={styles.jobPublishGrid}>
+                <DictionarySelect label="联系方式" value={jobContactMode} options={jobContactModeOptions} onChange={setJobContactMode} />
+                <div className={styles.formWide}>
+                  <CheckboxField label="联系方式保密（不想受到骚扰）" checked={jobContactHidden} onChange={setJobContactHidden} />
+                </div>
+                {jobContactMode === 'custom' ? (
+                  <>
+                    <Field label="联系人" value={jobContactName} onChange={setJobContactName} placeholder="请输入联系人" />
+                    <Field label="联系手机" value={jobContactMobile} onChange={setJobContactMobile} placeholder="请输入联系手机" />
+                    <Field label="联系固话" value={jobContactPhone} onChange={setJobContactPhone} placeholder="如 021-88889999" />
+                    <Field label="联系邮箱" value={jobContactEmail} onChange={setJobContactEmail} placeholder="hr@example.com" />
+                    <Field label="联系微信" value={jobContactWechat} onChange={setJobContactWechat} placeholder="请输入联系微信" />
+                  </>
+                ) : (
+                  <div className={styles.formWide}>
+                    <p className={styles.jobFormTip}>
+                      {jobContactMode === 'hidden'
+                        ? '本职位不公开联系方式，候选人仅可通过站内流程投递。'
+                        : '默认使用企业管理 > 基本资料中的联系方式；公开职位仍不展示企业内部联系方式。'}
+                    </p>
+                  </div>
+                )}
+                <div className={styles.jobSwitchPanel}>
+                  <CheckboxField label="接收通知（站内配置）" checked={jobNotifyEnabled} onChange={setJobNotifyEnabled} />
+                  <p>联系手机接收投递通知为占位说明，不接真实短信、微信、小程序或 App。</p>
+                </div>
+                <div className={styles.jobSwitchPanel}>
+                  <CheckboxField label="简历订阅（站内配置）" checked={jobResumeSubscriptionEnabled} onChange={setJobResumeSubscriptionEnabled} />
+                  <p>精准推送优质人才暂为站内配置，不开放搜索简历、联系解锁或公共简历库。</p>
+                </div>
+                <div className={styles.wechatNoticePlaceholder}>
+                  <strong>公众号通知占位</strong>
+                  <span>随时接收简历投递通知的真实微信/小程序/App 能力暂未接入。</span>
+                </div>
+              </div>
+            </section>
+
+            <div className={styles.jobPublishActions}>
+              <button type="submit" className={styles.secondaryButton}>保存草稿</button>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                onClick={() => void saveJob({ submitReview: true })}
+                disabled={!companyCanSubmitJobReview}
+                title={companyCanSubmitJobReview ? undefined : '企业认证通过后才能提交职位审核'}
+              >
+                发布职位（提交审核）
+              </button>
+              <button type="button" className={styles.plainButton} onClick={() => void onOfflineFirstJob()} disabled={jobs.length === 0}>下线首个职位</button>
             </div>
           </form>
         ) : null}
@@ -1726,10 +2074,19 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
             <span>已选 {selectedVisibleIds.length} 项</span>
           </label>
           <div>
-            <button type="button" className={styles.plainButton} disabled>刷新职位（占位）</button>
-            <button type="button" className={styles.plainButton} disabled>订阅简历（占位）</button>
-            <button type="button" className={styles.secondaryButton} onClick={() => void onOfflineSelectedJobs()} disabled={selectedVisibleIds.length === 0}>关闭所选</button>
-            <button type="button" className={styles.plainButton} disabled>删除职位（占位）</button>
+            {jobTab === 'deleted' ? (
+              <>
+                <button type="button" className={styles.secondaryButton} onClick={() => void onRestoreSelectedJobs(selectedVisibleIds)} disabled={selectedVisibleIds.length === 0}>恢复为草稿</button>
+                <button type="button" className={styles.plainButton} disabled>永久删除（禁止）</button>
+              </>
+            ) : (
+              <>
+                <button type="button" className={styles.plainButton} disabled>刷新职位（占位）</button>
+                <button type="button" className={styles.plainButton} disabled>订阅简历（占位）</button>
+                <button type="button" className={styles.secondaryButton} onClick={() => void onOfflineSelectedJobs(selectedVisibleIds)} disabled={selectedVisibleIds.length === 0}>关闭所选</button>
+                <button type="button" className={styles.plainButton} onClick={() => void onDeleteSelectedJobs(selectedVisibleIds)} disabled={selectedVisibleIds.length === 0}>删除职位</button>
+              </>
+            )}
           </div>
         </div>
 
@@ -1768,23 +2125,38 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
                     </td>
                     <td className={styles.jobNameCell}>
                       <strong>{job.title}</strong>
-                      <span>更新于 {formatDateText(job.updated_at)} · 编号 {job.job_id}</span>
-                      <em>{job.reject_reason || statusLabel('job_audit', job.audit_status)}</em>
-                      <div className={styles.jobInlineActions}>
-                        <button type="button" onClick={() => {
-                          loadJobIntoForm(job);
-                          setShowJobCreateForm(true);
-                        }}>修改</button>
-                        <button type="button" disabled>匹配（占位）</button>
-                        <button type="button" onClick={() => void onOfflineJob(job.job_id)} disabled={job.status === 3}>关闭</button>
-                        <button type="button" disabled>删除（占位）</button>
-                      </div>
+                      <span>{jobTab === 'deleted' ? `删除于 ${formatDateText(job.deleted_at)}` : `更新于 ${formatDateText(job.updated_at)}`} · 编号 {job.job_id}</span>
+                      <em>{jobTab === 'deleted' ? (job.delete_reason || '企业已软删除，历史投递和审计记录保留') : (job.reject_reason || statusLabel('job_audit', job.audit_status))}</em>
+                      {jobTab === 'deleted' ? (
+                        <div className={styles.jobInlineActions}>
+                          <button type="button" onClick={() => void onRestoreJobDraft(job.job_id)}>恢复为草稿</button>
+                          <button type="button" disabled>永久删除（禁止）</button>
+                        </div>
+                      ) : (
+                        <div className={styles.jobInlineActions}>
+                          <button type="button" onClick={() => {
+                            loadJobIntoForm(job);
+                            setShowJobCreateForm(true);
+                          }}>修改</button>
+                          <button
+                            type="button"
+                            onClick={() => void onSubmitJobReview(job.job_id)}
+                            disabled={!canSubmitJobReview(job)}
+                            title={companyCanSubmitJobReview ? undefined : '企业认证通过后才能提交职位审核'}
+                          >
+                            {submitReviewButtonLabel(job)}
+                          </button>
+                          <button type="button" disabled>匹配（占位）</button>
+                          <button type="button" onClick={() => void onOfflineJob(job.job_id)} disabled={job.status === 3}>关闭</button>
+                          <button type="button" onClick={() => void onDeleteJob(job.job_id)}>删除</button>
+                        </div>
+                      )}
                     </td>
                     <td>
                       <div className={styles.jobMetricList}>
                         <span>被投递 <strong>{applicationCount}</strong> 次</span>
                         <span>被浏览 <strong>0</strong> 次</span>
-                        <button type="button" disabled>一键分享（占位）</button>
+                        {jobTab === 'deleted' ? <span>回收站不支持推广或分享</span> : <button type="button" disabled>一键分享（占位）</button>}
                       </div>
                     </td>
                     <td>
@@ -1996,7 +2368,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
         </div>
       </header>
 
-      <div className={styles.workspace}>
+      <div className={styles.workspace} data-testid="company-workspace" data-layout="fluid">
         {renderMenu()}
         <div className={styles.content}>
           {renderStatusView()}

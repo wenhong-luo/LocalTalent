@@ -67,6 +67,19 @@ public class JobService {
         return new JobPageResponse(items, jobRepository.countByCompany(principal.companyId()));
     }
 
+    public JobPageResponse listDeletedCompanyJobs(int page, int size) {
+        AuthzPrincipal principal = requireCompanyPrincipal();
+        int normalizedPage = Math.max(page, 1);
+        int normalizedSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+        int offset = (normalizedPage - 1) * normalizedSize;
+        List<JobResponse> items = jobRepository
+                .listDeletedByCompany(principal.companyId(), normalizedSize, offset)
+                .stream()
+                .map(this::response)
+                .toList();
+        return new JobPageResponse(items, jobRepository.countDeletedByCompany(principal.companyId()));
+    }
+
     @Transactional
     public JobResponse create(JobCreateRequest request) {
         AuthzPrincipal principal = requireCompanyPrincipal();
@@ -79,7 +92,7 @@ public class JobService {
 
     public JobResponse getCompanyJob(long jobId) {
         AuthzPrincipal principal = requireCompanyPrincipal();
-        JobPostRow row = requireJob(jobId);
+        JobPostRow row = requireActiveJob(jobId);
         dataScopeService.assertAccessible(principal, "job_post", ResourceOwner.company(row.companyId()));
         return response(row);
     }
@@ -87,10 +100,10 @@ public class JobService {
     @Transactional
     public JobResponse update(long jobId, JobUpdateRequest request) {
         AuthzPrincipal principal = requireCompanyPrincipal();
-        JobPostRow before = requireCompanyOwnedJob(principal, jobId);
+        JobPostRow before = requireActiveCompanyOwnedJob(principal, jobId);
         JobUpdateRequest normalized = normalizeUpdate(request);
         jobRepository.update(jobId, normalized);
-        JobPostRow after = requireJob(jobId);
+        JobPostRow after = requireActiveJob(jobId);
         auditService.record(principal, "job_post", jobId, "job_update",
                 json(jobAuditSnapshot(before)),
                 json(jobAuditSnapshot(after)));
@@ -100,12 +113,12 @@ public class JobService {
     @Transactional
     public JobReviewResultResponse changeCompanyStatus(long jobId, JobStatusRequest request) {
         AuthzPrincipal principal = requireCompanyPrincipal();
-        JobPostRow before = requireCompanyOwnedJob(principal, jobId);
+        JobPostRow before = requireActiveCompanyOwnedJob(principal, jobId);
         String action = request == null ? null : normalizeNullable(request.action(), 32);
         String reason = request == null ? null : normalizeNullable(request.reason(), 500);
         if ("submit_review".equals(action)) {
             jobRepository.submitReview(jobId);
-            JobPostRow after = requireJob(jobId);
+            JobPostRow after = requireActiveJob(jobId);
             auditService.record(principal, "job_post", jobId, "job_submit_review",
                     json(jobAuditSnapshot(before)),
                     json(jobAuditSnapshot(after)));
@@ -113,13 +126,46 @@ public class JobService {
         }
         if ("offline".equals(action)) {
             jobRepository.offline(jobId, reason);
-            JobPostRow after = requireJob(jobId);
+            JobPostRow after = requireActiveJob(jobId);
             auditService.record(principal, "job_post", jobId, "job_offline",
                     json(jobAuditSnapshot(before)),
                     json(jobAuditSnapshot(after)));
             return reviewResult(after);
         }
         throw validation("action must be submit_review or offline");
+    }
+
+    @Transactional
+    public JobReviewResultResponse deleteCompanyJob(long jobId, String reason) {
+        AuthzPrincipal principal = requireCompanyPrincipal();
+        JobPostRow before = requireJob(jobId);
+        dataScopeService.assertWritable(principal, "job_post", ResourceOwner.company(before.companyId()));
+        if (before.deleted()) {
+            return reviewResult(before);
+        }
+        String normalizedReason = normalizeNullable(reason, 500);
+        jobRepository.softDelete(jobId, principal.userId(), normalizedReason);
+        JobPostRow after = requireJob(jobId);
+        auditService.record(principal, "job_post", jobId, "job_delete",
+                json(jobAuditSnapshot(before)),
+                json(jobAuditSnapshot(after)));
+        return reviewResult(after);
+    }
+
+    @Transactional
+    public JobResponse restoreCompanyJobDraft(long jobId, String reason) {
+        AuthzPrincipal principal = requireCompanyPrincipal();
+        JobPostRow before = requireJob(jobId);
+        dataScopeService.assertWritable(principal, "job_post", ResourceOwner.company(before.companyId()));
+        if (!before.deleted()) {
+            throw validation("job is not deleted");
+        }
+        jobRepository.restoreDraft(jobId);
+        JobPostRow after = requireActiveJob(jobId);
+        auditService.record(principal, "job_post", jobId, "job_restore_draft",
+                json(restoreAuditSnapshot(before, reason)),
+                json(jobAuditSnapshot(after)));
+        return response(after);
     }
 
     public JobPageResponse listForReview(Integer auditStatus, int page, int size) {
@@ -137,7 +183,7 @@ public class JobService {
 
     public JobResponse getForReview(long jobId) {
         requireAdminReader();
-        return response(requireJob(jobId));
+        return response(requireActiveJob(jobId));
     }
 
     @Transactional
@@ -150,7 +196,7 @@ public class JobService {
             throw validation("memo is required when rejecting job");
         }
 
-        JobPostRow before = requireJob(jobId);
+        JobPostRow before = requireActiveJob(jobId);
         if (auditStatus == AUDIT_APPROVED && before.companyAuthStatus() != CompanyService.AUTH_APPROVED) {
             throw validation("company is not certified");
         }
@@ -163,7 +209,7 @@ public class JobService {
                 memo,
                 auditStatus == AUDIT_REJECTED ? memo : null,
                 principal.userId());
-        JobPostRow after = requireJob(jobId);
+        JobPostRow after = requireActiveJob(jobId);
         auditService.record(
                 principal,
                 "job_post",
@@ -180,9 +226,23 @@ public class JobService {
         return row;
     }
 
+    private JobPostRow requireActiveCompanyOwnedJob(AuthzPrincipal principal, long jobId) {
+        JobPostRow row = requireActiveJob(jobId);
+        dataScopeService.assertWritable(principal, "job_post", ResourceOwner.company(row.companyId()));
+        return row;
+    }
+
     private JobPostRow requireJob(long jobId) {
         return jobRepository.findById(jobId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND_404", "job not found"));
+    }
+
+    private JobPostRow requireActiveJob(long jobId) {
+        JobPostRow row = requireJob(jobId);
+        if (row.deleted()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND_404", "job not found");
+        }
+        return row;
     }
 
     private AuthzPrincipal requireCompanyPrincipal() {
@@ -332,7 +392,9 @@ public class JobService {
                 row.status(),
                 row.auditStatus(),
                 row.rejectReason(),
-                row.updatedAt());
+                row.updatedAt(),
+                row.deletedAt(),
+                row.deleteReason());
     }
 
     private JobReviewResultResponse reviewResult(JobPostRow row) {
@@ -437,6 +499,15 @@ public class JobService {
         snapshot.put("audit_status", row.auditStatus());
         snapshot.put("reject_reason", row.rejectReason());
         snapshot.put("reject_reason_present", row.rejectReason() != null);
+        snapshot.put("deleted", row.deleted());
+        snapshot.put("deleted_at", row.deletedAt());
+        snapshot.put("delete_reason_present", row.deleteReason() != null);
+        return snapshot;
+    }
+
+    private Map<String, Object> restoreAuditSnapshot(JobPostRow row, String reason) {
+        Map<String, Object> snapshot = jobAuditSnapshot(row);
+        snapshot.put("restore_reason_present", normalizeNullable(reason, 500) != null);
         return snapshot;
     }
 

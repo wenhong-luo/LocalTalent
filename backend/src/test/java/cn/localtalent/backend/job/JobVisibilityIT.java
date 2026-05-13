@@ -154,6 +154,7 @@ class JobVisibilityIT {
         assertSuccess(visibleAfterApproval, 200, "trace-portal-after-approval");
         assertThat(visibleAfterApproval.body().at("/data/total").asLong()).isEqualTo(1);
         assertThat(visibleAfterApproval.body().at("/data/job_list/0/job_id").asLong()).isEqualTo(jobId);
+        assertPublicJobBodySafe(visibleAfterApproval);
 
         HttpJsonResponse portalDetail = getJson(
                 "/api/portal/jobs/" + jobId,
@@ -161,6 +162,7 @@ class JobVisibilityIT {
                 null);
         assertSuccess(portalDetail, 200, "trace-portal-job-detail");
         assertThat(portalDetail.body().at("/data/title").asText()).isEqualTo("Java 工程师");
+        assertPublicJobBodySafe(portalDetail);
 
         HttpJsonResponse offlineJob = postJson(
                 "/api/company/jobs/" + jobId + "/status",
@@ -214,6 +216,18 @@ class JobVisibilityIT {
                 32000,
                 2,
                 2);
+        long deletedJobId = insertJob(
+                certifiedCompanyId,
+                "Prompt18 已删除职位 " + suffix,
+                "p18-software",
+                "310000",
+                20000,
+                32000,
+                2,
+                2);
+        jdbcTemplate.update(
+                "UPDATE job_post SET deleted_at = CURRENT_TIMESTAMP, deleted_by = 1, delete_reason = 'visibility fixture' WHERE id = ?",
+                deletedJobId);
         insertJob(certifiedCompanyId, "Prompt18 待审核职位 " + suffix, "p18-software", "310000", 20000, 32000, 1, 1);
         insertJob(certifiedCompanyId, "Prompt18 下线职位 " + suffix, "p18-software", "310000", 20000, 32000, 3, 2);
         insertJob(uncertifiedCompanyId, "Prompt18 未认证职位 " + suffix, "p18-software", "310000", 20000, 32000, 2, 2);
@@ -227,6 +241,22 @@ class JobVisibilityIT {
         assertSuccess(filtered, 200, "trace-p18-portal-job-search");
         assertThat(filtered.body().at("/data/total").asLong()).isEqualTo(1);
         assertThat(filtered.body().at("/data/job_list/0/job_id").asLong()).isEqualTo(visibleJobId);
+        assertPublicJobBodySafe(filtered);
+
+        HttpJsonResponse deletedDetail = getJson(
+                "/api/portal/jobs/" + deletedJobId,
+                "trace-p18-portal-deleted-job-detail",
+                null);
+        assertError(deletedDetail, 404, "NOT_FOUND_404", "trace-p18-portal-deleted-job-detail");
+
+        HttpJsonResponse companyDetail = getJson(
+                "/api/portal/companies/" + certifiedCompanyId,
+                "trace-p18-company-detail-with-deleted-job",
+                null);
+        assertSuccess(companyDetail, 200, "trace-p18-company-detail-with-deleted-job");
+        assertThat(companyDetail.body().at("/data/open_job_count").asLong()).isEqualTo(1);
+        assertThat(companyDetail.body().at("/data/open_jobs/0/job_id").asLong()).isEqualTo(visibleJobId);
+        assertThat(companyDetail.body().toString()).doesNotContain("\"job_id\":" + deletedJobId);
 
         HttpJsonResponse salaryMismatch = getJson(
                 "/api/portal/jobs?keyword=%s&salary_min=40000&page=1&size=10".formatted(suffix),
@@ -267,6 +297,23 @@ class JobVisibilityIT {
         long companyId = registerResponse.body().at("/data/identity/company_id").asLong();
         String token = login("company", email, password, "trace-job-company-login");
         return new Account(userId, companyId, licenseNo, token);
+    }
+
+    private void assertPublicJobBodySafe(HttpJsonResponse response) {
+        assertThat(response.body().toString())
+                .doesNotContain("contact_name")
+                .doesNotContain("contact_mobile")
+                .doesNotContain("contact_phone")
+                .doesNotContain("contact_email")
+                .doesNotContain("contact_wechat")
+                .doesNotContain("contact_hidden")
+                .doesNotContain("notify_enabled")
+                .doesNotContain("resume_subscription_enabled")
+                .doesNotContain("审核材料")
+                .doesNotContain("attachment_object_key")
+                .doesNotContain("object_key")
+                .doesNotContain("支付链接")
+                .doesNotContain("联系解锁");
     }
 
     private long createJob(String token, String traceId) throws Exception {

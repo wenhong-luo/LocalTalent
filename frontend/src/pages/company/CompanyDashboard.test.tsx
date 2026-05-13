@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { ExportDownloadAction } from '@/components/backoffice/ExportDownloadAction';
 import { ACCESS_TOKEN_STORAGE_KEY } from '@/pages/backoffice/session';
 import { CompanyDashboard } from './CompanyDashboard';
@@ -196,6 +196,14 @@ const contactMissingWorkbenchOverview = {
   }
 };
 
+const pendingCertificationWorkbenchOverview = {
+  ...workbenchOverview,
+  profile: {
+    ...workbenchOverview.profile,
+    auth_status: 1
+  }
+};
+
 const workbenchJobs = {
   job_list: [
     {
@@ -236,6 +244,28 @@ const workbenchJobs = {
     }
   ],
   total: 1
+};
+
+const deletedWorkbenchJobs = {
+  job_list: [
+    {
+      ...workbenchJobs.job_list[0],
+      job_id: 801,
+      title: '已删除职位',
+      status: 3,
+      audit_status: 1,
+      reject_reason: '',
+      updated_at: '2026-05-04T10:00:00',
+      deleted_at: '2026-05-05T10:00:00',
+      delete_reason: '企业工作台软删除职位。'
+    }
+  ],
+  total: 1
+};
+
+const emptyDeletedWorkbenchJobs = {
+  job_list: [],
+  total: 0
 };
 
 const workbenchApplications = {
@@ -292,13 +322,17 @@ function installCompanyFetchMock({
   overview = workbenchOverview,
   completeAfterProfileSave = false,
   styleImages = companyStyleImages,
-  logo = companyLogo
+  logo = companyLogo,
+  jobPage = workbenchJobs,
+  deletedJobPage = emptyDeletedWorkbenchJobs
 }: {
   workbenchEnabled?: boolean;
   overview?: typeof workbenchOverview;
   completeAfterProfileSave?: boolean;
   styleImages?: { image_list: Array<Record<string, unknown>>; total: number };
   logo?: Record<string, unknown>;
+  jobPage?: typeof workbenchJobs;
+  deletedJobPage?: typeof workbenchJobs;
 } = {}) {
   let currentOverview = overview;
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
@@ -360,8 +394,12 @@ function installCompanyFetchMock({
       return apiOk({ image_list: [], total: 0 }, 'trace-style-delete');
     }
 
+    if (url.includes('/api/company/workbench/jobs/deleted') && method === 'GET') {
+      return apiOk(deletedJobPage, 'trace-deleted-jobs');
+    }
+
     if (url.includes('/api/company/workbench/jobs') && method === 'GET') {
-      return apiOk(workbenchJobs);
+      return apiOk(jobPage);
     }
 
     if (url.includes('/api/company/workbench/applications') && url.includes('/stage')) {
@@ -398,6 +436,14 @@ function installCompanyFetchMock({
 
     if (url.endsWith('/api/company/workbench/jobs') && method === 'POST') {
       return apiOk(workbenchJobs.job_list[0], 'trace-job-create');
+    }
+
+    if (url.includes('/api/company/workbench/jobs/') && method === 'PUT') {
+      return apiOk(workbenchJobs.job_list[0], 'trace-job-update');
+    }
+
+    if (url.includes('/api/company/workbench/jobs/') && url.includes('/restore-draft') && method === 'POST') {
+      return apiOk({ ...workbenchJobs.job_list[0], status: 1, audit_status: 1 }, 'trace-job-restore');
     }
 
     if (url.includes('/api/company/workbench/jobs/') && method === 'POST') {
@@ -468,7 +514,10 @@ function latestWorkbenchProfilePayload(fetchMock: ReturnType<typeof vi.spyOn>): 
 function latestWorkbenchJobPayload(fetchMock: ReturnType<typeof vi.spyOn>): Record<string, unknown> {
   const call = [...fetchMock.mock.calls].reverse().find(([input, init]) => {
     const url = String(input);
-    return url.endsWith('/api/company/workbench/jobs') && init?.method === 'POST';
+    return (
+      (url.endsWith('/api/company/workbench/jobs') && init?.method === 'POST')
+      || (url.includes('/api/company/workbench/jobs/') && init?.method === 'PUT')
+    );
   });
   if (!call) {
     throw new Error('workbench job payload not found');
@@ -593,12 +642,14 @@ describe('CompanyDashboard', () => {
     expect(await screen.findByText('企业会员首页')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /^职位管理$/ }));
 
+    expect(screen.getByTestId('company-workspace')).toHaveAttribute('data-layout', 'fluid');
     expect(await screen.findByText('管理职位')).toBeInTheDocument();
     expect(screen.getByText('职位工作台')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /\+ 发布职位/ })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /发布中/ })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /审核中/ })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /已下线/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /已删除/ })).toBeInTheDocument();
     expect(screen.getByText('招聘情况')).toBeInTheDocument();
     expect(screen.getByText('收到简历')).toBeInTheDocument();
     expect(screen.getByText('简历订阅')).toBeInTheDocument();
@@ -608,6 +659,7 @@ describe('CompanyDashboard', () => {
     fireEvent.click(screen.getByRole('tab', { name: /审核中/ }));
     expect(await screen.findByText('三期招聘顾问')).toBeInTheDocument();
     expect(screen.getByText((_, element) => element?.textContent === '被投递 1 次')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '提交审核' })).toBeDisabled();
     expect(screen.getByRole('button', { name: '职位置顶' })).toBeDisabled();
     expect(screen.getByRole('button', { name: '智能刷新' })).toBeDisabled();
     expect(screen.getByRole('button', { name: '紧急招聘' })).toBeDisabled();
@@ -616,34 +668,48 @@ describe('CompanyDashboard', () => {
     fireEvent.click(screen.getByLabelText('选择职位 三期招聘顾问'));
     expect(screen.getByRole('button', { name: '关闭所选' })).not.toBeDisabled();
     expect(screen.getByRole('button', { name: '刷新职位（占位）' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: '删除职位（占位）' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '删除职位' })).not.toBeDisabled();
 
     fireEvent.click(screen.getByRole('button', { name: /\+ 发布职位/ }));
-    expect(screen.getByText('发布职位（基础草稿）')).toBeInTheDocument();
-    expect(screen.getByText(/职位字段会保存到数据库/)).toBeInTheDocument();
-    expect(screen.getByText('职位性质')).toBeInTheDocument();
-    expect(screen.getByText('经验要求')).toBeInTheDocument();
-    expect(screen.getByText('学历要求')).toBeInTheDocument();
+    expect(screen.getByText('基本信息')).toBeInTheDocument();
+    expect(screen.getByText('其他信息')).toBeInTheDocument();
+    expect(screen.getAllByText('联系方式').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('button', { name: /职位性质/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /经验要求/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /学历要求/ })).toBeInTheDocument();
     expect(screen.getByText('岗位福利')).toBeInTheDocument();
-    expect(screen.getByText('联系方式配置')).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('职位标题'), { target: { value: '全量字段测试工程师' } });
-    fireEvent.change(screen.getByLabelText('职位类别名称'), { target: { value: '互联网/电子商务' } });
-    fireEvent.change(screen.getByLabelText('工作地区'), { target: { value: '山西 / 大同 / 云冈区' } });
+    expect(screen.getByText('接收通知（站内配置）')).toBeInTheDocument();
+    expect(screen.getByText(/真实微信\/小程序\/App 能力暂未接入/)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('职位名称 *'), { target: { value: '全量字段测试工程师' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /职位类别/ }));
+    const positionDialog = screen.getByRole('dialog', { name: '职位类别' });
+    fireEvent.click(within(positionDialog).getByRole('button', { name: '网络 | 通信 | 电子' }));
+    fireEvent.click(within(positionDialog).getByLabelText('前端工程师'));
+    fireEvent.click(within(positionDialog).getByRole('button', { name: '保存' }));
+
+    fireEvent.click(screen.getByRole('button', { name: /工作地区/ }));
+    fireEvent.click(screen.getByRole('button', { name: '山西' }));
+    fireEvent.click(screen.getByRole('button', { name: '大同' }));
+    fireEvent.click(screen.getByRole('button', { name: '云冈区' }));
+
+    fireEvent.click(screen.getByRole('button', { name: /联系方式 使用企业资料联系方式/ }));
+    fireEvent.click(screen.getByRole('option', { name: '使用本职位联系方式' }));
     fireEvent.change(screen.getByLabelText('联系手机'), { target: { value: '18877776666' } });
     fireEvent.change(screen.getByLabelText('联系邮箱'), { target: { value: 'hr-job@example.local' } });
-    fireEvent.click(screen.getByRole('button', { name: '创建职位草稿' }));
+    fireEvent.click(screen.getByRole('button', { name: '保存草稿' }));
     await waitFor(() => {
       expect(latestWorkbenchJobPayload(fetchMock).title).toBe('全量字段测试工程师');
     });
     const jobPayload = latestWorkbenchJobPayload(fetchMock);
     expect(jobPayload).toMatchObject({
       job_nature_code: 'full_time',
-      category_code: 'software',
-      category_name: '互联网/电子商务',
+      category_code: 'network_communication_electronics',
+      category_name: '前端工程师',
       experience_code: '1_3_years',
       education_code: 'college',
       recruit_count: 3,
-      city_code: '310000',
+      city_code: '140214',
       work_region_path: '山西 / 大同 / 云冈区',
       address: '上海市浦东新区演示大道 100 号',
       salary_min: 12000,
@@ -652,7 +718,7 @@ describe('CompanyDashboard', () => {
       department_name: '招聘运营部',
       age_unlimited: true,
       recruitment_time_code: 'long_term',
-      contact_mode: 'company_profile',
+      contact_mode: 'custom',
       contact_mobile: '18877776666',
       contact_email: 'hr-job@example.local',
       contact_hidden: true,
@@ -660,8 +726,178 @@ describe('CompanyDashboard', () => {
       resume_subscription_enabled: false
     });
     expect(jobPayload.welfare_codes).toEqual(['five_insurance', 'weekend_double']);
+    fireEvent.click(screen.getByRole('button', { name: /发布职位（提交审核）/ }));
+    await waitFor(() => {
+      expect(fetchMock.mock.calls.some(([input]) => String(input).includes('/submit-review'))).toBe(true);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: '修改' }));
+    expect(await screen.findByText('编辑职位')).toBeInTheDocument();
+    expect(screen.getByLabelText('职位名称 *')).toHaveValue('三期招聘顾问');
+    expect(screen.getByLabelText('招聘人数 *')).toHaveValue('3');
+    expect(screen.getByLabelText('最低薪资')).toHaveValue('12000');
+    expect(screen.getByLabelText('最高薪资')).toHaveValue('22000');
+    fireEvent.change(screen.getByLabelText('职位名称 *'), { target: { value: '编辑后的职位' } });
+    fireEvent.click(screen.getByRole('button', { name: '保存草稿' }));
+    await waitFor(() => {
+      const updated = [...fetchMock.mock.calls].some(([input, init]) =>
+        String(input).includes('/api/company/workbench/jobs/501') && init?.method === 'PUT'
+      );
+      expect(updated).toBe(true);
+    });
+    expect(latestWorkbenchJobPayload(fetchMock).title).toBe('编辑后的职位');
     expect(bodyText()).not.toContain('支付链接');
     expect(bodyText()).not.toContain('联系解锁入口');
+    expectNoSensitiveCandidateOrCompanyFields();
+  });
+
+  it('supports safe submit-review and bulk offline operations from job list', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'company-token');
+    const actionableJobs = {
+      job_list: [
+        {
+          ...workbenchJobs.job_list[0],
+          job_id: 701,
+          title: '可重新提交职位',
+          status: 3,
+          audit_status: 2,
+          reject_reason: '',
+          updated_at: '2026-05-02T10:10:00'
+        },
+        {
+          ...workbenchJobs.job_list[0],
+          job_id: 702,
+          title: '已通过职位',
+          status: 2,
+          audit_status: 2,
+          reject_reason: '',
+          updated_at: '2026-05-02T11:10:00'
+        }
+      ],
+      total: 2
+    };
+    const fetchMock = installCompanyFetchMock({ jobPage: actionableJobs });
+
+    render(<CompanyDashboard />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /^职位管理$/ }));
+    fireEvent.click(screen.getByRole('tab', { name: /已下线/ }));
+    expect(await screen.findByText('可重新提交职位')).toBeInTheDocument();
+    expect(screen.getByText('下线职位需要重新提交审核，审核通过后才会重新公开展示。')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '重新提交审核' }));
+    await waitFor(() => {
+      expect(fetchMock.mock.calls.some(([input]) => String(input).includes('/api/company/workbench/jobs/701/submit-review'))).toBe(true);
+    });
+    expect(await screen.findByText('职位已重新提交审核，审核通过后将上线。')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: /发布中/ }));
+    expect(await screen.findByText('已通过职位')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '提交审核' })).toBeDisabled();
+    fireEvent.click(screen.getByLabelText('选择职位 已通过职位'));
+    fireEvent.click(screen.getByRole('button', { name: '关闭所选' }));
+
+    await waitFor(() => {
+      expect(fetchMock.mock.calls.some(([input]) => String(input).includes('/api/company/workbench/jobs/702/offline'))).toBe(true);
+    });
+    fireEvent.click(screen.getByLabelText('选择职位 可重新提交职位'));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '删除职位' })).not.toBeDisabled();
+    });
+    fireEvent.click(screen.getByRole('button', { name: '删除职位' }));
+    await waitFor(() => {
+      expect(fetchMock.mock.calls.some(([input]) => String(input).includes('/api/company/workbench/jobs/701/delete'))).toBe(true);
+    });
+    const actionCalls = fetchMock.mock.calls.filter(([input], index) => {
+      const url = String(input);
+      return index >= 0 && (url.includes('/submit-review') || url.includes('/offline') || url.includes('/delete')) && !url.includes('/jobs/deleted');
+    });
+    expect(actionCalls.every(([, init]) => init?.method === 'POST')).toBe(true);
+    expect(bodyText()).not.toContain('支付链接');
+    expect(bodyText()).not.toContain('联系解锁入口');
+    expectNoSensitiveCandidateOrCompanyFields();
+  });
+
+  it('blocks submit-review actions in the UI until company certification is approved', async () => {
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'company-token');
+    const actionableJobs = {
+      job_list: [
+        {
+          ...workbenchJobs.job_list[0],
+          job_id: 711,
+          title: '认证前下线职位',
+          status: 3,
+          audit_status: 2,
+          reject_reason: '',
+          updated_at: '2026-05-02T10:10:00'
+        }
+      ],
+      total: 1
+    };
+    const fetchMock = installCompanyFetchMock({
+      overview: pendingCertificationWorkbenchOverview,
+      jobPage: actionableJobs
+    });
+
+    render(<CompanyDashboard />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /^职位管理$/ }));
+    fireEvent.click(screen.getByRole('tab', { name: /已下线/ }));
+
+    expect(await screen.findByText('认证前下线职位')).toBeInTheDocument();
+    expect(screen.getByText('企业认证通过后才能提交职位审核。你仍可以保存草稿、编辑职位、下线或删除本企业职位。')).toBeInTheDocument();
+    const submitButton = screen.getByRole('button', { name: '重新提交审核' });
+    expect(submitButton).toBeDisabled();
+
+    fireEvent.click(submitButton);
+    expect(fetchMock.mock.calls.some(([input]) => String(input).includes('/api/company/workbench/jobs/711/submit-review'))).toBe(false);
+    expectNoSensitiveCandidateOrCompanyFields();
+  });
+
+  it('shows the recycle bin and restores deleted jobs as drafts without unsafe actions', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'company-token');
+    const fetchMock = installCompanyFetchMock({ deletedJobPage: deletedWorkbenchJobs });
+
+    render(<CompanyDashboard />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /^职位管理$/ }));
+    fireEvent.click(screen.getByRole('tab', { name: /已删除/ }));
+
+    expect(await screen.findByText('已删除职位')).toBeInTheDocument();
+    expect(screen.getByText('企业工作台软删除职位。')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: '永久删除（禁止）' }).every((button) => button.hasAttribute('disabled'))).toBe(true);
+    expect(screen.queryByRole('button', { name: '修改' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '提交审核' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText('选择职位 已删除职位'));
+    fireEvent.click(screen.getAllByRole('button', { name: '恢复为草稿' })[0]);
+
+    await waitFor(() => {
+      expect(fetchMock.mock.calls.some(([input, init]) => {
+        const url = String(input);
+        const headers = init?.headers as Headers | undefined;
+        return url.includes('/api/company/workbench/jobs/801/restore-draft')
+          && init?.method === 'POST'
+          && headers?.get('Authorization') === 'Bearer company-token'
+          && Boolean(headers?.get('X-Trace-Id'))
+          && Boolean(headers?.get('X-Idempotency-Key'));
+      })).toBe(true);
+    });
+    expect(screen.getByRole('tab', { name: /审核中/ })).toHaveAttribute('aria-selected', 'true');
+
+    fireEvent.click(screen.getByRole('tab', { name: /已删除/ }));
+    await screen.findByText('已删除职位');
+    fireEvent.click(screen.getAllByRole('button', { name: '恢复为草稿' })[1]);
+    await waitFor(() => {
+      const restoreCalls = fetchMock.mock.calls.filter(([input]) => String(input).includes('/api/company/workbench/jobs/801/restore-draft'));
+      expect(restoreCalls.length).toBeGreaterThanOrEqual(2);
+    });
+
+    expect(bodyText()).not.toContain('支付链接');
+    expect(bodyText()).not.toContain('联系解锁入口');
+    expect(bodyText()).not.toContain('永久删除成功');
     expectNoSensitiveCandidateOrCompanyFields();
   });
 

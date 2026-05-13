@@ -14,6 +14,8 @@ import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.Company
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyProfileResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.CompanyProfileSaveRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.InterviewSessionPageResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.JobDeleteRequest;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.JobRestoreRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.OverviewResponse;
 import cn.localtalent.backend.company.workbench.application.CompanyWorkbenchService;
 import cn.localtalent.backend.exporting.api.ExportApplyRequest;
@@ -173,6 +175,15 @@ public class CompanyWorkbenchController {
         return ApiResponse.success(service.jobs(page, size));
     }
 
+    @GetMapping("/jobs/deleted")
+    @RequirePermission("company.workbench.read")
+    public ApiResponse<JobPageResponse> deletedJobs(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return ApiResponse.success(service.deletedJobs(page, size));
+    }
+
     @PostMapping("/jobs")
     @RequirePermission("company.workbench.write")
     public ApiResponse<JobResponse> createJob(
@@ -215,6 +226,26 @@ public class CompanyWorkbenchController {
             @RequestBody(required = false) JobStatusRequest request
     ) {
         return ApiResponse.success(service.offlineJob(id, request, idempotencyKey));
+    }
+
+    @PostMapping("/jobs/{id}/delete")
+    @RequirePermission("company.workbench.write")
+    public ApiResponse<Object> deleteJob(
+            @PathVariable long id,
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey,
+            @RequestBody(required = false) JobDeleteRequest request
+    ) {
+        return ApiResponse.success(service.deleteJob(id, request, idempotencyKey));
+    }
+
+    @PostMapping("/jobs/{id}/restore-draft")
+    @RequirePermission("company.workbench.write")
+    public ApiResponse<JobResponse> restoreJobDraft(
+            @PathVariable long id,
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey,
+            @RequestBody(required = false) JobRestoreRequest request
+    ) {
+        return ApiResponse.success(service.restoreJobDraft(id, request, idempotencyKey));
     }
 
     @GetMapping("/applications")

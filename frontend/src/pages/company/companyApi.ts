@@ -53,6 +53,8 @@ export type CompanyJob = {
   notify_enabled: boolean;
   resume_subscription_enabled: boolean;
   job_desc: string;
+  deleted_at: string;
+  delete_reason: string;
 };
 
 export type CompanyJobPage = {
@@ -324,7 +326,9 @@ function toJob(raw: unknown): CompanyJob {
     contact_hidden: row.contact_hidden !== false,
     notify_enabled: row.notify_enabled === true,
     resume_subscription_enabled: row.resume_subscription_enabled === true,
-    job_desc: text(row.job_desc)
+    job_desc: text(row.job_desc),
+    deleted_at: text(row.deleted_at),
+    delete_reason: text(row.delete_reason)
   };
 }
 
@@ -685,8 +689,35 @@ export async function createCompanyWorkbenchJob(
   return { data: toJob(result.data), traceId: result.traceId };
 }
 
+export async function updateCompanyWorkbenchJob(
+  token: string,
+  jobId: number,
+  payload: WorkbenchJobPayload
+): Promise<ApiResult<CompanyJob>> {
+  const result = await apiRequest<unknown>(`/api/company/workbench/jobs/${jobId}`, {
+    method: 'PUT',
+    token,
+    idempotencyKey: createIdempotencyKey('company-job-update'),
+    body: payload
+  });
+  return { data: toJob(result.data), traceId: result.traceId };
+}
+
 export async function fetchCompanyWorkbenchJobs(token: string): Promise<ApiResult<CompanyJobPage>> {
   const result = await apiGet<unknown>('/api/company/workbench/jobs?page=1&size=20', { token });
+  const payload = asRecord(result.data);
+  const rows = Array.isArray(payload.job_list) ? payload.job_list : [];
+  return {
+    data: {
+      job_list: rows.map(toJob),
+      total: numberOr(payload.total, rows.length)
+    },
+    traceId: result.traceId
+  };
+}
+
+export async function fetchDeletedCompanyWorkbenchJobs(token: string): Promise<ApiResult<CompanyJobPage>> {
+  const result = await apiGet<unknown>('/api/company/workbench/jobs/deleted?page=1&size=20', { token });
   const payload = asRecord(result.data);
   const rows = Array.isArray(payload.job_list) ? payload.job_list : [];
   return {
@@ -710,6 +741,22 @@ export async function offlineCompanyWorkbenchJob(token: string, jobId: number, r
   const result = await apiPost<unknown>(`/api/company/workbench/jobs/${jobId}/offline`, { reason }, {
     token,
     idempotencyKey: createIdempotencyKey('company-job-offline')
+  });
+  return { data: toJob(result.data), traceId: result.traceId };
+}
+
+export async function deleteCompanyWorkbenchJob(token: string, jobId: number, reason: string): Promise<ApiResult<CompanyJob>> {
+  const result = await apiPost<unknown>(`/api/company/workbench/jobs/${jobId}/delete`, { reason }, {
+    token,
+    idempotencyKey: createIdempotencyKey('company-job-delete')
+  });
+  return { data: toJob(result.data), traceId: result.traceId };
+}
+
+export async function restoreCompanyWorkbenchJobDraft(token: string, jobId: number, reason: string): Promise<ApiResult<CompanyJob>> {
+  const result = await apiPost<unknown>(`/api/company/workbench/jobs/${jobId}/restore-draft`, { reason }, {
+    token,
+    idempotencyKey: createIdempotencyKey('company-job-restore-draft')
   });
   return { data: toJob(result.data), traceId: result.traceId };
 }

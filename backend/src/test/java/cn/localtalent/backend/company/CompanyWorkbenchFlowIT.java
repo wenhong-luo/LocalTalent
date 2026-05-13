@@ -286,6 +286,79 @@ class CompanyWorkbenchFlowIT {
         assertThat(draftJob.body().at("/data/welfare_codes/1").asText()).isEqualTo("weekend_double");
         assertThat(draftJob.body().at("/data/contact_mobile").asText()).isEqualTo("18877776666");
 
+        HttpJsonResponse repeatedDraftJob = postJson(
+                "/api/company/workbench/jobs",
+                jobBody("P28 Java 工程师"),
+                "trace-p28-job-create-repeat",
+                "Bearer " + company.token(),
+                "idem-p28-job-create-001");
+        assertSuccess(repeatedDraftJob, 200, "trace-p28-job-create-repeat");
+        assertThat(repeatedDraftJob.body().at("/data/job_id").asLong()).isEqualTo(jobId);
+        HttpJsonResponse conflictingDraftJob = postJson(
+                "/api/company/workbench/jobs",
+                jobBody("P28 不同职位"),
+                "trace-p28-job-create-conflict",
+                "Bearer " + company.token(),
+                "idem-p28-job-create-001");
+        assertError(conflictingDraftJob, 409, "IDEMPOTENCY_409", "trace-p28-job-create-conflict");
+
+        HttpJsonResponse jobDetail = getJson(
+                "/api/company/workbench/jobs/" + jobId,
+                "trace-p28-job-detail",
+                "Bearer " + company.token());
+        assertSuccess(jobDetail, 200, "trace-p28-job-detail");
+        assertThat(jobDetail.body().at("/data/job_id").asLong()).isEqualTo(jobId);
+        HttpJsonResponse crossCompanyJobDetail = getJson(
+                "/api/company/workbench/jobs/" + jobId,
+                "trace-p28-cross-company-job-detail",
+                "Bearer " + otherCompany.token());
+        assertError(crossCompanyJobDetail, 403, "AUTHZ_403", "trace-p28-cross-company-job-detail");
+        HttpJsonResponse crossCompanyJobUpdate = putJson(
+                "/api/company/workbench/jobs/" + jobId,
+                jobBody("P28 越权编辑"),
+                "trace-p28-cross-company-job-update",
+                "Bearer " + otherCompany.token(),
+                "idem-p28-cross-company-job-update");
+        assertError(crossCompanyJobUpdate, 403, "AUTHZ_403", "trace-p28-cross-company-job-update");
+        HttpJsonResponse crossCompanyJobReview = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/submit-review",
+                "{}",
+                "trace-p28-cross-company-job-review",
+                "Bearer " + otherCompany.token(),
+                "idem-p28-cross-company-job-review");
+        assertError(crossCompanyJobReview, 403, "AUTHZ_403", "trace-p28-cross-company-job-review");
+        HttpJsonResponse crossCompanyJobOffline = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/offline",
+                """
+                        {
+                          "reason": "wrong tenant"
+                        }
+                        """,
+                "trace-p28-cross-company-job-offline",
+                "Bearer " + otherCompany.token(),
+                "idem-p28-cross-company-job-offline");
+        assertError(crossCompanyJobOffline, 403, "AUTHZ_403", "trace-p28-cross-company-job-offline");
+        String candidateToken = registerAndLoginCandidate();
+        HttpJsonResponse candidateJobUpdate = putJson(
+                "/api/company/workbench/jobs/" + jobId,
+                jobBody("P28 求职者越权编辑"),
+                "trace-p28-candidate-job-update",
+                "Bearer " + candidateToken,
+                "idem-p28-candidate-job-update");
+        assertError(candidateJobUpdate, 403, "AUTHZ_403", "trace-p28-candidate-job-update");
+        String operatorToken = login("operator", "operator", "LocalTalent@123456", "trace-p28-operator-login");
+        HttpJsonResponse operatorJobOffline = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/offline",
+                """
+                        {
+                          "reason": "operator should not use company workbench"
+                        }
+                        """,
+                "trace-p28-operator-job-offline",
+                "Bearer " + operatorToken,
+                "idem-p28-operator-job-offline");
+        assertError(operatorJobOffline, 403, "AUTHZ_403", "trace-p28-operator-job-offline");
+
         HttpJsonResponse blockedReview = postJson(
                 "/api/company/workbench/jobs/" + jobId + "/submit-review",
                 "{}",
@@ -293,6 +366,7 @@ class CompanyWorkbenchFlowIT {
                 "Bearer " + company.token(),
                 "idem-p28-review-blocked-001");
         assertError(blockedReview, 403, "AUTHZ_403", "trace-p28-review-blocked");
+        assertThat(blockedReview.body().at("/message").asText()).isEqualTo("企业认证通过后才能提交职位审核");
 
         jdbcTemplate.update("UPDATE company SET auth_status = 2 WHERE id = ?", company.companyId());
         HttpJsonResponse submitReview = postJson(
@@ -318,6 +392,48 @@ class CompanyWorkbenchFlowIT {
                 .doesNotContain("18877776666")
                 .doesNotContain("hr-job@example.local")
                 .doesNotContain("job-wechat");
+
+        HttpJsonResponse updatePublicJob = putJson(
+                "/api/company/workbench/jobs/" + jobId,
+                jobBody("P28 Java 工程师编辑后"),
+                "trace-p28-job-update",
+                "Bearer " + company.token(),
+                "idem-p28-job-update-001");
+        assertSuccess(updatePublicJob, 200, "trace-p28-job-update");
+        assertThat(updatePublicJob.body().at("/data/status").asInt()).isEqualTo(1);
+        assertThat(updatePublicJob.body().at("/data/audit_status").asInt()).isEqualTo(1);
+        HttpJsonResponse repeatedUpdate = putJson(
+                "/api/company/workbench/jobs/" + jobId,
+                jobBody("P28 Java 工程师编辑后"),
+                "trace-p28-job-update-repeat",
+                "Bearer " + company.token(),
+                "idem-p28-job-update-001");
+        assertSuccess(repeatedUpdate, 200, "trace-p28-job-update-repeat");
+        HttpJsonResponse conflictingUpdate = putJson(
+                "/api/company/workbench/jobs/" + jobId,
+                jobBody("P28 Java 工程师冲突编辑"),
+                "trace-p28-job-update-conflict",
+                "Bearer " + company.token(),
+                "idem-p28-job-update-001");
+        assertError(conflictingUpdate, 409, "IDEMPOTENCY_409", "trace-p28-job-update-conflict");
+        HttpJsonResponse publicJobAfterUpdate = getJson(
+                "/api/portal/jobs/" + jobId,
+                "trace-p28-public-job-after-update",
+                null);
+        assertError(publicJobAfterUpdate, 404, "NOT_FOUND_404", "trace-p28-public-job-after-update");
+        HttpJsonResponse resubmitAfterUpdate = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/submit-review",
+                "{}",
+                "trace-p28-job-resubmit-after-update",
+                "Bearer " + company.token(),
+                "idem-p28-job-resubmit-after-update");
+        assertSuccess(resubmitAfterUpdate, 200, "trace-p28-job-resubmit-after-update");
+        HttpJsonResponse publicJobAfterResubmit = getJson(
+                "/api/portal/jobs/" + jobId,
+                "trace-p28-public-job-after-resubmit",
+                null);
+        assertError(publicJobAfterResubmit, 404, "NOT_FOUND_404", "trace-p28-public-job-after-resubmit");
+        jdbcTemplate.update("UPDATE job_post SET status = 2, audit_status = 2, published_at = CURRENT_TIMESTAMP WHERE id = ?", jobId);
 
         long candidateId = insertCandidate();
         long resumeId = insertResume(candidateId);
@@ -420,20 +536,288 @@ class CompanyWorkbenchFlowIT {
         assertSuccess(export, 200, "trace-p28-export");
         assertThat(export.body().at("/data/approve_status").asInt()).isZero();
 
+        HttpJsonResponse offlineJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/offline",
+                """
+                        {
+                          "reason": "企业工作台安全收口下线。"
+                        }
+                        """,
+                "trace-p28-job-offline",
+                "Bearer " + company.token(),
+                "idem-p28-job-offline-001");
+        assertSuccess(offlineJob, 200, "trace-p28-job-offline");
+        assertThat(offlineJob.body().at("/data/status").asInt()).isEqualTo(3);
+        HttpJsonResponse repeatedOfflineJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/offline",
+                """
+                        {
+                          "reason": "企业工作台安全收口下线。"
+                        }
+                        """,
+                "trace-p28-job-offline-repeat",
+                "Bearer " + company.token(),
+                "idem-p28-job-offline-001");
+        assertSuccess(repeatedOfflineJob, 200, "trace-p28-job-offline-repeat");
+        HttpJsonResponse conflictingOfflineJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/offline",
+                """
+                        {
+                          "reason": "不同下线原因"
+                        }
+                        """,
+                "trace-p28-job-offline-conflict",
+                "Bearer " + company.token(),
+                "idem-p28-job-offline-001");
+        assertError(conflictingOfflineJob, 409, "IDEMPOTENCY_409", "trace-p28-job-offline-conflict");
+        HttpJsonResponse publicJobAfterOffline = getJson(
+                "/api/portal/jobs/" + jobId,
+                "trace-p28-public-job-after-offline",
+                null);
+        assertError(publicJobAfterOffline, 404, "NOT_FOUND_404", "trace-p28-public-job-after-offline");
+
+        HttpJsonResponse deleteJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/delete",
+                """
+                        {
+                          "reason": "企业工作台软删除职位。"
+                        }
+                        """,
+                "trace-p28-job-delete",
+                "Bearer " + company.token(),
+                "idem-p28-job-delete-001");
+        assertSuccess(deleteJob, 200, "trace-p28-job-delete");
+        assertThat(deleteJob.body().at("/data/status").asInt()).isEqualTo(3);
+        assertThat(countRows("job_post", "id = " + jobId + " AND deleted_at IS NOT NULL")).isEqualTo(1);
+        assertThat(countRows("job_application", "id = " + applicationId)).isEqualTo(1);
+        assertThat(countRows("interview_session", "application_id = " + applicationId)).isEqualTo(1);
+        assertThat(countRows("export_apply", "company_id = " + company.companyId())).isGreaterThanOrEqualTo(1);
+
+        HttpJsonResponse jobsAfterDelete = getJson(
+                "/api/company/workbench/jobs?page=1&size=20",
+                "trace-p28-jobs-after-delete",
+                "Bearer " + company.token());
+        assertSuccess(jobsAfterDelete, 200, "trace-p28-jobs-after-delete");
+        assertThat(jobsAfterDelete.body().at("/data/total").asLong()).isZero();
+        HttpJsonResponse deletedJobs = getJson(
+                "/api/company/workbench/jobs/deleted?page=1&size=20",
+                "trace-p28-deleted-jobs",
+                "Bearer " + company.token());
+        assertSuccess(deletedJobs, 200, "trace-p28-deleted-jobs");
+        assertThat(deletedJobs.body().at("/data/total").asLong()).isEqualTo(1);
+        assertThat(deletedJobs.body().at("/data/job_list/0/job_id").asLong()).isEqualTo(jobId);
+        assertThat(deletedJobs.body().at("/data/job_list/0/deleted_at").asText()).isNotBlank();
+        assertThat(deletedJobs.body().at("/data/job_list/0/delete_reason").asText()).contains("软删除");
+        HttpJsonResponse detailAfterDelete = getJson(
+                "/api/company/workbench/jobs/" + jobId,
+                "trace-p28-job-detail-after-delete",
+                "Bearer " + company.token());
+        assertError(detailAfterDelete, 404, "NOT_FOUND_404", "trace-p28-job-detail-after-delete");
+
+        HttpJsonResponse repeatedDeleteJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/delete",
+                """
+                        {
+                          "reason": "企业工作台软删除职位。"
+                        }
+                        """,
+                "trace-p28-job-delete-repeat",
+                "Bearer " + company.token(),
+                "idem-p28-job-delete-001");
+        assertSuccess(repeatedDeleteJob, 200, "trace-p28-job-delete-repeat");
+        HttpJsonResponse conflictingDeleteJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/delete",
+                """
+                        {
+                          "reason": "不同删除原因"
+                        }
+                        """,
+                "trace-p28-job-delete-conflict",
+                "Bearer " + company.token(),
+                "idem-p28-job-delete-001");
+        assertError(conflictingDeleteJob, 409, "IDEMPOTENCY_409", "trace-p28-job-delete-conflict");
+
+        HttpJsonResponse crossCompanyJobDelete = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/delete",
+                """
+                        {
+                          "reason": "wrong tenant delete"
+                        }
+                        """,
+                "trace-p28-cross-company-job-delete",
+                "Bearer " + otherCompany.token(),
+                "idem-p28-cross-company-job-delete");
+        assertError(crossCompanyJobDelete, 403, "AUTHZ_403", "trace-p28-cross-company-job-delete");
+        HttpJsonResponse candidateJobDelete = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/delete",
+                """
+                        {
+                          "reason": "candidate should not delete"
+                        }
+                        """,
+                "trace-p28-candidate-job-delete",
+                "Bearer " + candidateToken,
+                "idem-p28-candidate-job-delete");
+        assertError(candidateJobDelete, 403, "AUTHZ_403", "trace-p28-candidate-job-delete");
+        HttpJsonResponse operatorJobDelete = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/delete",
+                """
+                        {
+                          "reason": "operator should not use company workbench"
+                        }
+                        """,
+                "trace-p28-operator-job-delete",
+                "Bearer " + operatorToken,
+                "idem-p28-operator-job-delete");
+        assertError(operatorJobDelete, 403, "AUTHZ_403", "trace-p28-operator-job-delete");
+
+        HttpJsonResponse crossCompanyJobRestore = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/restore-draft",
+                """
+                        {
+                          "reason": "wrong tenant restore"
+                        }
+                        """,
+                "trace-p28-cross-company-job-restore",
+                "Bearer " + otherCompany.token(),
+                "idem-p28-cross-company-job-restore");
+        assertError(crossCompanyJobRestore, 403, "AUTHZ_403", "trace-p28-cross-company-job-restore");
+        HttpJsonResponse candidateJobRestore = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/restore-draft",
+                """
+                        {
+                          "reason": "candidate should not restore"
+                        }
+                        """,
+                "trace-p28-candidate-job-restore",
+                "Bearer " + candidateToken,
+                "idem-p28-candidate-job-restore");
+        assertError(candidateJobRestore, 403, "AUTHZ_403", "trace-p28-candidate-job-restore");
+        HttpJsonResponse operatorJobRestore = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/restore-draft",
+                """
+                        {
+                          "reason": "operator should not use company workbench"
+                        }
+                        """,
+                "trace-p28-operator-job-restore",
+                "Bearer " + operatorToken,
+                "idem-p28-operator-job-restore");
+        assertError(operatorJobRestore, 403, "AUTHZ_403", "trace-p28-operator-job-restore");
+
+        HttpJsonResponse restoreJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/restore-draft",
+                """
+                        {
+                          "reason": "企业工作台从回收站恢复为草稿。"
+                        }
+                        """,
+                "trace-p28-job-restore",
+                "Bearer " + company.token(),
+                "idem-p28-job-restore-001");
+        assertSuccess(restoreJob, 200, "trace-p28-job-restore");
+        assertThat(restoreJob.body().at("/data/status").asInt()).isEqualTo(1);
+        assertThat(restoreJob.body().at("/data/audit_status").asInt()).isEqualTo(1);
+        assertThat(countRows("job_post", "id = " + jobId + " AND deleted_at IS NULL AND status = 1 AND audit_status = 1")).isEqualTo(1);
+        assertThat(countRows("job_application", "id = " + applicationId)).isEqualTo(1);
+        assertThat(countRows("interview_session", "application_id = " + applicationId)).isEqualTo(1);
+
+        HttpJsonResponse jobsAfterRestore = getJson(
+                "/api/company/workbench/jobs?page=1&size=20",
+                "trace-p28-jobs-after-restore",
+                "Bearer " + company.token());
+        assertSuccess(jobsAfterRestore, 200, "trace-p28-jobs-after-restore");
+        assertThat(jobsAfterRestore.body().at("/data/total").asLong()).isEqualTo(1);
+        HttpJsonResponse deletedJobsAfterRestore = getJson(
+                "/api/company/workbench/jobs/deleted?page=1&size=20",
+                "trace-p28-deleted-jobs-after-restore",
+                "Bearer " + company.token());
+        assertSuccess(deletedJobsAfterRestore, 200, "trace-p28-deleted-jobs-after-restore");
+        assertThat(deletedJobsAfterRestore.body().at("/data/total").asLong()).isZero();
+        HttpJsonResponse publicJobAfterRestore = getJson(
+                "/api/portal/jobs/" + jobId,
+                "trace-p28-public-job-after-restore",
+                null);
+        assertError(publicJobAfterRestore, 404, "NOT_FOUND_404", "trace-p28-public-job-after-restore");
+
+        HttpJsonResponse repeatedRestoreJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/restore-draft",
+                """
+                        {
+                          "reason": "企业工作台从回收站恢复为草稿。"
+                        }
+                        """,
+                "trace-p28-job-restore-repeat",
+                "Bearer " + company.token(),
+                "idem-p28-job-restore-001");
+        assertSuccess(repeatedRestoreJob, 200, "trace-p28-job-restore-repeat");
+        HttpJsonResponse conflictingRestoreJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/restore-draft",
+                """
+                        {
+                          "reason": "不同恢复原因"
+                        }
+                        """,
+                "trace-p28-job-restore-conflict",
+                "Bearer " + company.token(),
+                "idem-p28-job-restore-001");
+        assertError(conflictingRestoreJob, 409, "IDEMPOTENCY_409", "trace-p28-job-restore-conflict");
+        HttpJsonResponse restoreActiveJob = postJson(
+                "/api/company/workbench/jobs/" + jobId + "/restore-draft",
+                """
+                        {
+                          "reason": "active job should not restore"
+                        }
+                        """,
+                "trace-p28-job-restore-active",
+                "Bearer " + company.token(),
+                "idem-p28-job-restore-active");
+        assertError(restoreActiveJob, 400, "VALID_400", "trace-p28-job-restore-active");
+
         HttpJsonResponse companyDenied = getJson(
                 "/api/company/workbench/overview",
                 "trace-p28-candidate-denied",
-                "Bearer " + registerAndLoginCandidate());
+                "Bearer " + candidateToken);
         assertError(companyDenied, 403, "AUTHZ_403", "trace-p28-candidate-denied");
 
-        assertThat(countRows("audit_log", "action_type IN ('company_logo_upload','company_logo_delete','company_style_image_upload','company_style_image_order','company_style_image_delete','company_profile_save','company_certification_submit','job_create','job_submit_review','application_stage_change','workbench_interview_invite','export_apply')"))
-                .isGreaterThanOrEqualTo(10);
+        assertThat(countRows("audit_log", "action_type IN ('company_logo_upload','company_logo_delete','company_style_image_upload','company_style_image_order','company_style_image_delete','company_profile_save','company_certification_submit','job_create','job_update','job_submit_review','job_offline','job_delete','job_restore_draft','application_stage_change','workbench_interview_invite','export_apply')"))
+                .isGreaterThanOrEqualTo(14);
         String jobAudit = jdbcTemplate.queryForObject(
                 "SELECT CAST(after_json AS CHAR) FROM audit_log WHERE action_type = 'job_create' AND biz_id = ? ORDER BY id DESC LIMIT 1",
                 String.class,
                 jobId);
         assertThat(jobAudit)
                 .contains("contact_mobile_present")
+                .doesNotContain("18877776666")
+                .doesNotContain("hr-job@example.local")
+                .doesNotContain("job-wechat");
+        String jobUpdateAudit = jdbcTemplate.queryForObject(
+                "SELECT CAST(after_json AS CHAR) FROM audit_log WHERE action_type = 'job_update' AND biz_id = ? ORDER BY id DESC LIMIT 1",
+                String.class,
+                jobId);
+        assertThat(jobUpdateAudit)
+                .contains("contact_mobile_present")
+                .doesNotContain("18877776666")
+                .doesNotContain("hr-job@example.local")
+                .doesNotContain("job-wechat");
+        String jobDeleteAudit = jdbcTemplate.queryForObject(
+                "SELECT CAST(after_json AS CHAR) FROM audit_log WHERE action_type = 'job_delete' AND biz_id = ? ORDER BY id DESC LIMIT 1",
+                String.class,
+                jobId);
+        assertThat(jobDeleteAudit)
+                .contains("\"deleted\": true")
+                .contains("delete_reason_present")
+                .doesNotContain("18877776666")
+                .doesNotContain("hr-job@example.local")
+                .doesNotContain("job-wechat");
+        String jobRestoreAudit = jdbcTemplate.queryForObject(
+                "SELECT CAST(after_json AS CHAR) FROM audit_log WHERE action_type = 'job_restore_draft' AND biz_id = ? ORDER BY id DESC LIMIT 1",
+                String.class,
+                jobId);
+        assertThat(jobRestoreAudit)
+                .contains("\"deleted\": false")
+                .contains("\"status\": 1")
+                .contains("\"audit_status\": 1")
                 .doesNotContain("18877776666")
                 .doesNotContain("hr-job@example.local")
                 .doesNotContain("job-wechat");
