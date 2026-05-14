@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 招聘者搜索简历分阶段开发规划</title>
+  <style>
+    :root {
+      --bg: #f6f8f5;
+      --card: #fff;
+      --ink: #16212b;
+      --muted: #64727f;
+      --line: #e1e8df;
+      --brand: #0f766e;
+      --brand-dark: #164e48;
+      --warn: #a15c05;
+      --warm: #fff7e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      line-height: 1.72;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(15, 118, 110, .12), transparent 28%),
+        radial-gradient(circle at 90% 4%, rgba(161, 92, 5, .10), transparent 30%),
+        var(--bg);
+    }
+    header {
+      padding: 46px 28px 36px;
+      color: #fff;
+      background: linear-gradient(135deg, #123134, #0f766e);
+    }
+    header .wrap, main { max-width: 1120px; margin: 0 auto; }
+    h1 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 46px); letter-spacing: .02em; }
+    h2 { margin: 0 0 14px; color: var(--brand-dark); }
+    h3 { margin: 20px 0 8px; color: #243f45; }
+    p { margin: 8px 0; }
+    code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    main { padding: 28px; }
+    .subtitle { max-width: 860px; color: rgba(255,255,255,.88); font-size: 18px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .badge {
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      padding: 7px 12px;
+      color: #fff;
+      background: rgba(255,255,255,.13);
+      font-weight: 650;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      margin: 18px 0;
+      box-shadow: 0 10px 28px rgba(24, 33, 43, .06);
+    }
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .toc a {
+      display: block;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #fff;
+      color: var(--brand-dark);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fbfdfb;
+    }
+    .step strong { color: var(--brand-dark); }
+    .callout {
+      padding: 14px 16px;
+      border-left: 5px solid var(--brand);
+      background: #effaf7;
+      border-radius: 12px;
+      margin: 14px 0;
+    }
+    .warn {
+      padding: 14px 16px;
+      border-left: 5px solid var(--warn);
+      background: var(--warm);
+      border-radius: 12px;
+      margin: 14px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #edf5f3; color: #173c3b; }
+    li { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>招聘者「搜索简历」分阶段开发规划</h1>
+      <p class="subtitle">将搜索简历定义为 company 私有域内的受控发布快照搜索，而不是公共简历库、联系解锁或完整简历下载。</p>
+      <div class="badges">
+        <span class="badge">建议 6 轮提示词</span>
+        <span class="badge">只读发布快照</span>
+        <span class="badge">默认关闭</span>
+        <span class="badge">字段白名单</span>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="card">
+      <h2>目录</h2>
+      <nav class="toc">
+        <a href="#status">当前状态</a>
+        <a href="#summary">总体结论</a>
+        <a href="#steps">六轮拆分</a>
+        <a href="#prompt1">Prompt 1 安全设计</a>
+        <a href="#prompt2">Prompt 2 实现记录</a>
+        <a href="#filters">六个下拉筛选</a>
+        <a href="#boundaries">固定边界</a>
+        <a href="#next">下一步</a>
+      </nav>
+    </section>
+
+    <section id="status" class="card">
+      <h2>当前状态补记</h2>
+      <div class="callout"><strong>Prompt 1：搜索简历边界重签与数据源设计已完成；Prompt 2：后端受控搜索接口与六个下拉筛选已完成；Prompt 3：搜索简历列表页高保真 UI 已完成；Prompt 4：安全简历详情抽屉与举报简历已完成。</strong></div>
+      <ul>
+        <li>已登记 <code>phase3.company_resume_search=false</code>，默认关闭；当前 <code>/company</code> 的「搜索简历」已具备 company 私有列表页、安全详情抽屉和举报弹窗。</li>
+        <li>允许的低风险子集仅限：company 私有域内、已认证企业、读取候选人主动授权发布的 <code>candidate_publish_snapshot</code> 安全快照。</li>
+        <li>Prompt 2 已新增 company 私有后端 API：<code>GET /api/company/workbench/resume-search</code>，只返回发布快照安全摘要，并写 <code>field_access_log</code>。</li>
+        <li>Prompt 4 已新增 company 私有详情接口、举报接口和 <code>V0027__create_company_resume_snapshot_report.sql</code>；详情读取写 <code>field_access_log</code>，举报写 <code>audit_log</code> 并可创建风险审核摘要任务。</li>
+        <li>仍未实现联系方式展示、完整简历下载、联系解锁、真实短信/微信、小程序/App 或会员支付。</li>
+        <li>下一轮如继续开发，必须从 <strong>Prompt 5：下载/联系/职聊/面试邀请的门禁占位</strong> 开始。</li>
+      </ul>
+    </section>
+
+    <section id="summary" class="card">
+      <h2>总体结论</h2>
+      <p>建议拆成 <strong>6 个提示词</strong> 完成。当前 <code>/company</code> 的「搜索简历」仍是风险池占位，不能直接照搬 74CMS 的「完整简历库 + 下载联系方式」。</p>
+      <div class="callout">核心原则：只搜索候选人主动授权发布的 <code>candidate_publish_snapshot</code> 安全快照；不直接展示手机号、邮箱、微信、附件、简历正文或联系方式。</div>
+      <p>如果只做领导演示 MVP，可以压缩成 4 轮；如果要对齐资料并为后续可控扩展留空间，推荐按 6 轮推进。</p>
+    </section>
+
+    <section id="steps" class="card">
+      <h2>六轮提示词拆分</h2>
+      <div class="step-grid">
+        <div class="step"><strong>Prompt 1：边界重签与数据源设计（已完成）</strong><p>已新增规划中的 <code>phase3.company_resume_search=false</code>，只允许读取发布快照，设计安全筛选字段，并更新三期边界。</p></div>
+        <div class="step"><strong>Prompt 2：后端受控搜索接口（已完成）</strong><p>新增 company 私有 <code>/api/company/workbench/resume-search</code>，支持地区、职位类别、关键词、学历、经验和六个下拉筛选，只返回发布快照安全摘要。</p></div>
+        <div class="step"><strong>Prompt 3：列表页高保真 UI（已完成）</strong><p>替换风险池占位，实现搜索条、筛选项、简历卡片、分页和空态；画像分析只占位。</p></div>
+        <div class="step"><strong>Prompt 4：安全详情与举报（已完成）</strong><p>实现安全详情抽屉和举报弹窗；联系方式区域只提示合规申请，不直接展示。</p></div>
+        <div class="step"><strong>Prompt 5：下载/联系门禁</strong><p>下载简历、聊一聊、面试邀请均做受控弹窗或申请入口，不生成完整简历，不发外部通知。</p></div>
+        <div class="step"><strong>Prompt 6：安全收口</strong><p>补 IDOR/BOLA、撤回不可见、字段黑名单、审计、边界脚本和文档收口。</p></div>
+      </div>
+    </section>
+
+    <section id="prompt1" class="card">
+      <h2>Prompt 1 安全数据源设计</h2>
+      <table>
+        <thead><tr><th>类型</th><th>字段/口径</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>唯一数据源</td><td><code>candidate_publish_snapshot</code></td><td>企业侧搜索不得读取 <code>candidate_resume</code> 原始 JSON；快照构建仍由 candidate 同意/发布流程负责。</td></tr>
+          <tr><td>可筛选字段</td><td>地区、职位类别、学历、经验、性别、行业、专业、工作性质、期望薪资、简历标签、更新时间</td><td>仅允许使用快照内已脱敏、已规范化、候选人同意发布的摘要字段。</td></tr>
+          <tr><td>可返回摘要</td><td>快照 ID、脱敏姓名、年龄段、学历、经验、期望职位、期望地区、期望薪资、技能摘要、更新时间</td><td>后续 API 响应只能返回卡片级安全字段，不返回联系方式或完整简历正文。</td></tr>
+          <tr><td>必须隐藏</td><td>手机号、邮箱、微信、附件 object key、简历正文、证据、原始 JSON、审核材料</td><td>禁止出现在接口响应、DOM、日志、审计摘要、URL、sitemap 或公开门户。</td></tr>
+          <tr><td>撤回联动</td><td>consent 撤回、快照下线、候选人禁用后不可见</td><td>搜索列表、详情、推荐或缓存都必须按服务端状态排除。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="prompt2" class="card">
+      <h2>Prompt 2 后端受控搜索接口实现记录</h2>
+      <table>
+        <thead><tr><th>类型</th><th>完成内容</th><th>边界</th></tr></thead>
+        <tbody>
+          <tr><td>Feature flag</td><td>继续使用 <code>phase3.company_resume_search=false</code>，并要求同时开启 <code>phase3.company_workbench=true</code>。</td><td>默认关闭；未开启时返回 <code>FEATURE_DISABLED_403</code>。</td></tr>
+          <tr><td>权限</td><td>新增 <code>company.resume-search.read</code>，仅授予 <code>company_admin</code>、<code>recruiter</code>。</td><td>candidate/operator/auditor/open_client 不授予。</td></tr>
+          <tr><td>数据源</td><td>新增 <code>V0026__extend_publish_snapshot_resume_search_fields.sql</code>，为 <code>candidate_publish_snapshot</code> 补安全筛选生成列与索引。</td><td>搜索接口只查发布快照，不读取 <code>candidate_resume</code> 原始 JSON。</td></tr>
+          <tr><td>API</td><td>新增 company 私有 <code>GET /api/company/workbench/resume-search</code>。</td><td>只允许已认证 company 访问；未认证、非 company、无权限均拒绝。</td></tr>
+          <tr><td>响应</td><td>返回快照 ID、脱敏姓名、年龄段、学历、经验、期望职位、期望地区、期望薪资、技能摘要、更新时间等安全摘要。</td><td>不返回 candidate_id、手机号、邮箱、微信、附件、证据、完整简历正文或原始 JSON。</td></tr>
+          <tr><td>日志</td><td>对返回快照写 <code>field_access_log</code>，<code>access_type=COMPANY_RESUME_SEARCH</code>。</td><td>只记录 snapshot ID、trace 和访问摘要，不记录关键词原文或敏感字段值。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="prompt4-record" class="card">
+      <h2>Prompt 4 安全详情与举报实现记录</h2>
+      <table>
+        <thead><tr><th>类型</th><th>完成内容</th><th>边界</th></tr></thead>
+        <tbody>
+          <tr><td>详情接口</td><td>新增 company 私有 <code>GET /api/company/workbench/resume-search/{snapshotId}</code>。</td><td>只返回发布快照安全详情字段，不返回候选人原始标识、联系方式、附件或原始 JSON。</td></tr>
+          <tr><td>举报接口</td><td>新增 company 私有 <code>POST /api/company/workbench/resume-search/{snapshotId}/reports</code>，支持固定原因枚举和 300 字备注摘要。</td><td>要求 trace 与幂等；只保存摘要，不保存联系方式、附件、证据或原始简历。</td></tr>
+          <tr><td>数据表</td><td>新增 <code>V0027__create_company_resume_snapshot_report.sql</code> 保存 company、举报人、snapshot、原因、摘要、状态和时间戳。</td><td>不新增完整简历表，不读取 <code>candidate_resume</code> 原始 JSON。</td></tr>
+          <tr><td>审计与风控</td><td>详情读取写 <code>field_access_log</code>；举报写 <code>audit_log</code>，并可创建 <code>risk_review</code> 摘要任务。</td><td>风控任务只记录摘要，不开放联系方式或下载能力。</td></tr>
+          <tr><td>前端</td><td><code>/company</code> 搜索简历页新增详情抽屉和举报弹窗。</td><td>画像分析、下载简历、聊一聊继续占位，不触发真实能力。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="filters" class="card">
+      <h2>六个下拉筛选建议</h2>
+      <table>
+        <thead><tr><th>筛选</th><th>建议选项</th></tr></thead>
+        <tbody>
+          <tr><td>性别</td><td>不限、男性、女性</td></tr>
+          <tr><td>简历标签</td><td>不限、形象好、气质佳、能出差、很幽默、技术精悍、有亲和力、高学历、经验丰富、能加班、海归、会开车、口才好、声音甜美、会应酬、诚实守信、外语好、性格开朗、有上进心、人脉广、知识丰富、才艺多</td></tr>
+          <tr><td>行业类别</td><td>复用企业行业字典，包含互联网/电子商务、通信、电子/半导体、会计/审计、金融、贸易、机械、汽车、医疗、建筑、教育、餐饮、物流、低空经济等</td></tr>
+          <tr><td>所学专业</td><td>先做本地静态专业字典；不得从原始简历 JSON 向企业暴露未授权明细</td></tr>
+          <tr><td>工作性质</td><td>不限、全职、兼职、实习</td></tr>
+          <tr><td>期望薪资</td><td>不限、1000-2000、2000-3000、3000-5000、5000-8000、8000-12000、12000-15000、15000以上</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="boundaries" class="card">
+      <h2>固定边界</h2>
+      <ul>
+        <li>只搜索 <code>candidate_publish_snapshot</code>。</li>
+        <li>不把 <code>candidate_resume</code> 原始 JSON 输出给企业前端。</li>
+        <li>不展示手机号、邮箱、微信、附件 key、证据、完整简历正文。</li>
+        <li>不做公共简历库、联系解锁、真实下载完整简历、真实短信微信通知、会员支付或套餐扣点。</li>
+        <li>不把搜索简历入口放到公开门户、sitemap、SEO 或游客页面。</li>
+      </ul>
+      <div class="warn">如果未来要做「查看联系方式 / 下载完整简历」，必须另起风险准入专项。</div>
+    </section>
+
+    <section id="next" class="card">
+      <h2>下一步</h2>
+      <p>Prompt 1 至 Prompt 4 已完成。下一轮如继续开发，应从 <strong>Prompt 5：下载/联系/职聊/面试邀请的门禁占位</strong> 开始，不要直接实现完整简历库、联系解锁或下载完整简历。</p>
+    </section>
+  </main>
+</body>
+</html>

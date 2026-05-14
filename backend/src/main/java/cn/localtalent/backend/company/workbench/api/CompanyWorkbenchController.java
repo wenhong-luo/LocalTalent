@@ -17,6 +17,12 @@ import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.Intervi
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.JobDeleteRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.JobRestoreRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.OverviewResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSearchDetailResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSearchPageResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSnapshotReportRequest;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSnapshotReportResponse;
+import cn.localtalent.backend.company.workbench.application.CompanyResumeSearchService;
+import cn.localtalent.backend.company.workbench.application.CompanyResumeSearchService.ResumeSearchRequest;
 import cn.localtalent.backend.company.workbench.application.CompanyWorkbenchService;
 import cn.localtalent.backend.exporting.api.ExportApplyRequest;
 import cn.localtalent.backend.exporting.api.ExportApplyResponse;
@@ -49,9 +55,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class CompanyWorkbenchController {
 
     private final CompanyWorkbenchService service;
+    private final CompanyResumeSearchService resumeSearchService;
 
-    public CompanyWorkbenchController(CompanyWorkbenchService service) {
+    public CompanyWorkbenchController(CompanyWorkbenchService service, CompanyResumeSearchService resumeSearchService) {
         this.service = service;
+        this.resumeSearchService = resumeSearchService;
     }
 
     @GetMapping("/overview")
@@ -182,6 +190,61 @@ public class CompanyWorkbenchController {
             @RequestParam(defaultValue = "20") int size
     ) {
         return ApiResponse.success(service.deletedJobs(page, size));
+    }
+
+    @GetMapping("/resume-search")
+    @RequirePermission("company.resume-search.read")
+    public ApiResponse<ResumeSearchPageResponse> resumeSearch(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(value = "city_code", required = false) String cityCode,
+            @RequestParam(value = "category_code", required = false) String categoryCode,
+            @RequestParam(value = "education_code", required = false) String educationCode,
+            @RequestParam(value = "experience_min", required = false) Integer experienceMin,
+            @RequestParam(value = "experience_max", required = false) Integer experienceMax,
+            @RequestParam(required = false) String gender,
+            @RequestParam(value = "resume_tag", required = false) String resumeTag,
+            @RequestParam(value = "industry_code", required = false) String industryCode,
+            @RequestParam(required = false) String major,
+            @RequestParam(value = "work_nature", required = false) String workNature,
+            @RequestParam(value = "expected_salary_code", required = false) String expectedSalaryCode,
+            @RequestParam(value = "updated_within", required = false) Integer updatedWithin,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String sort
+    ) {
+        return ApiResponse.success(resumeSearchService.search(new ResumeSearchRequest(
+                keyword,
+                cityCode,
+                categoryCode,
+                educationCode,
+                experienceMin,
+                experienceMax,
+                gender,
+                resumeTag,
+                industryCode,
+                major,
+                workNature,
+                expectedSalaryCode,
+                updatedWithin,
+                page,
+                size,
+                sort)));
+    }
+
+    @GetMapping("/resume-search/{snapshotId}")
+    @RequirePermission("company.resume-search.read")
+    public ApiResponse<ResumeSearchDetailResponse> resumeSearchDetail(@PathVariable long snapshotId) {
+        return ApiResponse.success(resumeSearchService.detail(snapshotId));
+    }
+
+    @PostMapping("/resume-search/{snapshotId}/reports")
+    @RequirePermission("company.resume-search.read")
+    public ApiResponse<ResumeSnapshotReportResponse> reportResumeSnapshot(
+            @PathVariable long snapshotId,
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey,
+            @RequestBody ResumeSnapshotReportRequest request
+    ) {
+        return ApiResponse.success(resumeSearchService.report(snapshotId, request, idempotencyKey));
     }
 
     @PostMapping("/jobs")

@@ -5,6 +5,7 @@ public record CandidateProfileRaw(
         String realName,
         boolean realnameVerified,
         String baseProfileJson,
+        String educationJson,
         String skillsJson
 ) {
 }

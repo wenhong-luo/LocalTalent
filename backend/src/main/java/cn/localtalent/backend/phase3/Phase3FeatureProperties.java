@@ -40,6 +40,12 @@ public class Phase3FeatureProperties {
     private boolean companyLogoUpload;
 
     /**
+     * Company-private controlled resume search over candidate publish snapshots.
+     * Defaults to false in configuration.
+     */
+    private boolean companyResumeSearch;
+
+    /**
      * Prompt 29 operator/auditor portal operations. Defaults to false in configuration.
      */
     private boolean operatorPortalOps;
@@ -90,6 +96,14 @@ public class Phase3FeatureProperties {
 
     public void setCompanyLogoUpload(boolean companyLogoUpload) {
         this.companyLogoUpload = companyLogoUpload;
+    }
+
+    public boolean isCompanyResumeSearch() {
+        return companyResumeSearch;
+    }
+
+    public void setCompanyResumeSearch(boolean companyResumeSearch) {
+        this.companyResumeSearch = companyResumeSearch;
     }
 
     public boolean isOperatorPortalOps() {

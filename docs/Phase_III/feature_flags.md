@@ -24,6 +24,7 @@
 | `phase3.company_workbench` | off | P3-3 | 企业资料、认证材料、职位、投递池、面试邀约、导出申请 | TBD | 关闭企业增强入口，保留二期企业页 | 企业只能访问本企业数据 |
 | `phase3.company_style_upload` | off | P3-3 补充 | 企业风采图片私有上传、预览、排序、删除 | TBD | 关闭风采上传入口，回到安全占位 | 只限企业私有域；不进入公开企业主页、推荐位、搜索、sitemap 或导出旁路 |
 | `phase3.company_logo_upload` | off | P3-3 补充 | 企业基本资料 Logo 私有上传、预览、替换、删除 | TBD | 关闭 Logo 上传入口，回到安全占位 | 只限企业后台私有域；不返回 object key、预签名 URL，不进入公开企业页、推荐位、搜索、sitemap 或导出旁路 |
+| `phase3.company_resume_search` | off | P3-3 搜索简历专项 Prompt 1 | 企业私有域内受控搜索候选人发布快照 | TBD | 关闭搜索简历入口，回到风险池占位 | 只允许读取 `candidate_publish_snapshot`；不开放公共简历库、联系解锁、完整简历下载、联系方式或原始候选人数据 |
 | `phase3.operator_portal_ops` | off | P3-4 | 运营审核、内容活动、推荐位、风险审核、门户状态驱动 | TBD | 关闭运营配置入口，回到二期静态演示 | auditor 只读，operator 写审计 |
 | `phase3.audit_security_gate` | off | P3-5 | 审计 trace、导出审批回归、撤回下线传播、字段黑名单、IDOR/BOLA | TBD | 阻断灰度入口，回退到上一个安全版本 | 不得放宽字段黑名单 |
 | `phase3.gray_ops` | off | P3-6 | 预发/灰度配置、备份恢复、监控告警、容量烟测、上线演练 | TBD | 关闭灰度流量并执行暂停/回滚 Runbook | 不代表公网正式上线 |

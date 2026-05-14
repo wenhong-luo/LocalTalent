@@ -45,6 +45,7 @@ localtalent:
     company-workbench: ${LOCALTALENT_PHASE3_COMPANY_WORKBENCH:false}
     company-style-upload: ${LOCALTALENT_PHASE3_COMPANY_STYLE_UPLOAD:false}
     company-logo-upload: ${LOCALTALENT_PHASE3_COMPANY_LOGO_UPLOAD:false}
+    company-resume-search: ${LOCALTALENT_PHASE3_COMPANY_RESUME_SEARCH:false}
     operator-portal-ops: ${LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS:false}
   resume-attachment:
     max-size-bytes: ${LOCALTALENT_RESUME_ATTACHMENT_MAX_BYTES:5242880}

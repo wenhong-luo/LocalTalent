@@ -42,6 +42,8 @@ import {
   fetchCompanyJobs,
   fetchCompanyLogo,
   fetchCompanyLogoBlob,
+  fetchCompanyResumeSearch,
+  fetchCompanyResumeSearchDetail,
   fetchCompanyStyleImageBlob,
   fetchCompanyStyleImages,
   fetchCompanyWorkbenchApplications,
@@ -50,6 +52,7 @@ import {
   fetchCompanyWorkbenchOverview,
   issueCompanyExportDownloadUrl,
   offlineCompanyWorkbenchJob,
+  reportCompanyResumeSnapshot,
   restoreCompanyWorkbenchJobDraft,
   saveCompanyWorkbenchProfile,
   saveCompanyStyleImageOrder,
@@ -64,6 +67,10 @@ import {
   type CompanyInterviewSession,
   type CompanyJob,
   type CompanyLogo,
+  type CompanyResumeSearchDetail,
+  type CompanyResumeSearchItem,
+  type CompanyResumeSearchPage,
+  type CompanyResumeSearchParams,
   type CompanyStyleImage,
   type CompanyStatus,
   type CompanyWorkbenchApplication,
@@ -74,6 +81,8 @@ import styles from './CompanyDashboard.module.css';
 type LoadStatus = 'loading' | 'ready' | 'error' | 'retrying';
 type WorkbenchMode = 'unknown' | 'enabled' | 'disabled';
 type JobTab = 'published' | 'reviewing' | 'offline' | 'deleted';
+type ResumeSearchStatus = 'idle' | 'loading' | 'ready' | 'error' | 'disabled';
+type ResumeDetailStatus = 'idle' | 'loading' | 'ready' | 'error';
 type CompanySection =
   | 'home'
   | 'jobs'
@@ -127,6 +136,74 @@ const jobTabs: Array<{ id: JobTab; label: string; hint: string }> = [
   { id: 'reviewing', label: '审核中', hint: '草稿、待审核或驳回' },
   { id: 'offline', label: '已下线', hint: '企业主动关闭' },
   { id: 'deleted', label: '已删除', hint: '回收站职位' }
+];
+
+const resumeSearchGenderOptions = [
+  { value: 'male', label: '男性' },
+  { value: 'female', label: '女性' }
+];
+
+const resumeTagOptions = [
+  { value: 'image_good', label: '形象好' },
+  { value: 'temperament_good', label: '气质佳' },
+  { value: 'travel_ready', label: '能出差' },
+  { value: 'technical', label: '技术精悍' },
+  { value: 'friendly', label: '有亲和力' },
+  { value: 'experienced', label: '经验丰富' },
+  { value: 'overtime_ready', label: '能加班' },
+  { value: 'driving', label: '会开车' },
+  { value: 'communicative', label: '口才好' },
+  { value: 'honest', label: '诚实守信' },
+  { value: 'foreign_language', label: '外语好' },
+  { value: 'positive', label: '有上进心' }
+];
+
+const resumeMajorOptions = [
+  { value: 'computer_science', label: '计算机类' },
+  { value: 'business_admin', label: '工商管理类' },
+  { value: 'accounting', label: '财会类' },
+  { value: 'marketing', label: '市场营销类' },
+  { value: 'mechanical', label: '机械制造类' },
+  { value: 'electronics', label: '电子信息类' },
+  { value: 'medicine', label: '医学护理类' },
+  { value: 'education', label: '教育类' },
+  { value: 'civil_engineering', label: '土木建筑类' },
+  { value: 'other_major', label: '其它专业' }
+];
+
+const resumeSalaryOptions = [
+  { value: '1k_2k', label: '1000-2000' },
+  { value: '2k_3k', label: '2000-3000' },
+  { value: '3k_5k', label: '3000-5000' },
+  { value: '5k_8k', label: '5000-8000' },
+  { value: '8k_12k', label: '8000-12000' },
+  { value: '12k_15k', label: '12000-15000' },
+  { value: '15k_plus', label: '15000以上' }
+];
+
+const resumeUpdatedWithinOptions = [
+  { value: '3', label: '最近3天' },
+  { value: '7', label: '最近7天' },
+  { value: '30', label: '最近30天' },
+  { value: '90', label: '最近90天' }
+];
+
+const resumeReportReasonOptions = [
+  { value: 'false_information', label: '信息不实' },
+  { value: 'inappropriate_content', label: '内容不当' },
+  { value: 'duplicate_snapshot', label: '重复简历' },
+  { value: 'wrong_category', label: '分类不准确' },
+  { value: 'privacy_concern', label: '隐私风险' },
+  { value: 'other', label: '其它原因' }
+];
+
+const resumeExperienceFilters = [
+  { value: '', label: '经验不限' },
+  { value: '0_1', label: '1年以下', min: 0, max: 1 },
+  { value: '1_3', label: '1～3年', min: 1, max: 3 },
+  { value: '3_5', label: '3～5年', min: 3, max: 5 },
+  { value: '5_10', label: '5～10年', min: 5, max: 10 },
+  { value: '10_plus', label: '10年以上', min: 10 }
 ];
 
 function Field({
@@ -432,6 +509,44 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   const [message, setMessage] = useState('正在读取企业后台数据。');
   const [traceId, setTraceId] = useState<string>();
   const [jobOperationNotice, setJobOperationNotice] = useState('');
+  const [resumeSearchKeyword, setResumeSearchKeyword] = useState('');
+  const [resumeSearchCityCode, setResumeSearchCityCode] = useState('');
+  const [resumeSearchPositions, setResumeSearchPositions] = useState<string[]>([]);
+  const [resumeSearchCategoryCode, setResumeSearchCategoryCode] = useState('');
+  const [resumeSearchEducationCode, setResumeSearchEducationCode] = useState('');
+  const [resumeSearchExperience, setResumeSearchExperience] = useState('');
+  const [resumeSearchGender, setResumeSearchGender] = useState('');
+  const [resumeSearchTag, setResumeSearchTag] = useState('');
+  const [resumeSearchIndustryCode, setResumeSearchIndustryCode] = useState('');
+  const [resumeSearchMajor, setResumeSearchMajor] = useState('');
+  const [resumeSearchWorkNature, setResumeSearchWorkNature] = useState('');
+  const [resumeSearchSalaryCode, setResumeSearchSalaryCode] = useState('');
+  const [resumeSearchUpdatedWithin, setResumeSearchUpdatedWithin] = useState('');
+  const [resumeSearchPage, setResumeSearchPage] = useState<CompanyResumeSearchPage>({
+    snapshot_list: [],
+    total: 0,
+    page: 1,
+    size: 20
+  });
+  const [resumeSearchStatus, setResumeSearchStatus] = useState<ResumeSearchStatus>('idle');
+  const [resumeSearchMessage, setResumeSearchMessage] = useState('');
+  const [resumeSearchTraceId, setResumeSearchTraceId] = useState('');
+  const [resumeSearchNotice, setResumeSearchNotice] = useState('');
+  const [resumeDetailStatus, setResumeDetailStatus] = useState<ResumeDetailStatus>('idle');
+  const [resumeDetail, setResumeDetail] = useState<CompanyResumeSearchDetail | null>(null);
+  const [resumeDetailMessage, setResumeDetailMessage] = useState('');
+  const [resumeReportOpen, setResumeReportOpen] = useState(false);
+  const [resumeReportReason, setResumeReportReason] = useState('false_information');
+  const [resumeReportRemark, setResumeReportRemark] = useState('');
+  const [resumeReportMessage, setResumeReportMessage] = useState('');
+  const [resumeReportSubmitting, setResumeReportSubmitting] = useState(false);
+
+  const workbenchEnabled = workbenchMode === 'enabled';
+  const applicationRows = workbenchEnabled ? workbenchApplications : legacyApplications;
+  const profile = overview?.profile ?? null;
+  const missingProfileFields = workbenchEnabled ? getMissingCompanyProfileFields(profile) : [];
+  const basicProfileComplete = !workbenchEnabled || missingProfileFields.length === 0;
+  const gateLocked = workbenchEnabled && Boolean(overview) && !basicProfileComplete;
 
   async function loadLegacy() {
     const [jobResult, applicationResult] = await Promise.all([
@@ -610,6 +725,13 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     }));
   }, [deletedJobs, jobTab, jobs]);
 
+  useEffect(() => {
+    if (activeSection !== 'talentSearch' || gateLocked || resumeSearchStatus !== 'idle') {
+      return;
+    }
+    void loadResumeSearch(1);
+  }, [activeSection, gateLocked, resumeSearchStatus]);
+
   async function runAction(description: string, action: () => Promise<void>): Promise<boolean> {
     setStatus('retrying');
     setMessage(description);
@@ -657,6 +779,140 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
       setMessage(fallback);
       setCompanyLogoMessage(fallback);
     }
+  }
+
+  function resumeSearchParams(page = 1, overrides: Partial<CompanyResumeSearchParams> = {}): CompanyResumeSearchParams {
+    const experience = resumeExperienceFilters.find((item) => item.value === resumeSearchExperience);
+    return {
+      keyword: resumeSearchKeyword.trim() || undefined,
+      city_code: resumeSearchCityCode || undefined,
+      category_code: resumeSearchCategoryCode || undefined,
+      education_code: resumeSearchEducationCode || undefined,
+      experience_min: experience?.min,
+      experience_max: experience?.max,
+      gender: resumeSearchGender || undefined,
+      resume_tag: resumeSearchTag || undefined,
+      industry_code: resumeSearchIndustryCode || undefined,
+      major: resumeSearchMajor || undefined,
+      work_nature: resumeSearchWorkNature || undefined,
+      expected_salary_code: resumeSearchSalaryCode || undefined,
+      updated_within: resumeSearchUpdatedWithin ? Number(resumeSearchUpdatedWithin) : undefined,
+      page,
+      size: 20,
+      sort: 'updated_desc',
+      ...overrides
+    };
+  }
+
+  async function loadResumeSearch(page = 1, overrides: Partial<CompanyResumeSearchParams> = {}) {
+    setResumeSearchStatus('loading');
+    setResumeSearchMessage('正在读取受控发布快照。');
+    try {
+      const result = await fetchCompanyResumeSearch(context.token, resumeSearchParams(page, overrides));
+      setResumeSearchPage(result.data);
+      setResumeSearchStatus('ready');
+      setResumeSearchMessage('');
+      setResumeSearchTraceId(result.traceId);
+    } catch (error) {
+      const trace = isHttpClientError(error) ? error.traceId ?? '' : '';
+      setResumeSearchTraceId(trace);
+      if (featureDisabled(error)) {
+        setResumeSearchStatus('disabled');
+        setResumeSearchMessage('受控搜索简历暂未开启。请先确认 phase3.company_resume_search 灰度开关。');
+        return;
+      }
+      setResumeSearchStatus('error');
+      setResumeSearchMessage(errorMessage(error, '搜索简历暂时不可用。'));
+    }
+  }
+
+  async function openResumeDetail(snapshotId: number) {
+    setResumeSearchNotice('');
+    setResumeDetailStatus('loading');
+    setResumeDetailMessage('正在读取发布快照安全摘要。');
+    setResumeDetail(null);
+    setResumeReportOpen(false);
+    setResumeReportRemark('');
+    setResumeReportMessage('');
+    try {
+      const result = await fetchCompanyResumeSearchDetail(context.token, snapshotId);
+      setResumeDetail(result.data);
+      setResumeSearchTraceId(result.traceId);
+      setResumeDetailStatus('ready');
+      setResumeDetailMessage('');
+    } catch (error) {
+      setResumeDetailStatus('error');
+      setResumeDetailMessage(errorMessage(error, '发布快照详情暂时不可用。'));
+      setResumeSearchTraceId(isHttpClientError(error) ? error.traceId ?? '' : '');
+    }
+  }
+
+  function closeResumeDetail() {
+    setResumeDetail(null);
+    setResumeDetailStatus('idle');
+    setResumeDetailMessage('');
+    setResumeReportOpen(false);
+    setResumeReportRemark('');
+    setResumeReportMessage('');
+  }
+
+  async function submitResumeReport(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!resumeDetail) {
+      return;
+    }
+    setResumeReportSubmitting(true);
+    setResumeReportMessage('正在提交举报。');
+    try {
+      const result = await reportCompanyResumeSnapshot(context.token, resumeDetail.snapshot_id, {
+        reason_code: resumeReportReason,
+        remark: resumeReportRemark
+      });
+      setResumeReportMessage(`${result.data.message} trace_id: ${result.traceId}`);
+      setResumeSearchTraceId(result.traceId);
+      setResumeReportRemark('');
+    } catch (error) {
+      const trace = isHttpClientError(error) ? error.traceId : undefined;
+      setResumeReportMessage(`${errorMessage(error, '举报提交失败。')}${trace ? ` trace_id: ${trace}` : ''}`);
+    } finally {
+      setResumeReportSubmitting(false);
+    }
+  }
+
+  async function onSubmitResumeSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await loadResumeSearch(1);
+  }
+
+  async function onResetResumeSearch() {
+    setResumeSearchKeyword('');
+    setResumeSearchCityCode('');
+    setResumeSearchPositions([]);
+    setResumeSearchCategoryCode('');
+    setResumeSearchEducationCode('');
+    setResumeSearchExperience('');
+    setResumeSearchGender('');
+    setResumeSearchTag('');
+    setResumeSearchIndustryCode('');
+    setResumeSearchMajor('');
+    setResumeSearchWorkNature('');
+    setResumeSearchSalaryCode('');
+    setResumeSearchUpdatedWithin('');
+    await loadResumeSearch(1, {
+      keyword: undefined,
+      city_code: undefined,
+      category_code: undefined,
+      education_code: undefined,
+      experience_min: undefined,
+      experience_max: undefined,
+      gender: undefined,
+      resume_tag: undefined,
+      industry_code: undefined,
+      major: undefined,
+      work_nature: undefined,
+      expected_salary_code: undefined,
+      updated_within: undefined
+    });
   }
 
   async function onLegacyApply(event: FormEvent<HTMLFormElement>) {
@@ -1074,13 +1330,6 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     return result.data;
   }
 
-  const workbenchEnabled = workbenchMode === 'enabled';
-  const applicationRows = workbenchEnabled ? workbenchApplications : legacyApplications;
-  const profile = overview?.profile ?? null;
-  const missingProfileFields = workbenchEnabled ? getMissingCompanyProfileFields(profile) : [];
-  const basicProfileComplete = !workbenchEnabled || missingProfileFields.length === 0;
-  const gateLocked = workbenchEnabled && Boolean(overview) && !basicProfileComplete;
-
   const menuItems: Array<{
     id: CompanySection;
     label: string;
@@ -1090,7 +1339,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   }> = [
     { id: 'home', label: '会员首页', disabledWhenLocked: true },
     { id: 'jobs', label: '职位管理', disabledWhenLocked: true },
-    { id: 'talentSearch', label: '搜索简历', disabledWhenLocked: true, risk: true },
+    { id: 'talentSearch', label: '搜索简历', disabledWhenLocked: true },
     { id: 'chat', label: '我的职聊', disabledWhenLocked: true, risk: true },
     { id: 'applications', label: '简历管理', disabledWhenLocked: true },
     { id: 'services', label: '会员服务', disabledWhenLocked: true, risk: true },
@@ -1476,7 +1725,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
       { icon: '发', label: '发布职位', section: 'jobs' as CompanySection },
       { icon: '职', label: '职位管理', section: 'jobs' as CompanySection },
       { icon: '刷', label: '一键刷新', section: 'services' as CompanySection, risk: true },
-      { icon: '才', label: '搜索人才', section: 'talentSearch' as CompanySection, risk: true },
+      { icon: '才', label: '搜索人才', section: 'talentSearch' as CompanySection, risk: false },
       { icon: '套', label: '我的套餐', section: 'services' as CompanySection, risk: true },
       { icon: '增', label: '增值服务', section: 'services' as CompanySection, risk: true },
       { icon: '顶', label: '职位置顶', section: 'services' as CompanySection, risk: true },
@@ -1611,7 +1860,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
                 <div className={styles.memberBlockTitle}>
                   <div>
                     <h3>人才推荐</h3>
-                    <p className={styles.muted}>根据职位与投递情况展示安全摘要。本轮不开放公共简历库、联系解锁或候选人搜索。</p>
+                    <p className={styles.muted}>根据职位与投递情况展示安全摘要。搜索人才仅限受控发布快照，不开放公共简历库、联系解锁或联系方式查看。</p>
                   </div>
                   <button type="button" onClick={() => chooseSection('jobs')}>选择职位</button>
                 </div>
@@ -2307,6 +2556,306 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     );
   }
 
+  function resumeSearchEducationLabel(item: CompanyResumeSearchItem): string {
+    return item.highest_education || dictionaryOptionLabel(jobEducationOptions, item.education_code, '学历暂未填写');
+  }
+
+  function resumeSearchWorkNatureLabel(value: string): string {
+    return dictionaryOptionLabel(jobNatureOptions, value, value || '求职性质不限');
+  }
+
+  function renderResumeSearchCard(item: CompanyResumeSearchItem) {
+    const positions = item.expected_positions.length > 0 ? item.expected_positions.join(' / ') : '期望职位暂未填写';
+    const cities = item.expected_cities.length > 0 ? item.expected_cities.join(' / ') : '期望地区不限';
+    const tags = item.resume_tags.length > 0 ? item.resume_tags : ['发布快照', '字段白名单'];
+    return (
+      <article className={styles.resumeSearchCard} key={item.snapshot_id}>
+        <div className={styles.resumeSearchAvatar} aria-hidden="true">
+          {item.display_name_masked.slice(0, 1) || '才'}
+        </div>
+        <div className={styles.resumeSearchMain}>
+          <div className={styles.resumeSearchTitleRow}>
+            <div>
+              <h3>{item.display_name_masked || '求职者*'}</h3>
+              <p>
+                {item.gender || '性别未公开'} · {item.age_band || '年龄段未公开'} · {resumeSearchEducationLabel(item)}
+                {item.experience_years == null ? '' : ` · ${item.experience_years}年经验`}
+              </p>
+            </div>
+            <span className={styles.resumeSearchUpdated}>{formatDateText(item.updated_at)} 更新</span>
+          </div>
+          <dl className={styles.resumeSearchSummary}>
+            <div><dt>期望职位</dt><dd>{positions}</dd></div>
+            <div><dt>期望地区</dt><dd>{cities}</dd></div>
+            <div><dt>期望薪资</dt><dd>{item.expected_salary || '面议'}</dd></div>
+            <div><dt>工作性质</dt><dd>{resumeSearchWorkNatureLabel(item.work_nature)}</dd></div>
+          </dl>
+          <p className={styles.resumeSearchSkills}>{item.skills_summary || '候选人暂未发布技能摘要。'}</p>
+          <div className={styles.resumeSearchTags}>
+            {tags.slice(0, 6).map((tag) => <span key={tag}>{tag}</span>)}
+          </div>
+        </div>
+        <div className={styles.resumeSearchActions}>
+          <button type="button" onClick={() => openResumeDetail(item.snapshot_id)}>查看摘要</button>
+          <button type="button" onClick={() => setResumeSearchNotice('画像分析仅为视觉占位，本轮不接 AI 或候选人画像能力。')}>画像分析（占位）</button>
+          <button type="button" onClick={() => setResumeSearchNotice('下载完整简历属于高风险能力，本轮不开放。')}>下载简历（受控占位）</button>
+          <button type="button" onClick={() => setResumeSearchNotice('聊一聊和联系方式查看仍需后续风险准入，本轮不开放。')}>聊一聊（占位）</button>
+        </div>
+      </article>
+    );
+  }
+
+  function renderResumeDetailDrawer() {
+    if (resumeDetailStatus === 'idle') {
+      return null;
+    }
+    const detail = resumeDetail;
+    const positions = detail && detail.expected_positions.length > 0 ? detail.expected_positions.join(' / ') : '期望职位暂未填写';
+    const cities = detail && detail.expected_cities.length > 0 ? detail.expected_cities.join(' / ') : '期望地区不限';
+    return (
+      <div className={styles.resumeDetailBackdrop} role="dialog" aria-modal="true" aria-labelledby="resume-detail-title">
+        <aside className={styles.resumeDetailDrawer}>
+          <div className={styles.resumeDetailHeader}>
+            <div>
+              <span>发布快照安全摘要</span>
+              <h3 id="resume-detail-title">简历摘要详情</h3>
+            </div>
+            <button type="button" aria-label="关闭简历摘要详情" onClick={closeResumeDetail}>×</button>
+          </div>
+          {resumeDetailStatus === 'loading' ? (
+            <div className={styles.resumeSearchEmpty}>正在读取安全详情...</div>
+          ) : null}
+          {resumeDetailStatus === 'error' ? (
+            <div className={styles.resumeSearchError}>
+              <strong>详情读取失败</strong>
+              <p>{resumeDetailMessage}</p>
+              {resumeSearchTraceId ? <span>trace_id: {resumeSearchTraceId}</span> : null}
+            </div>
+          ) : null}
+          {resumeDetailStatus === 'ready' && detail ? (
+            <>
+              <section className={styles.resumeDetailProfile}>
+                <div className={styles.resumeSearchAvatar} aria-hidden="true">{detail.display_name_masked.slice(0, 1) || '才'}</div>
+                <div>
+                  <h4>{detail.display_name_masked || '求职者*'}</h4>
+                  <p>
+                    {detail.gender || '性别未公开'} · {detail.age_band || '年龄段未公开'} · {resumeSearchEducationLabel(detail)}
+                    {detail.experience_years == null ? '' : ` · ${detail.experience_years}年经验`}
+                  </p>
+                  <span>{formatDateText(detail.updated_at)} 更新</span>
+                </div>
+              </section>
+              <dl className={styles.resumeDetailGrid}>
+                <div><dt>期望职位</dt><dd>{positions}</dd></div>
+                <div><dt>期望地区</dt><dd>{cities}</dd></div>
+                <div><dt>期望薪资</dt><dd>{detail.expected_salary || '面议'}</dd></div>
+                <div><dt>工作性质</dt><dd>{resumeSearchWorkNatureLabel(detail.work_nature)}</dd></div>
+                <div><dt>专业</dt><dd>{detail.major_name || '未公开'}</dd></div>
+                <div><dt>行业</dt><dd>{dictionaryOptionLabel(companyIndustryOptions, detail.industry_code, detail.industry_code || '未公开')}</dd></div>
+              </dl>
+              <section className={styles.resumeDetailSection}>
+                <h4>技能摘要</h4>
+                <p>{detail.skills_summary || '候选人暂未发布技能摘要。'}</p>
+                <div className={styles.resumeSearchTags}>
+                  {(detail.resume_tags.length > 0 ? detail.resume_tags : ['发布快照', '字段白名单']).slice(0, 8).map((tag) => <span key={tag}>{tag}</span>)}
+                </div>
+              </section>
+              <section className={styles.resumeDetailSection}>
+                <h4>经历与教育摘要</h4>
+                <p>{detail.experience_summary || '经历摘要未公开。'}</p>
+                <p>{detail.education_summary || '教育摘要未公开。'}</p>
+                <p>{detail.self_description_summary || '自我描述摘要未公开。'}</p>
+              </section>
+              <section className={styles.resumeDetailContact}>
+                <h4>联系方式</h4>
+                <p>{detail.contact_access_hint}</p>
+              </section>
+              <div className={styles.resumeDetailActions}>
+                <button type="button" onClick={() => setResumeReportOpen(true)}>举报简历</button>
+                <button type="button" onClick={() => setResumeSearchNotice('画像分析仅为视觉占位，本轮不接 AI 或候选人画像能力。')}>画像分析（占位）</button>
+                <button type="button" disabled>下载简历（受控占位）</button>
+                <button type="button" disabled>聊一聊（占位）</button>
+              </div>
+              {resumeReportOpen ? (
+                <form className={styles.resumeReportForm} onSubmit={submitResumeReport}>
+                  <h4>举报简历</h4>
+                  <DictionarySelect
+                    label="举报原因"
+                    value={resumeReportReason}
+                    options={resumeReportReasonOptions}
+                    onChange={setResumeReportReason}
+                    placeholder="请选择举报原因"
+                  />
+                  <label>
+                    <span>备注说明</span>
+                    <textarea
+                      value={resumeReportRemark}
+                      maxLength={300}
+                      onChange={(event) => setResumeReportRemark(event.target.value)}
+                      placeholder="请描述问题，最多 300 字。不要填写联系方式或敏感材料。"
+                    />
+                  </label>
+                  {resumeReportMessage ? <p className={styles.resumeReportMessage}>{resumeReportMessage}</p> : null}
+                  <div className={styles.actionRow}>
+                    <button type="button" className={styles.plainButton} onClick={() => setResumeReportOpen(false)}>取消</button>
+                    <button type="submit" className={styles.primaryButton} disabled={resumeReportSubmitting}>
+                      {resumeReportSubmitting ? '提交中...' : '提交举报'}
+                    </button>
+                  </div>
+                </form>
+              ) : null}
+            </>
+          ) : null}
+        </aside>
+      </div>
+    );
+  }
+
+  function renderTalentSearch() {
+    const totalPages = Math.max(1, Math.ceil(resumeSearchPage.total / resumeSearchPage.size));
+    const currentPage = Math.min(resumeSearchPage.page || 1, totalPages);
+    return (
+      <section className={styles.resumeSearchPage}>
+        <div className={styles.resumeSearchHero}>
+          <div>
+            <span>受控发布快照搜索</span>
+            <h2>搜索简历</h2>
+            <p>仅检索候选人授权发布的快照摘要，不展示联系方式、附件、完整简历或原始候选人数据。</p>
+          </div>
+          <strong>快照白名单</strong>
+        </div>
+
+        <form className={styles.resumeSearchFilters} onSubmit={onSubmitResumeSearch}>
+          <div className={styles.resumeSearchTopBar}>
+            <label>
+              <span>关键词</span>
+              <input
+                aria-label="搜索简历关键词"
+                value={resumeSearchKeyword}
+                onChange={(event) => setResumeSearchKeyword(event.target.value)}
+                placeholder="搜索期望职位、地区、技能摘要"
+              />
+            </label>
+            <button type="submit" className={styles.resumeSearchSubmit}>搜索简历</button>
+            <button type="button" className={styles.resumeSearchReset} onClick={onResetResumeSearch}>清空筛选</button>
+          </div>
+          <div className={styles.resumeSearchPrimaryFilters}>
+            <RegionCascadePicker
+              mode="single"
+              label="地区"
+              value={resumeSearchCityCode}
+              onChange={setResumeSearchCityCode}
+              placeholder="不限地区"
+              dialogLabel="搜索简历地区"
+            />
+            <ExpectedPositionPicker
+              selectedPositions={resumeSearchPositions}
+              selectedCategoryCode={resumeSearchCategoryCode}
+              maxSelections={1}
+              title="职位类别"
+              placeholder="不限职类"
+              searchPlaceholder="请输入职位类别关键词"
+              onSave={({ positions, categoryCode }) => {
+                setResumeSearchPositions(positions);
+                setResumeSearchCategoryCode(categoryCode);
+              }}
+            />
+            <DictionarySelect
+              label="学历"
+              value={resumeSearchEducationCode}
+              options={jobEducationOptions}
+              onChange={setResumeSearchEducationCode}
+              placeholder="不限学历"
+            />
+            <DictionarySelect
+              label="更新时间"
+              value={resumeSearchUpdatedWithin}
+              options={resumeUpdatedWithinOptions}
+              onChange={setResumeSearchUpdatedWithin}
+              placeholder="不限时间"
+            />
+          </div>
+          <div className={styles.resumeSearchQuickFilters} aria-label="工作经验快捷筛选">
+            {resumeExperienceFilters.map((option) => (
+              <button
+                key={option.value || 'all'}
+                type="button"
+                className={resumeSearchExperience === option.value ? styles.resumeQuickFilterActive : styles.resumeQuickFilter}
+                onClick={() => setResumeSearchExperience(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <div className={styles.resumeSearchMoreFilters}>
+            <DictionarySelect label="性别" value={resumeSearchGender} options={resumeSearchGenderOptions} onChange={setResumeSearchGender} placeholder="不限性别" />
+            <DictionarySelect label="简历标签" value={resumeSearchTag} options={resumeTagOptions} onChange={setResumeSearchTag} placeholder="不限标签" />
+            <DictionarySelect label="行业类别" value={resumeSearchIndustryCode} options={companyIndustryOptions} onChange={setResumeSearchIndustryCode} placeholder="不限行业" />
+            <DictionarySelect label="所学专业" value={resumeSearchMajor} options={resumeMajorOptions} onChange={setResumeSearchMajor} placeholder="不限专业" />
+            <DictionarySelect label="工作性质" value={resumeSearchWorkNature} options={jobNatureOptions} onChange={setResumeSearchWorkNature} placeholder="不限性质" />
+            <DictionarySelect label="期望薪资" value={resumeSearchSalaryCode} options={resumeSalaryOptions} onChange={setResumeSearchSalaryCode} placeholder="不限薪资" />
+          </div>
+        </form>
+
+        {resumeSearchNotice ? <div className={styles.resumeSearchNotice}>{resumeSearchNotice}</div> : null}
+
+        <div className={styles.resumeSearchBody}>
+          <div className={styles.resumeSearchList}>
+            <div className={styles.resumeSearchListHeader}>
+              <div>
+                <h3>简历快照列表</h3>
+                <p>共 {resumeSearchPage.total} 条安全快照。</p>
+              </div>
+              {resumeSearchTraceId ? <span>trace {resumeSearchTraceId}</span> : null}
+            </div>
+            {resumeSearchStatus === 'loading' ? (
+              <div className={styles.resumeSearchEmpty}>正在读取受控发布快照...</div>
+            ) : null}
+            {resumeSearchStatus === 'disabled' ? (
+              <div className={styles.resumeSearchEmpty}>
+                <strong>受控搜索简历暂未开启</strong>
+                <p>{resumeSearchMessage}</p>
+              </div>
+            ) : null}
+            {resumeSearchStatus === 'error' ? (
+              <div className={styles.resumeSearchError}>
+                <strong>搜索简历读取失败</strong>
+                <p>{resumeSearchMessage}</p>
+                {resumeSearchTraceId ? <span>trace_id: {resumeSearchTraceId}</span> : null}
+              </div>
+            ) : null}
+            {resumeSearchStatus === 'ready' && resumeSearchPage.snapshot_list.length === 0 ? (
+              <div className={styles.resumeSearchEmpty}>
+                <strong>暂无符合条件的发布快照</strong>
+                <p>请调整筛选条件，或等待候选人授权发布更多快照。</p>
+              </div>
+            ) : null}
+            {resumeSearchStatus === 'ready' && resumeSearchPage.snapshot_list.length > 0 ? (
+              <div className={styles.resumeSearchCards}>
+                {resumeSearchPage.snapshot_list.map(renderResumeSearchCard)}
+              </div>
+            ) : null}
+            <div className={styles.resumeSearchPagination}>
+              <span>第 {currentPage} / {totalPages} 页</span>
+              <button type="button" disabled={resumeSearchStatus === 'loading' || currentPage <= 1} onClick={() => loadResumeSearch(currentPage - 1)}>上一页</button>
+              <button type="button" disabled={resumeSearchStatus === 'loading' || currentPage >= totalPages} onClick={() => loadResumeSearch(currentPage + 1)}>下一页</button>
+            </div>
+          </div>
+          <aside className={styles.resumeSearchBoundary}>
+            <h3>搜索简历边界</h3>
+            <ul>
+              <li>只读取候选人授权发布快照。</li>
+              <li>不展示联系方式、附件或完整简历。</li>
+              <li>画像分析、下载和职聊均为占位。</li>
+              <li>撤回或下线快照不会出现在本页。</li>
+            </ul>
+          </aside>
+        </div>
+        {renderResumeDetailDrawer()}
+      </section>
+    );
+  }
+
   function renderRiskPlaceholder(title: string) {
     return (
       <section className={styles.riskPlaceholder}>
@@ -2326,7 +2875,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     if (section === 'applications') return renderApplications();
     if (section === 'interviews') return renderInterviews();
     if (section === 'exports') return renderExports();
-    if (section === 'talentSearch') return renderRiskPlaceholder('搜索简历：风险池占位');
+    if (section === 'talentSearch') return renderTalentSearch();
     if (section === 'chat') return renderRiskPlaceholder('我的职聊：站内沟通占位');
     if (section === 'services') return renderRiskPlaceholder('会员服务：灰度占位');
     if (section === 'recommend') return renderRiskPlaceholder('智能推荐：风险池占位');

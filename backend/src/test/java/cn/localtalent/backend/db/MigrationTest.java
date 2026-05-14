@@ -78,15 +78,31 @@ class MigrationTest {
                 "city_code",
                 "category_code",
                 "display_name_masked",
-                "experience_years"));
+                "experience_years",
+                "education_code",
+                "gender_code",
+                "industry_code",
+                "major_name",
+                "work_nature_code",
+                "expected_salary_code",
+                "resume_tags_text"));
         assertGeneratedColumnsExist(jdbcTemplate, "candidate_publish_snapshot", List.of(
                 "city_code",
                 "category_code",
                 "display_name_masked",
-                "experience_years"));
+                "experience_years",
+                "education_code",
+                "gender_code",
+                "industry_code",
+                "major_name",
+                "work_nature_code",
+                "expected_salary_code",
+                "resume_tags_text"));
         assertIndexesExist(jdbcTemplate, "candidate_publish_snapshot", List.of(
                 "idx_portal_snapshot_visible_time",
-                "idx_portal_snapshot_filter_time"));
+                "idx_portal_snapshot_filter_time",
+                "idx_resume_search_base",
+                "idx_resume_search_dropdown"));
         assertColumnsAbsent(jdbcTemplate, "candidate_publish_snapshot", List.of("mobile", "email", "password_hash"));
         assertColumnsAbsent(jdbcTemplate, "candidate_user", List.of("snapshot_json"));
         assertColumnsExist(jdbcTemplate, "company", List.of(
@@ -310,6 +326,19 @@ class MigrationTest {
                 "idx_status_severity_time",
                 "idx_target",
                 "idx_handler_time"));
+        assertColumnsExist(jdbcTemplate, "company_resume_snapshot_report", List.of(
+                "company_id",
+                "reporter_user_id",
+                "snapshot_id",
+                "reason_code",
+                "remark_summary",
+                "status",
+                "created_at",
+                "updated_at"));
+        assertIndexesExist(jdbcTemplate, "company_resume_snapshot_report", List.of(
+                "idx_company_report_time",
+                "idx_snapshot_status_time",
+                "idx_reason_status_time"));
         assertColumnsExist(jdbcTemplate, "company_style_image", List.of(
                 "company_id",
                 "file_name",

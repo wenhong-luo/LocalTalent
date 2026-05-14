@@ -268,6 +268,75 @@ const emptyDeletedWorkbenchJobs = {
   total: 0
 };
 
+const resumeSearchPage = {
+  snapshot_list: [
+    {
+      snapshot_id: 1101,
+      display_name_masked: '赵*',
+      age_band: '25-30岁',
+      gender: '女',
+      education_code: 'bachelor',
+      highest_education: '本科',
+      experience_years: 4,
+      expected_positions: ['前端工程师', 'UI设计师'],
+      expected_cities: ['上海 / 上海市 / 浦东新区'],
+      expected_salary: '12k-18k',
+      city_code: '310115',
+      category_code: 'network_communication_electronics',
+      industry_code: 'internet',
+      major_name: '计算机科学与技术',
+      work_nature: 'full_time',
+      resume_tags: ['近期活跃', '可到岗'],
+      skills_summary: 'Vue, TypeScript, 组件化协作',
+      updated_at: '2026-05-12T09:30:00',
+      candidate_id: 999,
+      mobile: '13900001234',
+      email: 'candidate@example.com',
+      wechat: 'candidate-wechat',
+      attachment_object_key: 'resume/private.pdf',
+      resume_body: 'raw resume body',
+      base_profile_json: '{"name":"raw"}',
+      education_json: '[]',
+      experience_json: '[]',
+      skills_json: '[]',
+      evidence: 'consent evidence',
+      password_hash: 'bcrypt-hash',
+      contact_unlock: 'paid'
+    }
+  ],
+  total: 1,
+  page: 1,
+  size: 20
+};
+
+const resumeSearchDetail = {
+  ...resumeSearchPage.snapshot_list[0],
+  education_summary: '本科 · 计算机科学与技术',
+  experience_summary: '4年互联网项目经验，熟悉组件化协作。',
+  self_description_summary: '注重交付质量，沟通协作稳定。',
+  contact_access_hint: '联系方式查看需通过合规申请；当前不开放联系解锁。',
+  candidate_id: 999,
+  mobile: '13900001234',
+  email: 'candidate@example.com',
+  wechat: 'candidate-wechat',
+  attachment_object_key: 'resume/private.pdf',
+  resume_body: 'raw resume body',
+  base_profile_json: '{"name":"raw"}',
+  education_json: '[]',
+  experience_json: '[]',
+  skills_json: '[]',
+  evidence: 'consent evidence',
+  password_hash: 'bcrypt-hash',
+  contact_unlock: 'paid'
+};
+
+const emptyResumeSearchPage = {
+  snapshot_list: [],
+  total: 0,
+  page: 1,
+  size: 20
+};
+
 const workbenchApplications = {
   application_list: [
     {
@@ -324,7 +393,10 @@ function installCompanyFetchMock({
   styleImages = companyStyleImages,
   logo = companyLogo,
   jobPage = workbenchJobs,
-  deletedJobPage = emptyDeletedWorkbenchJobs
+  deletedJobPage = emptyDeletedWorkbenchJobs,
+  resumeSearch = resumeSearchPage,
+  resumeDetail = resumeSearchDetail,
+  resumeSearchDisabled = false
 }: {
   workbenchEnabled?: boolean;
   overview?: typeof workbenchOverview;
@@ -333,6 +405,9 @@ function installCompanyFetchMock({
   logo?: Record<string, unknown>;
   jobPage?: typeof workbenchJobs;
   deletedJobPage?: typeof workbenchJobs;
+  resumeSearch?: { snapshot_list: Array<Record<string, unknown>>; total: number; page: number; size: number };
+  resumeDetail?: Record<string, unknown>;
+  resumeSearchDisabled?: boolean;
 } = {}) {
   let currentOverview = overview;
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
@@ -350,6 +425,29 @@ function installCompanyFetchMock({
 
     if (url.includes('/api/company/workbench/overview')) {
       return workbenchEnabled ? apiOk(currentOverview) : apiError('FEATURE_DISABLED_403', 'company workbench disabled');
+    }
+
+    if (url.includes('/api/company/workbench/resume-search/') && url.includes('/reports') && method === 'POST') {
+      return resumeSearchDisabled
+        ? apiError('FEATURE_DISABLED_403', 'controlled resume search disabled')
+        : apiOk({
+          report_id: 9001,
+          snapshot_id: 1101,
+          report_status: 'submitted',
+          message: '举报已提交，运营将按风险审核流程处理。'
+        }, 'trace-resume-report');
+    }
+
+    if (url.includes('/api/company/workbench/resume-search/') && method === 'GET') {
+      return resumeSearchDisabled
+        ? apiError('FEATURE_DISABLED_403', 'controlled resume search disabled')
+        : apiOk(resumeDetail, 'trace-resume-detail');
+    }
+
+    if (url.includes('/api/company/workbench/resume-search')) {
+      return resumeSearchDisabled
+        ? apiError('FEATURE_DISABLED_403', 'controlled resume search disabled')
+        : apiOk(resumeSearch, 'trace-resume-search');
     }
 
     if (url.endsWith('/api/company/workbench/logo') && method === 'GET') {
@@ -525,6 +623,17 @@ function latestWorkbenchJobPayload(fetchMock: ReturnType<typeof vi.spyOn>): Reco
   return JSON.parse(String(call[1]?.body ?? '{}')) as Record<string, unknown>;
 }
 
+function latestResumeSearchUrl(fetchMock: ReturnType<typeof vi.spyOn>): URL {
+  const call = [...fetchMock.mock.calls].reverse().find(([input, init]) => {
+    const url = String(input);
+    return url.includes('/api/company/workbench/resume-search') && (init?.method ?? 'GET') === 'GET';
+  });
+  if (!call) {
+    throw new Error('resume search request not found');
+  }
+  return new URL(String(call[0]), 'http://localhost');
+}
+
 function expectNoSensitiveCandidateOrCompanyFields() {
   const body = bodyText();
   expect(body).not.toContain('13900001234');
@@ -539,6 +648,8 @@ function expectNoSensitiveCandidateOrCompanyFields() {
   expect(body).not.toContain('private audit material');
   expect(body).not.toContain('mobile');
   expect(body).not.toContain('email');
+  expect(body).not.toContain('candidate_id');
+  expect(body).not.toContain('wechat');
   expect(body).not.toContain('resume_body');
   expect(body).not.toContain('attachment_object_key');
   expect(body).not.toContain('evidence');
@@ -551,6 +662,7 @@ function expectNoSensitiveCandidateOrCompanyFields() {
   expect(body).not.toContain('审核材料');
   expect(body).not.toContain('presigned_url');
   expect(body).not.toContain('object_key');
+  expect(body).not.toContain('contact_unlock');
 }
 
 describe('CompanyDashboard', () => {
@@ -609,7 +721,7 @@ describe('CompanyDashboard', () => {
     expect(screen.getByText('快捷菜单')).toBeInTheDocument();
     expect(screen.getByText('专属客服')).toBeInTheDocument();
     expect(screen.getByText(/会员商业化、真实支付、发票与订单暂未开放/)).toBeInTheDocument();
-    expect(screen.getByText(/不开放公共简历库、联系解锁或候选人搜索/)).toBeInTheDocument();
+    expect(screen.getByText(/搜索人才仅限受控发布快照/)).toBeInTheDocument();
 
     fireEvent.click(screen.getAllByRole('button', { name: '编辑资料' })[0]);
     expect(await screen.findByText('企业资料')).toBeInTheDocument();
@@ -627,9 +739,143 @@ describe('CompanyDashboard', () => {
     fireEvent.click(screen.getByRole('button', { name: /^会员首页$/ }));
     expect(await screen.findByText('我的公司')).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole('button', { name: /^搜索人才$/ })[0]);
-    expect(await screen.findByText('搜索简历：风险池占位')).toBeInTheDocument();
+    expect(await screen.findByText('受控发布快照搜索')).toBeInTheDocument();
+    expect(screen.getByText('赵*')).toBeInTheDocument();
+    expect(screen.queryByText('搜索简历：风险池占位')).not.toBeInTheDocument();
     expect(bodyText()).not.toContain('支付链接');
     expect(bodyText()).not.toContain('联系解锁入口');
+    expectNoSensitiveCandidateOrCompanyFields();
+  });
+
+  it('renders controlled resume search list with safe snapshot cards and placeholders', async () => {
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'company-token');
+    installCompanyFetchMock();
+
+    render(<CompanyDashboard />);
+
+    expect(await screen.findByText('企业会员首页')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^搜索简历$/ }));
+
+    expect(await screen.findByText('受控发布快照搜索')).toBeInTheDocument();
+    expect(screen.getByText('简历快照列表')).toBeInTheDocument();
+    expect(screen.getByText('赵*')).toBeInTheDocument();
+    expect(screen.getByText('前端工程师 / UI设计师')).toBeInTheDocument();
+    expect(screen.getByText('上海 / 上海市 / 浦东新区')).toBeInTheDocument();
+    expect(screen.getByText('Vue, TypeScript, 组件化协作')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '查看摘要' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '画像分析（占位）' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '下载简历（受控占位）' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '聊一聊（占位）' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '画像分析（占位）' }));
+    expect(screen.getByText(/画像分析仅为视觉占位/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '查看摘要' }));
+    expect(await screen.findByRole('dialog', { name: '简历摘要详情' })).toBeInTheDocument();
+    expect(screen.getByText('发布快照安全摘要')).toBeInTheDocument();
+    expect(screen.getByText('4年互联网项目经验，熟悉组件化协作。')).toBeInTheDocument();
+    expect(screen.getByText('联系方式查看需通过合规申请；当前不开放联系解锁。')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: '下载简历（受控占位）' }).at(-1)).toBeDisabled();
+    expect(screen.getAllByRole('button', { name: '聊一聊（占位）' }).at(-1)).toBeDisabled();
+
+    fireEvent.click(screen.getByRole('button', { name: '举报简历' }));
+    fireEvent.click(screen.getByRole('button', { name: /举报原因 信息不实/ }));
+    fireEvent.click(screen.getByRole('option', { name: '隐私风险' }));
+    fireEvent.change(screen.getByPlaceholderText(/请描述问题/), { target: { value: '疑似包含不合规信息 13900001234' } });
+    fireEvent.click(screen.getByRole('button', { name: '提交举报' }));
+    expect(await screen.findByText(/举报已提交，运营将按风险审核流程处理/)).toBeInTheDocument();
+    expect(screen.getAllByText(/trace-resume-report/).length).toBeGreaterThanOrEqual(1);
+    expectNoSensitiveCandidateOrCompanyFields();
+  });
+
+  it('submits controlled resume search filters without exposing raw candidate data', async () => {
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'company-token');
+    const fetchMock = installCompanyFetchMock();
+
+    render(<CompanyDashboard />);
+
+    expect(await screen.findByText('企业会员首页')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^搜索简历$/ }));
+    expect(await screen.findByText('受控发布快照搜索')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('搜索简历关键词'), { target: { value: '前端 Vue' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /地区 不限地区/ }));
+    fireEvent.click(screen.getByRole('button', { name: '上海' }));
+    fireEvent.click(screen.getByRole('button', { name: '浦东新区' }));
+
+    fireEvent.click(screen.getByRole('button', { name: '不限职类' }));
+    const positionDialog = screen.getByRole('dialog', { name: '职位类别' });
+    fireEvent.click(within(positionDialog).getByRole('button', { name: '网络 | 通信 | 电子' }));
+    fireEvent.click(within(positionDialog).getByLabelText('前端工程师'));
+    fireEvent.click(within(positionDialog).getByRole('button', { name: '保存' }));
+
+    fireEvent.click(screen.getByRole('button', { name: /学历 不限学历/ }));
+    fireEvent.click(screen.getByRole('option', { name: '本科' }));
+    fireEvent.click(screen.getByRole('button', { name: /更新时间 不限时间/ }));
+    fireEvent.click(screen.getByRole('option', { name: '最近7天' }));
+    fireEvent.click(screen.getByRole('button', { name: '3～5年' }));
+    fireEvent.click(screen.getByRole('button', { name: /性别 不限性别/ }));
+    fireEvent.click(screen.getByRole('option', { name: '女性' }));
+    fireEvent.click(screen.getByRole('button', { name: /简历标签 不限标签/ }));
+    fireEvent.click(screen.getByRole('option', { name: '技术精悍' }));
+    fireEvent.click(screen.getByRole('button', { name: /行业类别 不限行业/ }));
+    fireEvent.click(screen.getByRole('option', { name: '互联网/电子商务' }));
+    fireEvent.click(screen.getByRole('button', { name: /所学专业 不限专业/ }));
+    fireEvent.click(screen.getByRole('option', { name: '计算机类' }));
+    fireEvent.click(screen.getByRole('button', { name: /工作性质 不限性质/ }));
+    fireEvent.click(screen.getByRole('option', { name: '全职' }));
+    fireEvent.click(screen.getByRole('button', { name: /期望薪资 不限薪资/ }));
+    fireEvent.click(screen.getByRole('option', { name: '8000-12000' }));
+
+    fireEvent.click(screen.getAllByRole('button', { name: /^搜索简历$/ }).at(-1)!);
+
+    await waitFor(() => {
+      const url = latestResumeSearchUrl(fetchMock);
+      expect(url.searchParams.get('keyword')).toBe('前端 Vue');
+      expect(url.searchParams.get('city_code')).toBe('310115');
+      expect(url.searchParams.get('category_code')).toBe('network_communication_electronics');
+      expect(url.searchParams.get('education_code')).toBe('bachelor');
+      expect(url.searchParams.get('experience_min')).toBe('3');
+      expect(url.searchParams.get('experience_max')).toBe('5');
+      expect(url.searchParams.get('gender')).toBe('female');
+      expect(url.searchParams.get('resume_tag')).toBe('technical');
+      expect(url.searchParams.get('industry_code')).toBe('internet');
+      expect(url.searchParams.get('major')).toBe('computer_science');
+      expect(url.searchParams.get('work_nature')).toBe('full_time');
+      expect(url.searchParams.get('expected_salary_code')).toBe('8k_12k');
+      expect(url.searchParams.get('updated_within')).toBe('7');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: '清空筛选' }));
+    await waitFor(() => {
+      expect(latestResumeSearchUrl(fetchMock).searchParams.get('page')).toBe('1');
+    });
+    expect(screen.getByLabelText('搜索简历关键词')).toHaveValue('');
+    expectNoSensitiveCandidateOrCompanyFields();
+  });
+
+  it('shows safe disabled and empty states for controlled resume search', async () => {
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'company-token');
+    installCompanyFetchMock({ resumeSearchDisabled: true });
+
+    const { unmount } = render(<CompanyDashboard />);
+
+    expect(await screen.findByText('企业会员首页')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^搜索简历$/ }));
+    expect(await screen.findByText('受控搜索简历暂未开启')).toBeInTheDocument();
+    expect(screen.getByText(/phase3.company_resume_search/)).toBeInTheDocument();
+    expectNoSensitiveCandidateOrCompanyFields();
+
+    unmount();
+    vi.restoreAllMocks();
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'company-token');
+    installCompanyFetchMock({ resumeSearch: emptyResumeSearchPage });
+    render(<CompanyDashboard />);
+
+    expect(await screen.findByText('企业会员首页')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^搜索简历$/ }));
+    expect(await screen.findByText('暂无符合条件的发布快照')).toBeInTheDocument();
     expectNoSensitiveCandidateOrCompanyFields();
   });
 

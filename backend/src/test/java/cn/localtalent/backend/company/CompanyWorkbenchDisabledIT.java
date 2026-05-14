@@ -61,6 +61,14 @@ class CompanyWorkbenchDisabledIT {
         assertThat(disabled.body().at("/code").asText()).isEqualTo("FEATURE_DISABLED_403");
         assertThat(disabled.body().at("/trace_id").asText()).isEqualTo("trace-p28-disabled-overview");
 
+        HttpJsonResponse resumeSearchDisabled = getJson(
+                "/api/company/workbench/resume-search?page=1&size=20",
+                "trace-p28-disabled-resume-search",
+                "Bearer " + token);
+        assertThat(resumeSearchDisabled.status()).isEqualTo(403);
+        assertThat(resumeSearchDisabled.body().at("/code").asText()).isEqualTo("FEATURE_DISABLED_403");
+        assertThat(resumeSearchDisabled.body().at("/trace_id").asText()).isEqualTo("trace-p28-disabled-resume-search");
+
         HttpJsonResponse legacy = getJson(
                 "/api/company/jobs?page=1&size=20",
                 "trace-p28-disabled-legacy-jobs",

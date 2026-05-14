@@ -1616,6 +1616,620 @@
   padding: 7px 10px;
 }
 
+.resumeSearchPage {
+  display: grid;
+  gap: 18px;
+}
+
+.resumeSearchHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 280px);
+  gap: 18px;
+  align-items: center;
+  border: 1px solid #d7f4ef;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 82% 20%, rgba(20, 184, 166, 0.22), transparent 18rem),
+    linear-gradient(135deg, #f0fdfa 0%, #ffffff 66%);
+  padding: 28px 30px;
+}
+
+.resumeSearchHero span {
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.resumeSearchHero h2 {
+  margin: 8px 0 10px;
+  color: #10233f;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.08;
+}
+
+.resumeSearchHero p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.8;
+}
+
+.resumeSearchHero > div:last-child {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  color: #ffffff;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 18px 38px rgba(20, 184, 166, 0.22);
+}
+
+.resumeSearchHero > div:last-child strong {
+  display: block;
+  font-size: 44px;
+  line-height: 1;
+}
+
+.resumeSearchHero > div:last-child small {
+  display: block;
+  margin-top: 10px;
+  color: #dffcf7;
+  font-weight: 800;
+}
+
+.resumeSearchFilters,
+.resumeSearchList,
+.resumeSearchBoundary {
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+}
+
+.resumeSearchFilters {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+}
+
+.resumeSearchTopBar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto;
+  gap: 12px;
+}
+
+.resumeSearchTopBar input {
+  min-height: 44px;
+  border: 1px solid #dbe5f0;
+  border-radius: 12px;
+  padding: 0 14px;
+  color: #334155;
+  outline: none;
+}
+
+.resumeSearchTopBar input:focus {
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
+}
+
+.resumeSearchSubmit,
+.resumeSearchReset {
+  min-height: 44px;
+  border-radius: 12px;
+  padding: 0 20px;
+  font-weight: 900;
+}
+
+.resumeSearchSubmit {
+  border: 0;
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  color: #ffffff;
+}
+
+.resumeSearchReset {
+  border: 1px solid #dbe5f0;
+  background: #ffffff;
+  color: #334155;
+}
+
+.resumeSearchPrimaryFilters,
+.resumeSearchMoreFilters {
+  display: grid;
+  gap: 14px;
+}
+
+.resumeSearchPrimaryFilters {
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+}
+
+.resumeSearchMoreFilters {
+  grid-template-columns: repeat(6, minmax(150px, 1fr));
+}
+
+.resumeSearchQuickFilters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.resumeSearchQuickFilters::before {
+  content: "经验";
+  color: #64748b;
+  font-weight: 900;
+}
+
+.resumeQuickFilter,
+.resumeQuickFilterActive {
+  border: 1px solid #dbe5f0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #334155;
+  padding: 7px 13px;
+  font-weight: 800;
+}
+
+.resumeQuickFilterActive {
+  border-color: #14b8a6;
+  background: #ecfdf5;
+  color: #0f766e;
+}
+
+.resumeSearchNotice {
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 12px 16px;
+  font-weight: 800;
+}
+
+.resumeSearchBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 18px;
+  align-items: start;
+}
+
+.resumeSearchList {
+  overflow: hidden;
+}
+
+.resumeSearchListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #eef2f7;
+  padding: 20px 22px;
+}
+
+.resumeSearchListHeader h3 {
+  margin: 0;
+  color: #10233f;
+  font-size: 22px;
+}
+
+.resumeSearchListHeader p {
+  margin: 5px 0 0;
+  color: #64748b;
+}
+
+.resumeSearchListHeader span {
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #0f766e;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.resumeSearchCards {
+  display: grid;
+  gap: 14px;
+  padding: 18px 22px 6px;
+}
+
+.resumeSearchCard {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  gap: 16px;
+  border: 1px solid #edf2f7;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.resumeSearchCard:hover {
+  border-color: #99f6e4;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+}
+
+.resumeSearchAvatar {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ccfbf1, #f0fdfa);
+  color: #0f766e;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.resumeSearchMain {
+  min-width: 0;
+}
+
+.resumeSearchTitleRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.resumeSearchTitleRow h3,
+.resumeSearchTitleRow h4 {
+  margin: 0;
+  color: #0f766e;
+  font-size: 18px;
+}
+
+.resumeSearchTitleRow p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.resumeSearchUpdated {
+  color: #64748b;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.resumeSearchSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.resumeSearchSummary div {
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 10px;
+}
+
+.resumeSearchSummary dt {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.resumeSearchSummary dd {
+  margin: 5px 0 0;
+  color: #172033;
+  font-weight: 900;
+}
+
+.resumeSearchSkills {
+  margin: 0 0 10px;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.resumeSearchTags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.resumeSearchTags span {
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #0f766e;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.resumeSearchActions {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  min-width: 130px;
+}
+
+.resumeSearchActions button {
+  border: 1px solid #dbe5f0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #2563eb;
+  padding: 8px 12px;
+  font-weight: 900;
+}
+
+.resumeSearchActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.resumeSearchEmpty,
+.resumeSearchError {
+  margin: 20px 22px;
+  border-radius: 16px;
+  padding: 34px 24px;
+  text-align: center;
+}
+
+.resumeSearchEmpty {
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.resumeSearchEmpty strong,
+.resumeSearchError strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #172033;
+  font-size: 18px;
+}
+
+.resumeSearchEmpty p,
+.resumeSearchError p {
+  margin: 0;
+}
+
+.resumeSearchError {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.resumeSearchError span {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.resumeSearchPagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 22px 22px;
+  color: #64748b;
+}
+
+.resumeSearchPagination button {
+  border: 1px solid #dbe5f0;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #334155;
+  padding: 8px 12px;
+  font-weight: 800;
+}
+
+.resumeSearchPagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.resumeSearchBoundary {
+  padding: 20px;
+}
+
+.resumeSearchBoundary h3 {
+  margin: 0 0 12px;
+  color: #10233f;
+}
+
+.resumeSearchBoundary ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #64748b;
+  line-height: 1.8;
+}
+
+.resumeDetailBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(15, 23, 42, 0.44);
+  padding: 18px;
+}
+
+.resumeDetailDrawer {
+  width: min(580px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.28);
+  padding: 24px;
+}
+
+.resumeDetailHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+}
+
+.resumeDetailHeader span {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.resumeDetailHeader h3 {
+  margin: 5px 0 0;
+  color: #10233f;
+  font-size: 24px;
+}
+
+.resumeDetailHeader button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.resumeDetailProfile {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  border-radius: 18px;
+  background: #f8fafc;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.resumeDetailProfile h4 {
+  margin: 0 0 6px;
+  color: #10233f;
+  font-size: 20px;
+}
+
+.resumeDetailProfile p,
+.resumeDetailProfile span {
+  margin: 0;
+  color: #64748b;
+}
+
+.resumeDetailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.resumeDetailGrid div {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.resumeDetailGrid dt {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.resumeDetailGrid dd {
+  margin: 5px 0 0;
+  color: #172033;
+  font-weight: 900;
+}
+
+.resumeDetailSection,
+.resumeDetailContact,
+.resumeReportForm {
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 16px;
+  margin-top: 14px;
+}
+
+.resumeDetailSection h4,
+.resumeDetailContact h4,
+.resumeReportForm h4 {
+  margin: 0 0 10px;
+  color: #10233f;
+}
+
+.resumeDetailSection p,
+.resumeDetailContact p {
+  margin: 8px 0;
+  color: #475569;
+  line-height: 1.75;
+}
+
+.resumeDetailContact {
+  border-color: #fed7aa;
+  background: #fff7ed;
+}
+
+.resumeDetailActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.resumeDetailActions button {
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #2563eb;
+  padding: 10px 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.resumeDetailActions button:first-child {
+  border-color: #0f766e;
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.resumeDetailActions button:disabled {
+  color: #94a3b8;
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+
+.resumeReportForm label {
+  display: block;
+  margin-top: 12px;
+}
+
+.resumeReportForm label > span {
+  display: block;
+  margin-bottom: 8px;
+  color: #64748b;
+  font-weight: 900;
+}
+
+.resumeReportForm textarea {
+  width: 100%;
+  min-height: 92px;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 10px 12px;
+  color: #334155;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.resumeReportForm textarea:focus {
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
+}
+
+.resumeReportMessage {
+  margin: 10px 0 0;
+  color: #0f766e;
+  font-weight: 900;
+}
+
 .modalBackdrop {
   position: fixed;
   inset: 0;
@@ -1687,6 +2301,33 @@
   }
 
   .jobTabs {
+    grid-template-columns: 1fr;
+  }
+
+  .resumeSearchHero,
+  .resumeSearchBody,
+  .resumeSearchTopBar,
+  .resumeSearchPrimaryFilters,
+  .resumeSearchMoreFilters,
+  .resumeSearchCard,
+  .resumeSearchSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .resumeSearchActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resumeDetailBackdrop {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .resumeDetailDrawer {
+    max-height: calc(100vh - 24px);
+  }
+
+  .resumeDetailGrid {
     grid-template-columns: 1fr;
   }
 }

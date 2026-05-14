@@ -214,4 +214,74 @@ public final class CompanyWorkbenchDtos {
             @JsonProperty("reason") String reason
     ) {
     }
+
+    public record ResumeSearchPageResponse(
+            @JsonProperty("snapshot_list") List<ResumeSearchItemResponse> snapshotList,
+            long total,
+            int page,
+            int size
+    ) {
+    }
+
+    public record ResumeSearchItemResponse(
+            @JsonProperty("snapshot_id") long snapshotId,
+            @JsonProperty("display_name_masked") String displayNameMasked,
+            @JsonProperty("age_band") String ageBand,
+            String gender,
+            @JsonProperty("education_code") String educationCode,
+            @JsonProperty("highest_education") String highestEducation,
+            @JsonProperty("experience_years") Integer experienceYears,
+            @JsonProperty("expected_positions") List<String> expectedPositions,
+            @JsonProperty("expected_cities") List<String> expectedCities,
+            @JsonProperty("expected_salary") String expectedSalary,
+            @JsonProperty("city_code") String cityCode,
+            @JsonProperty("category_code") String categoryCode,
+            @JsonProperty("industry_code") String industryCode,
+            @JsonProperty("major_name") String majorName,
+            @JsonProperty("work_nature") String workNature,
+            @JsonProperty("resume_tags") List<String> resumeTags,
+            @JsonProperty("skills_summary") String skillsSummary,
+            @JsonProperty("updated_at") String updatedAt
+    ) {
+    }
+
+    public record ResumeSearchDetailResponse(
+            @JsonProperty("snapshot_id") long snapshotId,
+            @JsonProperty("display_name_masked") String displayNameMasked,
+            @JsonProperty("age_band") String ageBand,
+            String gender,
+            @JsonProperty("education_code") String educationCode,
+            @JsonProperty("highest_education") String highestEducation,
+            @JsonProperty("experience_years") Integer experienceYears,
+            @JsonProperty("expected_positions") List<String> expectedPositions,
+            @JsonProperty("expected_cities") List<String> expectedCities,
+            @JsonProperty("expected_salary") String expectedSalary,
+            @JsonProperty("city_code") String cityCode,
+            @JsonProperty("category_code") String categoryCode,
+            @JsonProperty("industry_code") String industryCode,
+            @JsonProperty("major_name") String majorName,
+            @JsonProperty("work_nature") String workNature,
+            @JsonProperty("resume_tags") List<String> resumeTags,
+            @JsonProperty("skills_summary") String skillsSummary,
+            @JsonProperty("education_summary") String educationSummary,
+            @JsonProperty("experience_summary") String experienceSummary,
+            @JsonProperty("self_description_summary") String selfDescriptionSummary,
+            @JsonProperty("contact_access_hint") String contactAccessHint,
+            @JsonProperty("updated_at") String updatedAt
+    ) {
+    }
+
+    public record ResumeSnapshotReportRequest(
+            @JsonProperty("reason_code") String reasonCode,
+            String remark
+    ) {
+    }
+
+    public record ResumeSnapshotReportResponse(
+            @JsonProperty("report_id") long reportId,
+            @JsonProperty("snapshot_id") long snapshotId,
+            @JsonProperty("report_status") String reportStatus,
+            String message
+    ) {
+    }
 }

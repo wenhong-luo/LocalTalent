@@ -72,6 +72,7 @@ flag_keys=(
   "phase3.company_workbench"
   "phase3.company_style_upload"
   "phase3.company_logo_upload"
+  "phase3.company_resume_search"
   "phase3.operator_portal_ops"
   "phase3.audit_security_gate"
   "phase3.gray_ops"
@@ -94,6 +95,7 @@ env_flag_keys=(
   "PHASE3_FEATURE_COMPANY_WORKBENCH=off"
   "PHASE3_FEATURE_COMPANY_STYLE_UPLOAD=off"
   "PHASE3_FEATURE_COMPANY_LOGO_UPLOAD=off"
+  "PHASE3_FEATURE_COMPANY_RESUME_SEARCH=off"
   "PHASE3_FEATURE_OPERATOR_PORTAL_OPS=off"
   "PHASE3_FEATURE_AUDIT_SECURITY_GATE=off"
   "PHASE3_FEATURE_GRAY_OPS=off"
@@ -113,6 +115,7 @@ runtime_flag_keys=(
   "LOCALTALENT_PHASE3_COMPANY_WORKBENCH=false"
   "LOCALTALENT_PHASE3_COMPANY_STYLE_UPLOAD=false"
   "LOCALTALENT_PHASE3_COMPANY_LOGO_UPLOAD=false"
+  "LOCALTALENT_PHASE3_COMPANY_RESUME_SEARCH=false"
   "LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS=false"
   "LOCALTALENT_PHASE3_GRAY_OPS=false"
 )

@@ -146,6 +146,21 @@
         </table>
       </section>
 
+      <section class="card" id="resume-search-plan">
+        <h2>后续专项规划：招聘者受控搜索简历（Prompt 1-4 已完成）</h2>
+        <p>已新增 <code>docs/Phase_III/招聘者搜索简历分阶段开发规划.md/html</code>。该文件用于约束后续开发，不代表可开放公共简历库。当前 Prompt 1（边界重签与数据源设计）、Prompt 2（后端受控搜索接口与六个下拉筛选）、Prompt 3（搜索简历列表页高保真 UI）和 Prompt 4（安全简历详情抽屉与举报简历）已完成，已登记 <code>phase3.company_resume_search=false</code> 且默认关闭，唯一允许数据源为 <code>candidate_publish_snapshot</code> 发布快照。</p>
+        <table>
+          <tr><th>轮次</th><th>主题</th><th>固定边界</th></tr>
+          <tr><td>1</td><td>搜索简历边界重签与数据源设计（已完成）</td><td>只登记默认关闭 flag 与安全数据源口径，不开放前端能力；只允许 company 私有域内搜索 <code>candidate_publish_snapshot</code> 发布快照。</td></tr>
+          <tr><td>2</td><td>后端受控搜索接口与六个下拉筛选（已完成）</td><td>新增 <code>V0026</code>、<code>company.resume-search.read</code>、company 私有 <code>GET /api/company/workbench/resume-search</code>；不得读取或返回 <code>candidate_resume</code> 原始 JSON。</td></tr>
+          <tr><td>3</td><td>搜索简历列表页高保真 UI（已完成）</td><td>卡片只展示发布快照字段，画像分析只占位。</td></tr>
+          <tr><td>4</td><td>安全简历详情抽屉与举报简历（已完成）</td><td>新增 <code>V0027</code>、company 私有详情/举报接口、详情抽屉和举报弹窗；联系方式区域只提示合规申请，不直接展示。</td></tr>
+          <tr><td>5</td><td>下载/联系/职聊/面试邀请的门禁占位</td><td>不生成完整简历文件，不发短信微信，不接支付。</td></tr>
+          <tr><td>6</td><td>安全收口与验收矩阵</td><td>覆盖 IDOR/BOLA、撤回不可见、字段黑名单、审计和边界脚本。</td></tr>
+        </table>
+        <p>后续如继续开发，必须从第 5 轮“下载/联系/职聊/面试邀请的门禁占位”开始，不得直接实现完整简历库、联系解锁或下载完整简历。公开门户、sitemap、游客页面不得新增搜索简历入口。</p>
+      </section>
+
       <section class="card" id="templates">
         <h2>校验与修复模板</h2>
         <h3>校验提示词模板</h3>

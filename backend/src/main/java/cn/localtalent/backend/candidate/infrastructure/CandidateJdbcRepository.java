@@ -27,6 +27,7 @@ public class CandidateJdbcRepository {
         return jdbcTemplate.query(
                 "SELECT cu.id, cu.real_name, cu.realname_verified_flag, "
                         + "cr.base_profile_json AS base_profile_json, "
+                        + "cr.education_json AS education_json, "
                         + "cr.skills_json AS skills_json "
                         + "FROM candidate_user cu "
                         + "LEFT JOIN candidate_resume cr ON cr.id = ("
@@ -39,6 +40,7 @@ public class CandidateJdbcRepository {
                         rs.getString("real_name"),
                         rs.getInt("realname_verified_flag") == 1,
                         rs.getString("base_profile_json"),
+                        rs.getString("education_json"),
                         rs.getString("skills_json")),
                 candidateId)
                 .stream()

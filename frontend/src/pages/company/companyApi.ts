@@ -101,6 +101,72 @@ export type CompanyWorkbenchFeature = {
   company_logo_upload_enabled: boolean;
 };
 
+export type CompanyResumeSearchItem = {
+  snapshot_id: number;
+  display_name_masked: string;
+  age_band: string;
+  gender: string;
+  education_code: string;
+  highest_education: string;
+  experience_years: number | null;
+  expected_positions: string[];
+  expected_cities: string[];
+  expected_salary: string;
+  city_code: string;
+  category_code: string;
+  industry_code: string;
+  major_name: string;
+  work_nature: string;
+  resume_tags: string[];
+  skills_summary: string;
+  updated_at: string;
+};
+
+export type CompanyResumeSearchDetail = CompanyResumeSearchItem & {
+  education_summary: string;
+  experience_summary: string;
+  self_description_summary: string;
+  contact_access_hint: string;
+};
+
+export type CompanyResumeSearchPage = {
+  snapshot_list: CompanyResumeSearchItem[];
+  total: number;
+  page: number;
+  size: number;
+};
+
+export type CompanyResumeSearchParams = {
+  keyword?: string;
+  city_code?: string;
+  category_code?: string;
+  education_code?: string;
+  experience_min?: number;
+  experience_max?: number;
+  gender?: string;
+  resume_tag?: string;
+  industry_code?: string;
+  major?: string;
+  work_nature?: string;
+  expected_salary_code?: string;
+  updated_within?: number;
+  page?: number;
+  size?: number;
+  sort?: string;
+};
+
+export type CompanyResumeReportPayload = {
+  reason_code: string;
+  remark: string;
+};
+
+export type CompanyResumeReportResponse = {
+  report_id: number;
+  snapshot_id: number;
+  report_status: string;
+  message: string;
+};
+
 export type CompanyWorkbenchProfile = {
   company_id: number;
   company_name: string;
@@ -460,6 +526,66 @@ function toCompanyLogo(raw: unknown): CompanyLogo {
   };
 }
 
+function nullableNumber(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function toResumeSearchItem(raw: unknown): CompanyResumeSearchItem {
+  const row = asRecord(raw);
+  return {
+    snapshot_id: numberOr(row.snapshot_id),
+    display_name_masked: text(row.display_name_masked, '求职者*'),
+    age_band: text(row.age_band),
+    gender: text(row.gender),
+    education_code: text(row.education_code),
+    highest_education: text(row.highest_education),
+    experience_years: nullableNumber(row.experience_years),
+    expected_positions: textArray(row.expected_positions),
+    expected_cities: textArray(row.expected_cities),
+    expected_salary: text(row.expected_salary),
+    city_code: text(row.city_code),
+    category_code: text(row.category_code),
+    industry_code: text(row.industry_code),
+    major_name: text(row.major_name),
+    work_nature: text(row.work_nature),
+    resume_tags: textArray(row.resume_tags),
+    skills_summary: text(row.skills_summary),
+    updated_at: text(row.updated_at)
+  };
+}
+
+function toResumeSearchDetail(raw: unknown): CompanyResumeSearchDetail {
+  const row = asRecord(raw);
+  return {
+    ...toResumeSearchItem(raw),
+    education_summary: text(row.education_summary),
+    experience_summary: text(row.experience_summary),
+    self_description_summary: text(row.self_description_summary),
+    contact_access_hint: text(row.contact_access_hint, '联系方式查看需通过合规申请；当前不开放联系解锁。')
+  };
+}
+
+function toResumeReportResponse(raw: unknown): CompanyResumeReportResponse {
+  const row = asRecord(raw);
+  return {
+    report_id: numberOr(row.report_id),
+    snapshot_id: numberOr(row.snapshot_id),
+    report_status: text(row.report_status, 'submitted'),
+    message: text(row.message, '举报已提交。')
+  };
+}
+
+function resumeSearchQuery(params: CompanyResumeSearchParams): string {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (typeof value === 'undefined' || value === null || value === '') {
+      return;
+    }
+    query.set(key, String(value));
+  });
+  return query.toString();
+}
+
 export async function submitCompanyApply(
   token: string,
   payload: CompanyApplyPayload
@@ -714,6 +840,49 @@ export async function fetchCompanyWorkbenchJobs(token: string): Promise<ApiResul
     },
     traceId: result.traceId
   };
+}
+
+export async function fetchCompanyResumeSearch(
+  token: string,
+  params: CompanyResumeSearchParams
+): Promise<ApiResult<CompanyResumeSearchPage>> {
+  const query = resumeSearchQuery(params);
+  const result = await apiGet<unknown>(`/api/company/workbench/resume-search${query ? `?${query}` : ''}`, { token });
+  const payload = asRecord(result.data);
+  const rows = Array.isArray(payload.snapshot_list) ? payload.snapshot_list : [];
+  return {
+    data: {
+      snapshot_list: rows.map(toResumeSearchItem),
+      total: numberOr(payload.total, rows.length),
+      page: numberOr(payload.page, params.page ?? 1),
+      size: numberOr(payload.size, params.size ?? 20)
+    },
+    traceId: result.traceId
+  };
+}
+
+export async function fetchCompanyResumeSearchDetail(
+  token: string,
+  snapshotId: number
+): Promise<ApiResult<CompanyResumeSearchDetail>> {
+  const result = await apiGet<unknown>(`/api/company/workbench/resume-search/${snapshotId}`, { token });
+  return { data: toResumeSearchDetail(result.data), traceId: result.traceId };
+}
+
+export async function reportCompanyResumeSnapshot(
+  token: string,
+  snapshotId: number,
+  payload: CompanyResumeReportPayload
+): Promise<ApiResult<CompanyResumeReportResponse>> {
+  const result = await apiPost<unknown>(
+    `/api/company/workbench/resume-search/${snapshotId}/reports`,
+    payload,
+    {
+      token,
+      idempotencyKey: createIdempotencyKey('company-resume-report')
+    }
+  );
+  return { data: toResumeReportResponse(result.data), traceId: result.traceId };
 }
 
 export async function fetchDeletedCompanyWorkbenchJobs(token: string): Promise<ApiResult<CompanyJobPage>> {
