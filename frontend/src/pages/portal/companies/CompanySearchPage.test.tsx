@@ -41,6 +41,8 @@ const company = {
 } as unknown as PortalCompany;
 
 function renderCompanies(initialState?: Partial<CompanySearchInitialState>) {
+  window.history.pushState({}, '', '/companies');
+
   render(
     <PortalShell>
       <CompanySearchPage
@@ -67,6 +69,10 @@ function renderCompanies(initialState?: Partial<CompanySearchInitialState>) {
 }
 
 describe('CompanySearchPage', () => {
+  afterEach(() => {
+    window.history.pushState({}, '', '/');
+  });
+
   it('renders portal shell, filters, company cards and detail link', () => {
     renderCompanies();
 
@@ -75,6 +81,11 @@ describe('CompanySearchPage', () => {
     expect(screen.getByLabelText('找企业频道首屏')).toBeInTheDocument();
     expect(screen.getByLabelText('找企业筛选')).toBeInTheDocument();
     expect(screen.getByLabelText('企业搜索结果')).toBeInTheDocument();
+    expect(screen.getByTestId('company-search-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(within(screen.getByLabelText('门户主导航')).getByRole('link', { name: '找企业' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
 
     expect(screen.getByLabelText('关键词')).toHaveValue('LocalTalent');
     expect(screen.getByLabelText('地区')).toHaveValue('310000');

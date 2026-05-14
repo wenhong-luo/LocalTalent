@@ -2,6 +2,10 @@ import { render, screen, within } from '@testing-library/react';
 import { PortalShell } from './PortalShell';
 
 describe('PortalShell', () => {
+  afterEach(() => {
+    window.history.pushState({}, '', '/');
+  });
+
   it('renders portal-wide header, navigation, footer and floating toolbar', () => {
     render(
       <PortalShell>
@@ -41,6 +45,20 @@ describe('PortalShell', () => {
     );
     expect(document.body).not.toHaveTextContent('简历库');
     expect(document.body).not.toHaveTextContent('搜索简历');
+  });
+
+  it('highlights the current public channel from pathname', () => {
+    window.history.pushState({}, '', '/companies');
+
+    render(
+      <PortalShell>
+        <main />
+      </PortalShell>
+    );
+
+    const nav = screen.getByLabelText('门户主导航');
+    expect(within(nav).getByRole('link', { name: '找企业' })).toHaveAttribute('aria-current', 'page');
+    expect(within(nav).getByRole('link', { name: '首页' })).not.toHaveAttribute('aria-current');
   });
 
   it('keeps external capabilities as disabled placeholders', () => {

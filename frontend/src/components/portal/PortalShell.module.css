@@ -190,12 +190,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 48px;
   padding: 0 18px;
   border: none;
   background: transparent;
   color: #1f2937;
   font: inherit;
   font-weight: 850;
+  line-height: 1;
   white-space: nowrap;
 }
 
@@ -213,6 +215,12 @@
 
 .moreWrap {
   position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.moreWrap > .navButton {
+  height: 100%;
 }
 
 .morePanel {

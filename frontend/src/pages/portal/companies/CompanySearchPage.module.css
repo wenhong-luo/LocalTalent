@@ -1,7 +1,9 @@
 .page {
   display: grid;
   gap: 22px;
-  padding: 24px 0 44px;
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 48px;
 }
 
 .hero {

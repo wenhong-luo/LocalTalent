@@ -172,7 +172,7 @@ export function CompanySearchPage({ initialState }: CompanySearchPageProps) {
   const companies = initialState.page?.company_list ?? [];
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-layout="portal-ad-rails" data-testid="company-search-page">
       <section className={styles.hero} aria-label="找企业频道首屏">
         <div>
           <p className={styles.eyebrow}>LocalTalent Companies</p>
