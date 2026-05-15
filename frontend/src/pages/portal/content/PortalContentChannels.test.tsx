@@ -104,6 +104,10 @@ describe('Portal public content channels', () => {
     );
 
     expect(screen.getByLabelText('就业政策频道首屏')).toBeInTheDocument();
+    expect(screen.getByTestId('content-channel-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByTestId('portal-ad-rail-frame')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByLabelText('就业政策左侧广告留白')).toBeInTheDocument();
+    expect(screen.getByLabelText('就业政策右侧广告留白')).toBeInTheDocument();
     expect(screen.getByLabelText('就业政策筛选')).toBeInTheDocument();
     expect(screen.getByLabelText('就业政策列表')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '就业政策公开说明' })).toHaveAttribute('href', '/articles/301');
@@ -126,6 +130,9 @@ describe('Portal public content channels', () => {
     );
 
     expect(screen.getByLabelText('招聘会频道首屏')).toBeInTheDocument();
+    expect(screen.getByTestId('job-fair-list-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByLabelText('招聘会左侧广告留白')).toBeInTheDocument();
+    expect(screen.getByLabelText('招聘会右侧广告留白')).toBeInTheDocument();
     expect(screen.getByLabelText('招聘会筛选')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '春风行动招聘会' })).toHaveAttribute('href', '/job-fairs/401');
     expect(screen.getByText('报名名单不公开')).toBeInTheDocument();
@@ -155,6 +162,9 @@ describe('Portal public content channels', () => {
     );
 
     expect(screen.getByLabelText('更多服务频道首屏')).toBeInTheDocument();
+    expect(screen.getByTestId('more-services-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByLabelText('更多服务左侧广告留白')).toBeInTheDocument();
+    expect(screen.getByLabelText('更多服务右侧广告留白')).toBeInTheDocument();
     const lowRiskRegion = screen.getByLabelText('低风险更多服务');
     expect(lowRiskRegion).toBeInTheDocument();
     expect(screen.getByLabelText('高风险更多服务占位')).toBeInTheDocument();

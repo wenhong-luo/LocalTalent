@@ -47,8 +47,17 @@ describe('PortalShell', () => {
     expect(document.body).not.toHaveTextContent('搜索简历');
   });
 
-  it('highlights the current public channel from pathname', () => {
-    window.history.pushState({}, '', '/companies');
+  it.each([
+    ['/companies', '找企业'],
+    ['/companies/201', '找企业'],
+    ['/jobs', '找工作'],
+    ['/jobs/famous', '找工作'],
+    ['/portal/talent-service-area', '人才服务区'],
+    ['/job-fairs', '招聘会'],
+    ['/articles/policies', '就业政策'],
+    ['/hr-tools', 'HR 工具箱']
+  ])('highlights %s as %s', (path, label) => {
+    window.history.pushState({}, '', path);
 
     render(
       <PortalShell>
@@ -57,8 +66,21 @@ describe('PortalShell', () => {
     );
 
     const nav = screen.getByLabelText('门户主导航');
-    expect(within(nav).getByRole('link', { name: '找企业' })).toHaveAttribute('aria-current', 'page');
-    expect(within(nav).getByRole('link', { name: '首页' })).not.toHaveAttribute('aria-current');
+    expect(within(nav).getByRole('link', { name: label })).toHaveAttribute('aria-current', 'page');
+    if (label !== '首页') {
+      expect(within(nav).getByRole('link', { name: '首页' })).not.toHaveAttribute('aria-current');
+    }
+  });
+
+  it('keeps more services aligned with first-level navigation styles', () => {
+    render(
+      <PortalShell>
+        <main />
+      </PortalShell>
+    );
+
+    const moreServices = screen.getByRole('button', { name: '更多服务' });
+    expect(moreServices).toHaveAttribute('data-nav-button', 'more-services');
   });
 
   it('keeps external capabilities as disabled placeholders', () => {

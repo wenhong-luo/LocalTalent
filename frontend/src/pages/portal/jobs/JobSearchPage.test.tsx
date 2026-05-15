@@ -61,6 +61,10 @@ describe('JobSearchPage', () => {
 
     expect(screen.getByLabelText('门户顶部工具条')).toBeInTheDocument();
     expect(screen.getByLabelText('门户搜索头部')).toBeInTheDocument();
+    expect(screen.getByTestId('job-search-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByTestId('portal-ad-rail-frame')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByLabelText('找工作左侧广告留白')).toBeInTheDocument();
+    expect(screen.getByLabelText('找工作右侧广告留白')).toBeInTheDocument();
     expect(screen.getByLabelText('找工作频道首屏')).toBeInTheDocument();
     expect(screen.getByLabelText('找工作筛选')).toBeInTheDocument();
     expect(screen.getByLabelText('职位搜索结果')).toBeInTheDocument();

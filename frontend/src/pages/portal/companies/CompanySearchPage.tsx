@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PortalAdRailFrame } from '@/components/portal/PortalAdRailFrame';
 import styles from './CompanySearchPage.module.css';
 import type { CompanySearchQuery, PortalCompany, PortalCompanyPage } from './portalCompanyApi';
 
@@ -173,48 +174,50 @@ export function CompanySearchPage({ initialState }: CompanySearchPageProps) {
 
   return (
     <main className={styles.page} data-layout="portal-ad-rails" data-testid="company-search-page">
-      <section className={styles.hero} aria-label="找企业频道首屏">
-        <div>
-          <p className={styles.eyebrow}>LocalTalent Companies</p>
-          <h1 className={styles.title}>找企业与企业公开主页</h1>
-          <p className={styles.subtitle}>
-            面向公开门户展示已认证企业、公开简介和在线职位聚合。企业内部联系方式、资质附件、审核资料和内部备注不进入公开层。
-          </p>
-        </div>
-        <div className={styles.brandCard}>
-          <span className={styles.brandMark}>企</span>
-          <span>名企展示占位</span>
-        </div>
-      </section>
-
-      <CompanyFilters query={initialState.query} />
-
-      <section className={styles.grid}>
-        <section className={`${styles.card} ${styles.listCard}`} aria-label="企业搜索结果">
-          <div className={styles.sectionHeader}>
-            <div>
-              <h2 className={styles.sectionTitle}>企业列表</h2>
-              <p className={styles.muted}>共 {initialState.page?.total ?? 0} 家认证企业，筛选 query 可分享。</p>
-            </div>
-            {initialState.traceId ? <span className={styles.tag}>trace {initialState.traceId}</span> : null}
+      <PortalAdRailFrame label="找企业">
+        <section className={styles.hero} aria-label="找企业频道首屏">
+          <div>
+            <p className={styles.eyebrow}>LocalTalent Companies</p>
+            <h1 className={styles.title}>找企业与企业公开主页</h1>
+            <p className={styles.subtitle}>
+              面向公开门户展示已认证企业、公开简介和在线职位聚合。企业内部联系方式、资质附件、审核资料和内部备注不进入公开层。
+            </p>
           </div>
-
-          {initialState.status === 'error' ? (
-            <div className={styles.empty}>{initialState.message ?? '企业列表暂时不可用，请稍后重试。'}</div>
-          ) : null}
-
-          {initialState.status === 'empty' ? <div className={styles.empty}>暂无符合条件的认证企业。</div> : null}
-
-          {companies.length > 0 ? (
-            <div className={styles.companyList}>
-              {companies.map((company) => (
-                <CompanyCard key={company.company_id} company={company} />
-              ))}
-            </div>
-          ) : null}
+          <div className={styles.brandCard}>
+            <span className={styles.brandMark}>企</span>
+            <span>名企展示占位</span>
+          </div>
         </section>
-        <SideBar />
-      </section>
+
+        <CompanyFilters query={initialState.query} />
+
+        <section className={styles.grid}>
+          <section className={`${styles.card} ${styles.listCard}`} aria-label="企业搜索结果">
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2 className={styles.sectionTitle}>企业列表</h2>
+                <p className={styles.muted}>共 {initialState.page?.total ?? 0} 家认证企业，筛选 query 可分享。</p>
+              </div>
+              {initialState.traceId ? <span className={styles.tag}>trace {initialState.traceId}</span> : null}
+            </div>
+
+            {initialState.status === 'error' ? (
+              <div className={styles.empty}>{initialState.message ?? '企业列表暂时不可用，请稍后重试。'}</div>
+            ) : null}
+
+            {initialState.status === 'empty' ? <div className={styles.empty}>暂无符合条件的认证企业。</div> : null}
+
+            {companies.length > 0 ? (
+              <div className={styles.companyList}>
+                {companies.map((company) => (
+                  <CompanyCard key={company.company_id} company={company} />
+                ))}
+              </div>
+            ) : null}
+          </section>
+          <SideBar />
+        </section>
+      </PortalAdRailFrame>
     </main>
   );
 }

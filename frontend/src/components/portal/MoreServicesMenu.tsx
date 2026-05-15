@@ -5,7 +5,7 @@ import styles from './PortalShell.module.css';
 export function MoreServicesMenu() {
   return (
     <div className={styles.moreWrap}>
-      <button className={styles.navButton} type="button" aria-haspopup="true">
+      <button className={`${styles.navButton} ${styles.moreNavButton}`} type="button" aria-haspopup="true" data-nav-button="more-services">
         更多服务
       </button>
       <div className={styles.morePanel} aria-label="更多服务菜单">

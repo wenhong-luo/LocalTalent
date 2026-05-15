@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PortalAdRailFrame } from '@/components/portal/PortalAdRailFrame';
 import { highRiskServicePlaceholders, lowRiskServiceLinks } from '@/components/portal/portalLinks';
 import styles from './PortalContentPages.module.css';
 import type { PortalContent, PortalContentPage, PortalEvent, PortalEventPage } from './portalContentApi';
@@ -146,56 +147,58 @@ function PublicBoundarySideBar() {
 export function ContentChannelPage({ config, initialState }: ContentChannelPageProps) {
   const contents = initialState.page?.content_list ?? [];
   return (
-    <main className={styles.page}>
-      <section className={styles.hero} aria-label={`${config.title}频道首屏`}>
-        <div>
-          <p className={styles.eyebrow}>{config.eyebrow}</p>
-          <h1 className={styles.title}>{config.title}</h1>
-          <p className={styles.subtitle}>{config.description}</p>
-        </div>
-        <div className={styles.heroBadge}>{config.badge}</div>
-      </section>
-
-      <form className={`${styles.card} ${styles.filters}`} action={config.detailBasePath} method="get" aria-label={`${config.title}筛选`}>
-        <label className={styles.filterLabel}>
-          城市
-          <select className={styles.select} name="city_code" defaultValue={initialState.query.city_code ?? ''}>
-            <option value="">不限城市</option>
-            {cityOptions.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <input type="hidden" name="page" value="1" />
-        <input type="hidden" name="size" value={initialState.query.size ?? 12} />
-        <button className={styles.searchButton} type="submit">
-          查询公开内容
-        </button>
-      </form>
-
-      <section className={styles.grid}>
-        <section className={`${styles.card} ${styles.listCard}`} aria-label={`${config.title}列表`}>
-          <div className={styles.sectionHeader}>
-            <div>
-              <h2 className={styles.sectionTitle}>{config.title}列表</h2>
-              <p className={styles.muted}>共 {initialState.page?.total ?? 0} 条公开内容。</p>
-            </div>
-            {initialState.traceId ? <span className={styles.tag}>trace {initialState.traceId}</span> : null}
+    <main className={styles.page} data-layout="portal-ad-rails" data-testid="content-channel-page">
+      <PortalAdRailFrame label={config.title}>
+        <section className={styles.hero} aria-label={`${config.title}频道首屏`}>
+          <div>
+            <p className={styles.eyebrow}>{config.eyebrow}</p>
+            <h1 className={styles.title}>{config.title}</h1>
+            <p className={styles.subtitle}>{config.description}</p>
           </div>
-          {initialState.status === 'error' ? <div className={styles.empty}>{initialState.message ?? '公开内容暂时不可用。'}</div> : null}
-          {initialState.status === 'empty' ? <div className={styles.empty}>暂无公开内容。</div> : null}
-          {contents.length > 0 ? (
-            <div className={styles.list}>
-              {contents.map((content) => (
-                <ContentCard key={content.content_id} content={content} detailBasePath={config.detailBasePath} />
-              ))}
-            </div>
-          ) : null}
+          <div className={styles.heroBadge}>{config.badge}</div>
         </section>
-        <PublicBoundarySideBar />
-      </section>
+
+        <form className={`${styles.card} ${styles.filters}`} action={config.detailBasePath} method="get" aria-label={`${config.title}筛选`}>
+          <label className={styles.filterLabel}>
+            城市
+            <select className={styles.select} name="city_code" defaultValue={initialState.query.city_code ?? ''}>
+              <option value="">不限城市</option>
+              {cityOptions.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <input type="hidden" name="page" value="1" />
+          <input type="hidden" name="size" value={initialState.query.size ?? 12} />
+          <button className={styles.searchButton} type="submit">
+            查询公开内容
+          </button>
+        </form>
+
+        <section className={styles.grid}>
+          <section className={`${styles.card} ${styles.listCard}`} aria-label={`${config.title}列表`}>
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2 className={styles.sectionTitle}>{config.title}列表</h2>
+                <p className={styles.muted}>共 {initialState.page?.total ?? 0} 条公开内容。</p>
+              </div>
+              {initialState.traceId ? <span className={styles.tag}>trace {initialState.traceId}</span> : null}
+            </div>
+            {initialState.status === 'error' ? <div className={styles.empty}>{initialState.message ?? '公开内容暂时不可用。'}</div> : null}
+            {initialState.status === 'empty' ? <div className={styles.empty}>暂无公开内容。</div> : null}
+            {contents.length > 0 ? (
+              <div className={styles.list}>
+                {contents.map((content) => (
+                  <ContentCard key={content.content_id} content={content} detailBasePath={config.detailBasePath} />
+                ))}
+              </div>
+            ) : null}
+          </section>
+          <PublicBoundarySideBar />
+        </section>
+      </PortalAdRailFrame>
     </main>
   );
 }
@@ -203,7 +206,8 @@ export function ContentChannelPage({ config, initialState }: ContentChannelPageP
 export function JobFairListPage({ initialState, topic }: JobFairListPageProps) {
   const events = initialState.page?.event_list ?? [];
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-layout="portal-ad-rails" data-testid="job-fair-list-page">
+      <PortalAdRailFrame label="招聘会">
       <section className={styles.hero} aria-label="招聘会频道首屏">
         <div>
           <p className={styles.eyebrow}>{topic?.eyebrow ?? 'LocalTalent Job Fairs'}</p>
@@ -266,6 +270,7 @@ export function JobFairListPage({ initialState, topic }: JobFairListPageProps) {
         </section>
         <PublicBoundarySideBar />
       </section>
+      </PortalAdRailFrame>
     </main>
   );
 }
@@ -346,7 +351,8 @@ export function JobFairDetailPage({ event, message, traceId }: DetailProps) {
 
 export function MoreServicesPage() {
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-layout="portal-ad-rails" data-testid="more-services-page">
+      <PortalAdRailFrame label="更多服务">
       <section className={styles.hero} aria-label="更多服务频道首屏">
         <div>
           <p className={styles.eyebrow}>More Services</p>
@@ -394,6 +400,7 @@ export function MoreServicesPage() {
           ))}
         </div>
       </section>
+      </PortalAdRailFrame>
     </main>
   );
 }

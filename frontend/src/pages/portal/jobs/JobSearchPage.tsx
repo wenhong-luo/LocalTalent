@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PortalAdRailFrame } from '@/components/portal/PortalAdRailFrame';
 import styles from './JobSearchPage.module.css';
 import { salaryText, type JobSearchQuery, type PortalJob, type PortalJobPage } from './portalJobApi';
 
@@ -211,60 +212,62 @@ export function JobSearchPage({ initialState, topic }: JobSearchPageProps) {
   const activeTab = initialState.query.famous === '1' ? 'famous' : 'all';
 
   return (
-    <main className={styles.page}>
-      <section className={styles.hero} aria-label="找工作频道首屏">
-        <div>
-          <p className={styles.eyebrow}>{topic?.eyebrow ?? 'LocalTalent Jobs'}</p>
-          <h1 className={styles.title}>{topic?.title ?? '找工作与名企直聘'}</h1>
-          <p className={styles.subtitle}>
-            {topic?.subtitle
-              ?? '面向公开门户的职位搜索页。列表只读取在线职位和认证企业职位，地图找工作、会员置顶与付费推广均不在本轮实现。'}
-          </p>
-        </div>
-        <div className={styles.scanCard} aria-label="扫码求职 CTA">
-          <span className={styles.qr}>QR</span>
-          <strong>{topic?.badge ?? '求职更简单'}</strong>
-          <span className={styles.muted}>扫码入口占位</span>
-        </div>
-      </section>
-
-      <nav className={styles.tabs} aria-label="职位频道">
-        <Link className={activeTab === 'all' ? styles.tabActive : styles.tab} href="/jobs">
-          全部职位
-        </Link>
-        <Link className={activeTab === 'famous' ? styles.tabActive : styles.tab} href="/jobs/famous">
-          名企直聘
-        </Link>
-      </nav>
-
-      <JobFilters query={initialState.query} />
-
-      <section className={styles.contentGrid}>
-        <section className={`${styles.card} ${styles.listCard}`} aria-label="职位搜索结果">
-          <div className={styles.sectionHeader}>
-            <div>
-              <h2 className={styles.sectionTitle}>职位列表</h2>
-              <p className={styles.muted}>共 {initialState.page?.total ?? 0} 个公开职位，筛选 query 可分享。</p>
-            </div>
-            {initialState.traceId ? <span className={styles.tag}>trace {initialState.traceId}</span> : null}
+    <main className={styles.page} data-layout="portal-ad-rails" data-testid="job-search-page">
+      <PortalAdRailFrame label="找工作">
+        <section className={styles.hero} aria-label="找工作频道首屏">
+          <div>
+            <p className={styles.eyebrow}>{topic?.eyebrow ?? 'LocalTalent Jobs'}</p>
+            <h1 className={styles.title}>{topic?.title ?? '找工作与名企直聘'}</h1>
+            <p className={styles.subtitle}>
+              {topic?.subtitle
+                ?? '面向公开门户的职位搜索页。列表只读取在线职位和认证企业职位，地图找工作、会员置顶与付费推广均不在本轮实现。'}
+            </p>
           </div>
-
-          {initialState.status === 'error' ? (
-            <div className={styles.empty}>{initialState.message ?? '职位列表暂时不可用，请稍后重试。'}</div>
-          ) : null}
-
-          {initialState.status === 'empty' ? <div className={styles.empty}>暂无符合条件的在线职位。</div> : null}
-
-          {jobs.length > 0 ? (
-            <div className={styles.jobList}>
-              {jobs.map((job) => (
-                <JobCard key={job.job_id} job={job} />
-              ))}
-            </div>
-          ) : null}
+          <div className={styles.scanCard} aria-label="扫码求职 CTA">
+            <span className={styles.qr}>QR</span>
+            <strong>{topic?.badge ?? '求职更简单'}</strong>
+            <span className={styles.muted}>扫码入口占位</span>
+          </div>
         </section>
-        <SideBar />
-      </section>
+
+        <nav className={styles.tabs} aria-label="职位频道">
+          <Link className={activeTab === 'all' ? styles.tabActive : styles.tab} href="/jobs">
+            全部职位
+          </Link>
+          <Link className={activeTab === 'famous' ? styles.tabActive : styles.tab} href="/jobs/famous">
+            名企直聘
+          </Link>
+        </nav>
+
+        <JobFilters query={initialState.query} />
+
+        <section className={styles.contentGrid}>
+          <section className={`${styles.card} ${styles.listCard}`} aria-label="职位搜索结果">
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2 className={styles.sectionTitle}>职位列表</h2>
+                <p className={styles.muted}>共 {initialState.page?.total ?? 0} 个公开职位，筛选 query 可分享。</p>
+              </div>
+              {initialState.traceId ? <span className={styles.tag}>trace {initialState.traceId}</span> : null}
+            </div>
+
+            {initialState.status === 'error' ? (
+              <div className={styles.empty}>{initialState.message ?? '职位列表暂时不可用，请稍后重试。'}</div>
+            ) : null}
+
+            {initialState.status === 'empty' ? <div className={styles.empty}>暂无符合条件的在线职位。</div> : null}
+
+            {jobs.length > 0 ? (
+              <div className={styles.jobList}>
+                {jobs.map((job) => (
+                  <JobCard key={job.job_id} job={job} />
+                ))}
+              </div>
+            ) : null}
+          </section>
+          <SideBar />
+        </section>
+      </PortalAdRailFrame>
     </main>
   );
 }

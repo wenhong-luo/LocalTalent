@@ -82,6 +82,9 @@ describe('CompanySearchPage', () => {
     expect(screen.getByLabelText('找企业筛选')).toBeInTheDocument();
     expect(screen.getByLabelText('企业搜索结果')).toBeInTheDocument();
     expect(screen.getByTestId('company-search-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByTestId('portal-ad-rail-frame')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByLabelText('找企业左侧广告留白')).toBeInTheDocument();
+    expect(screen.getByLabelText('找企业右侧广告留白')).toBeInTheDocument();
     expect(within(screen.getByLabelText('门户主导航')).getByRole('link', { name: '找企业' })).toHaveAttribute(
       'aria-current',
       'page'

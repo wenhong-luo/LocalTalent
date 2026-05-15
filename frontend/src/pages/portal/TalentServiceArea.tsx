@@ -3,6 +3,7 @@
 import { FormEvent, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { isHttpClientError } from '@/lib/httpClient';
+import { PortalAdRailFrame } from '@/components/portal/PortalAdRailFrame';
 import { StateView, type StateVariant } from '@/components/StateView';
 import {
   fetchTalentSnapshots,
@@ -203,139 +204,141 @@ export function TalentServiceArea({ initialState }: TalentServiceAreaProps) {
   const hasNext = currentPage * size < total;
 
   return (
-    <main className={styles.page}>
-      <section className={styles.hero} aria-label="人才服务区首屏">
-        <div>
-          <p className={styles.eyebrow}>LocalTalent Snapshot Area</p>
-          <h1 className={styles.title}>人才服务区：只展示候选人授权发布的快照摘要</h1>
-          <p className={styles.subtitle}>
-            本页参考目标站列表体验，但能力口径全部改写为发布快照展示。公开页面不提供详情读取、联系方式或高风险检索入口。
-          </p>
-        </div>
-        <div className={styles.heroPanel}>
-          <span className={styles.heroNumber}>{total}</span>
-          <strong>当前可展示快照</strong>
-          <span>SSR 首屏读取 · 可分享筛选</span>
-        </div>
-      </section>
-
-      <form className={`${styles.card} ${styles.filters}`} aria-label="人才服务区筛选" onSubmit={onSubmit}>
-        <label className={styles.filterLabel}>
-          城市
-          <select className={styles.select} value={cityCode} onChange={(event) => setCityCode(event.target.value)}>
-            <option value="">不限城市</option>
-            {cityOptions.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={styles.filterLabel}>
-          职类
-          <select className={styles.select} value={categoryCode} onChange={(event) => setCategoryCode(event.target.value)}>
-            <option value="">不限职类</option>
-            {categoryOptions.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={styles.filterLabel}>
-          经验下限
-          <input
-            className={styles.input}
-            inputMode="numeric"
-            value={experienceMin}
-            onChange={(event) => setExperienceMin(event.target.value)}
-            placeholder="例如 3"
-          />
-        </label>
-        <label className={styles.filterLabel}>
-          经验上限
-          <input
-            className={styles.input}
-            inputMode="numeric"
-            value={experienceMax}
-            onChange={(event) => setExperienceMax(event.target.value)}
-            placeholder="例如 8"
-          />
-        </label>
-        <label className={styles.filterLabel}>
-          更新时间
-          <select className={styles.select} value={updatedWithin} onChange={(event) => setUpdatedWithin(event.target.value)}>
-            <option value="">不限时间</option>
-            {updatedOptions.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={styles.filterLabel}>
-          排序
-          <select className={styles.select} value={sort} onChange={(event) => setSort(event.target.value)}>
-            {sortOptions.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className={styles.searchButton} type="submit">
-          查询发布快照
-        </button>
-      </form>
-
-      <section className={styles.contentGrid}>
-        <section className={`${styles.card} ${styles.listCard}`} aria-label="发布快照列表">
-          <div className={styles.sectionHeader}>
-            <div>
-              <h2 className={styles.sectionTitle}>发布快照列表</h2>
-              <p className={styles.muted}>共 {total} 条，当前第 {currentPage} 页。{traceId ? ` trace_id：${traceId}` : ''}</p>
-            </div>
-            <span className={styles.tag}>字段白名单</span>
+    <main className={styles.page} data-layout="portal-ad-rails" data-testid="talent-service-area-page">
+      <PortalAdRailFrame label="人才服务区">
+        <section className={styles.hero} aria-label="人才服务区首屏">
+          <div>
+            <p className={styles.eyebrow}>LocalTalent Snapshot Area</p>
+            <h1 className={styles.title}>人才服务区：只展示候选人授权发布的快照摘要</h1>
+            <p className={styles.subtitle}>
+              本页参考目标站列表体验，但能力口径全部改写为发布快照展示。公开页面不提供详情读取、联系方式或高风险检索入口。
+            </p>
           </div>
-
-          {effectiveStatus === 'ready' && snapshots.length > 0 ? (
-            <>
-              <div className={styles.snapshotList}>
-                {snapshots.map((snapshot) => (
-                  <SnapshotCard key={snapshot.snapshot_id} snapshot={snapshot} />
-                ))}
-              </div>
-              <nav className={styles.pagination} aria-label="发布快照分页">
-                {hasPrevious ? (
-                  <Link className={styles.pageButton} href={queryHref(buildQuery(currentPage - 1))}>
-                    上一页
-                  </Link>
-                ) : (
-                  <span className={styles.pageButtonDisabled}>上一页</span>
-                )}
-                {hasNext ? (
-                  <Link className={styles.pageButton} href={queryHref(buildQuery(currentPage + 1))}>
-                    下一页
-                  </Link>
-                ) : (
-                  <span className={styles.pageButtonDisabled}>下一页</span>
-                )}
-              </nav>
-            </>
-          ) : (
-            <div className={styles.emptyWrap}>
-              <StateView
-                variant={stateVariant(effectiveStatus)}
-                title={stateTitle(effectiveStatus)}
-                description={message ?? '请调整筛选条件或稍后重试。'}
-                retryLabel="重新读取"
-                onRetry={effectiveStatus === 'retrying' ? undefined : () => loadSnapshots(currentPage)}
-              />
-            </div>
-          )}
+          <div className={styles.heroPanel}>
+            <span className={styles.heroNumber}>{total}</span>
+            <strong>当前可展示快照</strong>
+            <span>SSR 首屏读取 · 可分享筛选</span>
+          </div>
         </section>
-        <BoundarySideBar />
-      </section>
+
+        <form className={`${styles.card} ${styles.filters}`} aria-label="人才服务区筛选" onSubmit={onSubmit}>
+          <label className={styles.filterLabel}>
+            城市
+            <select className={styles.select} value={cityCode} onChange={(event) => setCityCode(event.target.value)}>
+              <option value="">不限城市</option>
+              {cityOptions.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.filterLabel}>
+            职类
+            <select className={styles.select} value={categoryCode} onChange={(event) => setCategoryCode(event.target.value)}>
+              <option value="">不限职类</option>
+              {categoryOptions.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.filterLabel}>
+            经验下限
+            <input
+              className={styles.input}
+              inputMode="numeric"
+              value={experienceMin}
+              onChange={(event) => setExperienceMin(event.target.value)}
+              placeholder="例如 3"
+            />
+          </label>
+          <label className={styles.filterLabel}>
+            经验上限
+            <input
+              className={styles.input}
+              inputMode="numeric"
+              value={experienceMax}
+              onChange={(event) => setExperienceMax(event.target.value)}
+              placeholder="例如 8"
+            />
+          </label>
+          <label className={styles.filterLabel}>
+            更新时间
+            <select className={styles.select} value={updatedWithin} onChange={(event) => setUpdatedWithin(event.target.value)}>
+              <option value="">不限时间</option>
+              {updatedOptions.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.filterLabel}>
+            排序
+            <select className={styles.select} value={sort} onChange={(event) => setSort(event.target.value)}>
+              {sortOptions.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button className={styles.searchButton} type="submit">
+            查询发布快照
+          </button>
+        </form>
+
+        <section className={styles.contentGrid}>
+          <section className={`${styles.card} ${styles.listCard}`} aria-label="发布快照列表">
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2 className={styles.sectionTitle}>发布快照列表</h2>
+                <p className={styles.muted}>共 {total} 条，当前第 {currentPage} 页。{traceId ? ` trace_id：${traceId}` : ''}</p>
+              </div>
+              <span className={styles.tag}>字段白名单</span>
+            </div>
+
+            {effectiveStatus === 'ready' && snapshots.length > 0 ? (
+              <>
+                <div className={styles.snapshotList}>
+                  {snapshots.map((snapshot) => (
+                    <SnapshotCard key={snapshot.snapshot_id} snapshot={snapshot} />
+                  ))}
+                </div>
+                <nav className={styles.pagination} aria-label="发布快照分页">
+                  {hasPrevious ? (
+                    <Link className={styles.pageButton} href={queryHref(buildQuery(currentPage - 1))}>
+                      上一页
+                    </Link>
+                  ) : (
+                    <span className={styles.pageButtonDisabled}>上一页</span>
+                  )}
+                  {hasNext ? (
+                    <Link className={styles.pageButton} href={queryHref(buildQuery(currentPage + 1))}>
+                      下一页
+                    </Link>
+                  ) : (
+                    <span className={styles.pageButtonDisabled}>下一页</span>
+                  )}
+                </nav>
+              </>
+            ) : (
+              <div className={styles.emptyWrap}>
+                <StateView
+                  variant={stateVariant(effectiveStatus)}
+                  title={stateTitle(effectiveStatus)}
+                  description={message ?? '请调整筛选条件或稍后重试。'}
+                  retryLabel="重新读取"
+                  onRetry={effectiveStatus === 'retrying' ? undefined : () => loadSnapshots(currentPage)}
+                />
+              </div>
+            )}
+          </section>
+          <BoundarySideBar />
+        </section>
+      </PortalAdRailFrame>
     </main>
   );
 }

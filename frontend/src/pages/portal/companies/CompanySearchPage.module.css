@@ -1,8 +1,6 @@
 .page {
   display: grid;
   gap: 22px;
-  width: min(1200px, calc(100% - 32px));
-  margin: 0 auto;
   padding: 28px 0 48px;
 }
 
@@ -72,7 +70,7 @@
 
 .filters {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
   gap: 12px;
   align-items: end;
   padding: 18px;
@@ -257,6 +255,12 @@
   border: 1px solid #e8eef4;
   border-radius: 16px;
   padding: 14px;
+}
+
+@media (min-width: 1320px) {
+  .filters {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+  }
 }
 
 @media (max-width: 900px) {

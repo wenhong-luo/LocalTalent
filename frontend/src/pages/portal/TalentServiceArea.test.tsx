@@ -37,6 +37,10 @@ describe('TalentServiceArea', () => {
   it('renders initial snapshot list from SSR data', () => {
     render(<TalentServiceArea initialState={initialState({})} />);
 
+    expect(screen.getByTestId('talent-service-area-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByTestId('portal-ad-rail-frame')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByLabelText('人才服务区左侧广告留白')).toBeInTheDocument();
+    expect(screen.getByLabelText('人才服务区右侧广告留白')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: '人才服务区：只展示候选人授权发布的快照摘要' })).toBeInTheDocument();
     expect(screen.getByRole('form', { name: '人才服务区筛选' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: '发布快照列表' })).toBeInTheDocument();

@@ -44,6 +44,7 @@ describe('PortalHomePage', () => {
     expect(screen.getByLabelText('门户顶部工具条')).toBeInTheDocument();
     expect(screen.getByLabelText('门户搜索头部')).toBeInTheDocument();
     expect(screen.getByLabelText('门户主导航')).toBeInTheDocument();
+    expect(screen.getByTestId('portal-home-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
     expect(screen.getByLabelText('职位分类墙')).toBeInTheDocument();
     expect(screen.getByLabelText('首页快捷入口')).toBeInTheDocument();
     expect(screen.getByLabelText('首页登录卡片')).toBeInTheDocument();

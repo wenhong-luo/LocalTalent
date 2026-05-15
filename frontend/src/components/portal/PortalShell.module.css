@@ -181,7 +181,7 @@
 
 .nav {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   min-height: 48px;
 }
 
@@ -190,14 +190,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
+  height: 48px;
   padding: 0 18px;
   border: none;
   background: transparent;
   color: #1f2937;
   font: inherit;
   font-weight: 850;
-  line-height: 1;
+  line-height: 48px;
   white-space: nowrap;
 }
 
@@ -216,11 +216,15 @@
 .moreWrap {
   position: relative;
   display: flex;
-  align-items: stretch;
+  align-items: center;
 }
 
 .moreWrap > .navButton {
-  height: 100%;
+  height: 48px;
+}
+
+.moreNavButton {
+  position: relative;
 }
 
 .morePanel {
@@ -286,6 +290,35 @@
 
 .content {
   min-height: 520px;
+}
+
+.adRailFrame {
+  width: min(1680px, calc(100% - 32px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) minmax(0, 1200px) minmax(80px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.adRailContent {
+  min-width: 0;
+}
+
+.adRail {
+  min-height: 360px;
+  border: 1px dashed rgba(15, 118, 110, 0.14);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(24, 181, 158, 0.08), transparent 9rem),
+    rgba(255, 255, 255, 0.36);
+  color: rgba(15, 118, 110, 0.34);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  writing-mode: vertical-rl;
 }
 
 .footer {
@@ -378,6 +411,15 @@
 
   .nav {
     overflow-x: auto;
+  }
+
+  .adRailFrame {
+    width: min(1200px, calc(100% - 24px));
+    grid-template-columns: 1fr;
+  }
+
+  .adRail {
+    display: none;
   }
 
   .morePanel {

@@ -210,7 +210,7 @@ function ScanCta() {
 
 export function PortalHomePage({ hotJobs = [], featuredCompanies = [] }: PortalHomePageProps) {
   return (
-    <main className={styles.home}>
+    <main className={styles.home} data-layout="portal-ad-rails" data-testid="portal-home-page">
       <section className={styles.heroGrid} aria-label="首页高保真首屏">
         <JobCategoryWall />
         <div className={styles.centerStage}>
