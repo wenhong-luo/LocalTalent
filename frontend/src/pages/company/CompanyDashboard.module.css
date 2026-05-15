@@ -269,56 +269,62 @@
 
 .profileGrid {
   display: grid;
-  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
-  gap: 22px;
+  grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  margin-top: 16px;
 }
 
 .logoPanel {
-  border: 1px dashed #bfdbfe;
-  border-radius: 14px;
-  background: #f8fbff;
-  padding: 18px;
+  border: 1px solid #e3ebf5;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  padding: 18px 16px;
   display: grid;
   align-content: start;
-  gap: 10px;
+  gap: 9px;
+  justify-items: center;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.035);
 }
 
 .logoPreview {
-  width: 96px;
-  height: 96px;
-  margin: 0 auto 4px;
-  border-radius: 20px;
+  width: 92px;
+  height: 92px;
+  margin: 0 auto 2px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #dbeafe, #eff6ff);
   color: #2563eb;
   display: grid;
   place-items: center;
-  font-size: 34px;
+  font-size: 32px;
   font-weight: 900;
+  box-shadow: inset 0 0 0 1px #cfe1ff;
 }
 
 .logoImagePreview {
-  width: 104px;
-  height: 104px;
-  margin: 0 auto 4px;
-  border: 1px solid #dbeafe;
-  border-radius: 22px;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 2px;
+  border: 1px solid #dce8f6;
+  border-radius: 12px;
   background: #ffffff;
   object-fit: cover;
-  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.14);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
 }
 
 .logoUploadButton {
   position: relative;
   display: grid;
   width: 100%;
-  min-height: 42px;
+  min-height: 36px;
   place-items: center;
   overflow: hidden;
-  border: 1px solid #60a5fa;
-  border-radius: 12px;
+  border: 1px solid #2f8dfb;
+  border-radius: 6px;
   background: #ffffff;
-  color: #2563eb;
+  color: #1677ff;
   cursor: pointer;
+  font-size: 13px;
   font-weight: 900;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
@@ -346,11 +352,12 @@
 
 .placeholderButton {
   width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 12px;
+  border: 1px solid #d8e2ee;
+  border-radius: 6px;
   background: #ffffff;
   color: #64748b;
-  padding: 10px 12px;
+  padding: 8px 10px;
+  font-size: 13px;
   font-weight: 800;
   cursor: not-allowed;
 }
@@ -358,7 +365,12 @@
 .formGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 13px 16px;
+  border: 1px solid #e7eef7;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.025);
 }
 
 .capitalField {
@@ -368,19 +380,20 @@
 
 .capitalLabel {
   display: block;
-  margin-bottom: 7px;
-  color: var(--lt-ink-muted);
+  margin-bottom: 6px;
+  color: #475569;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .capitalControl,
 .capitalControlOpen {
   display: grid;
-  min-height: 44px;
-  grid-template-columns: minmax(0, 1fr) 128px;
+  min-height: 36px;
+  grid-template-columns: minmax(0, 1fr) 118px;
   overflow: visible;
-  border: 1px solid var(--lt-line);
-  border-radius: 14px;
+  border: 1px solid #d8e2ee;
+  border-radius: 6px;
   background: #ffffff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -393,11 +406,12 @@
 .capitalInput {
   min-width: 0;
   border: none;
-  border-radius: 14px 0 0 14px;
-  padding: 11px 12px;
+  border-radius: 6px 0 0 6px;
+  padding: 0 10px;
   background: #ffffff;
-  color: var(--lt-ink);
+  color: #1f2937;
   font: inherit;
+  font-size: 13px;
   outline: none;
 }
 
@@ -413,13 +427,14 @@
   min-width: 0;
   border: none;
   border-left: 1px solid var(--lt-line);
-  border-radius: 0 14px 14px 0;
+  border-radius: 0 6px 6px 0;
   background: #f8fafc;
   color: #64748b;
   cursor: pointer;
   font: inherit;
-  padding: 0 12px;
+  padding: 0 10px;
   text-align: left;
+  font-size: 13px;
 }
 
 .capitalUnitButton span:first-child {
@@ -439,7 +454,7 @@
   z-index: 36;
   top: calc(100% + 6px);
   right: 0;
-  width: 128px;
+  width: 118px;
   overflow: hidden;
   border: 1px solid #dbe3ef;
   border-radius: 8px;
@@ -456,8 +471,9 @@
   color: #475467;
   cursor: pointer;
   font: inherit;
-  padding: 12px 16px;
+  padding: 10px 13px;
   text-align: left;
+  font-size: 13px;
 }
 
 .capitalOption:hover,
@@ -473,12 +489,17 @@
 
 .formSectionTitle {
   grid-column: 1 / -1;
-  margin: 8px 0 0;
-  border-left: 4px solid #2563eb;
-  padding-left: 10px;
-  color: #172033;
-  font-size: 16px;
+  margin: 10px 0 2px;
+  border-left: 3px solid #1677ff;
+  padding-left: 9px;
+  color: #111827;
+  font-size: 15px;
+  line-height: 1.25;
   font-weight: 900;
+}
+
+.formSectionTitle:first-child {
+  margin-top: 0;
 }
 
 .addressWithMap {
@@ -491,22 +512,23 @@
 
 .mapPlaceholderButton,
 .aiPlaceholderButton {
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  border: 1px solid #d8e2ee;
+  border-radius: 6px;
   background: #ffffff;
   color: #2563eb;
   cursor: not-allowed;
+  font-size: 13px;
   font-weight: 900;
 }
 
 .mapPlaceholderButton {
-  min-height: 44px;
-  padding: 0 14px;
+  min-height: 36px;
+  padding: 0 12px;
 }
 
 .aiPlaceholderButton {
-  margin-top: 10px;
-  padding: 9px 14px;
+  margin-top: 8px;
+  padding: 8px 12px;
   color: #8b5cf6;
 }
 
@@ -528,10 +550,10 @@
 
 .actionRow {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 .primaryButton,
@@ -600,44 +622,46 @@
 
 .disabledTag {
   display: inline-flex;
-  margin-top: 12px;
+  margin-top: 6px;
   border-radius: 999px;
-  background: #e2e8f0;
+  border: 1px solid #d7e0ea;
+  background: #f1f5f9;
   color: #475569;
-  padding: 5px 10px;
-  font-size: 12px;
+  padding: 4px 9px;
+  font-size: 11px;
   font-weight: 900;
 }
 
 .enabledTag {
   display: inline-flex;
-  margin-top: 12px;
+  margin-top: 6px;
   border-radius: 999px;
-  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
   color: #166534;
-  padding: 5px 10px;
-  font-size: 12px;
+  padding: 4px 9px;
+  font-size: 11px;
   font-weight: 900;
 }
 
 .styleUploadGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(148px, 176px));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(134px, 162px));
+  gap: 14px;
   align-items: start;
-  min-height: 150px;
+  min-height: 132px;
 }
 
 .styleUploadCard {
-  min-height: 148px;
-  border: 1px dashed #cbd5e1;
-  border-radius: 14px;
-  background: #f8fafc;
+  min-height: 132px;
+  border: 1px dashed #d5dee8;
+  border-radius: 8px;
+  background: #fbfdff;
   display: grid;
   place-items: center;
   text-align: center;
   color: #64748b;
-  padding: 16px;
+  padding: 12px;
   overflow: hidden;
 }
 
@@ -646,10 +670,13 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  background: #fff7ed;
-  border-color: #fed7aa;
-  color: #c2410c;
+  gap: 8px;
+  border: 1px solid #d7e8ff;
+  border-radius: 8px;
+  background: #f2f8ff;
+  color: #1d4ed8;
+  padding: 10px 12px;
+  font-size: 13px;
 }
 
 .styleNoticeBar span:last-child {
@@ -667,8 +694,8 @@
 .styleImagePreview,
 .styleImagePlaceholder {
   width: 100%;
-  height: 104px;
-  border-radius: 12px;
+  height: 92px;
+  border-radius: 7px;
   background: #e2e8f0;
   object-fit: cover;
 }
@@ -683,8 +710,8 @@
 .styleImageMeta {
   width: 100%;
   display: grid;
-  gap: 4px;
-  margin-top: 10px;
+  gap: 3px;
+  margin-top: 8px;
   text-align: left;
   font-size: 12px;
 }
@@ -699,9 +726,9 @@
 .styleImageActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .styleImageActions button {
@@ -710,11 +737,12 @@
   background: #ffffff;
   color: #2563eb;
   cursor: pointer;
+  font-size: 12px;
   font-weight: 900;
 }
 
 .styleImageActions button {
-  padding: 6px 10px;
+  padding: 4px 8px;
 }
 
 .styleImageActions button:disabled {
@@ -723,14 +751,14 @@
 }
 
 .styleUploadInput {
-  width: 148px;
-  min-height: 148px;
+  width: 134px;
+  min-height: 132px;
   display: grid;
   place-items: center;
-  gap: 8px;
+  gap: 6px;
   border-style: dashed;
   background: #ffffff;
-  padding: 14px;
+  padding: 12px;
   cursor: pointer;
   color: #2563eb;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
@@ -771,15 +799,15 @@
 
 .memberHome {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 284px;
+  gap: 14px;
   align-items: start;
 }
 
 .memberMain,
 .memberAside {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .memberHomeTitle {
@@ -787,16 +815,17 @@
   align-items: end;
   justify-content: space-between;
   gap: 12px;
-  border-radius: 16px;
+  border: 1px solid #e6edf5;
+  border-radius: 8px;
   background: #ffffff;
-  padding: 18px 20px;
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.05);
+  padding: 14px 16px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.035);
 }
 
 .memberHomeTitle h2 {
   margin: 0;
   color: #0f172a;
-  font-size: 24px;
+  font-size: 21px;
 }
 
 .memberHomeTitle span {
@@ -806,21 +835,21 @@
 }
 
 .companyHomeCard {
-  padding: 20px;
+  padding: 16px;
 }
 
 .companyHomeHeader {
   display: grid;
-  grid-template-columns: 74px minmax(0, 1fr) auto;
-  gap: 16px;
+  grid-template-columns: 60px minmax(0, 1fr) auto;
+  gap: 14px;
   align-items: center;
 }
 
 .companyHomeLogo {
-  width: 74px;
-  height: 74px;
+  width: 60px;
+  height: 60px;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #dbeafe, #eff6ff);
   box-shadow: inset 0 0 0 1px #bfdbfe;
 }
@@ -837,7 +866,7 @@
   display: grid;
   place-items: center;
   color: #2563eb;
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 900;
 }
 
@@ -860,10 +889,10 @@
 
 .companyHomeInfo strong {
   display: block;
-  margin-top: 8px;
+  margin-top: 5px;
   overflow: hidden;
   color: #0f172a;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -877,7 +906,7 @@
 .companyHomeActions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   align-items: flex-end;
 }
 
@@ -887,8 +916,8 @@
   border-radius: 999px;
   background: #ffffff;
   color: #2563eb;
-  padding: 9px 14px;
-  font-size: 13px;
+  padding: 6px 11px;
+  font-size: 12px;
   font-weight: 900;
   text-decoration: none;
 }
@@ -900,15 +929,15 @@
 .memberMetricGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 
 .memberMetricCard {
-  padding: 18px;
+  padding: 14px;
 }
 
 .memberBlockTitle {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .memberBlockTitle button {
@@ -919,7 +948,7 @@
   cursor: pointer;
   font-size: 12px;
   font-weight: 900;
-  padding: 7px 10px;
+  padding: 5px 9px;
 }
 
 .memberMiniGrid {
@@ -932,7 +961,7 @@
 .packageBenefitItem,
 .quickMenuGrid button {
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  border-radius: 8px;
   background: #f8fafc;
   cursor: pointer;
   text-align: left;
@@ -940,8 +969,8 @@
 }
 
 .memberMiniItem {
-  min-height: 96px;
-  padding: 14px;
+  min-height: 78px;
+  padding: 10px;
 }
 
 .memberMiniItem:hover,
@@ -955,7 +984,7 @@
 .memberMiniItem strong {
   display: block;
   color: #2563eb;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 900;
 }
 
@@ -986,16 +1015,16 @@
 .packageRibbon {
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr);
-  gap: 12px;
+  gap: 10px;
   align-items: center;
-  border-radius: 16px;
+  border-radius: 8px;
   background: linear-gradient(135deg, #1d4ed8, #38bdf8);
   color: #ffffff;
-  padding: 16px;
+  padding: 12px;
 }
 
 .packageRibbon strong {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .packageRibbon span {
@@ -1015,12 +1044,12 @@
 .packageBenefitGrid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .packageBenefitItem {
-  padding: 14px;
+  padding: 10px;
 }
 
 .packageBenefitItem strong {
@@ -1037,9 +1066,9 @@
 .recommendEmpty {
   display: grid;
   place-items: center;
-  min-height: 118px;
+  min-height: 105px;
   border: 1px dashed #cbd5e1;
-  border-radius: 16px;
+  border-radius: 8px;
   background: #f8fafc;
   color: #64748b;
   text-align: center;
@@ -1057,25 +1086,25 @@
 }
 
 .asideCard {
-  padding: 18px;
+  padding: 14px;
 }
 
 .accountProfile {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-columns: 48px minmax(0, 1fr);
   gap: 12px;
   align-items: start;
 }
 
 .accountAvatar {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: linear-gradient(135deg, #2563eb, #38bdf8);
   color: #ffffff;
-  font-size: 21px;
+  font-size: 18px;
   font-weight: 900;
 }
 
@@ -1092,9 +1121,10 @@
 
 .vipMiniCard,
 .customerCard {
-  border-radius: 14px;
+  border: 1px solid #e8eef6;
+  border-radius: 8px;
   background: #f8fafc;
-  padding: 14px;
+  padding: 12px;
 }
 
 .vipMiniCard strong,
@@ -1127,28 +1157,28 @@
 .quickMenuGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px;
+  gap: 8px;
 }
 
 .quickMenuGrid button {
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 5px;
-  min-height: 76px;
-  padding: 10px 6px;
+  gap: 4px;
+  min-height: 66px;
+  padding: 8px 5px;
   text-align: center;
 }
 
 .quickMenuGrid span {
   display: grid;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   place-items: center;
-  border-radius: 9px;
+  border-radius: 7px;
   background: #eff6ff;
   color: #2563eb;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
 }
 

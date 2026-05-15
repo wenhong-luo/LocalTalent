@@ -722,6 +722,7 @@ describe('CompanyDashboard', () => {
     render(<CompanyDashboard />);
 
     expect(await screen.findByText('我的公司')).toBeInTheDocument();
+    expect(screen.getByTestId('company-member-home-refined')).toHaveAttribute('data-ui-stage', 'ui-5-refined');
     expect(screen.getByText('我的人才')).toBeInTheDocument();
     expect(screen.getByText('我的机会')).toBeInTheDocument();
     expect(screen.getByText('招聘岗位')).toBeInTheDocument();
@@ -1263,6 +1264,7 @@ describe('CompanyDashboard', () => {
     expect(await screen.findByText('企业资料')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /^企业风采$/ }));
 
+    expect(await screen.findByTestId('company-style-refined')).toHaveAttribute('data-ui-stage', 'ui-5-refined');
     expect((await screen.findAllByText(/最多可上传 6 张企业风采图片/)).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('+ 上传风采')).toHaveLength(1);
     expect(screen.getByText('上传暂未开放')).toBeInTheDocument();
@@ -1279,6 +1281,8 @@ describe('CompanyDashboard', () => {
     expect(await screen.findByText('企业会员首页')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /^基本资料$/ }));
 
+    expect(await screen.findByTestId('company-profile-refined')).toHaveAttribute('data-ui-stage', 'ui-5-refined');
+    expect(screen.getByTestId('company-logo-refined')).toBeInTheDocument();
     expect(await screen.findByAltText('企业 Logo')).toHaveAttribute('src', 'blob:http://localhost/style-image');
     expect(screen.getByText('替换 logo')).toBeInTheDocument();
     expect(screen.getByText('生成 LOGO（占位）')).toBeDisabled();
@@ -1324,6 +1328,7 @@ describe('CompanyDashboard', () => {
     expect(await screen.findByText('企业会员首页')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /^企业风采$/ }));
 
+    expect(await screen.findByTestId('company-style-refined')).toHaveAttribute('data-ui-stage', 'ui-5-refined');
     expect(await screen.findByText('私有上传已开启')).toBeInTheDocument();
     expect(screen.getByText('office.webp')).toBeInTheDocument();
     expect(screen.getByAltText('企业风采 1')).toHaveAttribute('src', 'blob:http://localhost/style-image');

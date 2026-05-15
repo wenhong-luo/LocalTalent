@@ -1498,7 +1498,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   function renderProfileForm() {
     const logoUploadEnabled = overview?.features.company_logo_upload_enabled === true;
     return (
-      <section className={styles.card}>
+      <section className={styles.card} data-testid="company-profile-refined" data-ui-stage="ui-5-refined">
         <div className={styles.cardTitle}>
           <div>
             <h2>企业资料</h2>
@@ -1520,7 +1520,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
         ) : null}
 
         <form onSubmit={workbenchEnabled ? onSaveProfile : onLegacyApply} className={styles.profileGrid}>
-          <div className={styles.logoPanel}>
+          <div className={styles.logoPanel} data-testid="company-logo-refined">
             {companyLogo?.has_logo && companyLogoUrl ? (
               <img src={companyLogoUrl} alt="企业 Logo" className={styles.logoImagePreview} />
             ) : (
@@ -1663,7 +1663,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     const styleUploadEnabled = overview?.features.company_style_upload_enabled === true;
     const canUploadMoreStyleImages = styleImages.length < 6;
     return (
-      <section className={styles.card}>
+      <section className={styles.card} data-testid="company-style-refined" data-ui-stage="ui-5-refined">
         <div className={styles.cardTitle}>
           <div>
             <h2>企业风采</h2>
@@ -1792,7 +1792,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     return (
       <>
         {workbenchEnabled && overview ? (
-          <div className={styles.memberHome}>
+          <div className={styles.memberHome} data-testid="company-member-home-refined" data-ui-stage="ui-5-refined">
             <div className={styles.memberMain}>
               <div className={styles.memberHomeTitle}>
                 <h2>企业会员首页</h2>
