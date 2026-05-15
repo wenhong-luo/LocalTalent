@@ -438,6 +438,17 @@ function installCompanyFetchMock({
         }, 'trace-resume-report');
     }
 
+    if (url.includes('/api/company/workbench/resume-search/') && url.includes('/access-requests') && method === 'POST') {
+      return resumeSearchDisabled
+        ? apiError('FEATURE_DISABLED_403', 'controlled resume search disabled')
+        : apiOk({
+          request_id: 9101,
+          request_type: 'download_resume',
+          status: 'submitted',
+          created_at: '2026-05-14T10:00:00'
+        }, 'trace-resume-access');
+    }
+
     if (url.includes('/api/company/workbench/resume-search/') && method === 'GET') {
       return resumeSearchDisabled
         ? apiError('FEATURE_DISABLED_403', 'controlled resume search disabled')
@@ -775,8 +786,37 @@ describe('CompanyDashboard', () => {
     expect(screen.getByText('发布快照安全摘要')).toBeInTheDocument();
     expect(screen.getByText('4年互联网项目经验，熟悉组件化协作。')).toBeInTheDocument();
     expect(screen.getByText('联系方式查看需通过合规申请；当前不开放联系解锁。')).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: '下载简历（受控占位）' }).at(-1)).toBeDisabled();
-    expect(screen.getAllByRole('button', { name: '聊一聊（占位）' }).at(-1)).toBeDisabled();
+    expect(screen.getByRole('button', { name: '申请查看联系方式' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '申请下载简历' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '申请聊一聊' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '申请面试邀请' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '申请查看联系方式' }));
+    await waitFor(() => {
+      expect(screen.getAllByText('申请查看联系方式').length).toBeGreaterThanOrEqual(1);
+    });
+    expect(screen.getByText(/不会生成完整简历、展示联系方式或发送外部通知/)).toBeInTheDocument();
+    fireEvent.change(screen.getByPlaceholderText(/请填写申请原因/), { target: { value: '只提交门禁记录，不查看手机号或邮箱' } });
+    fireEvent.click(screen.getByRole('button', { name: '提交申请' }));
+    expect(await screen.findByText(/申请已提交，状态：submitted/)).toBeInTheDocument();
+    expect(bodyText()).not.toContain('真实下载');
+    expect(bodyText()).not.toContain('联系解锁入口');
+
+    fireEvent.click(screen.getByRole('button', { name: '申请下载简历' }));
+    await waitFor(() => {
+      expect(screen.getAllByText('申请下载简历').length).toBeGreaterThanOrEqual(1);
+    });
+    expect(screen.getByText(/不生成完整简历/)).toBeInTheDocument();
+    fireEvent.change(screen.getByPlaceholderText(/请填写申请原因/), { target: { value: '希望进入合规申请 13900001234' } });
+    fireEvent.click(screen.getByRole('button', { name: '提交申请' }));
+    expect(await screen.findByText(/申请已提交，状态：submitted/)).toBeInTheDocument();
+    expect(screen.getAllByText(/trace-resume-access/).length).toBeGreaterThanOrEqual(1);
+
+    fireEvent.click(screen.getByRole('button', { name: '申请聊一聊' }));
+    fireEvent.click(screen.getByRole('button', { name: '取消' }));
+    fireEvent.click(screen.getByRole('button', { name: '申请面试邀请' }));
+    expect(screen.getAllByText('申请面试邀请').length).toBeGreaterThanOrEqual(1);
+    fireEvent.click(screen.getByRole('button', { name: '取消' }));
 
     fireEvent.click(screen.getByRole('button', { name: '举报简历' }));
     fireEvent.click(screen.getByRole('button', { name: /举报原因 信息不实/ }));

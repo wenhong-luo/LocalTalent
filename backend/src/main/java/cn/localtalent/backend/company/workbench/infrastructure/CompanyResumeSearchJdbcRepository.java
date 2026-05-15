@@ -102,6 +102,47 @@ public class CompanyResumeSearchJdbcRepository {
                         + (remarkSummary == null || remarkSummary.isBlank() ? "" : "; remark=" + remarkSummary));
     }
 
+    public AccessRequestRow createAccessRequest(
+            long companyId,
+            long requesterUserId,
+            long snapshotId,
+            String requestType,
+            String reasonSummary
+    ) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            var statement = connection.prepareStatement(
+                    "INSERT INTO company_resume_access_request "
+                            + "(company_id, requester_user_id, snapshot_id, request_type, reason_summary, status) "
+                            + "VALUES (?, ?, ?, ?, ?, 0)",
+                    java.sql.Statement.RETURN_GENERATED_KEYS);
+            statement.setLong(1, companyId);
+            statement.setLong(2, requesterUserId);
+            statement.setLong(3, snapshotId);
+            statement.setString(4, requestType);
+            statement.setString(5, reasonSummary);
+            return statement;
+        }, keyHolder);
+        Number key = keyHolder.getKey();
+        long requestId = key == null ? 0 : key.longValue();
+        String createdAt = jdbcTemplate.queryForObject(
+                "SELECT DATE_FORMAT(created_at, '%Y-%m-%dT%H:%i:%s') FROM company_resume_access_request WHERE id = ?",
+                String.class,
+                requestId);
+        return new AccessRequestRow(requestId, requestType, "submitted", createdAt);
+    }
+
+    public void createRiskReviewForAccessRequest(long requestId, long snapshotId, String requestType, String reasonSummary) {
+        jdbcTemplate.update(
+                "INSERT INTO risk_review "
+                        + "(risk_type, target_type, target_id, severity, status, title, summary) "
+                        + "VALUES ('resume_access_request', 'talent_snapshot', ?, 'medium', 0, ?, ?)",
+                snapshotId,
+                "企业受控访问申请 #" + snapshotId,
+                "request_id=" + requestId + "; type=" + requestType
+                        + (reasonSummary == null || reasonSummary.isBlank() ? "" : "; reason=" + reasonSummary));
+    }
+
     private void addEquals(StringBuilder where, List<Object> args, String columnName, String value) {
         if (value == null) {
             return;
@@ -183,5 +224,8 @@ public class CompanyResumeSearchJdbcRepository {
     }
 
     public record ResumeSearchRow(long snapshotId, String snapshotJson, String updatedAtText) {
+    }
+
+    public record AccessRequestRow(long requestId, String requestType, String status, String createdAt) {
     }
 }

@@ -284,4 +284,18 @@ public final class CompanyWorkbenchDtos {
             String message
     ) {
     }
+
+    public record ResumeAccessRequestPayload(
+            @JsonProperty("request_type") String requestType,
+            String reason
+    ) {
+    }
+
+    public record ResumeAccessRequestResponse(
+            @JsonProperty("request_id") long requestId,
+            @JsonProperty("request_type") String requestType,
+            String status,
+            @JsonProperty("created_at") String createdAt
+    ) {
+    }
 }

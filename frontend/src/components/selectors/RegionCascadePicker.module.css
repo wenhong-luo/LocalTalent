@@ -1,18 +1,19 @@
 .trigger {
   display: flex;
   width: 100%;
-  min-height: 46px;
+  min-height: var(--lt-control-height);
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   box-sizing: border-box;
-  border: 1px solid #dbe3ef;
-  border-radius: 4px;
-  padding: 11px 14px;
+  border: 1px solid var(--lt-ui-line);
+  border-radius: var(--lt-radius-xs);
+  padding: 0 var(--lt-control-padding-x);
   background: #ffffff;
   color: #1f2937;
   cursor: pointer;
-  font: inherit;
+  font-size: var(--lt-control-font-size);
+  line-height: 1.2;
   text-align: left;
 }
 
@@ -23,33 +24,36 @@
 
 .singleLabel {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 6px;
   color: var(--lt-ink-muted);
-  font-weight: 800;
+  font-size: var(--lt-control-label-size);
+  font-weight: 700;
+  line-height: 1.25;
 }
 
 .singleTrigger,
 .singleTriggerOpen {
   display: flex;
   width: 100%;
-  min-height: 44px;
+  min-height: var(--lt-control-height);
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   box-sizing: border-box;
-  border: 1px solid var(--lt-line);
-  border-radius: 14px;
-  padding: 11px 12px;
+  border: 1px solid var(--lt-ui-line);
+  border-radius: var(--lt-radius-xs);
+  padding: 0 var(--lt-control-padding-x);
   background: #ffffff;
   color: var(--lt-ink);
   cursor: pointer;
-  font: inherit;
+  font-size: var(--lt-control-font-size);
+  line-height: 1.2;
   text-align: left;
 }
 
 .singleTriggerOpen {
-  border-color: #2f8dfb;
-  box-shadow: 0 0 0 2px rgba(47, 141, 251, 0.12);
+  border-color: var(--lt-ui-primary);
+  box-shadow: 0 0 0 2px var(--lt-ui-focus);
 }
 
 .singleValue,
@@ -61,33 +65,34 @@
 }
 
 .singlePlaceholder {
-  color: #9aa4b2;
+  color: var(--lt-ui-muted);
 }
 
 .singleArrow {
-  color: #9aa4b2;
-  font-weight: 900;
+  color: #a3adbb;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .singleRegionPanel {
   position: absolute;
   z-index: 30;
-  top: calc(100% + 6px);
+  top: calc(100% + 4px);
   left: 0;
   display: grid;
   width: min(540px, calc(100vw - 48px));
-  max-height: 320px;
+  max-height: 300px;
   grid-template-columns: repeat(3, minmax(150px, 1fr));
   overflow: hidden;
-  border: 1px solid #dbe3ef;
-  border-radius: 8px;
+  border: 1px solid var(--lt-ui-line);
+  border-radius: var(--lt-radius-xs);
   background: #ffffff;
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.16);
+  box-shadow: var(--lt-shadow-popover);
 }
 
 .singleRegionColumn {
   min-width: 0;
-  max-height: 320px;
+  max-height: 300px;
   overflow: auto;
   border-right: 1px solid #edf1f7;
 }
@@ -104,23 +109,23 @@
   justify-content: space-between;
   gap: 8px;
   border: none;
-  padding: 11px 14px;
+  padding: 9px 12px;
   background: #ffffff;
   color: #475467;
   cursor: pointer;
-  font: inherit;
+  font-size: var(--lt-control-font-size);
   text-align: left;
 }
 
 .singleRegionOption:hover,
 .singleRegionOptionActive {
-  background: #f1f5f9;
-  color: #2563eb;
-  font-weight: 900;
+  background: #f5f8fc;
+  color: var(--lt-ui-primary);
+  font-weight: 700;
 }
 
 .placeholder {
-  color: #9aa4b2;
+  color: var(--lt-ui-muted);
 }
 
 .summary {
@@ -141,19 +146,20 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(15, 23, 42, 0.56);
+  background: rgba(15, 23, 42, 0.48);
 }
 
 .dialog {
   display: flex;
-  width: min(760px, calc(100vw - 32px));
-  height: min(680px, calc(100vh - 48px));
+  width: min(720px, calc(100vw - 32px));
+  height: min(620px, calc(100vh - 48px));
   max-height: calc(100vh - 48px);
   flex-direction: column;
   overflow: hidden;
-  border-radius: 4px;
+  border: 1px solid var(--lt-ui-line);
+  border-radius: var(--lt-radius-sm);
   background: #ffffff;
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+  box-shadow: var(--lt-shadow-dialog);
 }
 
 .header {
@@ -161,20 +167,20 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px;
-  padding: 20px 22px 14px;
+  padding: 16px 18px 10px;
 }
 
 .title {
   margin: 0;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 900;
   color: #1f2937;
 }
 
 .hint {
-  margin: 10px 0 0;
+  margin: 7px 0 0;
   color: #667085;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .close {
@@ -182,7 +188,7 @@
   background: transparent;
   color: #6b7280;
   cursor: pointer;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1;
 }
 
@@ -191,21 +197,22 @@
   min-height: 0;
   flex: 1;
   flex-direction: column;
-  padding: 0 22px 16px;
+  padding: 0 18px 12px;
 }
 
 .selectedInput {
   display: flex;
-  min-height: 44px;
+  min-height: var(--lt-control-height);
   align-items: center;
   gap: 10px;
   box-sizing: border-box;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
+  border: 1px solid var(--lt-ui-line);
+  border-radius: var(--lt-radius-xs);
   margin-bottom: 12px;
-  padding: 10px 14px;
+  padding: 0 12px;
   background: #ffffff;
   color: #111827;
+  font-size: var(--lt-control-font-size);
 }
 
 .selectedInputText {
@@ -213,7 +220,7 @@
   flex: 1;
   overflow: hidden;
   color: #1f2937;
-  font-weight: 800;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -221,19 +228,19 @@
 .selectedInputPlaceholder {
   min-width: 0;
   flex: 1;
-  color: #9aa4b2;
+  color: var(--lt-ui-muted);
 }
 
 .clearButton {
   flex: none;
   border: 1px solid #facc15;
   border-radius: 3px;
-  padding: 6px 12px;
+  padding: 5px 10px;
   background: #ffffff;
   color: #334155;
   cursor: pointer;
-  font: inherit;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .clearButton:hover {
@@ -249,11 +256,12 @@
 .search {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  padding: 11px 40px 11px 14px;
+  height: var(--lt-control-height);
+  border: 1px solid var(--lt-ui-line);
+  border-radius: var(--lt-radius-xs);
+  padding: 0 36px 0 12px;
   color: #1f2937;
-  font: inherit;
+  font-size: var(--lt-control-font-size);
 }
 
 .searchIcon {
@@ -269,7 +277,7 @@
   grid-template-columns: 180px 160px minmax(0, 1fr);
   min-height: 0;
   flex: 1;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--lt-ui-line);
   overflow: hidden;
 }
 
@@ -284,7 +292,7 @@
 .districts {
   min-width: 0;
   overflow: auto;
-  padding: 14px;
+  padding: 12px;
   background: #ffffff;
 }
 
@@ -298,11 +306,11 @@
   justify-content: space-between;
   gap: 8px;
   border: none;
-  padding: 10px 12px;
+  padding: 9px 12px;
   background: transparent;
   color: #334155;
   cursor: pointer;
-  font: inherit;
+  font-size: var(--lt-control-font-size);
   text-align: left;
 }
 
@@ -321,14 +329,14 @@
 .navButtonActive {
   background: #f1f5f9;
   color: #2563eb;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .choiceButton,
 .choiceButtonChecked {
   margin-bottom: 8px;
   border-radius: 4px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .choiceButton:hover,
@@ -345,8 +353,8 @@
 
 .districtGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(110px, 1fr));
-  gap: 10px 14px;
+  grid-template-columns: repeat(3, minmax(108px, 1fr));
+  gap: 8px 12px;
 }
 
 .districtButton,
@@ -358,11 +366,11 @@
   min-width: 0;
   border: none;
   border-radius: 4px;
-  padding: 7px 8px;
+  padding: 6px 8px;
   background: transparent;
   color: #475467;
   cursor: pointer;
-  font: inherit;
+  font-size: 13px;
   line-height: 1.35;
   text-align: left;
   word-break: keep-all;
@@ -383,7 +391,7 @@
 
 .districtButtonChecked {
   color: #2563eb;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .districtButtonChecked span {
@@ -393,15 +401,15 @@
 
 .selectedBar {
   display: flex;
-  max-height: 78px;
+  max-height: 70px;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-  margin-top: 14px;
+  margin-top: 12px;
   overflow: auto;
   color: #667085;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .chip {
@@ -410,10 +418,10 @@
   gap: 6px;
   border: 1px solid #bfdbfe;
   border-radius: 999px;
-  padding: 5px 10px;
+  padding: 4px 9px;
   background: #eff6ff;
   color: #1d4ed8;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .chip button {
@@ -429,22 +437,23 @@
   flex-shrink: 0;
   justify-content: center;
   gap: 12px;
-  padding: 18px 22px 22px;
+  padding: 14px 18px 18px;
   border-top: 1px solid #eef2f7;
 }
 
 .save,
 .cancel {
-  min-width: 88px;
+  min-width: 82px;
   border: 1px solid transparent;
   border-radius: 4px;
-  padding: 10px 24px;
+  padding: 8px 22px;
   cursor: pointer;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 800;
 }
 
 .save {
-  background: #2f8dfb;
+  background: var(--lt-ui-primary);
   color: #ffffff;
 }
 

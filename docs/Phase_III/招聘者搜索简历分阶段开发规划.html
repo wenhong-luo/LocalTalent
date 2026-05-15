@@ -145,14 +145,16 @@
 
     <section id="status" class="card">
       <h2>当前状态补记</h2>
-      <div class="callout"><strong>Prompt 1：搜索简历边界重签与数据源设计已完成；Prompt 2：后端受控搜索接口与六个下拉筛选已完成；Prompt 3：搜索简历列表页高保真 UI 已完成；Prompt 4：安全简历详情抽屉与举报简历已完成。</strong></div>
+      <div class="callout"><strong>Prompt 1：搜索简历边界重签与数据源设计已完成；Prompt 2：后端受控搜索接口与六个下拉筛选已完成；Prompt 3：搜索简历列表页高保真 UI 已完成；Prompt 4：安全简历详情抽屉与举报简历已完成；Prompt 5：下载/联系/职聊/面试邀请门禁占位已完成；Prompt 6：安全收口与验收矩阵已完成。</strong></div>
       <ul>
-        <li>已登记 <code>phase3.company_resume_search=false</code>，默认关闭；当前 <code>/company</code> 的「搜索简历」已具备 company 私有列表页、安全详情抽屉和举报弹窗。</li>
+        <li>已登记 <code>phase3.company_resume_search=false</code>，默认关闭；当前 <code>/company</code> 的「搜索简历」已具备 company 私有列表页、安全详情抽屉、举报弹窗和受控访问申请入口。</li>
         <li>允许的低风险子集仅限：company 私有域内、已认证企业、读取候选人主动授权发布的 <code>candidate_publish_snapshot</code> 安全快照。</li>
         <li>Prompt 2 已新增 company 私有后端 API：<code>GET /api/company/workbench/resume-search</code>，只返回发布快照安全摘要，并写 <code>field_access_log</code>。</li>
         <li>Prompt 4 已新增 company 私有详情接口、举报接口和 <code>V0027__create_company_resume_snapshot_report.sql</code>；详情读取写 <code>field_access_log</code>，举报写 <code>audit_log</code> 并可创建风险审核摘要任务。</li>
-        <li>仍未实现联系方式展示、完整简历下载、联系解锁、真实短信/微信、小程序/App 或会员支付。</li>
-        <li>下一轮如继续开发，必须从 <strong>Prompt 5：下载/联系/职聊/面试邀请的门禁占位</strong> 开始。</li>
+        <li>Prompt 5 已新增 company 私有 <code>POST /api/company/workbench/resume-search/{snapshotId}/access-requests</code> 和 <code>V0028__create_company_resume_access_request.sql</code>；下载简历、查看联系方式、聊一聊、面试邀请均只提交受控申请。</li>
+        <li>Prompt 6 已补齐后端 IDOR/BOLA、游客/非 company 拒绝、撤回/下线/非公开快照不可见、审计与字段访问脱敏测试；前端已覆盖列表、详情、举报和受控申请弹窗的 DOM 字段黑名单；新增 <code>scripts/check_company_resume_search_acceptance</code> 并接入三期安全验收脚本。</li>
+        <li>搜索简历专项主线已收口，但仍未实现联系方式展示、完整简历下载、联系解锁、真实短信/微信、小程序/App 或会员支付。</li>
+        <li>后续如继续扩展「查看联系方式 / 下载完整简历」，必须另起风险准入专项，不得混入本搜索简历基础能力。</li>
       </ul>
     </section>
 
@@ -170,8 +172,8 @@
         <div class="step"><strong>Prompt 2：后端受控搜索接口（已完成）</strong><p>新增 company 私有 <code>/api/company/workbench/resume-search</code>，支持地区、职位类别、关键词、学历、经验和六个下拉筛选，只返回发布快照安全摘要。</p></div>
         <div class="step"><strong>Prompt 3：列表页高保真 UI（已完成）</strong><p>替换风险池占位，实现搜索条、筛选项、简历卡片、分页和空态；画像分析只占位。</p></div>
         <div class="step"><strong>Prompt 4：安全详情与举报（已完成）</strong><p>实现安全详情抽屉和举报弹窗；联系方式区域只提示合规申请，不直接展示。</p></div>
-        <div class="step"><strong>Prompt 5：下载/联系门禁</strong><p>下载简历、聊一聊、面试邀请均做受控弹窗或申请入口，不生成完整简历，不发外部通知。</p></div>
-        <div class="step"><strong>Prompt 6：安全收口</strong><p>补 IDOR/BOLA、撤回不可见、字段黑名单、审计、边界脚本和文档收口。</p></div>
+        <div class="step"><strong>Prompt 5：下载/联系门禁（已完成）</strong><p>下载简历、查看联系方式、聊一聊、面试邀请均做受控申请入口，不生成完整简历，不展示联系方式，不发外部通知。</p></div>
+        <div class="step"><strong>Prompt 6：安全收口（已完成）</strong><p>已补 IDOR/BOLA、撤回不可见、字段黑名单、审计、边界脚本和文档收口。</p></div>
       </div>
     </section>
 
@@ -218,6 +220,19 @@
       </table>
     </section>
 
+    <section id="prompt6-record" class="card">
+      <h2>Prompt 6 安全收口实现记录</h2>
+      <table>
+        <thead><tr><th>类型</th><th>完成内容</th><th>边界</th></tr></thead>
+        <tbody>
+          <tr><td>后端验收矩阵</td><td>扩展 <code>CompanyResumeSearchIT</code>，覆盖列表、详情、举报、受控申请四类接口的游客、candidate、operator、auditor 拒绝，以及撤回、下线、非公开 scope 快照不可见。</td><td>不新增 API、不新增迁移；只证明现有受控发布快照搜索安全可回归。</td></tr>
+          <tr><td>审计与字段访问</td><td>断言列表/详情写 <code>field_access_log</code>，举报/申请写 <code>audit_log</code>，日志摘要不含关键词原文、手机号、邮箱、微信、附件 key、完整简历正文或原始 JSON。</td><td>审计只保留摘要、对象 ID、状态和 trace。</td></tr>
+          <tr><td>前端 DOM 安全</td><td>扩展 <code>CompanyDashboard.test.tsx</code>，覆盖列表、详情抽屉、举报弹窗、下载/联系/聊一聊/面试邀请申请弹窗的字段黑名单。</td><td><code>画像分析</code>、下载、联系、职聊、面试邀请仍不触发真实能力。</td></tr>
+          <tr><td>专项脚本</td><td>新增 <code>scripts/check_company_resume_search_acceptance</code>，并接入 <code>scripts/check_phase3_security_acceptance</code>。</td><td>专项脚本只做静态验收，不放宽三期风险池边界。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
     <section id="filters" class="card">
       <h2>六个下拉筛选建议</h2>
       <table>
@@ -247,7 +262,7 @@
 
     <section id="next" class="card">
       <h2>下一步</h2>
-      <p>Prompt 1 至 Prompt 4 已完成。下一轮如继续开发，应从 <strong>Prompt 5：下载/联系/职聊/面试邀请的门禁占位</strong> 开始，不要直接实现完整简历库、联系解锁或下载完整简历。</p>
+      <p>Prompt 1 至 Prompt 6 已完成，招聘者「搜索简历」基础专项可以收口。下一步建议转向招聘者中心的其它安全闭环，例如「简历管理 / 收到投递 / 面试邀约高保真与处理闭环」。如果后续要做「查看联系方式 / 下载完整简历 / 真实职聊」，必须单独走风险准入。</p>
     </section>
   </main>
 </body>

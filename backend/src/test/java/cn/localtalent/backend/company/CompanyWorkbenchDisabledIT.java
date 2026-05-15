@@ -69,6 +69,21 @@ class CompanyWorkbenchDisabledIT {
         assertThat(resumeSearchDisabled.body().at("/code").asText()).isEqualTo("FEATURE_DISABLED_403");
         assertThat(resumeSearchDisabled.body().at("/trace_id").asText()).isEqualTo("trace-p28-disabled-resume-search");
 
+        HttpJsonResponse accessRequestDisabled = postJson(
+                "/api/company/workbench/resume-search/1/access-requests",
+                """
+                        {
+                          "request_type": "download_resume",
+                          "reason": "disabled gate"
+                        }
+                        """,
+                "trace-p28-disabled-resume-access",
+                "Bearer " + token,
+                "idem-p28-disabled-resume-access");
+        assertThat(accessRequestDisabled.status()).isEqualTo(403);
+        assertThat(accessRequestDisabled.body().at("/code").asText()).isEqualTo("FEATURE_DISABLED_403");
+        assertThat(accessRequestDisabled.body().at("/trace_id").asText()).isEqualTo("trace-p28-disabled-resume-access");
+
         HttpJsonResponse legacy = getJson(
                 "/api/company/jobs?page=1&size=20",
                 "trace-p28-disabled-legacy-jobs",

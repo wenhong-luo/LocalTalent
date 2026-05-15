@@ -59,6 +59,7 @@ class MigrationTest {
                 "candidate_resume_ai_suggestion_item",
                 "portal_recommendation",
                 "risk_review",
+                "company_resume_access_request",
                 "company_style_image",
                 "company_logo_asset",
                 "audit_log",
@@ -339,6 +340,19 @@ class MigrationTest {
                 "idx_company_report_time",
                 "idx_snapshot_status_time",
                 "idx_reason_status_time"));
+        assertColumnsExist(jdbcTemplate, "company_resume_access_request", List.of(
+                "company_id",
+                "requester_user_id",
+                "snapshot_id",
+                "request_type",
+                "reason_summary",
+                "status",
+                "created_at",
+                "updated_at"));
+        assertIndexesExist(jdbcTemplate, "company_resume_access_request", List.of(
+                "idx_company_access_time",
+                "idx_snapshot_access_status_time",
+                "idx_type_status_time"));
         assertColumnsExist(jdbcTemplate, "company_style_image", List.of(
                 "company_id",
                 "file_name",

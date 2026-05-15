@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+BACKEND_DIR="$ROOT_DIR/backend"
+FRONTEND_DIR="$ROOT_DIR/frontend"
+PHASE_III_DIR="$ROOT_DIR/docs/Phase_III"
+
+required_files=(
+  "$BACKEND_DIR/src/main/resources/db/migration/V0026__extend_publish_snapshot_resume_search_fields.sql"
+  "$BACKEND_DIR/src/main/resources/db/migration/V0027__create_company_resume_snapshot_report.sql"
+  "$BACKEND_DIR/src/main/resources/db/migration/V0028__create_company_resume_access_request.sql"
+  "$BACKEND_DIR/src/main/java/cn/localtalent/backend/company/workbench/api/CompanyWorkbenchController.java"
+  "$BACKEND_DIR/src/main/java/cn/localtalent/backend/company/workbench/application/CompanyResumeSearchService.java"
+  "$BACKEND_DIR/src/main/java/cn/localtalent/backend/company/workbench/infrastructure/CompanyResumeSearchJdbcRepository.java"
+  "$BACKEND_DIR/src/test/java/cn/localtalent/backend/company/CompanyResumeSearchIT.java"
+  "$FRONTEND_DIR/src/pages/company/CompanyDashboard.tsx"
+  "$FRONTEND_DIR/src/pages/company/CompanyDashboard.test.tsx"
+  "$FRONTEND_DIR/src/pages/company/companyApi.ts"
+  "$PHASE_III_DIR/招聘者搜索简历分阶段开发规划.md"
+  "$PHASE_III_DIR/招聘者搜索简历分阶段开发规划.html"
+  "$PHASE_III_DIR/00_PHASE_III_BOUNDARY.md"
+  "$PHASE_III_DIR/三期研发提示词.md"
+)
+
+for required_file in "${required_files[@]}"; do
+  if [ ! -f "$required_file" ]; then
+    echo "FAIL: controlled resume search acceptance file missing: $required_file"
+    exit 1
+  fi
+done
+
+backend_test_markers=(
+  "companyResumeSearchShouldUsePublishSnapshotsOnlyWithFiltersAndSafeFields"
+  "assertHiddenSnapshotBlocked"
+  "publish-disabled"
+  "consent-revoked"
+  "offline"
+  "private-scope"
+  "trace-p3-resume-search-visitor"
+  "trace-p3-resume-search-detail-candidate"
+  "trace-p3-resume-search-report-operator"
+  "trace-p3-resume-search-detail-auditor"
+  "trace-p3-resume-access-auditor"
+  "COMPANY_RESUME_SEARCH_DETAIL"
+  "resume_snapshot_report"
+  "resume_snapshot_access_request"
+  "assertAuditAndFieldAccessLogsAreSanitized"
+)
+
+for marker in "${backend_test_markers[@]}"; do
+  if ! grep -Fq "$marker" "$BACKEND_DIR/src/test/java/cn/localtalent/backend/company/CompanyResumeSearchIT.java"; then
+    echo "FAIL: controlled resume search backend test marker missing: $marker"
+    exit 1
+  fi
+done
+
+frontend_test_markers=(
+  "受控发布快照搜索"
+  "查看摘要"
+  "举报简历"
+  "申请查看联系方式"
+  "申请下载简历"
+  "申请聊一聊"
+  "申请面试邀请"
+  "画像分析（占位）"
+  "不生成完整简历"
+  "不会生成完整简历、展示联系方式或发送外部通知"
+  "contact_unlock"
+  "expectNoSensitiveCandidateOrCompanyFields"
+)
+
+for marker in "${frontend_test_markers[@]}"; do
+  if ! grep -Fq "$marker" "$FRONTEND_DIR/src/pages/company/CompanyDashboard.test.tsx"; then
+    echo "FAIL: controlled resume search frontend test marker missing: $marker"
+    exit 1
+  fi
+done
+
+implementation_markers=(
+  "GET /api/company/workbench/resume-search"
+  "GET /api/company/workbench/resume-search/{snapshotId}"
+  "POST /api/company/workbench/resume-search/{snapshotId}/reports"
+  "POST /api/company/workbench/resume-search/{snapshotId}/access-requests"
+  "candidate_publish_snapshot"
+  "phase3.company_resume_search=false"
+  "Prompt 6"
+  "安全收口"
+  "不是公共简历库"
+)
+
+for marker in "${implementation_markers[@]}"; do
+  if ! grep -R -Fq "$marker" \
+    "$PHASE_III_DIR/招聘者搜索简历分阶段开发规划.md" \
+    "$PHASE_III_DIR/00_PHASE_III_BOUNDARY.md" \
+    "$PHASE_III_DIR/三期研发提示词.md"; then
+    echo "FAIL: controlled resume search doc marker missing: $marker"
+    exit 1
+  fi
+done
+
+runtime_forbidden_markers=(
+  "contact_unlock"
+  "unlock_contact"
+  "presigned_url"
+  "full_resume_download"
+  "raw_resume_json"
+)
+
+for marker in "${runtime_forbidden_markers[@]}"; do
+  if grep -R -Fq "$marker" \
+    "$BACKEND_DIR/src/main/java/cn/localtalent/backend/company/workbench/api/CompanyWorkbenchController.java" \
+    "$BACKEND_DIR/src/main/java/cn/localtalent/backend/company/workbench/application/CompanyResumeSearchService.java" \
+    "$BACKEND_DIR/src/main/java/cn/localtalent/backend/company/workbench/infrastructure/CompanyResumeSearchJdbcRepository.java" \
+    "$FRONTEND_DIR/src/pages/company/CompanyDashboard.tsx" \
+    "$FRONTEND_DIR/src/pages/company/companyApi.ts"; then
+    echo "FAIL: controlled resume search forbidden runtime marker detected: $marker"
+    exit 1
+  fi
+done
+
+if grep -R -Fq "candidate_resume" \
+  "$BACKEND_DIR/src/main/java/cn/localtalent/backend/company/workbench/application/CompanyResumeSearchService.java" \
+  "$BACKEND_DIR/src/main/java/cn/localtalent/backend/company/workbench/infrastructure/CompanyResumeSearchJdbcRepository.java"; then
+  echo "FAIL: controlled resume search must not query candidate_resume raw data"
+  exit 1
+fi
+
+echo "PASS"

@@ -100,4 +100,6 @@ if grep -RIEq "debug.*export|temporary.*export|临时脚本.*导出|direct.*down
   exit 1
 fi
 
+"$ROOT_DIR/scripts/check_company_resume_search_acceptance"
+
 echo "PASS"

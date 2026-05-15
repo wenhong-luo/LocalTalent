@@ -19,6 +19,8 @@ import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.JobRest
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.OverviewResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSearchDetailResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSearchPageResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeAccessRequestPayload;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeAccessRequestResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSnapshotReportRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSnapshotReportResponse;
 import cn.localtalent.backend.company.workbench.application.CompanyResumeSearchService;
@@ -245,6 +247,16 @@ public class CompanyWorkbenchController {
             @RequestBody ResumeSnapshotReportRequest request
     ) {
         return ApiResponse.success(resumeSearchService.report(snapshotId, request, idempotencyKey));
+    }
+
+    @PostMapping("/resume-search/{snapshotId}/access-requests")
+    @RequirePermission("company.resume-search.request")
+    public ApiResponse<ResumeAccessRequestResponse> requestResumeAccess(
+            @PathVariable long snapshotId,
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey,
+            @RequestBody ResumeAccessRequestPayload request
+    ) {
+        return ApiResponse.success(resumeSearchService.requestAccess(snapshotId, request, idempotencyKey));
     }
 
     @PostMapping("/jobs")

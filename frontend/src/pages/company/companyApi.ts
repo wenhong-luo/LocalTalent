@@ -167,6 +167,24 @@ export type CompanyResumeReportResponse = {
   message: string;
 };
 
+export type CompanyResumeAccessRequestType =
+  | 'download_resume'
+  | 'contact_access'
+  | 'chat_request'
+  | 'interview_invite_request';
+
+export type CompanyResumeAccessRequestPayload = {
+  request_type: CompanyResumeAccessRequestType;
+  reason: string;
+};
+
+export type CompanyResumeAccessRequestResponse = {
+  request_id: number;
+  request_type: CompanyResumeAccessRequestType;
+  status: string;
+  created_at: string;
+};
+
 export type CompanyWorkbenchProfile = {
   company_id: number;
   company_name: string;
@@ -575,6 +593,16 @@ function toResumeReportResponse(raw: unknown): CompanyResumeReportResponse {
   };
 }
 
+function toResumeAccessRequestResponse(raw: unknown): CompanyResumeAccessRequestResponse {
+  const row = asRecord(raw);
+  return {
+    request_id: numberOr(row.request_id),
+    request_type: text(row.request_type, 'download_resume') as CompanyResumeAccessRequestType,
+    status: text(row.status, 'submitted'),
+    created_at: text(row.created_at)
+  };
+}
+
 function resumeSearchQuery(params: CompanyResumeSearchParams): string {
   const query = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
@@ -883,6 +911,22 @@ export async function reportCompanyResumeSnapshot(
     }
   );
   return { data: toResumeReportResponse(result.data), traceId: result.traceId };
+}
+
+export async function requestCompanyResumeAccess(
+  token: string,
+  snapshotId: number,
+  payload: CompanyResumeAccessRequestPayload
+): Promise<ApiResult<CompanyResumeAccessRequestResponse>> {
+  const result = await apiPost<unknown>(
+    `/api/company/workbench/resume-search/${snapshotId}/access-requests`,
+    payload,
+    {
+      token,
+      idempotencyKey: createIdempotencyKey(`company-resume-access-${payload.request_type}`)
+    }
+  );
+  return { data: toResumeAccessRequestResponse(result.data), traceId: result.traceId };
 }
 
 export async function fetchDeletedCompanyWorkbenchJobs(token: string): Promise<ApiResult<CompanyJobPage>> {

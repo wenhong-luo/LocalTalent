@@ -12,9 +12,12 @@ import cn.localtalent.backend.company.application.CompanyService;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSearchDetailResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSearchItemResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSearchPageResponse;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeAccessRequestPayload;
+import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeAccessRequestResponse;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSnapshotReportRequest;
 import cn.localtalent.backend.company.workbench.api.CompanyWorkbenchDtos.ResumeSnapshotReportResponse;
 import cn.localtalent.backend.company.workbench.infrastructure.CompanyResumeSearchJdbcRepository;
+import cn.localtalent.backend.company.workbench.infrastructure.CompanyResumeSearchJdbcRepository.AccessRequestRow;
 import cn.localtalent.backend.company.workbench.infrastructure.CompanyResumeSearchJdbcRepository.ResumeSearchQuery;
 import cn.localtalent.backend.company.workbench.infrastructure.CompanyResumeSearchJdbcRepository.ResumeSearchRow;
 import cn.localtalent.backend.company.workbench.infrastructure.CompanyWorkbenchJdbcRepository;
@@ -36,6 +39,7 @@ public class CompanyResumeSearchService {
     private static final int DEFAULT_SIZE = 20;
     private static final int MAX_SIZE = 50;
     private static final String REPORT_API = "company.resume-search.report";
+    private static final String ACCESS_REQUEST_API = "company.resume-search.access-request";
     private static final String CONTACT_ACCESS_HINT = "联系方式查看需通过合规申请；当前不开放联系解锁。";
     private static final Set<String> REPORT_REASON_CODES = Set.of(
             "false_information",
@@ -44,6 +48,11 @@ public class CompanyResumeSearchService {
             "wrong_category",
             "privacy_concern",
             "other");
+    private static final Set<String> ACCESS_REQUEST_TYPES = Set.of(
+            "download_resume",
+            "contact_access",
+            "chat_request",
+            "interview_invite_request");
 
     private final Phase3FeatureProperties phase3Features;
     private final CompanyWorkbenchJdbcRepository companyRepository;
@@ -119,6 +128,30 @@ public class CompanyResumeSearchService {
                 () -> reportOnce(principal, snapshotId, normalized));
     }
 
+    @Transactional
+    public ResumeAccessRequestResponse requestAccess(
+            long snapshotId,
+            ResumeAccessRequestPayload request,
+            String idempotencyKey
+    ) {
+        AuthzPrincipal principal = requireCompany();
+        requireEnabled();
+        requireApprovedCompany(principal);
+        requireVisibleSnapshot(snapshotId);
+        NormalizedAccessRequest normalized = normalizeAccessRequest(request);
+        Map<String, Object> fingerprint = Map.of(
+                "snapshot_id", snapshotId,
+                "request_type", normalized.requestType(),
+                "reason_summary", normalized.reasonSummary() == null ? "" : normalized.reasonSummary());
+        return idempotencyService.execute(
+                ACCESS_REQUEST_API,
+                principal,
+                idempotencyKey,
+                fingerprint,
+                ResumeAccessRequestResponse.class,
+                () -> requestAccessOnce(principal, snapshotId, normalized));
+    }
+
     private IdempotentActionResult<ResumeSnapshotReportResponse> reportOnce(
             AuthzPrincipal principal,
             long snapshotId,
@@ -147,6 +180,40 @@ public class CompanyResumeSearchService {
                         "举报已提交，运营将按风险审核流程处理。"),
                 "company_resume_snapshot_report",
                 reportId);
+    }
+
+    private IdempotentActionResult<ResumeAccessRequestResponse> requestAccessOnce(
+            AuthzPrincipal principal,
+            long snapshotId,
+            NormalizedAccessRequest normalized
+    ) {
+        AccessRequestRow row = searchRepository.createAccessRequest(
+                principal.companyId(),
+                principal.userId(),
+                snapshotId,
+                normalized.requestType(),
+                normalized.reasonSummary());
+        searchRepository.createRiskReviewForAccessRequest(
+                row.requestId(),
+                snapshotId,
+                normalized.requestType(),
+                normalized.reasonSummary());
+        auditService.record(
+                principal,
+                "company_resume_access_request",
+                row.requestId(),
+                "resume_snapshot_access_request",
+                null,
+                "{\"snapshot_id\":" + snapshotId + ",\"request_type\":\"" + normalized.requestType()
+                        + "\",\"status\":\"submitted\"}");
+        return new IdempotentActionResult<>(
+                new ResumeAccessRequestResponse(
+                        row.requestId(),
+                        row.requestType(),
+                        row.status(),
+                        row.createdAt()),
+                "company_resume_access_request",
+                row.requestId());
     }
 
     private AuthzPrincipal requireCompany() {
@@ -267,6 +334,17 @@ public class CompanyResumeSearchService {
             throw validation("unsupported report reason");
         }
         return new NormalizedReport(reasonCode, sanitizeRemark(request.remark()));
+    }
+
+    private NormalizedAccessRequest normalizeAccessRequest(ResumeAccessRequestPayload request) {
+        if (request == null) {
+            throw validation("access request is required");
+        }
+        String requestType = normalizeCode(request.requestType(), 64);
+        if (requestType == null || !ACCESS_REQUEST_TYPES.contains(requestType)) {
+            throw validation("unsupported access request type");
+        }
+        return new NormalizedAccessRequest(requestType, sanitizeRemark(request.reason()));
     }
 
     private String sanitizeRemark(String value) {
@@ -412,5 +490,8 @@ public class CompanyResumeSearchService {
     }
 
     private record NormalizedReport(String reasonCode, String remarkSummary) {
+    }
+
+    private record NormalizedAccessRequest(String requestType, String reasonSummary) {
     }
 }

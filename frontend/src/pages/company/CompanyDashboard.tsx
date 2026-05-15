@@ -53,6 +53,7 @@ import {
   issueCompanyExportDownloadUrl,
   offlineCompanyWorkbenchJob,
   reportCompanyResumeSnapshot,
+  requestCompanyResumeAccess,
   restoreCompanyWorkbenchJobDraft,
   saveCompanyWorkbenchProfile,
   saveCompanyStyleImageOrder,
@@ -68,6 +69,7 @@ import {
   type CompanyJob,
   type CompanyLogo,
   type CompanyResumeSearchDetail,
+  type CompanyResumeAccessRequestType,
   type CompanyResumeSearchItem,
   type CompanyResumeSearchPage,
   type CompanyResumeSearchParams,
@@ -196,6 +198,13 @@ const resumeReportReasonOptions = [
   { value: 'privacy_concern', label: '隐私风险' },
   { value: 'other', label: '其它原因' }
 ];
+
+const resumeAccessRequestLabels: Record<CompanyResumeAccessRequestType, string> = {
+  download_resume: '申请下载简历',
+  contact_access: '申请查看联系方式',
+  chat_request: '申请聊一聊',
+  interview_invite_request: '申请面试邀请'
+};
 
 const resumeExperienceFilters = [
   { value: '', label: '经验不限' },
@@ -540,6 +549,10 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
   const [resumeReportRemark, setResumeReportRemark] = useState('');
   const [resumeReportMessage, setResumeReportMessage] = useState('');
   const [resumeReportSubmitting, setResumeReportSubmitting] = useState(false);
+  const [resumeAccessRequestType, setResumeAccessRequestType] = useState<CompanyResumeAccessRequestType | null>(null);
+  const [resumeAccessReason, setResumeAccessReason] = useState('');
+  const [resumeAccessMessage, setResumeAccessMessage] = useState('');
+  const [resumeAccessSubmitting, setResumeAccessSubmitting] = useState(false);
 
   const workbenchEnabled = workbenchMode === 'enabled';
   const applicationRows = workbenchEnabled ? workbenchApplications : legacyApplications;
@@ -834,6 +847,9 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     setResumeReportOpen(false);
     setResumeReportRemark('');
     setResumeReportMessage('');
+    setResumeAccessRequestType(null);
+    setResumeAccessReason('');
+    setResumeAccessMessage('');
     try {
       const result = await fetchCompanyResumeSearchDetail(context.token, snapshotId);
       setResumeDetail(result.data);
@@ -854,6 +870,9 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     setResumeReportOpen(false);
     setResumeReportRemark('');
     setResumeReportMessage('');
+    setResumeAccessRequestType(null);
+    setResumeAccessReason('');
+    setResumeAccessMessage('');
   }
 
   async function submitResumeReport(event: FormEvent<HTMLFormElement>) {
@@ -876,6 +895,36 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
       setResumeReportMessage(`${errorMessage(error, '举报提交失败。')}${trace ? ` trace_id: ${trace}` : ''}`);
     } finally {
       setResumeReportSubmitting(false);
+    }
+  }
+
+  function openResumeAccessRequest(requestType: CompanyResumeAccessRequestType) {
+    setResumeReportOpen(false);
+    setResumeAccessRequestType(requestType);
+    setResumeAccessReason('');
+    setResumeAccessMessage('本申请只进入合规门禁记录，不会生成完整简历、展示联系方式或发送外部通知。');
+  }
+
+  async function submitResumeAccessRequest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!resumeDetail || !resumeAccessRequestType) {
+      return;
+    }
+    setResumeAccessSubmitting(true);
+    setResumeAccessMessage('正在提交受控访问申请。');
+    try {
+      const result = await requestCompanyResumeAccess(context.token, resumeDetail.snapshot_id, {
+        request_type: resumeAccessRequestType,
+        reason: resumeAccessReason
+      });
+      setResumeAccessMessage(`申请已提交，状态：${result.data.status}。trace_id: ${result.traceId}`);
+      setResumeSearchTraceId(result.traceId);
+      setResumeAccessReason('');
+    } catch (error) {
+      const trace = isHttpClientError(error) ? error.traceId : undefined;
+      setResumeAccessMessage(`${errorMessage(error, '受控访问申请提交失败。')}${trace ? ` trace_id: ${trace}` : ''}`);
+    } finally {
+      setResumeAccessSubmitting(false);
     }
   }
 
@@ -2669,13 +2718,37 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
               <section className={styles.resumeDetailContact}>
                 <h4>联系方式</h4>
                 <p>{detail.contact_access_hint}</p>
+                <button type="button" onClick={() => openResumeAccessRequest('contact_access')}>申请查看联系方式</button>
               </section>
               <div className={styles.resumeDetailActions}>
                 <button type="button" onClick={() => setResumeReportOpen(true)}>举报简历</button>
                 <button type="button" onClick={() => setResumeSearchNotice('画像分析仅为视觉占位，本轮不接 AI 或候选人画像能力。')}>画像分析（占位）</button>
-                <button type="button" disabled>下载简历（受控占位）</button>
-                <button type="button" disabled>聊一聊（占位）</button>
+                <button type="button" onClick={() => openResumeAccessRequest('download_resume')}>申请下载简历</button>
+                <button type="button" onClick={() => openResumeAccessRequest('chat_request')}>申请聊一聊</button>
+                <button type="button" onClick={() => openResumeAccessRequest('interview_invite_request')}>申请面试邀请</button>
               </div>
+              {resumeAccessRequestType ? (
+                <form className={styles.resumeAccessForm} onSubmit={submitResumeAccessRequest}>
+                  <h4>{resumeAccessRequestLabels[resumeAccessRequestType]}</h4>
+                  <p>申请只进入合规审核记录，不生成完整简历、不展示手机号/邮箱/微信、不创建真实职聊，也不会发送短信、微信、小程序或 App 通知。</p>
+                  <label>
+                    <span>申请说明</span>
+                    <textarea
+                      value={resumeAccessReason}
+                      maxLength={300}
+                      onChange={(event) => setResumeAccessReason(event.target.value)}
+                      placeholder="请填写申请原因，最多 300 字。不要填写联系方式或敏感材料。"
+                    />
+                  </label>
+                  {resumeAccessMessage ? <p className={styles.resumeReportMessage}>{resumeAccessMessage}</p> : null}
+                  <div className={styles.actionRow}>
+                    <button type="button" className={styles.plainButton} onClick={() => setResumeAccessRequestType(null)}>取消</button>
+                    <button type="submit" className={styles.primaryButton} disabled={resumeAccessSubmitting}>
+                      {resumeAccessSubmitting ? '提交中...' : '提交申请'}
+                    </button>
+                  </div>
+                </form>
+              ) : null}
               {resumeReportOpen ? (
                 <form className={styles.resumeReportForm} onSubmit={submitResumeReport}>
                   <h4>举报简历</h4>
