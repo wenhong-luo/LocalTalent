@@ -769,9 +769,15 @@ describe('CompanyDashboard', () => {
 
     expect(await screen.findByText('受控发布快照搜索')).toBeInTheDocument();
     expect(screen.getByText('简历快照列表')).toBeInTheDocument();
+    expect(screen.getByText('学历')).toBeInTheDocument();
+    expect(screen.getByText('工作经验')).toBeInTheDocument();
+    expect(screen.getByText('其他筛选')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /地区 不限地区/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '职位类型' })).toBeInTheDocument();
+    expect(screen.getByLabelText('搜索简历关键词')).toHaveAttribute('placeholder', '请输入关键词搜索');
     expect(screen.getByText('赵*')).toBeInTheDocument();
-    expect(screen.getByText('前端工程师 / UI设计师')).toBeInTheDocument();
-    expect(screen.getByText('上海 / 上海市 / 浦东新区')).toBeInTheDocument();
+    expect(screen.getByText(/前端工程师 \/ UI设计师/)).toBeInTheDocument();
+    expect(screen.getByText(/上海 \/ 上海市 \/ 浦东新区/)).toBeInTheDocument();
     expect(screen.getByText('Vue, TypeScript, 组件化协作')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '查看摘要' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '画像分析（占位）' })).toBeInTheDocument();
@@ -844,16 +850,13 @@ describe('CompanyDashboard', () => {
     fireEvent.click(screen.getByRole('button', { name: '上海' }));
     fireEvent.click(screen.getByRole('button', { name: '浦东新区' }));
 
-    fireEvent.click(screen.getByRole('button', { name: '不限职类' }));
+    fireEvent.click(screen.getByRole('button', { name: '职位类型' }));
     const positionDialog = screen.getByRole('dialog', { name: '职位类别' });
     fireEvent.click(within(positionDialog).getByRole('button', { name: '网络 | 通信 | 电子' }));
     fireEvent.click(within(positionDialog).getByLabelText('前端工程师'));
     fireEvent.click(within(positionDialog).getByRole('button', { name: '保存' }));
 
-    fireEvent.click(screen.getByRole('button', { name: /学历 不限学历/ }));
-    fireEvent.click(screen.getByRole('option', { name: '本科' }));
-    fireEvent.click(screen.getByRole('button', { name: /更新时间 不限时间/ }));
-    fireEvent.click(screen.getByRole('option', { name: '最近7天' }));
+    fireEvent.click(screen.getByRole('button', { name: '本科' }));
     fireEvent.click(screen.getByRole('button', { name: '3～5年' }));
     fireEvent.click(screen.getByRole('button', { name: /性别 不限性别/ }));
     fireEvent.click(screen.getByRole('option', { name: '女性' }));
@@ -867,6 +870,8 @@ describe('CompanyDashboard', () => {
     fireEvent.click(screen.getByRole('option', { name: '全职' }));
     fireEvent.click(screen.getByRole('button', { name: /期望薪资 不限薪资/ }));
     fireEvent.click(screen.getByRole('option', { name: '8000-12000' }));
+    fireEvent.click(screen.getByRole('button', { name: /更新时间 不限时间/ }));
+    fireEvent.click(screen.getByRole('option', { name: '最近7天' }));
 
     fireEvent.click(screen.getAllByRole('button', { name: /^搜索简历$/ }).at(-1)!);
 

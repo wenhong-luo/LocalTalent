@@ -1635,177 +1635,184 @@
 
 .resumeSearchPage {
   display: grid;
-  gap: 18px;
+  gap: 12px;
 }
 
 .resumeSearchHero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(210px, 280px);
-  gap: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
   align-items: center;
-  border: 1px solid #d7f4ef;
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 82% 20%, rgba(20, 184, 166, 0.22), transparent 18rem),
-    linear-gradient(135deg, #f0fdfa 0%, #ffffff 66%);
-  padding: 28px 30px;
+  border: 1px solid #e7edf5;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 16px 18px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
 }
 
 .resumeSearchHero span {
-  color: #0f766e;
-  font-size: 13px;
+  color: #1683f7;
+  font-size: 12px;
   font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .resumeSearchHero h2 {
-  margin: 8px 0 10px;
-  color: #10233f;
-  font-size: clamp(30px, 4vw, 48px);
-  line-height: 1.08;
+  margin: 4px 0 5px;
+  color: #111827;
+  font-size: 26px;
+  line-height: 1.2;
 }
 
 .resumeSearchHero p {
   margin: 0;
-  color: #475569;
-  line-height: 1.8;
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 13px;
 }
 
-.resumeSearchHero > div:last-child {
-  border-radius: 20px;
-  background: linear-gradient(135deg, #0f766e, #14b8a6);
-  color: #ffffff;
-  padding: 24px;
+.resumeSearchHero > strong {
+  min-width: 120px;
+  border-radius: 6px;
+  background: #f0f7ff;
+  color: #1677ff;
+  padding: 10px 14px;
   text-align: center;
-  box-shadow: 0 18px 38px rgba(20, 184, 166, 0.22);
-}
-
-.resumeSearchHero > div:last-child strong {
-  display: block;
-  font-size: 44px;
-  line-height: 1;
-}
-
-.resumeSearchHero > div:last-child small {
-  display: block;
-  margin-top: 10px;
-  color: #dffcf7;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .resumeSearchFilters,
 .resumeSearchList,
 .resumeSearchBoundary {
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
+  border: 1px solid #e7edf5;
+  border-radius: 8px;
   background: #ffffff;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
 }
 
 .resumeSearchFilters {
   display: grid;
-  gap: 16px;
-  padding: 22px;
+  gap: 10px;
+  padding: 16px 18px;
 }
 
 .resumeSearchTopBar {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) auto auto;
-  gap: 12px;
+  grid-template-columns: minmax(130px, 150px) minmax(150px, 180px) minmax(280px, 1fr) 96px;
+  gap: 8px;
+  align-items: end;
+}
+
+.resumeSearchTopBar label {
+  display: block;
 }
 
 .resumeSearchTopBar input {
-  min-height: 44px;
-  border: 1px solid #dbe5f0;
-  border-radius: 12px;
-  padding: 0 14px;
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid #d8e0eb;
+  border-radius: 6px;
+  padding: 0 12px;
   color: #334155;
   outline: none;
+  font-size: 13px;
 }
 
 .resumeSearchTopBar input:focus {
-  border-color: #14b8a6;
-  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
+  border-color: #1683f7;
+  box-shadow: 0 0 0 2px rgba(22, 131, 247, 0.12);
 }
 
 .resumeSearchSubmit,
 .resumeSearchReset {
-  min-height: 44px;
-  border-radius: 12px;
-  padding: 0 20px;
-  font-weight: 900;
+  min-height: 36px;
+  border-radius: 6px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .resumeSearchSubmit {
   border: 0;
-  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  background: #1683f7;
   color: #ffffff;
 }
 
 .resumeSearchReset {
-  border: 1px solid #dbe5f0;
+  border: 1px solid #d8e0eb;
   background: #ffffff;
-  color: #334155;
+  color: #4b5563;
 }
 
 .resumeSearchPrimaryFilters,
 .resumeSearchMoreFilters {
-  display: grid;
-  gap: 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .resumeSearchPrimaryFilters {
-  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  padding: 6px 0 0;
 }
 
 .resumeSearchMoreFilters {
-  grid-template-columns: repeat(6, minmax(150px, 1fr));
+  border-top: 1px solid #eef2f7;
+  padding-top: 10px;
+}
+
+.resumeSearchPrimaryFilters > span,
+.resumeSearchQuickFilters > span,
+.resumeSearchMoreFilters > span {
+  flex: 0 0 auto;
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .resumeSearchQuickFilters {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
-  padding-top: 2px;
-}
-
-.resumeSearchQuickFilters::before {
-  content: "经验";
-  color: #64748b;
-  font-weight: 900;
+  border-top: 1px solid #eef2f7;
+  padding-top: 10px;
 }
 
 .resumeQuickFilter,
 .resumeQuickFilterActive {
-  border: 1px solid #dbe5f0;
+  min-height: 28px;
+  border: 1px solid #d8e0eb;
   border-radius: 999px;
   background: #ffffff;
-  color: #334155;
-  padding: 7px 13px;
-  font-weight: 800;
+  color: #4b5563;
+  padding: 0 11px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .resumeQuickFilterActive {
-  border-color: #14b8a6;
-  background: #ecfdf5;
-  color: #0f766e;
+  border-color: #1683f7;
+  background: #eef6ff;
+  color: #1677ff;
 }
 
 .resumeSearchNotice {
   border: 1px solid #bfdbfe;
-  border-radius: 14px;
+  border-radius: 8px;
   background: #eff6ff;
   color: #1d4ed8;
-  padding: 12px 16px;
-  font-weight: 800;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .resumeSearchBody {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 12px;
   align-items: start;
 }
 
@@ -1817,61 +1824,62 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   border-bottom: 1px solid #eef2f7;
-  padding: 20px 22px;
+  padding: 14px 16px;
 }
 
 .resumeSearchListHeader h3 {
   margin: 0;
-  color: #10233f;
-  font-size: 22px;
+  color: #111827;
+  font-size: 18px;
 }
 
 .resumeSearchListHeader p {
-  margin: 5px 0 0;
-  color: #64748b;
+  margin: 3px 0 0;
+  color: #6b7280;
+  font-size: 13px;
 }
 
 .resumeSearchListHeader span {
   border-radius: 999px;
-  background: #ecfdf5;
-  color: #0f766e;
-  padding: 8px 12px;
+  background: #eff6ff;
+  color: #1677ff;
+  padding: 6px 10px;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .resumeSearchCards {
   display: grid;
-  gap: 14px;
-  padding: 18px 22px 6px;
+  gap: 10px;
+  padding: 12px 16px 4px;
 }
 
 .resumeSearchCard {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr) auto;
-  gap: 16px;
-  border: 1px solid #edf2f7;
-  border-radius: 16px;
+  grid-template-columns: 52px minmax(0, 1fr) 112px;
+  gap: 14px;
+  border: 1px solid #eef2f7;
+  border-radius: 8px;
   background: #ffffff;
-  padding: 18px;
+  padding: 16px;
 }
 
 .resumeSearchCard:hover {
-  border-color: #99f6e4;
-  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+  border-color: #c8dcff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.055);
 }
 
 .resumeSearchAvatar {
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ccfbf1, #f0fdfa);
-  color: #0f766e;
-  font-size: 24px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #eef6ff;
+  color: #1677ff;
+  font-size: 19px;
   font-weight: 900;
 }
 
@@ -1882,40 +1890,59 @@
 .resumeSearchTitleRow {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   align-items: flex-start;
 }
 
 .resumeSearchTitleRow h3,
 .resumeSearchTitleRow h4 {
   margin: 0;
-  color: #0f766e;
-  font-size: 18px;
+  color: #111827;
+  font-size: 17px;
 }
 
 .resumeSearchTitleRow p {
-  margin: 6px 0 0;
-  color: #64748b;
+  margin: 4px 0 0;
+  color: #4b5563;
   font-size: 13px;
 }
 
 .resumeSearchUpdated {
-  color: #64748b;
+  color: #9ca3af;
   white-space: nowrap;
   font-size: 12px;
 }
 
+.resumeSearchMetaLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 9px;
+  color: #334155;
+  font-size: 13px;
+}
+
+.resumeSearchMetaLine span {
+  position: relative;
+}
+
+.resumeSearchMetaLine span + span::before {
+  content: "·";
+  margin-right: 10px;
+  color: #cbd5e1;
+}
+
 .resumeSearchSummary {
   display: grid;
-  grid-template-columns: repeat(4, minmax(120px, 1fr));
-  gap: 10px;
-  margin: 14px 0;
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 10px 0;
 }
 
 .resumeSearchSummary div {
-  border-radius: 12px;
+  border-radius: 6px;
   background: #f8fafc;
-  padding: 10px;
+  padding: 8px 10px;
 }
 
 .resumeSearchSummary dt {
@@ -1924,46 +1951,50 @@
 }
 
 .resumeSearchSummary dd {
-  margin: 5px 0 0;
-  color: #172033;
-  font-weight: 900;
+  margin: 4px 0 0;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .resumeSearchSkills {
-  margin: 0 0 10px;
-  color: #475569;
-  line-height: 1.7;
+  margin: 0 0 8px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .resumeSearchTags {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .resumeSearchTags span {
   border-radius: 999px;
-  background: #ecfdf5;
-  color: #0f766e;
-  padding: 5px 9px;
+  background: #f0fdf4;
+  color: #16a34a;
+  padding: 3px 8px;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .resumeSearchActions {
   display: grid;
-  gap: 8px;
+  gap: 7px;
   align-content: center;
-  min-width: 130px;
 }
 
 .resumeSearchActions button {
-  border: 1px solid #dbe5f0;
-  border-radius: 999px;
+  min-height: 30px;
+  border: 1px solid #d8e0eb;
+  border-radius: 6px;
   background: #ffffff;
-  color: #2563eb;
-  padding: 8px 12px;
-  font-weight: 900;
+  color: #1677ff;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .resumeSearchActions button:disabled {
@@ -1973,9 +2004,9 @@
 
 .resumeSearchEmpty,
 .resumeSearchError {
-  margin: 20px 22px;
-  border-radius: 16px;
-  padding: 34px 24px;
+  margin: 12px 16px;
+  border-radius: 8px;
+  padding: 30px 18px;
   text-align: center;
 }
 
@@ -1987,9 +2018,9 @@
 .resumeSearchEmpty strong,
 .resumeSearchError strong {
   display: block;
-  margin-bottom: 8px;
-  color: #172033;
-  font-size: 18px;
+  margin-bottom: 6px;
+  color: #111827;
+  font-size: 16px;
 }
 
 .resumeSearchEmpty p,
@@ -2013,18 +2044,21 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 10px;
-  padding: 16px 22px 22px;
-  color: #64748b;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  color: #6b7280;
+  font-size: 13px;
 }
 
 .resumeSearchPagination button {
-  border: 1px solid #dbe5f0;
-  border-radius: 9px;
+  min-height: 30px;
+  border: 1px solid #d8e0eb;
+  border-radius: 6px;
   background: #ffffff;
-  color: #334155;
-  padding: 8px 12px;
-  font-weight: 800;
+  color: #4b5563;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .resumeSearchPagination button:disabled {
@@ -2033,19 +2067,21 @@
 }
 
 .resumeSearchBoundary {
-  padding: 20px;
+  padding: 16px;
 }
 
 .resumeSearchBoundary h3 {
-  margin: 0 0 12px;
-  color: #10233f;
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: 17px;
 }
 
 .resumeSearchBoundary ul {
   margin: 0;
   padding-left: 18px;
-  color: #64748b;
-  line-height: 1.8;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.75;
 }
 
 .resumeDetailBackdrop {

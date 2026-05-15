@@ -2633,11 +2633,15 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
             </div>
             <span className={styles.resumeSearchUpdated}>{formatDateText(item.updated_at)} 更新</span>
           </div>
+          <div className={styles.resumeSearchMetaLine}>
+            <span>期望：{positions}</span>
+            <span>{cities}</span>
+            <span>{item.expected_salary || '面议'}</span>
+            <span>{resumeSearchWorkNatureLabel(item.work_nature)}</span>
+          </div>
           <dl className={styles.resumeSearchSummary}>
-            <div><dt>期望职位</dt><dd>{positions}</dd></div>
-            <div><dt>期望地区</dt><dd>{cities}</dd></div>
-            <div><dt>期望薪资</dt><dd>{item.expected_salary || '面议'}</dd></div>
-            <div><dt>工作性质</dt><dd>{resumeSearchWorkNatureLabel(item.work_nature)}</dd></div>
+            <div><dt>专业方向</dt><dd>{item.major_name || '专业未公开'}</dd></div>
+            <div><dt>行业类别</dt><dd>{dictionaryOptionLabel(companyIndustryOptions, item.industry_code, item.industry_code || '行业未公开')}</dd></div>
           </dl>
           <p className={styles.resumeSearchSkills}>{item.skills_summary || '候选人暂未发布技能摘要。'}</p>
           <div className={styles.resumeSearchTags}>
@@ -2800,19 +2804,6 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
 
         <form className={styles.resumeSearchFilters} onSubmit={onSubmitResumeSearch}>
           <div className={styles.resumeSearchTopBar}>
-            <label>
-              <span>关键词</span>
-              <input
-                aria-label="搜索简历关键词"
-                value={resumeSearchKeyword}
-                onChange={(event) => setResumeSearchKeyword(event.target.value)}
-                placeholder="搜索期望职位、地区、技能摘要"
-              />
-            </label>
-            <button type="submit" className={styles.resumeSearchSubmit}>搜索简历</button>
-            <button type="button" className={styles.resumeSearchReset} onClick={onResetResumeSearch}>清空筛选</button>
-          </div>
-          <div className={styles.resumeSearchPrimaryFilters}>
             <RegionCascadePicker
               mode="single"
               label="地区"
@@ -2826,29 +2817,45 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
               selectedCategoryCode={resumeSearchCategoryCode}
               maxSelections={1}
               title="职位类别"
-              placeholder="不限职类"
+              placeholder="职位类型"
               searchPlaceholder="请输入职位类别关键词"
               onSave={({ positions, categoryCode }) => {
                 setResumeSearchPositions(positions);
                 setResumeSearchCategoryCode(categoryCode);
               }}
             />
-            <DictionarySelect
-              label="学历"
-              value={resumeSearchEducationCode}
-              options={jobEducationOptions}
-              onChange={setResumeSearchEducationCode}
-              placeholder="不限学历"
-            />
-            <DictionarySelect
-              label="更新时间"
-              value={resumeSearchUpdatedWithin}
-              options={resumeUpdatedWithinOptions}
-              onChange={setResumeSearchUpdatedWithin}
-              placeholder="不限时间"
-            />
+            <label>
+              <input
+                aria-label="搜索简历关键词"
+                value={resumeSearchKeyword}
+                onChange={(event) => setResumeSearchKeyword(event.target.value)}
+                placeholder="请输入关键词搜索"
+              />
+            </label>
+            <button type="submit" className={styles.resumeSearchSubmit}>搜索简历</button>
+          </div>
+          <div className={styles.resumeSearchPrimaryFilters}>
+            <span>学历</span>
+            <button
+              type="button"
+              className={!resumeSearchEducationCode ? styles.resumeQuickFilterActive : styles.resumeQuickFilter}
+              onClick={() => setResumeSearchEducationCode('')}
+            >
+              不限
+            </button>
+            {jobEducationOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={resumeSearchEducationCode === option.value ? styles.resumeQuickFilterActive : styles.resumeQuickFilter}
+                onClick={() => setResumeSearchEducationCode(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
           <div className={styles.resumeSearchQuickFilters} aria-label="工作经验快捷筛选">
+            <span>工作经验</span>
             {resumeExperienceFilters.map((option) => (
               <button
                 key={option.value || 'all'}
@@ -2861,12 +2868,21 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
             ))}
           </div>
           <div className={styles.resumeSearchMoreFilters}>
+            <span>其他筛选</span>
             <DictionarySelect label="性别" value={resumeSearchGender} options={resumeSearchGenderOptions} onChange={setResumeSearchGender} placeholder="不限性别" />
             <DictionarySelect label="简历标签" value={resumeSearchTag} options={resumeTagOptions} onChange={setResumeSearchTag} placeholder="不限标签" />
             <DictionarySelect label="行业类别" value={resumeSearchIndustryCode} options={companyIndustryOptions} onChange={setResumeSearchIndustryCode} placeholder="不限行业" />
             <DictionarySelect label="所学专业" value={resumeSearchMajor} options={resumeMajorOptions} onChange={setResumeSearchMajor} placeholder="不限专业" />
             <DictionarySelect label="工作性质" value={resumeSearchWorkNature} options={jobNatureOptions} onChange={setResumeSearchWorkNature} placeholder="不限性质" />
             <DictionarySelect label="期望薪资" value={resumeSearchSalaryCode} options={resumeSalaryOptions} onChange={setResumeSearchSalaryCode} placeholder="不限薪资" />
+            <DictionarySelect
+              label="更新时间"
+              value={resumeSearchUpdatedWithin}
+              options={resumeUpdatedWithinOptions}
+              onChange={setResumeSearchUpdatedWithin}
+              placeholder="不限时间"
+            />
+            <button type="button" className={styles.resumeSearchReset} onClick={onResetResumeSearch}>清空筛选</button>
           </div>
         </form>
 
