@@ -2086,7 +2086,11 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
     }
 
     return (
-      <section className={`${styles.card} ${styles.jobManagementCard}`}>
+      <section
+        className={`${styles.card} ${styles.jobManagementCard}`}
+        data-testid="company-job-management"
+        data-ui-stage="ui-4-refined"
+      >
         <div className={styles.jobToolbar}>
           <div>
             <p className={styles.eyebrow}>职位工作台</p>
@@ -2153,7 +2157,12 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
         ) : null}
 
         {showJobCreateForm ? (
-          <form onSubmit={onSaveJobDraft} className={styles.jobPublishForm}>
+          <form
+            onSubmit={onSaveJobDraft}
+            className={styles.jobPublishForm}
+            data-testid="company-job-publish-form"
+            data-ui-stage="ui-4-refined"
+          >
             <div className={styles.jobPublishHeader}>
               <div>
                 <p className={styles.eyebrow}>发布职位</p>
@@ -2388,7 +2397,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
           </div>
         </div>
 
-        <div className={styles.jobTableWrap}>
+        <div className={styles.jobTableWrap} data-testid="company-job-table-wrap">
           <table className={styles.jobTable}>
             <thead>
               <tr>

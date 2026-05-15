@@ -940,6 +940,7 @@ describe('CompanyDashboard', () => {
     expect(screen.getByText('通知：站内')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/');
     expect(await screen.findByText('管理职位')).toBeInTheDocument();
+    expect(screen.getByTestId('company-job-management')).toHaveAttribute('data-ui-stage', 'ui-4-refined');
     expect(screen.getByText('职位工作台')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /\+ 发布职位/ })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /发布中/ })).toBeInTheDocument();
@@ -967,6 +968,8 @@ describe('CompanyDashboard', () => {
     expect(screen.getByRole('button', { name: '删除职位' })).not.toBeDisabled();
 
     fireEvent.click(screen.getByRole('button', { name: /\+ 发布职位/ }));
+    expect(screen.getByTestId('company-job-publish-form')).toHaveAttribute('data-ui-stage', 'ui-4-refined');
+    expect(screen.getByTestId('company-job-table-wrap')).toBeInTheDocument();
     expect(screen.getByText('基本信息')).toBeInTheDocument();
     expect(screen.getByText('其他信息')).toBeInTheDocument();
     expect(screen.getAllByText('联系方式').length).toBeGreaterThanOrEqual(1);
