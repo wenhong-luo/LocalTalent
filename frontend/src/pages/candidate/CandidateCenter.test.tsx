@@ -499,6 +499,7 @@ describe('CandidateCenter', () => {
     expect(screen.getByText('醒目标签')).toBeInTheDocument();
     expect(screen.getByText('委托投递')).toBeInTheDocument();
     expect(screen.getByText('仅展示公开职位白名单字段')).toBeInTheDocument();
+    expect(screen.getByText(/私有页面 noindex/)).toBeInTheDocument();
 
     const body = document.body.textContent ?? '';
     expect(body).not.toContain('联系解锁');

@@ -160,6 +160,7 @@
       <h2>1. 演示前结论</h2>
       <ul>
         <li>三期主线 <code>Prompt 25-31</code> 已收口，可作为小 demo 给领导看。</li>
+        <li>整站 UI 精致化 <code>Prompt UI-1</code> 至 <code>Prompt UI-8</code> 已收口，公开门户、求职者中心、招聘者后台和运营后台视觉密度已统一。</li>
         <li>已按 <code>docs/Phase_III/三期灰度试运营使用说明.md</code> 做过页面复核。</li>
         <li><code>./scripts/smoke_phase3</code> 已通过。</li>
         <li>核心页面均可访问：<code>/</code>、<code>/jobs</code>、<code>/companies</code>、<code>/portal/talent-service-area</code>、<code>/job-fairs</code>、<code>/articles/policies</code>、<code>/hr-tools</code>、<code>/auth/login</code>、<code>/candidate/center</code>、<code>/company</code>、<code>/admin</code>。</li>
@@ -227,6 +228,7 @@ export LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS=true</code></pre>
 
     <section id="route" class="card">
       <h2>4. 10 分钟演示路线</h2>
+      <div class="callout">演示时可先点明：公开门户已经统一导航高亮和左右广告留白，招聘者后台和求职者中心也已收敛为更精致的小控件、高密度卡片与可演示的私有中心布局。</div>
       <div class="timeline">
         <div class="step"><strong>开场 30 秒</strong><br />说明三期是小范围灰度试运营候选，不是公网正式上线。</div>
         <div class="step"><strong>门户 3 分钟</strong><br />首页、找工作、找企业、人才服务区、招聘会、政策、HR 工具箱。</div>
@@ -255,16 +257,19 @@ export LOCALTALENT_PHASE3_OPERATOR_PORTAL_OPS=true</code></pre>
         <tr><td>补充频道</td><td><code>/jobs/famous</code>、<code>/daily-jobs</code>、<code>/campus</code></td><td>二期补齐的低风险公开频道</td></tr>
       </table>
       <pre><code>这是给公众访问的人才网门户。首页、找工作、找企业、招聘会、政策资讯和工具箱已经形成完整门户结构。
-这里重点不是“页面好看”而已，而是公开侧字段被严格裁剪，人才服务区只看发布快照，不能看到完整简历或联系方式。</code></pre>
+这里重点不是“页面好看”而已，而是首页、找工作、找企业和人才服务区已经统一广告留白与导航高亮。
+公开侧字段被严格裁剪，人才服务区只看发布快照，不能看到完整简历或联系方式。</code></pre>
 
       <h3>求职者 2 分钟</h3>
       <p>演示 <code>/auth/login</code> 和 <code>/candidate/center</code>。</p>
       <pre><code>这是求职者登录后的私有中心。三期重点是让求职者真正能维护资料、看投递、看通知和管理发布状态。
+首次完善简历、会员中心、期望职位/地区选择器、附件上传和 AI 建议卡片已经统一为更精致的私有中心视觉。
 但这些都属于本人私有域，公开门户仍只读取发布快照白名单。撤回之后，公开侧会联动不可见。</code></pre>
 
       <h3>企业 2 分钟</h3>
       <p>演示 <code>/auth/login</code> 和 <code>/company</code>。</p>
       <pre><code>这是企业侧招聘工作台。企业可以维护资料、提交认证、管理职位和处理投递。
+招聘者后台 Shell、会员首页、职位管理、发布职位长表单、企业资料、Logo、企业风采和受控搜索简历都已统一为更接近专业人才网后台的紧凑风格。
 这里的投递池不是公共简历库，只能处理本企业职位产生的投递，跨企业访问会被服务端阻断。
 导出也不能直接下载，必须走审批和字段裁剪。</code></pre>
 
@@ -324,6 +329,7 @@ done</code></pre>
       <table>
         <tr><th>成功标准</th><th>说明</th></tr>
         <tr><td>门户完整</td><td>首页、找工作、找企业、人才服务区、招聘会、资讯、工具箱可顺畅演示</td></tr>
+        <tr><td>UI 统一</td><td>公开门户广告留白、导航高亮、求职者/招聘者后台卡片密度和控件高度保持一致</td></tr>
         <tr><td>角色闭环</td><td>求职者、企业、运营三类角色各有真实试运营路径</td></tr>
         <tr><td>边界讲清</td><td>明确不是公共简历库，不公开原始候选人数据，不接真实外部能力</td></tr>
         <tr><td>安全可信</td><td>能说清审计、字段裁剪、导出审批、撤回下线、IDOR/BOLA</td></tr>
@@ -336,6 +342,7 @@ done</code></pre>
       <ul>
         <li><code>docs/Phase_III/三期灰度试运营使用说明.md</code></li>
         <li><code>docs/Phase_III/三期主线收口验收报告.md</code></li>
+        <li><code>docs/Phase_III/整站UI精致化验收报告.md</code></li>
         <li><code>docs/Phase_III/RUNBOOK.md</code></li>
         <li><code>docs/Phase_III/灰度上线暂停回滚检查单.md</code></li>
         <li><code>docs/Phase_III/灰度备份恢复演练记录模板.md</code></li>

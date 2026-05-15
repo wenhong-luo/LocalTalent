@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 整站 UI 精致化验收报告</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #fff;
+      --ink: #172033;
+      --muted: #637083;
+      --line: #dfe6ef;
+      --brand: #1683f7;
+      --brand-dark: #123d72;
+      --ok: #0f766e;
+      --warn: #a15c00;
+      --soft: #eef7ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      line-height: 1.72;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(22, 131, 247, .12), transparent 28%),
+        radial-gradient(circle at 88% 0%, rgba(15, 118, 110, .12), transparent 28%),
+        var(--bg);
+    }
+    header {
+      padding: 46px 28px 34px;
+      color: #fff;
+      background: linear-gradient(135deg, #123d72, #1683f7);
+    }
+    header .wrap, main { max-width: 1120px; margin: 0 auto; }
+    h1 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 46px); }
+    h2 { margin: 0 0 14px; color: var(--brand-dark); }
+    h3 { margin: 18px 0 8px; color: #243f45; }
+    p { margin: 8px 0; }
+    main { padding: 28px; }
+    code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    pre { padding: 14px 16px; border-radius: 14px; overflow: auto; background: #111827; color: #eef2ff; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; overflow: hidden; border-radius: 12px; background: #fff; }
+    th, td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: #edf4ff; }
+    .subtitle { color: rgba(255,255,255,.88); max-width: 860px; font-size: 18px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .badge { border: 1px solid rgba(255,255,255,.28); border-radius: 999px; padding: 7px 12px; background: rgba(255,255,255,.13); font-weight: 650; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; margin: 18px 0; box-shadow: 0 10px 28px rgba(24,33,43,.06); }
+    .note { border-left: 5px solid var(--brand); border-radius: 12px; padding: 13px 15px; background: var(--soft); }
+    .warn { border-left: 5px solid var(--warn); border-radius: 12px; padding: 13px 15px; background: #fff8ed; }
+    ul { padding-left: 22px; }
+    li { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>LocalTalent 整站 UI 精致化验收报告</h1>
+      <p class="subtitle">记录 Prompt UI-1 至 UI-8 的完成范围、响应式验收口径、测试建议和三期边界。当前结论：整站 UI 精致化主线收口。</p>
+      <div class="badges">
+        <span class="badge">Prompt UI-8</span>
+        <span class="badge">宽屏 / 笔记本 / 移动端</span>
+        <span class="badge">领导演示可用</span>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="card">
+      <h2>1. 验收结论</h2>
+      <div class="note">Prompt UI-1 至 UI-8 已完成，整站 UI 精致化主线收口。</div>
+      <ul>
+        <li>本轮 UI-8 只做结构验收、前端测试补强和文档收口。</li>
+        <li>未改后端接口、未新增迁移、未新增业务能力。</li>
+        <li>未改变权限、字段白名单、发布快照边界或风险能力状态。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>2. UI-1 至 UI-8 完成范围</h2>
+      <table>
+        <tr><th>轮次</th><th>完成内容</th><th>边界</th></tr>
+        <tr><td>UI-1</td><td>全站视觉基线与共享控件收口</td><td>只改前端视觉底座</td></tr>
+        <tr><td>UI-2</td><td>招聘者后台 Shell 精致化</td><td>不改企业工作台业务逻辑</td></tr>
+        <tr><td>UI-3</td><td>搜索简历 UI 高保真重做</td><td>仍是受控发布快照搜索</td></tr>
+        <tr><td>UI-4</td><td>职位管理与发布职位 UI 精致化</td><td>不改职位状态机</td></tr>
+        <tr><td>UI-5</td><td>企业管理与会员首页 UI 精致化</td><td>Logo/风采仍只在企业私有域</td></tr>
+        <tr><td>UI-6</td><td>求职者端 UI 精致化</td><td>不改变发布快照边界</td></tr>
+        <tr><td>UI-7</td><td>公开门户 UI 对齐</td><td>不改公开字段白名单</td></tr>
+        <tr><td>UI-8</td><td>全站验收、响应式和文档收口</td><td>不新增业务能力</td></tr>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>3. 响应式验收口径</h2>
+      <ul>
+        <li>宽屏：公开门户使用中间内容区加左右广告 rail；<code>/company</code> 使用流式工作台宽度。</li>
+        <li>笔记本：公开频道、求职者中心、招聘者后台主要模块保持可读，表格和筛选区只在必要时内部滚动。</li>
+        <li>移动端：公开门户广告 rail 折叠，主要内容、导航、登录入口和私有中心核心模块仍可访问。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>4. 建议验收命令</h2>
+      <pre><code>cd frontend && npm test -- PortalShell.test.tsx PortalHomePage.test.tsx JobSearchPage.test.tsx CompanySearchPage.test.tsx TalentServiceArea.test.tsx PortalContentChannels.test.tsx
+cd frontend && npm test -- CompanyDashboard.test.tsx CandidateCenter.test.tsx CandidateResumeCreate.test.tsx SharedSelectors.test.tsx
+cd frontend && npm test
+cd frontend && npm run build
+./scripts/check_phase3_boundary
+./scripts/check_phase3_ops
+./scripts/check_phase3_security_acceptance
+./scripts/check_portal_snapshot_fields
+./scripts/check_boundary</code></pre>
+    </section>
+
+    <section class="card warn">
+      <h2>5. 未开放风险能力</h2>
+      <ul>
+        <li>公共简历库、联系解锁、完整简历下载。</li>
+        <li>真实支付、会员商业化、套餐扣点。</li>
+        <li>真实短信、微信、小程序、App、地图、视频、直播、ATS/RPA。</li>
+        <li>AI 处理原始候选人数据。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>6. 后续建议</h2>
+      <p>UI 主线已完成，不建议继续扩散为 UI-9。后续如要优化，应按具体页面单独开任务，例如企业公开主页视觉优化、招聘者简历管理页高保真、运营后台审计中心视觉增强。</p>
+    </section>
+  </main>
+</body>
+</html>

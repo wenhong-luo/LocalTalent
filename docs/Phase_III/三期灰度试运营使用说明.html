@@ -41,6 +41,7 @@
         <a href="#login">账号与登录</a>
         <a href="#walkthrough">页面 Walkthrough</a>
         <a href="#checks">灰度前必跑命令</a>
+        <a href="#ui">UI 精致化验收</a>
         <a href="#limits">当前限制</a>
       </nav>
     </section>
@@ -140,10 +141,24 @@ LOCALTALENT_PHASE3_BACKUP_FILE=/tmp/localtalent-phase3-backups/&lt;dump&gt;.sql 
       <p class="muted">如果 load 首次因本地 Next 冷启动导致 P95 超阈值但全部请求为 200，可热身后复跑；灰度环境以稳定复跑和监控为准。</p>
     </section>
 
-    <section id="limits" class="card">
-      <h2>7. 当前限制</h2>
+    <section id="ui" class="card">
+      <h2>7. UI 精致化与响应式检查</h2>
+      <div class="note">整站 UI 精致化主线 <code>Prompt UI-1</code> 至 <code>Prompt UI-8</code> 已收口，适合用于灰度演示和领导看样。</div>
       <ul>
-        <li>不做公共简历库、搜索简历、查看完整简历。</li>
+        <li>宽屏桌面：公开门户保留中间内容区和左右广告留白；招聘者后台 <code>/company</code> 使用流式工作台宽度。</li>
+        <li>普通笔记本：公开频道、求职者中心、招聘者后台主要卡片保持可读，筛选控件和表格只在必要时内部滚动。</li>
+        <li>小屏兜底：公开门户广告 rail 自动折叠，主要内容、导航、登录入口和私有中心核心模块仍可访问。</li>
+      </ul>
+      <pre><code>cd frontend && npm test
+cd frontend && npm run build</code></pre>
+      <p class="warn">UI 优化不改变边界：人才服务区仍只展示发布快照，公开页面仍不得出现手机号、邮箱、微信、附件 key、原始 JSON、联系解锁或完整简历下载入口。</p>
+    </section>
+
+    <section id="limits" class="card">
+      <h2>8. 当前限制</h2>
+      <ul>
+        <li>不做公共简历库、查看完整简历、公开简历详情或联系方式解锁。</li>
+        <li>招聘者搜索简历仅限 company 私有域受控发布快照搜索，不展示联系方式、附件或原始简历。</li>
         <li>不做受控找人才、联系解锁、会员商业化和真实支付。</li>
         <li>不接真实短信、微信、小程序、App、地图、视频、直播。</li>
         <li>不接真实 ATS/RPA 或受控候选池同步。</li>

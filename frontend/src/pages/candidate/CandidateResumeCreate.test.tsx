@@ -249,9 +249,10 @@ describe('CandidateResumeCreate', () => {
     window.localStorage.setItem(CANDIDATE_TOKEN_STORAGE_KEY, 'candidate-token');
     mockResumeCreateFetch();
 
-    render(<CandidateResumeCreate />);
+    const { container } = render(<CandidateResumeCreate />);
 
     expect(await screen.findByLabelText('完善简历基本信息表单')).toBeInTheDocument();
+    expect(container.querySelector('main[data-ui-stage="ui-6-refined"]')).toBeInTheDocument();
     expect(screen.getByTestId('resume-create-basic-refined')).toHaveAttribute('data-ui-stage', 'ui-6-refined');
     expect(screen.getByText('导入附件简历，一键完成在线简历填写')).toBeInTheDocument();
     expect(screen.getByLabelText('上传附件简历')).toBeInTheDocument();

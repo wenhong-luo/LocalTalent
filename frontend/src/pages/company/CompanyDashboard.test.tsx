@@ -722,6 +722,8 @@ describe('CompanyDashboard', () => {
     render(<CompanyDashboard />);
 
     expect(await screen.findByText('我的公司')).toBeInTheDocument();
+    expect(screen.getByTestId('company-workspace')).toHaveAttribute('data-layout', 'fluid');
+    expect(screen.getByTestId('company-workspace')).toHaveAttribute('data-shell', 'refined');
     expect(screen.getByTestId('company-member-home-refined')).toHaveAttribute('data-ui-stage', 'ui-5-refined');
     expect(screen.getByText('我的人才')).toBeInTheDocument();
     expect(screen.getByText('我的机会')).toBeInTheDocument();
