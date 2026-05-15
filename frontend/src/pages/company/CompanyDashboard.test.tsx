@@ -929,6 +929,11 @@ describe('CompanyDashboard', () => {
     fireEvent.click(screen.getByRole('button', { name: /^职位管理$/ }));
 
     expect(screen.getByTestId('company-workspace')).toHaveAttribute('data-layout', 'fluid');
+    expect(screen.getByTestId('company-workspace')).toHaveAttribute('data-shell', 'refined');
+    expect(screen.getByRole('heading', { name: '企业会员管理中心' })).toBeInTheDocument();
+    expect(screen.getByLabelText('企业中心搜索占位')).toBeInTheDocument();
+    expect(screen.getByText('通知：站内')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/');
     expect(await screen.findByText('管理职位')).toBeInTheDocument();
     expect(screen.getByText('职位工作台')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /\+ 发布职位/ })).toBeInTheDocument();

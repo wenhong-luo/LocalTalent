@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 整站 UI 精致化分阶段规划</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #fff;
+      --ink: #16212b;
+      --muted: #64727f;
+      --line: #dfe7f1;
+      --brand: #1683f7;
+      --brand-dark: #0f3f75;
+      --good: #0f766e;
+      --warn: #a15c05;
+      --warm: #fff7e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      line-height: 1.72;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(22, 131, 247, .12), transparent 28%),
+        radial-gradient(circle at 90% 4%, rgba(15, 118, 110, .10), transparent 30%),
+        var(--bg);
+    }
+    header {
+      padding: 46px 28px 36px;
+      color: #fff;
+      background: linear-gradient(135deg, #102f55, #1683f7);
+    }
+    header .wrap, main { max-width: 1120px; margin: 0 auto; }
+    h1 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 46px); letter-spacing: .02em; }
+    h2 { margin: 0 0 14px; color: var(--brand-dark); }
+    h3 { margin: 20px 0 8px; color: #243f45; }
+    p { margin: 8px 0; }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    main { padding: 28px; }
+    .subtitle { max-width: 860px; color: rgba(255,255,255,.88); font-size: 18px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .badge {
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      padding: 7px 12px;
+      color: #fff;
+      background: rgba(255,255,255,.13);
+      font-weight: 650;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      margin: 18px 0;
+      box-shadow: 0 10px 28px rgba(24, 33, 43, .06);
+    }
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .toc a {
+      display: block;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #fff;
+      color: var(--brand-dark);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      background: #fff;
+    }
+    .step h3 { margin-top: 0; }
+    ul { padding-left: 20px; }
+    li { margin: 6px 0; }
+    .done {
+      border-color: rgba(15, 118, 110, .35);
+      background: #f0fdfa;
+    }
+    .warn {
+      border-color: #f1d59b;
+      background: var(--warm);
+    }
+    footer {
+      padding: 26px 28px 42px;
+      text-align: center;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>LocalTalent 整站 UI 精致化分阶段规划</h1>
+      <p class="subtitle">将控件高度、字体、卡片密度、筛选区布局、按钮风格和后台工作台视觉统一到更精致的人才网后台形态。</p>
+      <div class="badges">
+        <span class="badge">Phase III 补充规划</span>
+        <span class="badge">Prompt UI-1 至 UI-8</span>
+        <span class="badge">只做 UI，不扩业务</span>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="card">
+      <h2>Summary</h2>
+      <p>整站 UI 精致化建议拆成 <strong>8 个提示词</strong> 完成。先做统一视觉规范和共享控件，再逐个业务域套用，避免把视觉优化误伤成业务改造。</p>
+    </section>
+
+    <section class="card done">
+      <h2>已完成记录</h2>
+      <ul>
+        <li><code>Prompt UI-1：全站视觉基线与共享控件收口</code> 已完成。</li>
+        <li>UI-1 只改前端视觉底座和共享选择器样式，不改后端、不新增接口、不新增迁移、不改变权限或业务边界。</li>
+        <li><code>Prompt UI-2：招聘者后台 Shell 精致化</code> 已完成。</li>
+        <li>UI-2 只优化 <code>/company</code> 顶部栏、左侧菜单、内容区宽度、背景、卡片密度和响应式，不改接口、状态机、门禁、权限或风险能力。</li>
+        <li>已通过前端测试、构建和三期边界脚本。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>目录</h2>
+      <div class="toc">
+        <a href="#ui1">UI-1 视觉基线</a>
+        <a href="#ui2">UI-2 招聘者后台 Shell</a>
+        <a href="#ui3">UI-3 搜索简历</a>
+        <a href="#ui4">UI-4 职位管理</a>
+        <a href="#ui5">UI-5 企业管理</a>
+        <a href="#ui6">UI-6 求职者端</a>
+        <a href="#ui7">UI-7 公开门户</a>
+        <a href="#ui8">UI-8 全站验收</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>推荐 8 轮提示词</h2>
+      <div class="step-grid">
+        <article class="step done" id="ui1">
+          <h3>Prompt UI-1：全站视觉基线与共享控件收口</h3>
+          <p>建立统一 UI tokens，重构共享选择器紧凑风格，让输入框、下拉框、按钮、标签、卡片先统一底座。</p>
+        </article>
+        <article class="step done" id="ui2">
+          <h3>Prompt UI-2：招聘者后台 Shell 精致化</h3>
+          <p>优化 <code>/company</code> 顶部栏、左侧菜单、内容宽度、背景和卡片密度，对齐 74CMS 后台风格。</p>
+        </article>
+        <article class="step" id="ui3">
+          <h3>Prompt UI-3：搜索简历 UI 高保真重做</h3>
+          <p>修复搜索简历页控件不对齐、筛选行密度不统一和简历卡片不够精致的问题。</p>
+        </article>
+        <article class="step" id="ui4">
+          <h3>Prompt UI-4：职位管理与发布职位 UI 精致化</h3>
+          <p>统一职位管理列表、发布职位长表单、回收站、表格、批量操作栏、tab 和分页样式。</p>
+        </article>
+        <article class="step" id="ui5">
+          <h3>Prompt UI-5：企业管理与会员首页 UI 精致化</h3>
+          <p>优化企业基本资料、Logo 上传、企业风采和招聘者会员首页，不接公开展示。</p>
+        </article>
+        <article class="step" id="ui6">
+          <h3>Prompt UI-6：求职者端 UI 精致化</h3>
+          <p>优化求职者首次完善简历、会员中心、期望职位/地区、附件上传和 AI 建议卡片。</p>
+        </article>
+        <article class="step" id="ui7">
+          <h3>Prompt UI-7：公开门户 UI 对齐</h3>
+          <p>优化首页、找工作、找企业、人才服务区等公开页面，并修复导航高亮和广告位留白。</p>
+        </article>
+        <article class="step" id="ui8">
+          <h3>Prompt UI-8：全站验收、响应式和文档收口</h3>
+          <p>做宽屏、笔记本、移动端回归，补测试并更新三期演示说明和领导演示路线。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>推荐优先级</h2>
+      <ul>
+        <li>先解决当前最扎眼的问题：做 <code>Prompt UI-1</code> 到 <code>Prompt UI-3</code>。</li>
+        <li>让招聘者后台整体像专业人才网：做 <code>Prompt UI-1</code> 到 <code>Prompt UI-5</code>。</li>
+        <li>整站统一交付给领导或客户看：完整做 <code>Prompt UI-1</code> 到 <code>Prompt UI-8</code>。</li>
+      </ul>
+    </section>
+
+    <section class="card warn">
+      <h2>统一边界</h2>
+      <ul>
+        <li>本规划只做 UI 精致化，不新增业务能力。</li>
+        <li>不新增后端接口、数据库迁移、权限规则或真实外部能力，除非某轮单独明确。</li>
+        <li>公共简历库、联系解锁、真实下载、真实支付、短信/微信/小程序/App、地图、直播、ATS/RPA 不因 UI 优化而开放。</li>
+        <li>人才服务区仍只展示候选人授权发布快照。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>建议下一轮</h2>
+      <p>UI-2 已完成，下一轮建议执行：<strong>Prompt UI-3：搜索简历 UI 高保真重做</strong>。</p>
+    </section>
+  </main>
+  <footer>LocalTalent Phase III UI Refinement Plan</footer>
+</body>
+</html>

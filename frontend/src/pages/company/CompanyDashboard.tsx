@@ -2990,7 +2990,7 @@ function CompanyDashboardContent({ context }: { context: GuardContext }) {
         </div>
       </header>
 
-      <div className={styles.workspace} data-testid="company-workspace" data-layout="fluid">
+      <div className={styles.workspace} data-testid="company-workspace" data-layout="fluid" data-shell="refined">
         {renderMenu()}
         <div className={styles.content}>
           {renderStatusView()}
