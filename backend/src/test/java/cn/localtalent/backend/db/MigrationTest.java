@@ -58,6 +58,7 @@ class MigrationTest {
                 "candidate_resume_ai_suggestion_task",
                 "candidate_resume_ai_suggestion_item",
                 "portal_recommendation",
+                "portal_home_operation_slot",
                 "risk_review",
                 "company_resume_access_request",
                 "company_style_image",
@@ -312,6 +313,32 @@ class MigrationTest {
                 "idx_slot_status_order",
                 "idx_target",
                 "idx_status_time"));
+        assertColumnsExist(jdbcTemplate, "portal_home_operation_slot", List.of(
+                "slot_code",
+                "title",
+                "subtitle",
+                "image_url",
+                "image_object_key",
+                "image_file_name",
+                "image_content_type",
+                "image_size_bytes",
+                "image_sha256",
+                "image_uploaded_at",
+                "image_alt",
+                "link_type",
+                "link_url",
+                "target_type",
+                "target_id",
+                "display_order",
+                "status",
+                "start_time",
+                "end_time",
+                "operator_id"));
+        assertIndexesExist(jdbcTemplate, "portal_home_operation_slot", List.of(
+                "idx_home_slot_status_order",
+                "idx_home_target",
+                "idx_home_status_time",
+                "idx_home_slot_image_status"));
         assertColumnsExist(jdbcTemplate, "risk_review", List.of(
                 "risk_type",
                 "target_type",

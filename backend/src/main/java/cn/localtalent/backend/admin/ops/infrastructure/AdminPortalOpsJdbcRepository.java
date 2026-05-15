@@ -1,5 +1,6 @@
 package cn.localtalent.backend.admin.ops.infrastructure;
 
+import cn.localtalent.backend.admin.ops.api.AdminPortalOpsDtos.HomeSlotResponse;
 import cn.localtalent.backend.admin.ops.api.AdminPortalOpsDtos.RecommendationResponse;
 import cn.localtalent.backend.admin.ops.api.AdminPortalOpsDtos.RiskReviewResponse;
 import cn.localtalent.backend.portal.recommendation.api.PortalRecommendationDtos.PortalRecommendationItem;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Repository;
 public class AdminPortalOpsJdbcRepository {
 
     private static final int STATUS_ACTIVE = 1;
+    private static final String HOME_SLOT_COLUMNS = "id, slot_code, title, subtitle, image_url, image_object_key, "
+            + "image_file_name, image_content_type, image_size_bytes, image_sha256, image_uploaded_at, image_alt, "
+            + "link_type, link_url, target_type, target_id, display_order, status, start_time, end_time, updated_at";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -51,6 +55,10 @@ public class AdminPortalOpsJdbcRepository {
         return count("SELECT COUNT(*) FROM portal_recommendation WHERE status = 1");
     }
 
+    public long activeHomeSlotCount() {
+        return count("SELECT COUNT(*) FROM portal_home_operation_slot WHERE status = 1");
+    }
+
     public long pendingRiskCount() {
         return count("SELECT COUNT(*) FROM risk_review WHERE status = 0");
     }
@@ -80,11 +88,49 @@ public class AdminPortalOpsJdbcRepository {
         return count(query.sql(), query.args().toArray());
     }
 
+    public List<HomeSlotResponse> listHomeSlots(
+            String slotCode,
+            Integer status,
+            int limit,
+            int offset
+    ) {
+        QueryParts query = homeSlotQuery(slotCode, status, false);
+        query.args().add(limit);
+        query.args().add(offset);
+        return jdbcTemplate.query(
+                query.sql() + " ORDER BY slot_code ASC, display_order ASC, updated_at DESC, id DESC LIMIT ? OFFSET ?",
+                (rs, rowNum) -> homeSlot(rs),
+                query.args().toArray());
+    }
+
+    public long countHomeSlots(String slotCode, Integer status) {
+        QueryParts query = homeSlotQuery(slotCode, status, true);
+        return count(query.sql(), query.args().toArray());
+    }
+
     public Optional<RecommendationResponse> findRecommendation(long id) {
         return jdbcTemplate.query(
                 "SELECT id, slot_code, target_type, target_id, title_override, summary_override, display_order, "
                         + "status, start_time, end_time, updated_at FROM portal_recommendation WHERE id = ? LIMIT 1",
                 (rs, rowNum) -> recommendation(rs, resolveTarget(rs.getString("target_type"), rs.getLong("target_id")).isPresent(), null),
+                id).stream().findFirst();
+    }
+
+    public Optional<HomeSlotResponse> findHomeSlot(long id) {
+        return jdbcTemplate.query(
+                "SELECT " + HOME_SLOT_COLUMNS + " "
+                        + "FROM portal_home_operation_slot WHERE id = ? LIMIT 1",
+                (rs, rowNum) -> homeSlot(rs),
+                id).stream().findFirst();
+    }
+
+    public Optional<HomeSlotResponse> findActiveHomeSlot(long id) {
+        return jdbcTemplate.query(
+                "SELECT " + HOME_SLOT_COLUMNS + " "
+                        + "FROM portal_home_operation_slot WHERE id = ? AND status = 1 "
+                        + "AND (start_time IS NULL OR start_time <= CURRENT_TIMESTAMP) "
+                        + "AND (end_time IS NULL OR end_time >= CURRENT_TIMESTAMP) LIMIT 1",
+                (rs, rowNum) -> homeSlot(rs),
                 id).stream().findFirst();
     }
 
@@ -124,6 +170,54 @@ public class AdminPortalOpsJdbcRepository {
         return key == null ? 0 : key.longValue();
     }
 
+    public long createHomeSlot(
+            String slotCode,
+            String title,
+            String subtitle,
+            String imageUrl,
+            String imageAlt,
+            String linkType,
+            String linkUrl,
+            String targetType,
+            Long targetId,
+            int displayOrder,
+            int status,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            long operatorId
+    ) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO portal_home_operation_slot "
+                            + "(slot_code, title, subtitle, image_url, image_alt, link_type, link_url, target_type, target_id, "
+                            + "display_order, status, start_time, end_time, operator_id) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, slotCode);
+            ps.setString(2, title);
+            ps.setString(3, subtitle);
+            ps.setString(4, imageUrl);
+            ps.setString(5, imageAlt);
+            ps.setString(6, linkType);
+            ps.setString(7, linkUrl);
+            ps.setString(8, targetType);
+            if (targetId == null) {
+                ps.setObject(9, null);
+            } else {
+                ps.setLong(9, targetId);
+            }
+            ps.setInt(10, displayOrder);
+            ps.setInt(11, status);
+            ps.setObject(12, startTime);
+            ps.setObject(13, endTime);
+            ps.setLong(14, operatorId);
+            return ps;
+        }, keyHolder);
+        Number key = keyHolder.getKey();
+        return key == null ? 0 : key.longValue();
+    }
+
     public void updateRecommendation(
             long id,
             String slotCode,
@@ -154,9 +248,85 @@ public class AdminPortalOpsJdbcRepository {
                 id);
     }
 
+    public void updateHomeSlot(
+            long id,
+            String slotCode,
+            String title,
+            String subtitle,
+            String imageUrl,
+            String imageAlt,
+            String linkType,
+            String linkUrl,
+            String targetType,
+            Long targetId,
+            int displayOrder,
+            int status,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            long operatorId
+    ) {
+        jdbcTemplate.update(
+                "UPDATE portal_home_operation_slot SET slot_code = ?, title = ?, subtitle = ?, image_url = ?, "
+                        + "image_alt = ?, link_type = ?, link_url = ?, target_type = ?, target_id = ?, display_order = ?, "
+                        + "status = ?, start_time = ?, end_time = ?, operator_id = ? WHERE id = ?",
+                slotCode,
+                title,
+                subtitle,
+                imageUrl,
+                imageAlt,
+                linkType,
+                linkUrl,
+                targetType,
+                targetId,
+                displayOrder,
+                status,
+                startTime,
+                endTime,
+                operatorId,
+                id);
+    }
+
     public void offlineRecommendation(long id, long operatorId) {
         jdbcTemplate.update(
                 "UPDATE portal_recommendation SET status = 0, operator_id = ? WHERE id = ?",
+                operatorId,
+                id);
+    }
+
+    public void offlineHomeSlot(long id, long operatorId) {
+        jdbcTemplate.update(
+                "UPDATE portal_home_operation_slot SET status = 0, operator_id = ? WHERE id = ?",
+                operatorId,
+                id);
+    }
+
+    public void updateHomeSlotImage(
+            long id,
+            String objectKey,
+            String fileName,
+            String contentType,
+            long sizeBytes,
+            String sha256,
+            long operatorId
+    ) {
+        jdbcTemplate.update(
+                "UPDATE portal_home_operation_slot SET image_object_key = ?, image_file_name = ?, "
+                        + "image_content_type = ?, image_size_bytes = ?, image_sha256 = ?, "
+                        + "image_uploaded_at = CURRENT_TIMESTAMP, operator_id = ? WHERE id = ?",
+                objectKey,
+                fileName,
+                contentType,
+                sizeBytes,
+                sha256,
+                operatorId,
+                id);
+    }
+
+    public void clearHomeSlotImage(long id, long operatorId) {
+        jdbcTemplate.update(
+                "UPDATE portal_home_operation_slot SET image_object_key = NULL, image_file_name = NULL, "
+                        + "image_content_type = NULL, image_size_bytes = NULL, image_sha256 = NULL, "
+                        + "image_uploaded_at = NULL, operator_id = ? WHERE id = ?",
                 operatorId,
                 id);
     }
@@ -204,6 +374,29 @@ public class AdminPortalOpsJdbcRepository {
                 (rs, rowNum) -> recommendation(rs, true, null),
                 slotCode,
                 limit);
+    }
+
+    public List<HomeSlotResponse> activeHomeSlots(List<String> slotCodes, int limit) {
+        List<Object> args = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT " + HOME_SLOT_COLUMNS + " "
+                        + "FROM portal_home_operation_slot WHERE status = 1 "
+                        + "AND (start_time IS NULL OR start_time <= CURRENT_TIMESTAMP) "
+                        + "AND (end_time IS NULL OR end_time >= CURRENT_TIMESTAMP)");
+        if (slotCodes != null && !slotCodes.isEmpty()) {
+            sql.append(" AND slot_code IN (");
+            for (int i = 0; i < slotCodes.size(); i++) {
+                if (i > 0) {
+                    sql.append(", ");
+                }
+                sql.append("?");
+                args.add(slotCodes.get(i));
+            }
+            sql.append(")");
+        }
+        sql.append(" ORDER BY slot_code ASC, display_order ASC, updated_at DESC, id DESC LIMIT ?");
+        args.add(limit);
+        return jdbcTemplate.query(sql.toString(), (rs, rowNum) -> homeSlot(rs), args.toArray());
     }
 
     public Optional<PortalRecommendationItem> resolveTargetCard(RecommendationResponse recommendation) {
@@ -326,6 +519,23 @@ public class AdminPortalOpsJdbcRepository {
         return new QueryParts(sql.toString(), args);
     }
 
+    private QueryParts homeSlotQuery(String slotCode, Integer status, boolean countOnly) {
+        StringBuilder sql = new StringBuilder(countOnly ? "SELECT COUNT(*) FROM portal_home_operation_slot" :
+                "SELECT " + HOME_SLOT_COLUMNS + " "
+                        + "FROM portal_home_operation_slot");
+        List<Object> args = new ArrayList<>();
+        sql.append(" WHERE 1 = 1");
+        if (slotCode != null) {
+            sql.append(" AND slot_code = ?");
+            args.add(slotCode);
+        }
+        if (status != null) {
+            sql.append(" AND status = ?");
+            args.add(status);
+        }
+        return new QueryParts(sql.toString(), args);
+    }
+
     private QueryParts riskQuery(String riskType, Integer status, String severity, boolean countOnly) {
         StringBuilder sql = new StringBuilder(countOnly ? "SELECT COUNT(*) FROM risk_review" :
                 "SELECT id, risk_type, target_type, target_id, severity, status, title, summary, decision, "
@@ -362,6 +572,32 @@ public class AdminPortalOpsJdbcRepository {
                 targetValid,
                 invalidReason,
                 timestamp(rs, "updated_at"));
+    }
+
+    private HomeSlotResponse homeSlot(ResultSet rs) throws SQLException {
+        return new HomeSlotResponse(
+                rs.getLong("id"),
+                rs.getString("slot_code"),
+                rs.getString("title"),
+                rs.getString("subtitle"),
+                rs.getString("image_url"),
+                rs.getString("image_alt"),
+                rs.getString("image_object_key") != null && !rs.getString("image_object_key").isBlank(),
+                rs.getString("image_file_name"),
+                rs.getString("image_content_type"),
+                rs.getObject("image_size_bytes", Long.class),
+                timestamp(rs, "image_uploaded_at"),
+                rs.getString("image_object_key") == null ? null : "/api/admin/home-slots/" + rs.getLong("id") + "/image/content",
+                rs.getString("link_type"),
+                rs.getString("link_url"),
+                rs.getString("target_type"),
+                rs.getObject("target_id", Long.class),
+                rs.getInt("display_order"),
+                rs.getInt("status"),
+                timestamp(rs, "start_time"),
+                timestamp(rs, "end_time"),
+                timestamp(rs, "updated_at"),
+                rs.getString("image_object_key"));
     }
 
     private RiskReviewResponse risk(ResultSet rs) throws SQLException {

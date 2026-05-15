@@ -38,7 +38,7 @@ function renderHome() {
 }
 
 describe('PortalHomePage', () => {
-  it('renders the high-fidelity home first screen structure', () => {
+  it('renders the high-fidelity home first screen without an inline login form', () => {
     renderHome();
 
     expect(screen.getByLabelText('门户顶部工具条')).toBeInTheDocument();
@@ -46,47 +46,81 @@ describe('PortalHomePage', () => {
     expect(screen.getByLabelText('门户主导航')).toBeInTheDocument();
     expect(screen.getByTestId('portal-home-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
     expect(screen.getByLabelText('职位分类墙')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页搜索增强')).toBeInTheDocument();
     expect(screen.getByLabelText('首页快捷入口')).toBeInTheDocument();
-    expect(screen.getByLabelText('首页登录卡片')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页右侧运营面板')).toBeInTheDocument();
+    expect(screen.getByLabelText('安全登录入口')).toBeInTheDocument();
     expect(screen.getByLabelText('公告与招聘会')).toBeInTheDocument();
-    expect(screen.getByLabelText('首页广告位')).toBeInTheDocument();
-    expect(screen.getByLabelText('扫码 CTA')).toBeInTheDocument();
-    expect(screen.getByLabelText('推荐企业')).toBeInTheDocument();
-    expect(screen.getByLabelText('热招职位')).toBeInTheDocument();
     expect(screen.getByLabelText('右侧浮动工具条')).toBeInTheDocument();
+    expect(screen.queryByLabelText('手机号视觉占位')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('验证码视觉占位')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '短信占位' })).not.toBeInTheDocument();
   });
 
-  it('renders job categories, service entrances and public recommendation data', () => {
+  it('renders the ten-category wall with flyout position groups', () => {
     renderHome();
 
-    expect(screen.getByRole('link', { name: /生活 \| 服务业/ })).toHaveAttribute('href', expect.stringContaining('/jobs?category='));
+    expect(screen.getByRole('link', { name: /生活 \| 服务业/ })).toHaveAttribute('href', '/jobs?category=life_service');
+    expect(screen.getByRole('link', { name: /建筑 \| 物业 \| 农林牧渔 \| 其他/ })).toHaveAttribute(
+      'href',
+      '/jobs?category=construction_property_agriculture'
+    );
+    expect(screen.getByText('餐饮')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '服务员' })).toHaveAttribute('href', expect.stringContaining('/jobs?category=life_service'));
+    expect(screen.getByRole('link', { name: '前端工程师' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/jobs?category=network_communication_electronics')
+    );
+  });
+
+  it('renders service entrances, public recommendations and below-fold modules', () => {
+    renderHome();
+
     expect(screen.getByRole('link', { name: /名企直聘/ })).toHaveAttribute('href', '/jobs?channel=famous');
     expect(screen.getByRole('link', { name: /现场招聘会/ })).toHaveAttribute('href', '/job-fairs?type=offline');
     expect(screen.getByText('Java 后端工程师')).toBeInTheDocument();
     expect(screen.getAllByText('山西正力网络有限公司').length).toBeGreaterThan(0);
     expect(screen.getAllByText('认证企业').length).toBeGreaterThan(0);
+    expect(screen.getByLabelText('首页招聘会模块')).toBeInTheDocument();
+    expect(screen.getByLabelText('资讯公告与 HR 工具箱')).toBeInTheDocument();
+    expect(screen.getByLabelText('友情链接与合作入口')).toBeInTheDocument();
   });
 
-  it('shows an operations placeholder when recommendation slots are empty', () => {
+  it('renders the full home operation slot system as placeholders', () => {
+    renderHome();
+
+    expect(screen.getByLabelText('首页运营广告位体系')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页通栏广告位')).toHaveTextContent('城市人才服务季');
+    expect(screen.getByAltText('城市人才服务季运营图')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页1/2广告位')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页1/3广告位')).toBeInTheDocument();
+    expect(screen.getByAltText('企业发布职位运营图')).toBeInTheDocument();
+    expect(screen.getByAltText('就业政策运营图')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页快捷广告位')).toBeInTheDocument();
+    expect(screen.getByText('广告位仅为运营占位，不接真实投放、计费、支付或外部平台。')).toBeInTheDocument();
+  });
+
+  it('uses safe demo data when recommendation slots are empty', () => {
     render(
       <PortalShell>
         <PortalHomePage />
       </PortalShell>
     );
 
-    expect(screen.getByText('热招职位待配置')).toBeInTheDocument();
-    expect(screen.getByText('明星企业待配置')).toBeInTheDocument();
-    expect(screen.getAllByText(/运营位待配置或目标已失效/).length).toBeGreaterThan(0);
+    expect(screen.getByText('前端开发工程师')).toBeInTheDocument();
+    expect(screen.getByText('生产质检员')).toBeInTheDocument();
+    expect(screen.getByText('LocalTalent 数字服务示范企业')).toBeInTheDocument();
+    expect(screen.getAllByText('演示数据').length).toBeGreaterThan(0);
   });
 
-  it('keeps login and external capabilities as placeholders', () => {
+  it('keeps external capabilities as placeholders', () => {
     renderHome();
 
-    expect(screen.getByRole('tab', { name: '求职者登录' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('tab', { name: '企业登录' })).toHaveAttribute('aria-selected', 'false');
-    expect(screen.getByLabelText('手机号视觉占位')).toBeInTheDocument();
-    expect(screen.getByLabelText('验证码视觉占位')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '短信占位' })).toBeDisabled();
+    expect(screen.getByText(/首页不放置短信验证码表单/)).toBeInTheDocument();
+    expect(screen.getByText('短信、微信、小程序、App 登录均为后续专项，不在首页开放。')).toBeInTheDocument();
+    for (const button of screen.getAllByRole('button', { name: '地图搜索占位' })) {
+      expect(button).toBeDisabled();
+    }
     expect(screen.getByText('公众号、小程序和 App 均为占位，不接真实外部能力。')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '公众号占位' })).toBeDisabled();
     expect(screen.getByRole('button', { name: '小程序占位' })).toBeDisabled();
@@ -108,7 +142,8 @@ describe('PortalHomePage', () => {
       '审核材料',
       '营业执照附件',
       '简历库',
-      '搜索简历'
+      '搜索简历',
+      'contact_unlock'
     ];
 
     for (const marker of forbiddenMarkers) {

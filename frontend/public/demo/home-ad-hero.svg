@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="220" viewBox="0 0 960 220" role="img" aria-label="城市人才服务季运营图">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="0.55" stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+    <radialGradient id="orb" cx="70%" cy="22%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".82"/>
+      <stop offset=".38" stop-color="#ffffff" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="960" height="220" rx="18" fill="url(#bg)"/>
+  <circle cx="790" cy="46" r="150" fill="url(#orb)"/>
+  <circle cx="824" cy="180" r="118" fill="#ffffff" opacity=".13"/>
+  <g fill="#fff">
+    <text x="44" y="54" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="20" font-weight="700" letter-spacing="3">LOCALTALENT</text>
+    <text x="44" y="112" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="48" font-weight="900">城市人才服务季</text>
+    <text x="46" y="154" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="22" font-weight="700" opacity=".92">公开职位 · 招聘会 · 政策资讯 · HR 工具</text>
+  </g>
+  <g transform="translate(708 54)">
+    <rect x="0" y="0" width="150" height="108" rx="20" fill="#ffffff" opacity=".2"/>
+    <path d="M40 70c12-28 30-42 54-42 24 0 42 14 54 42" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".9"/>
+    <circle cx="94" cy="36" r="19" fill="#fff" opacity=".9"/>
+    <rect x="35" y="82" width="84" height="10" rx="5" fill="#fff" opacity=".78"/>
+  </g>
+</svg>

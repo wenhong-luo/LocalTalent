@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="150" viewBox="0 0 360 150" role="img" aria-label="招聘会运营图">
+  <rect width="360" height="150" rx="16" fill="#eff6ff"/>
+  <rect x="34" y="44" width="82" height="58" rx="12" fill="#3b82f6" opacity=".9"/>
+  <rect x="132" y="34" width="82" height="68" rx="12" fill="#14b8a6" opacity=".88"/>
+  <rect x="230" y="54" width="82" height="48" rx="12" fill="#f59e0b" opacity=".86"/>
+  <text x="34" y="126" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="22" font-weight="900" fill="#1e3a8a">招聘会预约</text>
+</svg>

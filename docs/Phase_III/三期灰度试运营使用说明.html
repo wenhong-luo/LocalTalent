@@ -108,13 +108,14 @@ export LOCALTALENT_PHASE3_COMPANY_STYLE_UPLOAD=true</code></pre>
       <h3>公开门户</h3>
       <table>
         <tr><th>页面</th><th>地址</th><th>说明</th></tr>
-        <tr><td>首页</td><td><code>/</code></td><td>高保真门户、推荐位、公开频道入口</td></tr>
+        <tr><td>首页</td><td><code>/</code></td><td>对齐 <code>docs/page/网站首页/人才网首页.jpeg</code> 的高保真首屏、分类墙、运营右栏、广告位体系和公开内容模块</td></tr>
         <tr><td>找工作</td><td><code>/jobs</code></td><td>公开职位搜索</td></tr>
         <tr><td>找企业</td><td><code>/companies</code></td><td>已认证企业公开列表</td></tr>
         <tr><td>人才服务区</td><td><code>/portal/talent-service-area</code></td><td>只展示发布快照白名单</td></tr>
         <tr><td>招聘会</td><td><code>/job-fairs</code></td><td>公开招聘会频道</td></tr>
         <tr><td>校园招聘</td><td><code>/campus</code></td><td>校园职位、活动、资讯聚合</td></tr>
       </table>
+      <div class="note">首页右侧不再放置短信验证码登录表单，改为公告、招聘会和安全登录入口按钮；首页广告位仅为运营占位，不接真实广告投放、点击计费、支付、外部平台或统计；首页已加入本地 SVG 演示素材和安全演示数据兜底，当推荐位无后端配置时，会展示标注为“演示数据”的公开职位/企业卡片，避免演示空白；职位分类墙支持大类、二级分组和岗位浮层，但所有入口仍跳转公开职位频道，不开放公共简历库或联系解锁。</div>
       <h3>私有中心</h3>
       <ul>
         <li><code>/candidate/resume/create</code>：首次完善简历 1、完善简历 2、创建完成三页；进度由服务端 <code>candidate_resume_onboarding</code> 表判断；开启 <code>LOCALTALENT_PHASE3_RESUME_ATTACHMENT_UPLOAD=true</code> 后支持本人私有简历附件上传、下载、替换、删除；开启 <code>LOCALTALENT_PHASE3_RESUME_AI_ASSIST=true</code> 后支持安全规则版简历优化建议。</li>

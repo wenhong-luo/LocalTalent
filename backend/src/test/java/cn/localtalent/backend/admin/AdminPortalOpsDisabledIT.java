@@ -55,5 +55,17 @@ class AdminPortalOpsDisabledIT extends AdminIntegrationTestSupport {
                 null);
         assertSuccess(publicRecommendations, 200, "trace-p29-disabled-public");
         assertThat(publicRecommendations.body().at("/data/recommendation_list")).isEmpty();
+
+        assertError(getJson(
+                "/api/admin/home-slots?page=1&size=10",
+                "trace-home-slot-disabled-admin",
+                "Bearer " + token), 403, "FEATURE_DISABLED_403", "trace-home-slot-disabled-admin");
+
+        HttpJsonResponse publicHomeSlots = getJson(
+                "/api/portal/home-slots?slot_codes=home_hero_banner",
+                "trace-home-slot-disabled-public",
+                null);
+        assertSuccess(publicHomeSlots, 200, "trace-home-slot-disabled-public");
+        assertThat(publicHomeSlots.body().at("/data/slot_list")).isEmpty();
     }
 }

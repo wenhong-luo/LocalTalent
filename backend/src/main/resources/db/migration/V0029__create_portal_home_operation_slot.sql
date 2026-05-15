@@ -1,0 +1,22 @@
+CREATE TABLE portal_home_operation_slot (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  slot_code VARCHAR(64) NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  subtitle VARCHAR(500) DEFAULT NULL,
+  image_url VARCHAR(500) DEFAULT NULL,
+  image_alt VARCHAR(200) DEFAULT NULL,
+  link_type VARCHAR(32) NOT NULL DEFAULT 'none',
+  link_url VARCHAR(500) DEFAULT NULL,
+  target_type VARCHAR(32) DEFAULT NULL,
+  target_id BIGINT UNSIGNED DEFAULT NULL,
+  display_order INT NOT NULL DEFAULT 100,
+  status TINYINT NOT NULL DEFAULT 1,
+  start_time DATETIME DEFAULT NULL,
+  end_time DATETIME DEFAULT NULL,
+  operator_id BIGINT UNSIGNED DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_home_slot_status_order (slot_code, status, display_order, updated_at),
+  KEY idx_home_target (target_type, target_id),
+  KEY idx_home_status_time (status, start_time, end_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

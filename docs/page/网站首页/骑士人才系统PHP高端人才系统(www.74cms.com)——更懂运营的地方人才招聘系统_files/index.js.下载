@@ -1,0 +1,653 @@
+function loadTencent() {
+    if (window.BMap !== undefined) {
+        return
+    }
+    var script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://turing.captcha.qcloud.com/TCaptcha.js'
+    document.body.appendChild(script)
+}
+
+function loadVaptcha() {
+    if (window.BMap !== undefined) {
+        return
+    }
+    var script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://v.vaptcha.com/v3.js'
+    document.body.appendChild(script)
+}
+
+if (parseInt(qscms.captcha_open) == 1) {
+    if (qscms.captcha_type == 'tencent') {
+        loadTencent()
+    } else if (qscms.captcha_type == 'vaptcha') {
+        loadVaptcha()
+    } else if(qscms.captcha_type == 'qscms'){
+        // 骑士验证码
+        qsCaptchaLoad()
+    }
+}
+
+$(document).ready(function() {
+    $(function() {
+        // 图片懒加载
+        $("img").lazyload({
+            effect: "fadeIn"
+        });
+
+        // 首页向上滚动，右侧滚动条样式不变
+        window.addEventListener('scroll', function() {
+            let t = $('body, html').scrollTop();
+            $('.rt_nav_box').addClass('scroll_rt_nav_box_0')
+        })
+
+        // 职位分类瀑布流 start
+        $('.jno_item').hover(function() {
+            $(this).find('.jno_item_pop').css('display', 'block')
+            var boxWidth = 715
+            if ($(this).hasClass('jno_item_all')) {
+                return false
+            }
+            var boxArr = $(this).find('.jno_item_pop_container'),
+                num = Math.floor(boxWidth / boxArr.eq(0).outerWidth(true)),
+                columnHeightArr = [];
+            columnHeightArr.length = num;
+            boxArr.each(function(index, item) {
+                if (index < num) {
+                    columnHeightArr[index] = $(item).outerHeight(true);
+                } else {
+                    var minHeight = Math.min.apply(null, columnHeightArr),
+                        minHeightIndex = $.inArray(minHeight, columnHeightArr);
+                    $(item).css({
+                        position: 'absolute',
+                        top: minHeight,
+                        left: boxArr.eq(minHeightIndex).position().left
+                    });
+                    columnHeightArr[minHeightIndex] += $(item).outerHeight(true);
+                }
+            });
+        }, function() {
+            $(this).find('.jno_item_pop').css('display', 'none')
+        })
+        // 职位分类瀑布流 end
+
+        // 轮播广告位1
+        var swiper1 = new Swiper('#J_sw1', {
+            autoplay: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            }
+        });
+        // 轮播广告位2
+        // var swiper2 = new Swiper('#J_sw2', {
+        //     autoplay: true,
+        //     pagination: {
+        //         el: '.swiper-pagination',
+        //         clickable: true,
+        //     }
+        // });
+
+        // 鼠标悬浮广告位
+        $('#da-thumbs > li').each(function() {
+            $(this).hoverdir()
+        });
+        // 网站动态滚动
+        function textSlide(liveNum, a, b) {
+            liveNum.animate({
+                marginLeft: "-360px"
+            }, "slow", function() {
+                liveNum.children().slice(a, b).remove().appendTo(liveNum);
+                liveNum.css({
+                    marginLeft: 0
+                })
+            })
+        }
+        // 网站动态轮播
+        var applyLive = $(".app_live ul");
+        var myInt;
+        $('.app_live').hover(function() {
+            clearInterval(myInt);
+        }, function() {
+            myInt = setInterval(function() {
+                textSlide(applyLive, 0, 1)
+            }, 3000);
+        }).trigger("mouseleave")
+        // 公告滚动
+        var $announcements = $('#announcement ul li');
+        var currentIndex = 0;
+
+        startCarousel();
+
+        function startCarousel() {
+            setInterval(function() {
+                var $currentAnnouncement = $announcements.eq(currentIndex);
+                var $nextAnnouncement = $currentAnnouncement.next();
+
+                if ($nextAnnouncement.length === 0) {
+                    $nextAnnouncement = $announcements.first();
+                }
+
+                $currentAnnouncement.animate({
+                    'margin-top': '-30px'
+                }, 500, function() {
+                    $(this).css('margin-top', 0).appendTo($(this).parent());
+                });
+
+                $nextAnnouncement.css('margin-top', '30px').animate({
+                    'margin-top': 0
+                }, 500);
+
+                currentIndex = (currentIndex + 1) % $announcements.length;
+            }, 2500);
+        }
+    })
+})
+
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        isIe: false,
+        regularMobile: /^13[0-9]{9}$|14[0-9]{9}$|15[0-9]{9}$|18[0-9]{9}$|17[0-9]{9}$|16[0-9]{9}$|19[0-9]{9}$/,
+        loginUtype: 0,
+        username: '',
+        password: '',
+        mobile: '',
+        code: '',
+        formUtype: 2,
+        statAfterLogin: {},
+        loginByMobile: true,
+        sendSmsBtnDisabled: false,
+        sendSmsBtnText: '获取验证码',
+        sendSmsTimer: '',
+        sendSmsInterval: 60,
+        captcha_open: parseInt(qscms.captcha_open),
+        captcha_type: qscms.captcha_type,
+        showPictureCaptcha: false,
+        captchaForm: {
+            code: ''
+        },
+        captchaRules: {
+            code: [{
+                required: true,
+                message: '请输入验证码',
+                trigger: 'blur'
+            }],
+        },
+        secret_str: '',
+        catpchaSrc: '',
+        pictureCaptchaCallback: '',
+        guideQrcode: '',
+        showGuide: false,
+        sendSmsLimit: false,
+        scan: false,
+        subsite_open: parseInt(qscms.subsite_open),
+        subsite_domain: qscms.subsite_domain
+    },
+    created: function() {
+        this.getUserInfo()
+        if (navigator.userAgent.indexOf('Trident') > -1) {
+            this.isIe = true
+        }
+        if (qscms.guide_qrcode == '') {
+            this.guideQrcode = qscms.apiUrl + qscms.apiList.qrcode +
+                "?type=normal&url=" + qscms.mobiledomain
+        } else {
+            this.guideQrcode = qscms.guide_qrcode
+        }
+        if (window.WxLogin === undefined) {
+            let script = document.createElement('script')
+            let head = document.getElementsByTagName('head')[0]
+            script.type = 'text/javascript'
+            script.charset = 'UTF-8'
+            script.src = 'https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js'
+            head.appendChild(script)
+        }
+
+    },
+    methods: {
+        showScan: function() {
+            this.scan = !this.scan
+            if (this.scan === true) {
+                let login_type = this.formUtype === 1 ? '/member/login/company' :
+                    '/member/login/personal'
+                let redirect_uri = qscms.sitedomain + login_type
+                new window.WxLogin({
+                    id: "wxlogin",
+                    appid: qscms.wechat_open_appid,
+                    scope: "snsapi_login",
+                    redirect_uri: redirect_uri,
+                    state: "",
+                    style: "",
+                    href: "data:text/css;base64,LmxvZ2luUGFuZWwgewogICAgd2lkdGg6IDIyNnB4OwogICAgcGFkZGluZy10b3A6IDMxcHg7Cn0KLmltcG93ZXJCb3ggLnFyY29kZSB7CiAgd2lkdGg6IDEyMHB4Owp9Ci5pbXBvd2VyQm94IC5pbmZvIHsKICB3aWR0aDogMjAwcHg7Cn0KLmltcG93ZXJCb3ggLnN0YXR1cyB7CiAgdGV4dC1hbGlnbjogY2VudGVyOwp9Cgo="
+                });
+            }
+        },
+        qqLogin: function() {
+            location.href = qscms.locationList.oauthQq
+        },
+        handlerMemberCenter: function(utype) {
+            if (utype == 1) {
+                location.href = qscms.locationList.indexCompany
+            } else {
+                location.href = qscms.locationList.indexPersonal
+            }
+        },
+        getUserInfo: function() {
+            var that = this
+            httpget(qscms.apiList.userinfo).then(function(res) {
+                if (res.data.login === true) {
+                    that.loginUtype = res.data.userinfo.utype
+                    that.getStatAfterLogin()
+                    that.showGuide = false
+                } else {
+                    if (qscms.guide_open == '1') {
+                        that.showGuide = true
+                    }
+                }
+            }).catch(function() {})
+        },
+        getStatAfterLogin: function() {
+            var that = this
+            httpget(qscms.apiList.statAfterLogin).then(function(res) {
+                that.statAfterLogin = res.data
+            }).catch(function() {})
+        },
+        handlerChangeUtype: function() {
+            this.formUtype = this.formUtype == 1 ? 2 : 1
+        },
+        // 发送验证码
+        sendSms: function() {
+            var that = this
+            if (that.sendSmsBtnDisabled === true) {
+                return false
+            }
+            if (!that.mobile) {
+                that.$message.error('请输入手机号')
+                return false
+            }
+            if (!that.regularMobile.test(that.mobile)) {
+                that.$message.error('手机号格式不正确')
+                return false
+            }
+            if (that.captcha_open == 1) {
+                if (that.captcha_type == 'tencent') {
+                    var captchaWindow = new TencentCaptcha(qscms.captcha_tencent_appid,
+                        function(res) {
+                            that.doSendSms(res)
+                        });
+                    captchaWindow.show()
+                } else if (that.captcha_type == 'vaptcha') {
+                    vaptcha({
+                        vid: qscms.captcha_vaptcha_vid, // 验证单元id
+                        type: "invisible", // 显示类型 隐藏式
+                        scene: 0, // 场景值 默认0
+                        offline_server: "", //离线模式服务端地址，若尚未配置离线模式，请填写任意地址即可。
+                    }).then(function(vaptchaObj) {
+                        obj = vaptchaObj; //将VAPTCHA验证实例保存到局部变量中
+                        //获取token的方式二：
+                        vaptchaObj.listen("pass", function() {
+                            that.doSendSms({
+                                code: vaptchaObj.getToken()
+                            })
+                        });
+                        //关闭验证弹窗时触发
+                        vaptchaObj.listen("close", function() {
+                            //验证弹窗关闭触发
+                        });
+                        obj.validate();
+                    });
+                }else if(that.captcha_type == "qscms"){
+                    qsCaptchaShow().then(res=>{
+                        that.doSendSms({secret_str:res})
+                    })
+                }else {
+                    that.showPictureCaptcha = true
+                    that.pictureCaptchaCallback = 'doSendSms'
+                }
+            } else {
+                that.doSendSms(null)
+            }
+        },
+        //zdq 短信验证码重复发送修改
+        doSendSms: function(captcha) {
+            var that = this
+            if (that.sendSmsLimit) {
+                return false
+            }
+            that.sendSmsLimit = true
+            httppost(qscms.apiList.getLoginCode, {
+                mobile: that.mobile,
+                utype: that.formUtype,
+                captcha: captcha
+            }).then(function(res) {
+                that.sendSmsLimit = false
+                that.$message({
+                    type: 'success',
+                    message: '验证码发送成功'
+                })
+                that.sendSmsTimer = setInterval(function() {
+                    if (that.sendSmsInterval === 0) {
+                        that.sendSmsBtnDisabled = false
+                        that.sendSmsBtnText = '获取验证码'
+                        that.sendSmsInterval = 60
+                        clearInterval(that.sendSmsTimer)
+                    } else {
+                        that.sendSmsBtnDisabled = true
+                        that.sendSmsBtnText = '重发 ' + that.sendSmsInterval + ' 秒'
+                        that.sendSmsInterval--
+                    }
+                }, 1000)
+            }).catch(function() {
+                that.sendSmsLimit = false
+            })
+        },
+        doLogin: function() {
+            var that = this
+            if (that.loginByMobile) {
+                if (!that.mobile) {
+                    that.$message.error('请输入手机号')
+                    return false
+                }
+                if (!that.regularMobile.test(that.mobile)) {
+                    that.$message.error('手机号格式不正确')
+                    return false
+                }
+                if (!that.code) {
+                    that.$message.error('请输入验证码')
+                    return false
+                }
+                var data = {
+                    mobile: that.mobile
+                }
+                httpget(qscms.apiList.loginByCode, data).then(function(check_res) {
+                    var setShow = false
+                    if (check_res.data == 1) {
+                        setShow = true
+                    }
+                    if (setShow) {
+                        if (that.captcha_type == 'tencent') {
+                            var captchaWindow = new TencentCaptcha(
+                                qscms.captcha_tencent_appid,
+                                function(res) {
+                                    that.doRequestLoginByCode(res)
+                                });
+                            captchaWindow.show()
+                        } else if (that.captcha_type == 'vaptcha') {
+                            vaptcha({
+                                vid: qscms.captcha_vaptcha_vid, // 验证单元id
+                                type: "invisible", // 显示类型 隐藏式
+                                scene: 0, // 场景值 默认0
+                                offline_server: "", //离线模式服务端地址，若尚未配置离线模式，请填写任意地址即可。
+                            }).then(function(vaptchaObj) {
+                                obj = vaptchaObj; //将VAPTCHA验证实例保存到局部变量中
+                                //获取token的方式二：
+                                vaptchaObj.listen("pass", function() {
+                                    that.doRequestLoginByCode({
+                                        code: vaptchaObj.getToken()
+                                    })
+                                });
+                                //关闭验证弹窗时触发
+                                vaptchaObj.listen("close", function() {
+                                    //验证弹窗关闭触发
+                                });
+                                obj.validate();
+                            });
+                        }else if(that.captcha_type == "qscms"){
+                            qsCaptchaShow().then(res=>{
+                                that.doRequestLoginByCode({secret_str:res})
+                            })
+                        } else {
+                            that.showPictureCaptcha = true
+                            that.pictureCaptchaCallback = 'doRequestLoginByCode'
+                        }
+                    } else {
+                        that.doRequestLoginByCode(null)
+                    }
+                }).catch(function() {})
+
+            } else {
+                if (!that.username) {
+                    that.$message.error('请输入手机号/用户名/邮箱')
+                    return false
+                }
+                if (!that.password) {
+                    that.$message.error('请输入密码')
+                    return false
+                }
+                var data = {
+                    username: that.username
+                }
+                httpget(qscms.apiList.loginByPwd, data).then(function(check_res) {
+                    var setShow = false
+                    if (check_res.data == 1) {
+                        setShow = true
+                    }
+                    if (setShow) {
+                        if (that.captcha_type == 'tencent') {
+                            var captchaWindow = new TencentCaptcha(
+                                qscms.captcha_tencent_appid,
+                                function(res) {
+                                    that.doRequestLoginByPwd(res)
+                                });
+                            captchaWindow.show()
+                        } else if (that.captcha_type == 'vaptcha') {
+                            vaptcha({
+                                vid: qscms.captcha_vaptcha_vid, // 验证单元id
+                                type: "invisible", // 显示类型 隐藏式
+                                scene: 0, // 场景值 默认0
+                                offline_server: "", //离线模式服务端地址，若尚未配置离线模式，请填写任意地址即可。
+                            }).then(function(vaptchaObj) {
+                                obj = vaptchaObj; //将VAPTCHA验证实例保存到局部变量中
+                                //获取token的方式二：
+                                vaptchaObj.listen("pass", function() {
+                                    that.doRequestLoginByPwd({
+                                        code: vaptchaObj.getToken()
+                                    })
+                                });
+                                //关闭验证弹窗时触发
+                                vaptchaObj.listen("close", function() {
+                                    //验证弹窗关闭触发
+                                });
+                                obj.validate();
+                            });
+                        }else if(that.captcha_type == "qscms"){
+                            qsCaptchaShow().then(res=>{
+                                that.doRequestLoginByPwd({secret_str:res})
+                            })
+                        } else {
+                            that.showPictureCaptcha = true
+                            that.pictureCaptchaCallback = 'doRequestLoginByPwd'
+                        }
+                    } else {
+                        that.doRequestLoginByPwd(null)
+                    }
+                }).catch(function() {})
+            }
+        },
+        doRequestLoginByPwd: function(captcha) {
+            var that = this
+            var data = {
+                username: that.username,
+                password: that.password,
+                utype: that.formUtype,
+                captcha: captcha
+            }
+            httppost(qscms.apiList.loginByPwd, data).then(function(res) {
+                var visitor = {
+                    utype: res.data.utype,
+                    token: res.data.token,
+                    mobile: res.data.mobile,
+                    userIminfo: res.data.user_iminfo
+                }
+                if (that.subsite_open === 1 && that.subsite_domain != '') {
+                    setCookie("qscms_visitor", JSON.stringify(visitor), {
+                        expires: 7,
+                        domain: "." + this.subsite_domain
+                      })
+                } else {
+                    setCookie("qscms_visitor", JSON.stringify(visitor), {
+                        expires: 7,
+                      })
+                }
+                window.location.reload()
+            }).catch(function() {})
+        },
+        doRequestLoginByCode: function(captcha) {
+            var that = this
+            var data = {
+                mobile: that.mobile,
+                code: that.code,
+                utype: that.formUtype,
+                captcha: captcha
+            }
+            httppost(qscms.apiList.loginByCode, data).then(function(res) {
+                var visitor = {
+                    utype: res.data.utype,
+                    token: res.data.token,
+                    mobile: res.data.mobile,
+                    userIminfo: res.data.user_iminfo
+                }
+                if (that.subsite_open === 1 && that.subsite_domain != '') {
+                    setCookie("qscms_visitor", JSON.stringify(visitor), {
+                        expires: 7,
+                        domain: "." + this.subsite_domain
+                      })
+                } else {
+                    setCookie("qscms_visitor", JSON.stringify(visitor), {
+                        expires: 7,
+                      })
+                }
+                window.location.reload()
+            }).catch(function() {})
+        },
+        handlerCompanyJobApplyList: function() {
+            location.href = qscms.locationList.companyJobApplyList
+        },
+        handlerPersonalJobApplyList: function() {
+            location.href = qscms.locationList.personalJobApplyList
+        },
+        handlerCompanyInterviewList: function() {
+            location.href = qscms.locationList.companyInterviewList
+        },
+        handlerPersonalInterviewList: function() {
+            location.href = qscms.locationList.personalInterviewList
+        },
+        handlerCompanyViewList: function() {
+            location.href = qscms.locationList.companyViewList
+        },
+        handlerPersonalViewList: function() {
+            location.href = qscms.locationList.personalViewList
+        },
+        handlerCompanyJoblist: function() {
+            location.href = qscms.locationList.companyJoblist
+        },
+        handlerCompanyService: function() {
+            location.href = qscms.locationList.companyService
+        },
+        handlerResumeIndex: function() {
+            location.href = qscms.locationList.personalResume
+        },
+        handlerPersonalRecommend: function() {
+            location.href = qscms.locationList.recommendJob
+        },
+        handlerRefreshJob: function() {
+            var that = this
+            this.$confirm('确定刷新所有发布中的职位吗？', '系统提示', {
+                    type: 'warning'
+                })
+                .then(function() {
+                    httppost(qscms.apiList.companyJobRefreshBatch, {}).then(function(res) {
+                        if (res.data.done === 0) {
+                            that.$confirm(res.message, '系统提示', {
+                                    type: 'warning'
+                                })
+                                .then(function() {
+                                    location.href = qscms.locationList.companyJoblist
+                                })
+                                .catch(function() {})
+                            return false
+                        } else {
+                            that.$message({
+                                type: 'success',
+                                message: res.message
+                            })
+                        }
+                    }).catch(function() {})
+                })
+                .catch(function() {})
+        },
+        handlerRefreshResume: function() {
+            var that = this
+            httppost(qscms.apiList.resumeRefresh).then(function(res) {
+                if (parseInt(res.code) === 200) {
+                    that.$message({
+                        type: 'success',
+                        message: res.message
+                    })
+                } else {
+                    that.$message.error(res.message)
+                }
+            }).catch(function() {})
+        },
+        handlerMemberCenter: function(utype) {
+            if (utype == 1) {
+                location.href = qscms.locationList.indexCompany
+            } else {
+                location.href = qscms.locationList.indexPersonal
+            }
+        },
+        handlerRegCompany: function() {
+            if (parseInt(qscms.closereg) === 1) {
+                this.$message.error('网站已关闭会员注册')
+                return false
+            } else {
+                location.href = qscms.locationList.regCompany
+            }
+        },
+        handlerForget: function(utype) {
+            var url = qscms.locationList.forget
+            url = url.replace('1', utype)
+            location.href = url
+        },
+        handlerReg: function() {
+            if (parseInt(qscms.closereg) === 1) {
+                this.$message.error('网站已关闭会员注册')
+                return false
+            } else {
+                //进入模板首页注册时，先进选身份的注册页
+                location.href = qscms.locationList.reg
+            }
+        },
+        changeImg: function() {
+            var that = this
+            httpget(qscms.apiList.captchaPicture, {})
+                .then(function(res) {
+                    that.secret_str = res.data.secret_str
+                    that.catpchaSrc = res.data.src
+                })
+                .catch(function() {})
+        },
+        pictureCaptchaOpened: function() {
+            this.changeImg()
+        },
+        submitPictureCaptcha: function() {
+            var that = this
+            that.$refs.captchaForm.validate(function(valid) {
+                if (valid) {
+                    that.showPictureCaptcha = false
+                    that[that.pictureCaptchaCallback]({
+                        code: that.captchaForm.code,
+                        secret_str: that.secret_str
+                    })
+                    that.captchaForm.code = ''
+                } else {
+                    that.captchaForm.code = ''
+                    return false;
+                }
+            });
+        }
+    }
+})

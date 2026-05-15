@@ -123,6 +123,40 @@ function installAdminFetchMock(options: { operatorOpsEnabled?: boolean } = {}) {
       }, 'trace-admin-recommendations');
     }
 
+    if (url.includes('/api/admin/home-slots/188/image/content') && method === 'GET') {
+      return new Response(new Blob(['home-slot-image'], { type: 'image/webp' }), {
+        status: 200,
+        headers: { 'Content-Type': 'image/webp' }
+      });
+    }
+
+    if (url.includes('/api/admin/home-slots') && method === 'GET') {
+      return apiOk({
+        slot_list: operatorOpsEnabled ? [
+          {
+            slot_id: 188,
+            slot_code: 'home_hero_banner',
+            title: '首页首屏运营位',
+            subtitle: '不做广告售卖',
+            image_url: '/demo/home-ad-full.svg',
+            image_alt: '首页运营位',
+            has_image: true,
+            image_file_name: 'hero.webp',
+            image_content_type: 'image/webp',
+            image_size_bytes: 4096,
+            image_uploaded_at: '2026-05-01T10:00:00',
+            image_content_url: '/api/admin/home-slots/188/image/content',
+            link_type: 'internal',
+            link_url: '/jobs',
+            display_order: 1,
+            status: 1,
+            updated_at: '2026-05-01T10:00:00'
+          }
+        ] : [],
+        total: operatorOpsEnabled ? 1 : 0
+      }, 'trace-admin-home-slots');
+    }
+
     if (url.includes('/api/admin/risk-reviews') && method === 'GET') {
       return apiOk({
         risk_review_list: operatorOpsEnabled ? [
@@ -193,6 +227,69 @@ function installAdminFetchMock(options: { operatorOpsEnabled?: boolean } = {}) {
       }, 'trace-admin-recommendation-write');
     }
 
+    if (url.includes('/api/admin/home-slots/188/image') && method === 'POST') {
+      return apiOk({
+        slot_id: 188,
+        slot_code: 'home_hero_banner',
+        title: '首页首屏运营位',
+        subtitle: '不做广告售卖',
+        image_url: '/demo/home-ad-full.svg',
+        image_alt: '首页运营位',
+        has_image: true,
+        image_file_name: 'new-hero.webp',
+        image_content_type: 'image/webp',
+        image_size_bytes: 2048,
+        image_uploaded_at: '2026-05-01T11:00:00',
+        image_content_url: '/api/admin/home-slots/188/image/content',
+        link_type: 'internal',
+        link_url: '/jobs',
+        display_order: 1,
+        status: 1
+      }, 'trace-admin-home-slot-image-upload');
+    }
+
+    if (url.includes('/api/admin/home-slots/188/image') && method === 'DELETE') {
+      return apiOk({
+        slot_id: 188,
+        slot_code: 'home_hero_banner',
+        title: '首页首屏运营位',
+        subtitle: '不做广告售卖',
+        image_url: '/demo/home-ad-full.svg',
+        image_alt: '首页运营位',
+        has_image: false,
+        image_file_name: '',
+        image_content_type: '',
+        image_size_bytes: 0,
+        image_uploaded_at: '',
+        image_content_url: '',
+        link_type: 'internal',
+        link_url: '/jobs',
+        display_order: 1,
+        status: 1
+      }, 'trace-admin-home-slot-image-delete');
+    }
+
+    if (url.includes('/api/admin/home-slots') && method === 'POST') {
+      return apiOk({
+        slot_id: 189,
+        slot_code: 'home_hero_banner',
+        title: '首页首屏运营位',
+        subtitle: '后台运营可配置；不做广告售卖、支付或外部投放。',
+        image_url: '/demo/home-ad-full.svg',
+        image_alt: 'LocalTalent 首页运营位',
+        has_image: false,
+        image_file_name: '',
+        image_content_type: '',
+        image_size_bytes: 0,
+        image_uploaded_at: '',
+        image_content_url: '',
+        link_type: 'internal',
+        link_url: '/jobs',
+        display_order: 1,
+        status: url.includes('/offline') ? 0 : 1
+      }, 'trace-admin-home-slot-write');
+    }
+
     if (url.includes('/api/admin/risk-reviews') && method === 'POST') {
       return apiOk({
         risk_id: 99,
@@ -213,6 +310,8 @@ describe('AdminDashboard', () => {
   beforeEach(() => {
     window.localStorage.clear();
     vi.restoreAllMocks();
+    Object.defineProperty(URL, 'createObjectURL', { value: vi.fn(() => 'blob:http://localhost/home-slot-image'), configurable: true });
+    Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true });
   });
 
   it('renders company, job, export review queues and audit trace entry', async () => {
@@ -274,8 +373,11 @@ describe('AdminDashboard', () => {
     expect(await screen.findByText(/三期运营化已开启/)).toBeInTheDocument();
     expect(screen.getByText('运营首页')).toBeInTheDocument();
     expect(screen.getByLabelText('推荐位配置')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页运营位配置')).toBeInTheDocument();
     expect(screen.getByLabelText('风险审核')).toBeInTheDocument();
     expect(screen.getByText('Prompt29 风险任务')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('首页首屏运营位')).toBeInTheDocument();
+    expect(screen.getByText(/首页运营位图片已上传/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: '保存推荐位' }));
 
@@ -286,6 +388,43 @@ describe('AdminDashboard', () => {
       expect(postCall).toBeTruthy();
       expect((postCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toContain('admin-recommendation');
       expect(postCall?.[1]?.body).toContain('"slot_code":"home_hot_jobs"');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: '保存首页运营位' }));
+
+    await waitFor(() => {
+      const slotCall = fetchMock.mock.calls.find(([input, init]) => (
+        String(input).includes('/api/admin/home-slots') && init?.method === 'POST'
+      ));
+      expect(slotCall).toBeTruthy();
+      expect((slotCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toContain('admin-home-slot');
+      expect(slotCall?.[1]?.body).toContain('"slot_code":"home_hero_banner"');
+    });
+
+    const imageInput = screen.getByLabelText('上传 home_hero_banner 图片') as HTMLInputElement;
+    fireEvent.change(imageInput, {
+      target: {
+        files: [new File(['hero'], 'new-hero.webp', { type: 'image/webp' })]
+      }
+    });
+
+    await waitFor(() => {
+      const imageCall = fetchMock.mock.calls.find(([input, init]) => (
+        String(input).includes('/api/admin/home-slots/188/image') && init?.method === 'POST'
+      ));
+      expect(imageCall).toBeTruthy();
+      expect((imageCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toContain('admin-home-slot-image');
+      expect(imageCall?.[1]?.body).toBeInstanceOf(FormData);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: '删除首页运营位图片' }));
+
+    await waitFor(() => {
+      const deleteCall = fetchMock.mock.calls.find(([input, init]) => (
+        String(input).includes('/api/admin/home-slots/188/image') && init?.method === 'DELETE'
+      ));
+      expect(deleteCall).toBeTruthy();
+      expect((deleteCall?.[1]?.headers as Headers).get('X-Idempotency-Key')).toContain('admin-home-slot-image-delete');
     });
 
     fireEvent.click(screen.getByRole('button', { name: '处理为低风险' }));

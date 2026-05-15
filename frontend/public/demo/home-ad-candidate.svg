@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="160" viewBox="0 0 480 160" role="img" aria-label="求职者完善资料运营图">
+  <rect width="480" height="160" rx="18" fill="#fff7ed"/>
+  <circle cx="92" cy="72" r="34" fill="#fed7aa"/>
+  <circle cx="92" cy="62" r="18" fill="#fb923c"/>
+  <path d="M54 126c10-28 23-42 38-42s28 14 38 42" fill="#fdba74"/>
+  <rect x="162" y="38" width="238" height="20" rx="10" fill="#ffedd5"/>
+  <rect x="162" y="72" width="190" height="16" rx="8" fill="#fed7aa"/>
+  <rect x="162" y="102" width="132" height="16" rx="8" fill="#fdba74"/>
+  <text x="164" y="139" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="16" font-weight="800" fill="#9a3412">私有资料维护 · 发布快照可撤回</text>
+</svg>

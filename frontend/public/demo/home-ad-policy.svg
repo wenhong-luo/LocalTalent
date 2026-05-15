@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="150" viewBox="0 0 360 150" role="img" aria-label="就业政策运营图">
+  <rect width="360" height="150" rx="16" fill="#f0fdf4"/>
+  <rect x="42" y="28" width="126" height="94" rx="10" fill="#fff" stroke="#bbf7d0" stroke-width="3"/>
+  <rect x="64" y="52" width="82" height="8" rx="4" fill="#16a34a"/>
+  <rect x="64" y="74" width="70" height="8" rx="4" fill="#86efac"/>
+  <rect x="64" y="96" width="92" height="8" rx="4" fill="#86efac"/>
+  <text x="194" y="74" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="24" font-weight="900" fill="#166534">就业政策</text>
+  <text x="196" y="104" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#15803d">公开内容频道</text>
+</svg>

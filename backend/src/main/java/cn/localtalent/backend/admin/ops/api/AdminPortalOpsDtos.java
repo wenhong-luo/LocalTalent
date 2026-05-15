@@ -1,6 +1,7 @@
 package cn.localtalent.backend.admin.ops.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -93,6 +94,64 @@ public final class AdminPortalOpsDtos {
     public record RiskHandleRequest(
             int status,
             String decision
+    ) {
+    }
+
+    public record HomeSlotRequest(
+            @JsonProperty("slot_code") String slotCode,
+            String title,
+            String subtitle,
+            @JsonProperty("image_url") String imageUrl,
+            @JsonProperty("image_alt") String imageAlt,
+            @JsonProperty("link_type") String linkType,
+            @JsonProperty("link_url") String linkUrl,
+            @JsonProperty("target_type") String targetType,
+            @JsonProperty("target_id") Long targetId,
+            @JsonProperty("display_order") Integer displayOrder,
+            Integer status,
+            @JsonProperty("start_time") LocalDateTime startTime,
+            @JsonProperty("end_time") LocalDateTime endTime
+    ) {
+    }
+
+    public record HomeSlotResponse(
+            @JsonProperty("slot_id") long slotId,
+            @JsonProperty("slot_code") String slotCode,
+            String title,
+            String subtitle,
+            @JsonProperty("image_url") String imageUrl,
+            @JsonProperty("image_alt") String imageAlt,
+            @JsonProperty("has_image") boolean hasImage,
+            @JsonProperty("image_file_name") String imageFileName,
+            @JsonProperty("image_content_type") String imageContentType,
+            @JsonProperty("image_size_bytes") Long imageSizeBytes,
+            @JsonProperty("image_uploaded_at") LocalDateTime imageUploadedAt,
+            @JsonProperty("image_content_url") String imageContentUrl,
+            @JsonProperty("link_type") String linkType,
+            @JsonProperty("link_url") String linkUrl,
+            @JsonProperty("target_type") String targetType,
+            @JsonProperty("target_id") Long targetId,
+            @JsonProperty("display_order") int displayOrder,
+            int status,
+            @JsonProperty("start_time") LocalDateTime startTime,
+            @JsonProperty("end_time") LocalDateTime endTime,
+            @JsonProperty("updated_at") LocalDateTime updatedAt,
+            @JsonIgnore String imageObjectKey
+    ) {
+    }
+
+    public record HomeSlotImageDownload(
+            String fileName,
+            String contentType,
+            byte[] content
+    ) {
+    }
+
+    public record HomeSlotPageResponse(
+            @JsonProperty("slot_list") List<HomeSlotResponse> slotList,
+            long total,
+            int page,
+            int size
     ) {
     }
 }

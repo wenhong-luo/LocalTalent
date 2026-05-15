@@ -8,21 +8,28 @@ import { StatusBadge } from '@/components/backoffice/StatusBadge';
 import { StateView } from '@/components/StateView';
 import { isHttpClientError } from '@/lib/httpClient';
 import {
+  createHomeSlot,
   createRecommendation,
+  deleteHomeSlotImage,
   fetchAuditTrace,
   fetchCompanyReviewQueue,
   fetchExportReviewQueue,
+  fetchHomeSlotImageBlob,
+  fetchHomeSlots,
   fetchJobReviewQueue,
   fetchOpsOverview,
   fetchRecommendations,
   fetchRiskReviews,
   handleRiskReview,
+  offlineHomeSlot,
   offlineRecommendation,
   reviewCompany,
   reviewExport,
   reviewJob,
+  uploadHomeSlotImage,
   type AuditTraceSummary,
   type CompanyReviewItem,
+  type HomeSlotItem,
   type JobReviewItem,
   type OpsOverview,
   type RecommendationItem,
@@ -70,17 +77,34 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
   const [exports, setExports] = useState<CompanyExportApply[]>([]);
   const [opsOverview, setOpsOverview] = useState<OpsOverview | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
+  const [homeSlots, setHomeSlots] = useState<HomeSlotItem[]>([]);
+  const [homeSlotImageUrls, setHomeSlotImageUrls] = useState<Record<number, string>>({});
   const [riskReviews, setRiskReviews] = useState<RiskReviewItem[]>([]);
   const [operatorOpsEnabled, setOperatorOpsEnabled] = useState(false);
   const [auditTraceId, setAuditTraceId] = useState('trace-demo');
   const [auditTrace, setAuditTrace] = useState<AuditTraceSummary | null>(null);
   const [recommendationTargetId, setRecommendationTargetId] = useState('1');
   const [recommendationTitle, setRecommendationTitle] = useState('首页推荐位');
+  const [homeSlotCode, setHomeSlotCode] = useState('home_hero_banner');
+  const [homeSlotTitle, setHomeSlotTitle] = useState('首页首屏运营位');
+  const [homeSlotImageUrl, setHomeSlotImageUrl] = useState('/demo/home-ad-full.svg');
   const [status, setStatus] = useState<'loading' | 'ready' | 'error' | 'retrying'>('loading');
   const [message, setMessage] = useState('正在读取运营后台队列。');
   const [traceId, setTraceId] = useState<string>();
 
   const canWrite = context.adminRoleHint === 'operator';
+
+  async function hydrateHomeSlotImageUrls(items: HomeSlotItem[]) {
+    const withImages = items.filter((item) => item.has_image && item.image_content_url);
+    const entries = await Promise.all(withImages.map(async (item) => {
+      const blob = await fetchHomeSlotImageBlob(context.token, item);
+      return [item.slot_id, URL.createObjectURL(blob)] as const;
+    }));
+    setHomeSlotImageUrls((previous) => {
+      Object.values(previous).forEach((url) => URL.revokeObjectURL(url));
+      return Object.fromEntries(entries);
+    });
+  }
 
   async function load() {
     setStatus('retrying');
@@ -98,20 +122,28 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
 
       try {
         const overviewResult = await fetchOpsOverview(context.token);
-        const [recommendationResult, riskResult] = await Promise.all([
+        const [recommendationResult, homeSlotResult, riskResult] = await Promise.all([
           fetchRecommendations(context.token),
+          fetchHomeSlots(context.token),
           fetchRiskReviews(context.token)
         ]);
         setOpsOverview(overviewResult.data);
         setOperatorOpsEnabled(overviewResult.data.features.operator_portal_ops_enabled);
         setRecommendations(recommendationResult.data);
+        setHomeSlots(homeSlotResult.data);
+        await hydrateHomeSlotImageUrls(homeSlotResult.data);
         setRiskReviews(riskResult.data);
-        latestTraceId = riskResult.traceId || recommendationResult.traceId || overviewResult.traceId || latestTraceId;
+        latestTraceId = riskResult.traceId || homeSlotResult.traceId || recommendationResult.traceId || overviewResult.traceId || latestTraceId;
       } catch (error) {
         if (isHttpClientError(error) && error.code === 'FEATURE_DISABLED_403') {
           setOperatorOpsEnabled(false);
           setOpsOverview(null);
           setRecommendations([]);
+          setHomeSlots([]);
+          setHomeSlotImageUrls((previous) => {
+            Object.values(previous).forEach((url) => URL.revokeObjectURL(url));
+            return {};
+          });
           setRiskReviews([]);
         } else {
           throw error;
@@ -129,6 +161,12 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
 
   useEffect(() => {
     void load();
+    return () => {
+      setHomeSlotImageUrls((previous) => {
+        Object.values(previous).forEach((url) => URL.revokeObjectURL(url));
+        return {};
+      });
+    };
   }, []);
 
   async function submitCompanyReview(companyId: number, decision: ApprovalDecision, memo: string) {
@@ -196,6 +234,70 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
     } catch (error) {
       setStatus('error');
       setMessage(error instanceof Error ? error.message : '推荐位下线失败。');
+    }
+  }
+
+  async function onCreateHomeSlot(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus('retrying');
+    setMessage('正在保存首页运营位。');
+    try {
+      const result = await createHomeSlot(context.token, {
+        slot_code: homeSlotCode,
+        title: homeSlotTitle,
+        subtitle: '后台运营可配置；不做广告售卖、支付或外部投放。',
+        image_url: homeSlotImageUrl,
+        image_alt: 'LocalTalent 首页运营位',
+        link_type: 'internal',
+        link_url: '/jobs',
+        display_order: 1,
+        status: 1
+      });
+      setTraceId(result.traceId);
+      await load();
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : '首页运营位保存失败。');
+    }
+  }
+
+  async function onOfflineHomeSlot(slotId: number) {
+    setStatus('retrying');
+    setMessage('正在下线首页运营位。');
+    try {
+      const result = await offlineHomeSlot(context.token, slotId);
+      setTraceId(result.traceId);
+      await load();
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : '首页运营位下线失败。');
+    }
+  }
+
+  async function onUploadHomeSlotImage(slotId: number, file?: File) {
+    if (!file) return;
+    setStatus('retrying');
+    setMessage('正在上传首页运营位图片。');
+    try {
+      const result = await uploadHomeSlotImage(context.token, slotId, file);
+      setTraceId(result.traceId);
+      await load();
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : '首页运营位图片上传失败。');
+    }
+  }
+
+  async function onDeleteHomeSlotImage(slotId: number) {
+    setStatus('retrying');
+    setMessage('正在删除首页运营位图片。');
+    try {
+      const result = await deleteHomeSlotImage(context.token, slotId);
+      setTraceId(result.traceId);
+      await load();
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : '首页运营位图片删除失败。');
     }
   }
 
@@ -386,6 +488,104 @@ function AdminDashboardContent({ context }: { context: GuardContext }) {
                   ) : null}
                 </article>
               ))}
+            </div>
+          </section>
+
+          <section style={cardStyle} aria-label="首页运营位配置">
+            <h2 style={{ marginTop: 0 }}>首页运营位配置</h2>
+            <p style={{ color: 'var(--lt-ink-muted)', lineHeight: 1.7 }}>
+              首页运营位用于 banner、通栏、半宽和快捷入口等展示位；支持运营后台私有上传图片，公开首页通过后端代理读取，不暴露对象存储路径。
+            </p>
+            {operatorOpsEnabled && canWrite ? (
+              <form onSubmit={onCreateHomeSlot} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', alignItems: 'end' }}>
+                <label>
+                  <span style={{ display: 'block', marginBottom: '7px', color: 'var(--lt-ink-muted)' }}>首页位置</span>
+                  <select value={homeSlotCode} onChange={(event) => setHomeSlotCode(event.target.value)} style={inputStyle}>
+                    <option value="home_hero_banner">首屏大 banner</option>
+                    <option value="home_full_width_banner">通栏运营位</option>
+                    <option value="home_half_left">半宽运营位左</option>
+                    <option value="home_half_right">半宽运营位右</option>
+                    <option value="home_third_1">三列运营位 1</option>
+                    <option value="home_third_2">三列运营位 2</option>
+                    <option value="home_third_3">三列运营位 3</option>
+                    <option value="home_quick_1">快捷入口 1</option>
+                    <option value="home_quick_2">快捷入口 2</option>
+                    <option value="home_quick_3">快捷入口 3</option>
+                    <option value="home_bottom_banner">底部运营位</option>
+                  </select>
+                </label>
+                <label>
+                  <span style={{ display: 'block', marginBottom: '7px', color: 'var(--lt-ink-muted)' }}>标题</span>
+                  <input value={homeSlotTitle} onChange={(event) => setHomeSlotTitle(event.target.value)} style={inputStyle} />
+                </label>
+                <label>
+                  <span style={{ display: 'block', marginBottom: '7px', color: 'var(--lt-ink-muted)' }}>图片 URL</span>
+                  <input value={homeSlotImageUrl} onChange={(event) => setHomeSlotImageUrl(event.target.value)} style={inputStyle} />
+                </label>
+                <button type="submit" style={buttonStyle}>保存首页运营位</button>
+              </form>
+            ) : (
+              <p style={{ color: 'var(--lt-ink-muted)' }}>{canWrite ? '三期运营化未开启。' : 'auditor/未知角色只读，不显示首页运营位写入口。'}</p>
+            )}
+            <div style={{ display: 'grid', gap: '10px', marginTop: '14px' }}>
+              {homeSlots.length === 0 ? (
+                <p style={{ color: 'var(--lt-ink-muted)' }}>暂无首页运营位配置。</p>
+              ) : homeSlots.map((item) => {
+                const previewUrl = homeSlotImageUrls[item.slot_id] || item.image_url;
+                return (
+                  <article key={item.slot_id} style={{ border: '1px solid var(--lt-line)', borderRadius: '16px', padding: '12px', display: 'grid', gap: '12px' }}>
+                    <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      {previewUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={previewUrl}
+                          alt={item.image_alt || item.title || '首页运营位图片'}
+                          style={{ width: '156px', height: '72px', objectFit: 'cover', borderRadius: '14px', border: '1px solid var(--lt-line)' }}
+                        />
+                      ) : (
+                        <div style={{ width: '156px', height: '72px', borderRadius: '14px', border: '1px dashed var(--lt-line)', display: 'grid', placeItems: 'center', color: 'var(--lt-ink-muted)' }}>
+                          暂无图片
+                        </div>
+                      )}
+                      <div style={{ flex: '1 1 260px' }}>
+                        <strong>{item.slot_code} · {item.title}</strong>
+                        <p style={{ margin: '6px 0', color: 'var(--lt-ink-muted)' }}>
+                          {item.subtitle || '未设置副标题'} · {item.link_type === 'internal' ? item.link_url : item.link_type} · 状态 {item.status}
+                        </p>
+                        <p style={{ margin: 0, color: 'var(--lt-ink-muted)' }}>
+                          {item.has_image
+                            ? `首页运营位图片已上传：${item.image_file_name || '未命名图片'} · ${Math.round(item.image_size_bytes / 1024)}KB`
+                            : '未上传图片，公开首页将使用安全图片 URL 或占位图。'}
+                        </p>
+                      </div>
+                    </div>
+                    {operatorOpsEnabled && canWrite ? (
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <label style={{ ...buttonStyle, display: 'inline-flex', alignItems: 'center' }}>
+                          上传首页运营位图片
+                          <input
+                            aria-label={`上传 ${item.slot_code} 图片`}
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                            style={{ display: 'none' }}
+                            onChange={(event) => {
+                              const file = event.currentTarget.files?.[0];
+                              event.currentTarget.value = '';
+                              void onUploadHomeSlotImage(item.slot_id, file);
+                            }}
+                          />
+                        </label>
+                        {item.has_image ? (
+                          <button type="button" style={{ ...buttonStyle, background: '#b91c1c' }} onClick={() => onDeleteHomeSlotImage(item.slot_id)}>删除首页运营位图片</button>
+                        ) : null}
+                        {item.status === 1 ? (
+                          <button type="button" style={buttonStyle} onClick={() => onOfflineHomeSlot(item.slot_id)}>下线首页运营位</button>
+                        ) : null}
+                      </div>
+                    ) : <span style={{ color: 'var(--lt-ink-muted)' }}>只读：auditor 可预览配置，不能上传或删除图片。</span>}
+                  </article>
+                );
+              })}
             </div>
           </section>
 

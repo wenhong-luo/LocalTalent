@@ -1084,7 +1084,7 @@ describe('CompanyDashboard', () => {
     render(<CompanyDashboard />);
 
     fireEvent.click(await screen.findByRole('button', { name: /^职位管理$/ }));
-    fireEvent.click(screen.getByRole('tab', { name: /已下线/ }));
+    fireEvent.click(await screen.findByRole('tab', { name: /已下线/ }));
     expect(await screen.findByText('可重新提交职位')).toBeInTheDocument();
     expect(screen.getByText('下线职位需要重新提交审核，审核通过后才会重新公开展示。')).toBeInTheDocument();
 

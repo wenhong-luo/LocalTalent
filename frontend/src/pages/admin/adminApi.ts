@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiRequest, createIdempotencyKey, type ApiResult } from '@/lib/httpClient';
+import { apiGet, apiPost, apiRequest, createIdempotencyKey, createTraceId, type ApiResult } from '@/lib/httpClient';
 import { type CompanyExportApply } from '@/pages/company/companyApi';
 
 type RawRecord = Record<string, unknown>;
@@ -92,6 +92,28 @@ export type RecommendationItem = {
   status: number;
   target_valid: boolean;
   invalid_reason: string;
+  updated_at: string;
+};
+
+export type HomeSlotItem = {
+  slot_id: number;
+  slot_code: string;
+  title: string;
+  subtitle: string;
+  image_url: string;
+  image_alt: string;
+  has_image: boolean;
+  image_file_name: string;
+  image_content_type: string;
+  image_size_bytes: number;
+  image_uploaded_at: string;
+  image_content_url: string;
+  link_type: string;
+  link_url: string;
+  target_type: string;
+  target_id: number;
+  display_order: number;
+  status: number;
   updated_at: string;
 };
 
@@ -197,6 +219,31 @@ function toRecommendationItem(raw: unknown): RecommendationItem {
   };
 }
 
+function toHomeSlotItem(raw: unknown): HomeSlotItem {
+  const row = asRecord(raw);
+  return {
+    slot_id: numberOr(row.slot_id),
+    slot_code: text(row.slot_code),
+    title: text(row.title),
+    subtitle: text(row.subtitle),
+    image_url: text(row.image_url),
+    image_alt: text(row.image_alt),
+    has_image: Boolean(row.has_image),
+    image_file_name: text(row.image_file_name),
+    image_content_type: text(row.image_content_type),
+    image_size_bytes: numberOr(row.image_size_bytes),
+    image_uploaded_at: text(row.image_uploaded_at),
+    image_content_url: text(row.image_content_url),
+    link_type: text(row.link_type, 'none'),
+    link_url: text(row.link_url),
+    target_type: text(row.target_type),
+    target_id: numberOr(row.target_id),
+    display_order: numberOr(row.display_order, 100),
+    status: numberOr(row.status),
+    updated_at: text(row.updated_at)
+  };
+}
+
 function toRiskReviewItem(raw: unknown): RiskReviewItem {
   const row = asRecord(raw);
   return {
@@ -288,6 +335,14 @@ export async function fetchRecommendations(token: string): Promise<ApiResult<Rec
   return { data: rows.map(toRecommendationItem), traceId: result.traceId };
 }
 
+export async function fetchHomeSlots(token: string): Promise<ApiResult<HomeSlotItem[]>> {
+  const result = await apiGet<unknown>('/api/admin/home-slots?page=1&size=20', { token });
+  const rows = Array.isArray(asRecord(result.data).slot_list)
+    ? asRecord(result.data).slot_list as unknown[]
+    : [];
+  return { data: rows.map(toHomeSlotItem), traceId: result.traceId };
+}
+
 export async function createRecommendation(
   token: string,
   payload: {
@@ -307,12 +362,79 @@ export async function createRecommendation(
   return { data: toRecommendationItem(result.data), traceId: result.traceId };
 }
 
+export async function createHomeSlot(
+  token: string,
+  payload: {
+    slot_code: string;
+    title: string;
+    subtitle: string;
+    image_url: string;
+    image_alt: string;
+    link_type: string;
+    link_url: string;
+    display_order: number;
+    status: number;
+  }
+): Promise<ApiResult<HomeSlotItem>> {
+  const result = await apiPost<unknown>('/api/admin/home-slots', payload, {
+    token,
+    idempotencyKey: createIdempotencyKey('admin-home-slot')
+  });
+  return { data: toHomeSlotItem(result.data), traceId: result.traceId };
+}
+
 export async function offlineRecommendation(token: string, recommendationId: number): Promise<ApiResult<RecommendationItem>> {
   const result = await apiPost<unknown>(`/api/admin/recommendations/${recommendationId}/offline`, {}, {
     token,
     idempotencyKey: createIdempotencyKey('admin-recommendation-offline')
   });
   return { data: toRecommendationItem(result.data), traceId: result.traceId };
+}
+
+export async function offlineHomeSlot(token: string, slotId: number): Promise<ApiResult<HomeSlotItem>> {
+  const result = await apiPost<unknown>(`/api/admin/home-slots/${slotId}/offline`, {}, {
+    token,
+    idempotencyKey: createIdempotencyKey('admin-home-slot-offline')
+  });
+  return { data: toHomeSlotItem(result.data), traceId: result.traceId };
+}
+
+export async function uploadHomeSlotImage(token: string, slotId: number, file: File): Promise<ApiResult<HomeSlotItem>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const result = await apiRequest<unknown>(`/api/admin/home-slots/${slotId}/image`, {
+    method: 'POST',
+    token,
+    idempotencyKey: createIdempotencyKey('admin-home-slot-image'),
+    body: formData
+  });
+  return { data: toHomeSlotItem(result.data), traceId: result.traceId };
+}
+
+export async function fetchHomeSlotImageBlob(token: string, item: HomeSlotItem): Promise<Blob> {
+  const traceId = createTraceId();
+  const response = await fetch(item.image_content_url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'X-Trace-Id': traceId,
+      Accept: item.image_content_type || 'image/*'
+    },
+    cache: 'no-store'
+  });
+  if (!response.ok) {
+    throw new Error('首页运营位图片读取失败');
+  }
+  return response.blob();
+}
+
+export async function deleteHomeSlotImage(token: string, slotId: number): Promise<ApiResult<HomeSlotItem>> {
+  const result = await apiRequest<unknown>(`/api/admin/home-slots/${slotId}/image`, {
+    method: 'DELETE',
+    token,
+    idempotencyKey: createIdempotencyKey('admin-home-slot-image-delete')
+  });
+  return { data: toHomeSlotItem(result.data), traceId: result.traceId };
 }
 
 export async function fetchRiskReviews(token: string): Promise<ApiResult<RiskReviewItem[]>> {

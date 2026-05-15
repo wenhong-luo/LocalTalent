@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 网站首页高保真改造投喂手册</title>
+  <style>
+    :root {
+      --bg: #f4f8fb;
+      --card: #ffffff;
+      --ink: #102033;
+      --muted: #66788f;
+      --line: #dce8f2;
+      --brand: #10a88a;
+      --brand-dark: #087863;
+      --warn: #fff4db;
+      --code: #0f172a;
+      --code-bg: #f8fafc;
+      --shadow: 0 18px 50px rgba(16, 32, 51, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(16, 168, 138, 0.10), transparent 28rem),
+        linear-gradient(180deg, #f8fcff 0%, var(--bg) 100%);
+      line-height: 1.72;
+    }
+    .shell {
+      width: min(1180px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 36px 0 80px;
+    }
+    .hero {
+      padding: 34px 38px;
+      border: 1px solid rgba(16, 168, 138, 0.18);
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(16, 168, 138, 0.12), rgba(255, 255, 255, 0.92) 58%, rgba(11, 121, 104, 0.10));
+      box-shadow: var(--shadow);
+    }
+    .eyebrow {
+      color: var(--brand-dark);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1.12;
+      letter-spacing: -0.04em;
+    }
+    .lead {
+      max-width: 760px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 22px 0 0;
+    }
+    .toc a {
+      color: var(--brand-dark);
+      text-decoration: none;
+      padding: 10px 12px;
+      border: 1px solid rgba(16, 168, 138, 0.20);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.68);
+      font-weight: 700;
+      font-size: 14px;
+    }
+    section {
+      margin-top: 24px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: 0 10px 30px rgba(16, 32, 51, 0.05);
+    }
+    h2 {
+      margin: 0 0 14px;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+    h3 {
+      margin: 22px 0 10px;
+      font-size: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+    }
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+    th {
+      background: #eef8f5;
+      color: #0b6f60;
+      font-weight: 800;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .note {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--warn);
+      border: 1px solid #f3d28a;
+      color: #7a4d00;
+      font-weight: 700;
+    }
+    pre {
+      margin: 14px 0 0;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid #d6e2ee;
+      background: var(--code-bg);
+      color: var(--code);
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e7fff8;
+      color: #087863;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .pending {
+      background: #eef3f8;
+      color: #586a80;
+    }
+    @media (max-width: 720px) {
+      .shell { width: min(100vw - 24px, 1180px); padding-top: 18px; }
+      .hero, section { padding: 20px; border-radius: 18px; }
+      th, td { font-size: 13px; padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">LocalTalent Phase III</p>
+      <h1>网站首页高保真改造投喂手册</h1>
+      <p class="lead">用于逐轮复制投喂 Codex，完成公开网站首页从“当前基础首页”到 `docs/page/网站首页` 目标效果的高保真改造。当前 Home-1 与 Home-2 已完成，下一轮从 Home-3 开始。</p>
+      <nav class="toc">
+        <a href="#card">开发前必读卡</a>
+        <a href="#common">通用投喂头</a>
+        <a href="#overview">轮次总览</a>
+        <a href="#home1">Home-1</a>
+        <a href="#home2">Home-2</a>
+        <a href="#home3">Home-3</a>
+        <a href="#home4">Home-4</a>
+        <a href="#home5">Home-5</a>
+        <a href="#home6">Home-6</a>
+        <a href="#next">下一步投喂</a>
+      </nav>
+    </header>
+
+    <section id="card">
+      <h2>开发前必读卡</h2>
+      <table>
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>当前状态</td><td><span class="status">Prompt Home-1 与 Prompt Home-2 已完成</span></td></tr>
+        <tr><td>下一轮</td><td>从 <strong>Prompt Home-3：首页首屏高保真重构</strong> 开始</td></tr>
+        <tr><td>总目标</td><td>首页接近 <code>docs/page/网站首页/人才网(目标页面效果).jpeg</code> 和静态 HTML 的完整地方人才网首页效果</td></tr>
+        <tr><td>核心约束</td><td>首页运营位是运营配置，不是商业广告售卖系统</td></tr>
+        <tr><td>禁止越界</td><td>真实广告售卖、支付、点击结算、外部广告平台、公共简历库、联系解锁、真实短信/微信/小程序/App、真实地图、视频、直播、ATS/RPA</td></tr>
+      </table>
+    </section>
+
+    <section id="common">
+      <h2>每轮通用投喂头</h2>
+      <pre><code>请先阅读并严格遵守：
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- docs/Phase_III/三期研发提示词.md
+- docs/Phase_III/网站首页高保真改造投喂手册.md
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_I/00_MASTER_BOUNDARY.md
+
+本轮只执行 docs/Phase_III/网站首页高保真改造投喂手册.md 中的 Prompt Home-X。
+禁止实现 Prompt Home-X 之外的内容。
+
+继续遵守边界：不做真实广告售卖、支付、点击结算、外部广告平台、公共简历库、联系解锁、真实短信/微信/小程序/App、地图、视频、直播或 ATS/RPA。</code></pre>
+    </section>
+
+    <section id="overview">
+      <h2>轮次总览</h2>
+      <table>
+        <tr><th>轮次</th><th>标题</th><th>状态</th><th>说明</th></tr>
+        <tr><td>Home-1</td><td>首页运营位模型与后台配置基础</td><td><span class="status">已完成</span></td><td>后台可配置运营位，公开接口可读取在线运营位</td></tr>
+        <tr><td>Home-2</td><td>首页运营位图片资产上传</td><td><span class="status">已完成</span></td><td>为运营位补真实图片上传、预览、替换、删除</td></tr>
+        <tr><td>Home-3</td><td>首页首屏高保真重构</td><td><span class="status pending">待执行</span></td><td>对齐目标首页首屏，移除登录表单感</td></tr>
+        <tr><td>Home-4</td><td>首页广告位与中下部内容模块补齐</td><td><span class="status pending">待执行</span></td><td>补通栏广告、热招职位、名企、招聘会、资讯等</td></tr>
+        <tr><td>Home-5</td><td>首页分类墙、交互与响应式精修</td><td><span class="status pending">待执行</span></td><td>分类 hover、搜索交互、移动端折叠</td></tr>
+        <tr><td>Home-6</td><td>首页最终验收与文档收口</td><td><span class="status pending">待执行</span></td><td>测试、边界、演示文档与验收报告</td></tr>
+      </table>
+    </section>
+
+    <section id="home1">
+      <h2>Prompt Home-1：首页运营位模型与后台配置基础</h2>
+      <p class="note">状态：已完成。</p>
+      <pre><code>请先阅读并严格遵守：
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- docs/Phase_III/三期研发提示词.md
+- docs/Phase_III/网站首页高保真改造投喂手册.md
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_I/00_MASTER_BOUNDARY.md
+
+本轮只执行 Prompt Home-1：首页运营位模型与后台配置基础。
+禁止实现 Prompt Home-1 之外的内容。
+
+本轮只做“首页运营位/广告位”的后台可配置基础，不重做首页 UI。
+禁止实现真实广告售卖、支付、点击结算、外部广告平台、短信微信、小程序/App 或联系解锁。
+
+目标：
+- 新增首页运营位配置模型，用于支持首页 banner、通栏广告、半宽广告、三列广告、快捷入口等位置。
+- 运营人员可在后台创建、编辑、下线首页运营位。
+- 公开首页只读取已发布、在线、未过期的运营位。
+- 运营位可以配置标题、副标题、链接、排序、状态、开始/结束时间、展示位置。
+- 本轮图片可先使用占位 URL 或已有静态资源路径；真实图片上传留到下一轮。
+
+建议实现：
+- 新增 forward-only 迁移，例如 V0029__create_portal_home_operation_slot.sql。
+- 新增表 portal_home_operation_slot，字段至少包含 slot_code/title/subtitle/image_url/image_alt/link_type/link_url/target_type/target_id/display_order/status/start_time/end_time/operator_id/created_at/updated_at。
+- 新增或扩展运营后台接口：GET/POST/PUT /api/admin/home-slots，POST /api/admin/home-slots/{id}/offline。
+- 新增公开接口：GET /api/portal/home-slots?slot_codes=...
+- 写操作必须鉴权 operator，auditor 只读。
+- 写操作必须有 X-Trace-Id、X-Idempotency-Key 和 audit_log。
+- 公开接口不得返回后台备注、operator_id、对象 key、审核材料或内部字段。
+
+首页 slot_code 固定建议：
+- home_hero_banner
+- home_full_width_banner
+- home_half_left
+- home_half_right
+- home_third_1
+- home_third_2
+- home_third_3
+- home_quick_1
+- home_quick_2
+- home_quick_3
+- home_bottom_banner
+
+验收：
+- operator 可以配置首页运营位。
+- auditor 写操作被拒绝。
+- 公开接口只返回合法在线运营位。
+- 不出现真实广告支付、点击结算或外部广告平台字段。
+- 后端测试、前端测试、构建和三期边界脚本通过。</code></pre>
+    </section>
+
+    <section id="home2">
+      <h2>Prompt Home-2：首页运营位图片资产上传</h2>
+      <p class="note">状态：已完成。</p>
+      <p class="note">完成记录：已新增首页运营位图片资产字段、运营后台上传/预览/替换/删除接口、公开图片代理和运营后台图片管理入口。图片 object key 只保存在服务端，响应、DOM 与审计摘要不返回 MinIO key、bucket/path 或 presigned URL。</p>
+      <pre><code>请先阅读并严格遵守：
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- docs/Phase_III/三期研发提示词.md
+- docs/Phase_III/网站首页高保真改造投喂手册.md
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_I/00_MASTER_BOUNDARY.md
+
+本轮只执行 Prompt Home-2：首页运营位图片资产上传。
+禁止实现 Prompt Home-2 之外的内容。
+
+本轮只做首页运营位图片资产上传和预览。
+禁止接入外部图床、真实广告平台、支付、点击结算或第三方统计。
+
+目标：
+- 运营人员可为首页运营位上传、替换、删除图片。
+- 图片只用于公开首页运营位展示。
+- 前端和公开接口不得暴露 MinIO object key、bucket/path 或 presigned URL。
+
+建议实现：
+- 扩展 portal_home_operation_slot，如需要新增字段：image_object_key/image_file_name/image_content_type/image_size_bytes/image_sha256/image_uploaded_at。
+- 新增 admin 图片接口：POST /api/admin/home-slots/{id}/image，GET /api/admin/home-slots/{id}/image/content，DELETE /api/admin/home-slots/{id}/image。
+- 新增公开图片代理：GET /api/portal/home-slots/{id}/image。
+- 上传限制 JPG / PNG / WebP，默认最大 5MiB。
+- 校验 MIME、扩展名、非空文件、安全文件名。
+- object key 由服务端生成，不使用用户原始文件名作为路径。
+- 上传、替换、删除写 audit_log。
+- 图片读取写必要的访问日志，但不记录 object key。
+
+前端：
+- 运营后台 home slot 表单增加图片上传、预览、替换、删除。
+- 首页仍只通过公开代理图片地址展示。
+- 无图时显示安全占位，不硬编码敏感或外部图片。
+
+验收：
+- 图片上传后首页可显示。
+- 响应、DOM、日志不出现 object key、bucket/path、presigned URL。
+- 非 operator 不可上传。
+- auditor 只读。
+- 三期边界脚本通过。</code></pre>
+    </section>
+
+    <section id="home3">
+      <h2>Prompt Home-3：首页首屏高保真重构</h2>
+      <pre><code>请先阅读并严格遵守：
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- docs/Phase_III/三期研发提示词.md
+- docs/Phase_III/网站首页高保真改造投喂手册.md
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_I/00_MASTER_BOUNDARY.md
+
+本轮只执行 Prompt Home-3：首页首屏高保真重构。
+禁止实现 Prompt Home-3 之外的内容。
+
+本轮只重构公开首页首屏 UI，对齐 docs/page/网站首页/人才网(目标页面效果).jpeg 和静态 HTML。
+禁止新增后端接口、迁移或真实外部能力。
+
+目标：
+- 首页首屏接近目标图：顶部搜索、职位分类墙、中间大 banner、快捷入口、右侧公告/招聘会/安全登录入口。
+- 移除或弱化当前右侧登录表单感，不做短信验证码登录框。
+- banner 使用后台配置的 home_hero_banner，无配置时显示安全默认占位。
+- 快捷入口使用运营位或安全静态入口，不接支付和外部平台。
+- 分类墙继续使用本地职位目录，不新增后端。
+
+实现：
+- 重构 PortalHomePage 首屏结构。
+- 保留 PortalShell 导航。
+- 右侧区域改为网站公告、招聘会信息、求职者/企业登录入口按钮、安全边界提示。
+- 不展示真实短信、微信、小程序/App 登录入口。
+- 不出现公共简历库、联系解锁、完整简历下载。
+
+验收：
+- 首屏结构和目标图接近。
+- 首页右侧不再像登录窗口。
+- home_hero_banner 可由后台运营位驱动。
+- DOM 不出现手机号、邮箱、附件 key、原始候选人数据、contact_unlock。
+- 前端测试、构建、边界脚本通过。</code></pre>
+    </section>
+
+    <section id="home4">
+      <h2>Prompt Home-4：首页广告位与中下部内容模块补齐</h2>
+      <pre><code>请先阅读并严格遵守：
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- docs/Phase_III/三期研发提示词.md
+- docs/Phase_III/网站首页高保真改造投喂手册.md
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_I/00_MASTER_BOUNDARY.md
+
+本轮只执行 Prompt Home-4：首页广告位与中下部内容模块补齐。
+禁止实现 Prompt Home-4 之外的内容。
+
+本轮补齐首页中下部内容模块和运营广告位。
+禁止真实广告售卖、支付、点击结算、外部广告平台。
+
+目标：
+- 首页向下滚动后也接近完整人才网首页。
+- 补齐通栏广告、半宽广告、三列广告、热招职位、名企展示、招聘会、资讯公告、HR 工具箱、友情链接。
+- 广告/运营位全部优先读取后台配置。
+- 无配置时显示“运营位待配置”或安全 demo 占位。
+
+数据源：
+- 首页运营位：GET /api/portal/home-slots
+- 热招职位：公开职位接口或 home_hot_jobs 推荐位
+- 名企展示：公开企业接口或 home_featured_companies 推荐位
+- 招聘会、资讯、HR 工具箱：现有公开内容接口或安全空态
+
+必须保持：
+- 公开职位只展示已审核、已发布、在线、认证企业职位。
+- 企业只展示认证企业公开白名单字段。
+- 人才服务区仍只展示发布快照摘要，不在首页展示完整简历或联系方式。
+- 不展示候选人手机号、邮箱、微信、附件、完整简历正文。
+
+验收：
+- 首页中下部模块完整。
+- 后台运营位能驱动广告位展示。
+- 无数据时空态美观，不使用敏感假数据。
+- 公开字段黑名单通过。</code></pre>
+    </section>
+
+    <section id="home5">
+      <h2>Prompt Home-5：首页分类墙、交互与响应式精修</h2>
+      <pre><code>请先阅读并严格遵守：
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- docs/Phase_III/三期研发提示词.md
+- docs/Phase_III/网站首页高保真改造投喂手册.md
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_I/00_MASTER_BOUNDARY.md
+
+本轮只执行 Prompt Home-5：首页分类墙、交互与响应式精修。
+禁止实现 Prompt Home-5 之外的内容。
+
+本轮只做首页交互和响应式精修，不新增业务能力。
+
+目标：
+- 分类墙对齐目标页：左侧十大类，hover/focus 展示二级/三级职位浮层。
+- 搜索区更接近 74CMS：找工作搜索、高级搜索入口、地图搜索占位。
+- 广告位和内容模块在宽屏、笔记本、小屏下都可读。
+- 移动端将分类墙、浮层和广告位折叠为安全可读布局。
+
+要求：
+- 地图搜索只做占位，不接真实地图。
+- 视频、直播、短信、微信、小程序/App 仍保持禁用占位。
+- 搜索只跳转公开职位搜索，不引入搜索简历或公共简历库。
+- 分类 hover 不读取后端，不暴露候选人数据。
+
+验收：
+- 分类 hover/focus 可用。
+- 小屏布局不横向撑爆。
+- 广告位折叠合理。
+- 首页导航高亮稳定。
+- 前端测试覆盖分类交互和响应式结构标记。</code></pre>
+    </section>
+
+    <section id="home6">
+      <h2>Prompt Home-6：首页最终验收与文档收口</h2>
+      <pre><code>请先阅读并严格遵守：
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- docs/Phase_III/三期研发提示词.md
+- docs/Phase_III/网站首页高保真改造投喂手册.md
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_I/00_MASTER_BOUNDARY.md
+
+本轮只执行 Prompt Home-6：首页最终验收与文档收口。
+禁止实现 Prompt Home-6 之外的内容。
+
+本轮只做首页最终验收、测试补强和文档收口。
+不新增后端接口、不新增迁移、不新增业务功能。
+
+目标：
+- 验收首页已按 docs/page/网站首页 目标效果完成高保真对齐。
+- 验收后台运营位可配置首页广告/运营内容。
+- 验收公开边界不放宽。
+- 更新三期演示说明和领导演示路线。
+
+测试：
+- 扩展 PortalHomePage.test.tsx：首屏结构、分类墙、后台运营位渲染、通栏/半宽/三列广告位、热招职位、名企展示、招聘会/资讯/HR 工具箱、响应式结构标记、字段黑名单。
+- 扩展运营后台测试：operator 配置首页运营位、auditor 只读、图片上传/替换/删除、公开接口不暴露 object key。
+
+文档：
+- 更新 docs/Phase_III/三期灰度试运营使用说明.md/html
+- 更新 docs/Phase_III/三期领导演示路线.md/html
+- 可新增 docs/Phase_III/网站首页高保真改造验收报告.md/html
+
+验收命令：
+- cd backend &amp;&amp; ./mvnw test
+- cd frontend &amp;&amp; npm test
+- cd frontend &amp;&amp; npm run build
+- ./scripts/check_phase3_boundary
+- ./scripts/check_phase3_ops
+- ./scripts/check_phase3_security_acceptance
+- ./scripts/check_portal_snapshot_fields
+- ./scripts/check_boundary
+
+最终结论：
+- 首页可作为领导演示第一屏。
+- 首页广告位由后台运营人员配置。
+- 未开放真实广告售卖、支付、公共简历库、联系解锁、短信/微信/小程序/App、地图、视频、直播。</code></pre>
+    </section>
+
+    <section id="next">
+      <h2>下一步投喂建议</h2>
+      <pre><code>请先阅读并严格遵守：
+- docs/Phase_III/00_PHASE_III_BOUNDARY.md
+- docs/Phase_III/三期研发提示词.md
+- docs/Phase_III/网站首页高保真改造投喂手册.md
+- docs/Phase_II/00_PHASE_II_BOUNDARY.md
+- docs/Phase_I/00_MASTER_BOUNDARY.md
+
+本轮只执行 docs/Phase_III/网站首页高保真改造投喂手册.md 中的 Prompt Home-3：首页首屏高保真重构。
+禁止实现 Prompt Home-3 之外的内容。
+
+请按 Prompt Home-3 的目标、接口、边界与验收要求完成实现，并在完成后告诉我新增/修改文件、已通过的测试和下一轮建议。</code></pre>
+    </section>
+  </main>
+</body>
+</html>

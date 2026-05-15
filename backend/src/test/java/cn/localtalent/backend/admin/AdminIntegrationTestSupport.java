@@ -246,6 +246,7 @@ abstract class AdminIntegrationTestSupport {
         return new HttpJsonResponse(
                 response.statusCode(),
                 response.headers().firstValue("X-Trace-Id").orElse(null),
+                response.body(),
                 objectMapper.readTree(response.body()));
     }
 
@@ -256,6 +257,6 @@ abstract class AdminIntegrationTestSupport {
     protected record Account(long companyId, String licenseNo, String token) {
     }
 
-    protected record HttpJsonResponse(int status, String headerTraceId, JsonNode body) {
+    protected record HttpJsonResponse(int status, String headerTraceId, String rawBody, JsonNode body) {
     }
 }

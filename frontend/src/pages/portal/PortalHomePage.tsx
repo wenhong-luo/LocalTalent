@@ -2,16 +2,98 @@ import Link from 'next/link';
 import styles from './PortalHomePage.module.css';
 import { type PortalRecommendationItem } from './portalRecommendationApi';
 
-const categories = [
-  '生活 | 服务业',
-  '人力 | 行政 | 管理',
-  '销售 | 客服 | 采购 | 淘宝',
-  '市场 | 媒介 | 广告 | 设计',
-  '生产 | 物流 | 质控 | 汽车',
-  '网络 | 通信 | 电子',
-  '法律 | 教育 | 翻译 | 出版',
-  '财会 | 金融 | 保险',
-  '医疗 | 制药 | 环保'
+type CategoryGroup = {
+  code: string;
+  label: string;
+  groups: Array<{
+    title: string;
+    positions: string[];
+  }>;
+};
+
+const categoryGroups: CategoryGroup[] = [
+  {
+    code: 'life_service',
+    label: '生活 | 服务业',
+    groups: [
+      { title: '餐饮', positions: ['服务员', '厨师/厨师长', '配菜/打荷', '茶艺师', '洗碗工', '面点师'] },
+      { title: '家政保洁/安保', positions: ['保洁', '保姆', '月嫂', '育婴师', '安保', '护工'] },
+      { title: '美容/美发', positions: ['美容师', '美发师', '美甲师', '化妆师', '美容顾问'] }
+    ]
+  },
+  {
+    code: 'hr_admin_management',
+    label: '人力 | 行政 | 管理',
+    groups: [
+      { title: '人事行政', positions: ['行政专员', '人事专员', '招聘专员', '前台文员', '办公室主任'] },
+      { title: '管理岗位', positions: ['项目经理', '运营主管', '门店店长', '总经理助理', '储备干部'] }
+    ]
+  },
+  {
+    code: 'sales_customer_purchase',
+    label: '销售 | 客服 | 采购 | 淘宝',
+    groups: [
+      { title: '销售', positions: ['销售代表', '客户经理', '渠道专员', '电话销售', '销售主管'] },
+      { title: '客服电商', positions: ['客服专员', '售后客服', '淘宝客服', '电商运营', '采购专员'] }
+    ]
+  },
+  {
+    code: 'marketing_media_design',
+    label: '市场 | 媒介 | 广告 | 设计',
+    groups: [
+      { title: '市场媒介', positions: ['市场专员', '活动策划', '新媒体运营', '短视频运营', '品牌专员'] },
+      { title: '广告设计', positions: ['平面设计', 'UI 设计师', '视觉设计', '文案策划', '摄影剪辑'] }
+    ]
+  },
+  {
+    code: 'production_logistics_quality',
+    label: '生产 | 物流 | 质控 | 汽车',
+    groups: [
+      { title: '生产质控', positions: ['普工', '操作工', '质检员', '生产主管', '设备维修'] },
+      { title: '物流汽车', positions: ['仓库管理员', '物流专员', '货运司机', '汽车维修', '叉车工'] }
+    ]
+  },
+  {
+    code: 'network_communication_electronics',
+    label: '网络 | 通信 | 电子',
+    groups: [
+      { title: '互联网开发', positions: ['前端工程师', 'Java 工程师', '测试工程师', '产品经理', '运维工程师'] },
+      { title: '通信电子', positions: ['网络工程师', '弱电工程师', '电子工程师', '通信技术员', '硬件工程师'] }
+    ]
+  },
+  {
+    code: 'law_education_translation',
+    label: '法律 | 教育 | 翻译 | 出版',
+    groups: [
+      { title: '教育培训', positions: ['教师', '课程顾问', '教务管理', '培训讲师', '幼教'] },
+      { title: '法律出版', positions: ['法务专员', '律师助理', '翻译', '编辑', '校对'] }
+    ]
+  },
+  {
+    code: 'finance_accounting_insurance',
+    label: '财会 | 金融 | 保险',
+    groups: [
+      { title: '财务会计', positions: ['会计', '出纳', '审计专员', '财务主管', '税务专员'] },
+      { title: '金融保险', positions: ['银行柜员', '理财顾问', '保险顾问', '风控专员', '信贷专员'] }
+    ]
+  },
+  {
+    code: 'medical_pharma_environment',
+    label: '医疗 | 制药 | 环保',
+    groups: [
+      { title: '医疗护理', positions: ['护士', '医生助理', '药剂师', '检验师', '康复治疗师'] },
+      { title: '环保制药', positions: ['环保工程师', '污水处理员', '制药技术员', '质量管理', '实验员'] }
+    ]
+  },
+  {
+    code: 'construction_property_agriculture',
+    label: '建筑 | 物业 | 农林牧渔 | 其他',
+    groups: [
+      { title: '建筑物业', positions: ['施工员', '资料员', '造价员', '物业管家', '物业维修'] },
+      { title: '农林牧渔', positions: ['养殖人员', '饲料业务', '农艺师', '畜牧师', '园林绿化'] },
+      { title: '其他招聘信息', positions: ['其他职位', '实习生', '兼职', '储备人才'] }
+    ]
+  }
 ];
 
 const quickEntries = [
@@ -21,8 +103,130 @@ const quickEntries = [
   { label: '普工招聘', href: '/jobs?category=general-worker', icon: '普' }
 ];
 
-const notices = ['系统升级公告', '活动预告公告'];
-const fairNotices = ['春风行动招聘会开放预约', '网络招聘会频道占位'];
+const notices = ['系统升级公告', '活动预告公告', '春风行动招聘会开放预约', '网络招聘会频道占位'];
+
+const demoHotJobs: PortalRecommendationItem[] = [
+  {
+    target_type: 'job',
+    target_id: 9001,
+    title: '前端开发工程师',
+    summary: '数字化服务企业 · 10K~16K · 上海',
+    tags: ['公开职位', '认证企业', '五险一金'],
+    url: '/jobs?keyword=%E5%89%8D%E7%AB%AF',
+    city_code: '上海',
+    updated_at: '2026-05-15T09:00:00',
+    display_order: 1
+  },
+  {
+    target_type: 'job',
+    target_id: 9002,
+    title: '生产质检员',
+    summary: '智能制造企业 · 6K~9K · 苏州',
+    tags: ['公开职位', '长白班', '包工作餐'],
+    url: '/jobs?keyword=%E8%B4%A8%E6%A3%80',
+    city_code: '苏州',
+    updated_at: '2026-05-15T09:10:00',
+    display_order: 2
+  },
+  {
+    target_type: 'job',
+    target_id: 9003,
+    title: '行政人事专员',
+    summary: '本地服务企业 · 5K~8K · 杭州',
+    tags: ['公开职位', '双休', '成长空间'],
+    url: '/jobs?keyword=%E8%A1%8C%E6%94%BF',
+    city_code: '杭州',
+    updated_at: '2026-05-15T09:20:00',
+    display_order: 3
+  }
+];
+
+const demoCompanies: PortalRecommendationItem[] = [
+  {
+    target_type: 'company',
+    target_id: 9101,
+    title: 'LocalTalent 数字服务示范企业',
+    summary: '互联网服务 · 100~500人 · 招聘流程数字化',
+    tags: ['认证企业', '公开主页', '本地名企'],
+    url: '/companies',
+    city_code: '上海',
+    updated_at: '2026-05-15T09:00:00',
+    display_order: 1
+  },
+  {
+    target_type: 'company',
+    target_id: 9102,
+    title: '智造园区协作企业',
+    summary: '智能制造 · 500~1000人 · 多岗位热招',
+    tags: ['认证企业', '园区招聘'],
+    url: '/companies',
+    city_code: '苏州',
+    updated_at: '2026-05-15T09:10:00',
+    display_order: 2
+  }
+];
+
+const adSlots = {
+  banner: {
+    title: '城市人才服务季',
+    subtitle: '公开职位、招聘会、政策资讯一站式触达',
+    image: '/demo/home-ad-hero.svg',
+    href: '/jobs',
+    alt: '城市人才服务季运营图'
+  },
+  half: [
+    {
+      title: '企业发布职位',
+      subtitle: '灰度演示入口 · 不含付费投放',
+      image: '/demo/home-ad-company.svg',
+      href: '/company',
+      alt: '企业发布职位运营图'
+    },
+    {
+      title: '求职者完善资料',
+      subtitle: '私有中心维护 · 发布快照可撤回',
+      image: '/demo/home-ad-candidate.svg',
+      href: '/candidate/center',
+      alt: '求职者完善资料运营图'
+    }
+  ],
+  third: [
+    {
+      title: '招聘会预约',
+      image: '/demo/home-ad-fair.svg',
+      href: '/job-fairs',
+      alt: '招聘会运营图'
+    },
+    {
+      title: '就业政策公开',
+      image: '/demo/home-ad-policy.svg',
+      href: '/articles/policies',
+      alt: '就业政策运营图'
+    },
+    {
+      title: 'HR 工具箱',
+      image: '/demo/home-ad-toolkit.svg',
+      href: '/hr-tools',
+      alt: 'HR 工具箱运营图'
+    }
+  ]
+};
+
+const jobFairCards = [
+  { title: '春风行动专场招聘会', meta: '5月下旬 · 市民服务中心 · 公开活动' },
+  { title: '制造业网络招聘会', meta: '每周三更新 · 在线岗位展示' },
+  { title: '高校毕业生双选会', meta: '校园协作 · 青年就业服务' }
+];
+
+const newsItems = [
+  '2026 春季就业服务月公开事项',
+  '企业招聘信息发布与审核流程说明',
+  '高校毕业生就业见习岗位征集公告'
+];
+
+const hrTools = ['面试安排清单', '招聘流程说明', '岗位 JD 编写提示', '入职材料核对表'];
+
+const friendLinks = ['地方人社服务入口', '高校就业指导中心', '产业园区招聘协作', '公共就业服务平台'];
 
 type PortalHomePageProps = {
   hotJobs?: PortalRecommendationItem[];
@@ -33,12 +237,26 @@ function JobCategoryWall() {
   return (
     <aside className={`${styles.card} ${styles.categoryWall}`} aria-label="职位分类墙">
       <ul className={styles.categoryList}>
-        {categories.map((category) => (
-          <li key={category}>
-            <Link className={styles.categoryLink} href={`/jobs?category=${encodeURIComponent(category)}`}>
-              {category}
+        {categoryGroups.map((category) => (
+          <li key={category.code} className={styles.categoryItem}>
+            <Link className={styles.categoryLink} href={`/jobs?category=${category.code}`}>
+              {category.label}
               <span>›</span>
             </Link>
+            <div className={styles.categoryFlyout} aria-label={`${category.label} 职位浮层`}>
+              {category.groups.map((group) => (
+                <section key={group.title} className={styles.categoryGroup}>
+                  <h3>{group.title}</h3>
+                  <div className={styles.positionLinks}>
+                    {group.positions.map((position) => (
+                      <Link key={position} href={`/jobs?category=${category.code}&keyword=${encodeURIComponent(position)}`}>
+                        {position}
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           </li>
         ))}
       </ul>
@@ -46,6 +264,30 @@ function JobCategoryWall() {
         全部职位
       </Link>
     </aside>
+  );
+}
+
+function HomeSearchPanel() {
+  return (
+    <section className={`${styles.card} ${styles.homeSearchPanel}`} aria-label="首页搜索增强">
+      <div className={styles.homeSearchTabs} aria-label="首页搜索类型">
+        <span className={styles.searchTabActive}>找工作</span>
+        <span>找企业</span>
+        <span>人才服务区</span>
+      </div>
+      <div className={styles.homeSearchRow}>
+        <input aria-label="首页职位关键词" placeholder="请输入职位、企业或帮扶内容关键词" />
+        <Link href="/jobs" className={styles.homeSearchButton}>
+          搜索
+        </Link>
+      </div>
+      <div className={styles.homeSearchMeta}>
+        <Link href="/jobs?advanced=1">高级搜索</Link>
+        <button type="button" aria-disabled="true" disabled>
+          地图搜索占位
+        </button>
+      </div>
+    </section>
   );
 }
 
@@ -62,34 +304,23 @@ function ServiceEntranceGrid() {
   );
 }
 
-function LoginCard() {
+function HomeOperationsPanel() {
   return (
-    <section className={`${styles.card} ${styles.loginCard}`} aria-label="首页登录卡片">
-      <div className={styles.loginTabs} role="tablist" aria-label="登录身份">
-        <span className={styles.loginTabActive} role="tab" aria-selected="true">
-          求职者登录
-        </span>
-        <span role="tab" aria-selected="false">
-          企业登录
-        </span>
-      </div>
-      <div className={styles.loginFields}>
-        <input className={styles.input} aria-label="手机号视觉占位" placeholder="请输入手机号" />
-        <div className={styles.codeRow}>
-          <input aria-label="验证码视觉占位" placeholder="请输入验证码" />
-          <button className={styles.disabledCode} type="button" aria-disabled="true" disabled>
-            短信占位
-          </button>
+    <aside className={styles.sidePanel} aria-label="首页右侧运营面板">
+      <section className={`${styles.card} ${styles.safeEntryCard}`} aria-label="安全登录入口">
+        <div className={styles.safeEntryHeader}>
+          <span className={styles.safeEntryActive}>求职者入口</span>
+          <span>企业入口</span>
         </div>
-      </div>
-      <div className={styles.loginMeta}>
-        <Link href="/auth/login?role=candidate&redirect=/candidate/center">密码登录</Link>
-        <Link href="/auth/register?role=candidate">立即注册</Link>
-      </div>
-      <Link className={styles.loginButton} href="/auth/login?role=candidate&redirect=/candidate/center">
-        进入登录页
-      </Link>
-    </section>
+        <p>账号登录、注册与私有中心统一进入登录页；首页不放置短信验证码表单。</p>
+        <div className={styles.safeEntryActions}>
+          <Link href="/auth/login?role=candidate&redirect=/candidate/center">进入求职者中心</Link>
+          <Link href="/auth/login?role=company&redirect=/company">进入企业管理中心</Link>
+        </div>
+        <small>短信、微信、小程序、App 登录均为后续专项，不在首页开放。</small>
+      </section>
+      <NoticeTabs />
+    </aside>
   );
 }
 
@@ -105,7 +336,7 @@ function NoticeTabs() {
         </span>
       </div>
       <ul className={styles.noticeList}>
-        {[...notices, ...fairNotices].map((notice) => (
+        {notices.map((notice) => (
           <li key={notice}>⌁ {notice}</li>
         ))}
       </ul>
@@ -115,37 +346,60 @@ function NoticeTabs() {
 
 function AdvertisementBand() {
   return (
-    <section className={styles.adBand} aria-label="首页广告位">
-      <div className={styles.primaryAd}>首页自定义 通栏广告位</div>
-      <div className={styles.secondaryAds}>
-        <div className={styles.secondaryAd}>免费注册简历 · 占位 CTA</div>
-        <div className={styles.secondaryAd}>企业发布职位 · 占位 CTA</div>
+    <section className={styles.adBand} aria-label="首页运营广告位体系">
+      <Link className={styles.primaryAd} aria-label="首页通栏广告位" href={adSlots.banner.href}>
+        <img src={adSlots.banner.image} alt={adSlots.banner.alt} />
+        <span>
+          <strong>{adSlots.banner.title}</strong>
+          <small>{adSlots.banner.subtitle}</small>
+        </span>
+      </Link>
+      <div className={styles.halfAds} aria-label="首页1/2广告位">
+        {adSlots.half.map((slot) => (
+          <Link key={slot.title} href={slot.href}>
+            <img src={slot.image} alt={slot.alt} />
+            <span>
+              <strong>{slot.title}</strong>
+              <small>{slot.subtitle}</small>
+            </span>
+          </Link>
+        ))}
       </div>
+      <div className={styles.thirdAds} aria-label="首页1/3广告位">
+        {adSlots.third.map((slot) => (
+          <Link key={slot.title} href={slot.href}>
+            <img src={slot.image} alt={slot.alt} />
+            <strong>{slot.title}</strong>
+          </Link>
+        ))}
+      </div>
+      <div className={styles.smallAdGrid} aria-label="首页快捷广告位">
+        {['岗位直达', '名企展示', '帮扶专区', '招聘会', '更多服务'].map((slot) => (
+          <div key={slot}>{slot}</div>
+        ))}
+      </div>
+      <p className={styles.adNote}>广告位仅为运营占位，不接真实投放、计费、支付或外部平台。</p>
     </section>
   );
 }
 
-function RecommendationEmpty({ label }: { label: string }) {
-  return (
-    <article className={styles.companyCard}>
-      <h3 className={styles.companyName}>{label}</h3>
-      <p className={styles.muted}>运营位待配置或目标已失效；公开门户不会回退到敏感数据或假推荐。</p>
-      <span className={styles.tag}>公开白名单</span>
-    </article>
-  );
-}
-
 function RecommendedCompanies({ items }: { items: PortalRecommendationItem[] }) {
+  const displayItems = items.length === 0 ? demoCompanies : items;
+  const usesDemoData = items.length === 0;
+
   return (
-    <section className={`${styles.card} ${styles.sectionCard}`} aria-label="推荐企业">
+    <section className={`${styles.card} ${styles.sectionCard}`} aria-label="名企展示">
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>明星企业</h2>
+        <div>
+          <p className={styles.eyebrow}>Featured Companies</p>
+          <h2 className={styles.sectionTitle}>名企展示</h2>
+        </div>
         <Link className={styles.moreLink} href="/companies">
           查看更多
         </Link>
       </div>
       <div className={styles.companyList}>
-        {items.length === 0 ? <RecommendationEmpty label="明星企业待配置" /> : items.map((company) => (
+        {displayItems.map((company) => (
           <article key={`${company.target_type}-${company.target_id}`} className={styles.companyCard}>
             <div className={styles.companyTop}>
               <div>
@@ -154,7 +408,7 @@ function RecommendedCompanies({ items }: { items: PortalRecommendationItem[] }) 
                   {company.city_code || '城市待配置'} · {company.summary || '公开企业摘要'}
                 </p>
               </div>
-              <span className={styles.tag}>认证企业</span>
+              <span className={styles.tag}>{usesDemoData ? '演示数据' : '认证企业'}</span>
             </div>
             <Link className={styles.moreLink} href={company.url}>进入企业公开页</Link>
           </article>
@@ -165,20 +419,26 @@ function RecommendedCompanies({ items }: { items: PortalRecommendationItem[] }) 
 }
 
 function HotJobs({ items }: { items: PortalRecommendationItem[] }) {
+  const displayItems = items.length === 0 ? demoHotJobs : items;
+  const usesDemoData = items.length === 0;
+
   return (
     <section className={`${styles.card} ${styles.sectionCard}`} aria-label="热招职位">
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>热招职位</h2>
+        <div>
+          <p className={styles.eyebrow}>Hot Jobs</p>
+          <h2 className={styles.sectionTitle}>热招职位</h2>
+        </div>
         <Link className={styles.moreLink} href="/jobs">
           查看更多
         </Link>
       </div>
       <div className={styles.jobGrid}>
-        {items.length === 0 ? <RecommendationEmpty label="热招职位待配置" /> : items.map((job) => (
+        {displayItems.map((job) => (
           <article key={`${job.target_type}-${job.target_id}`} className={styles.jobCard}>
             <div className={styles.jobTop}>
               <h3 className={styles.jobTitle}>{job.title}</h3>
-              <span className={styles.salary}>公开推荐</span>
+              <span className={styles.salary}>{usesDemoData ? '演示岗位' : '公开推荐'}</span>
             </div>
             <p className={styles.muted}>
               {job.city_code || '城市待配置'} · {job.summary || '在线职位公开摘要'}
@@ -194,16 +454,86 @@ function HotJobs({ items }: { items: PortalRecommendationItem[] }) {
   );
 }
 
+function JobFairPreview() {
+  return (
+    <section className={`${styles.card} ${styles.sectionCard}`} aria-label="首页招聘会模块">
+      <div className={styles.sectionHeader}>
+        <div>
+          <p className={styles.eyebrow}>Job Fairs</p>
+          <h2 className={styles.sectionTitle}>招聘会</h2>
+        </div>
+        <Link className={styles.moreLink} href="/job-fairs">
+          查看更多
+        </Link>
+      </div>
+      <div className={styles.fairGrid}>
+        {jobFairCards.map((fair) => (
+          <article key={fair.title} className={styles.fairCard}>
+            <h3>{fair.title}</h3>
+            <p>{fair.meta}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function NewsAndTools() {
+  return (
+    <section className={styles.newsToolsGrid} aria-label="资讯公告与 HR 工具箱">
+      <div className={`${styles.card} ${styles.sectionCard}`}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <p className={styles.eyebrow}>News</p>
+            <h2 className={styles.sectionTitle}>资讯公告</h2>
+          </div>
+          <Link className={styles.moreLink} href="/articles/policies">
+            政策资讯
+          </Link>
+        </div>
+        <ul className={styles.newsList}>
+          {newsItems.map((item) => <li key={item}>{item}</li>)}
+        </ul>
+      </div>
+      <div className={`${styles.card} ${styles.sectionCard}`}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <p className={styles.eyebrow}>Toolkit</p>
+            <h2 className={styles.sectionTitle}>HR 工具箱</h2>
+          </div>
+          <Link className={styles.moreLink} href="/hr-tools">
+            查看工具
+          </Link>
+        </div>
+        <div className={styles.toolList}>
+          {hrTools.map((tool) => <span key={tool}>{tool}</span>)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FriendLinks() {
+  return (
+    <section className={`${styles.card} ${styles.friendLinks}`} aria-label="友情链接与合作入口">
+      <h2 className={styles.sectionTitle}>友情链接与合作入口</h2>
+      <div>
+        {friendLinks.map((link) => <span key={link}>{link}</span>)}
+      </div>
+    </section>
+  );
+}
+
 function ScanCta() {
   return (
     <section className={styles.ctaStrip} aria-label="扫码 CTA">
       <div>
         <p className={styles.eyebrow}>LocalTalent</p>
-        <h2 className={styles.sectionTitle}>海量职位任您选，可信发布快照为边界。</h2>
+        <h2 className={styles.sectionTitle}>可信发布、合规展示，适合灰度试运营的地方人才门户。</h2>
         <p className={styles.footerText}>公众号、小程序和 App 均为占位，不接真实外部能力。</p>
       </div>
       <span className={styles.qrMini}>QR</span>
-      <span>扫码占位 · 求职更简单</span>
+      <span>扫码占位 · 关注公开服务</span>
     </section>
   );
 }
@@ -214,27 +544,28 @@ export function PortalHomePage({ hotJobs = [], featuredCompanies = [] }: PortalH
       <section className={styles.heroGrid} aria-label="首页高保真首屏">
         <JobCategoryWall />
         <div className={styles.centerStage}>
+          <HomeSearchPanel />
           <section className={styles.banner} aria-label="首页首屏广告位">
             <p className={styles.eyebrow}>LocalTalent Portal</p>
             <h1 className={styles.title}>地方人才网首页，高保真门户首屏。</h1>
             <p className={styles.subtitle}>
-              对标 demo 的模块密度和入口层级，但公开层只展示职位、企业、活动、资讯和发布快照白名单。
+              对标专业地方人才网首页的模块密度和入口层级，但公开层只展示职位、企业、活动、资讯和发布快照白名单。
             </p>
           </section>
           <ServiceEntranceGrid />
         </div>
-        <div className={styles.sidePanel}>
-          <LoginCard />
-          <NoticeTabs />
-        </div>
+        <HomeOperationsPanel />
       </section>
 
       <AdvertisementBand />
-      <ScanCta />
-      <section className={styles.recommendGrid} aria-label="公开推荐模块">
+      <section className={styles.homeContent} aria-label="首页公开内容模块">
         <HotJobs items={hotJobs} />
         <RecommendedCompanies items={featuredCompanies} />
+        <JobFairPreview />
+        <NewsAndTools />
       </section>
+      <ScanCta />
+      <FriendLinks />
     </main>
   );
 }
