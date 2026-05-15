@@ -7,7 +7,7 @@
   gap: 8px;
   box-sizing: border-box;
   border: 1px solid var(--lt-ui-line);
-  border-radius: var(--lt-radius-xs);
+  border-radius: 6px;
   padding: 0 var(--lt-control-padding-x);
   background: #ffffff;
   color: #1f2937;
@@ -50,7 +50,7 @@
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--lt-ui-line);
-  border-radius: var(--lt-radius-sm);
+  border-radius: 10px;
   background: #ffffff;
   box-shadow: var(--lt-shadow-dialog);
 }
@@ -100,7 +100,7 @@
   gap: 10px;
   box-sizing: border-box;
   border: 1px solid var(--lt-ui-line);
-  border-radius: var(--lt-radius-xs);
+  border-radius: 6px;
   margin-bottom: 12px;
   padding: 0 12px;
   background: #ffffff;
@@ -151,7 +151,7 @@
   box-sizing: border-box;
   height: var(--lt-control-height);
   border: 1px solid var(--lt-ui-line);
-  border-radius: var(--lt-radius-xs);
+  border-radius: 6px;
   padding: 0 36px 0 12px;
   color: #1f2937;
   font-size: var(--lt-control-font-size);
@@ -171,6 +171,7 @@
   min-height: 0;
   flex: 1;
   border: 1px solid var(--lt-ui-line);
+  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -293,7 +294,7 @@
 .cancel {
   min-width: 82px;
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 8px 22px;
   cursor: pointer;
   font-size: 14px;

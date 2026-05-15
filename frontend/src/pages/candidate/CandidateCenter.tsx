@@ -39,59 +39,6 @@ import {
 type CandidateCenterStatus = 'loading' | 'ready' | 'unauthorized' | 'error' | 'retrying';
 type ClosureStatus = 'idle' | 'loading' | 'ready' | 'error';
 
-const gridStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
-  gap: '16px',
-  marginTop: '20px'
-};
-
-const cardStyle = {
-  border: '1px solid var(--lt-line)',
-  borderRadius: '24px',
-  background: 'var(--lt-card)',
-  padding: '22px',
-  boxShadow: '0 16px 38px rgba(20, 33, 61, 0.07)'
-};
-
-const sectionTitleStyle = {
-  margin: '0 0 14px',
-  fontSize: '1.2rem',
-  color: 'var(--lt-ink)'
-};
-
-const fieldStyle = {
-  width: '100%',
-  boxSizing: 'border-box' as const,
-  border: '1px solid var(--lt-line)',
-  borderRadius: '14px',
-  padding: '11px 12px',
-  background: '#ffffff',
-  color: 'var(--lt-ink)'
-};
-
-const labelStyle = {
-  display: 'grid',
-  gap: '6px',
-  color: 'var(--lt-ink-muted)',
-  fontWeight: 800
-};
-
-const primaryButtonStyle = {
-  border: 'none',
-  borderRadius: '999px',
-  padding: '12px 18px',
-  background: 'var(--lt-accent)',
-  color: '#ffffff',
-  cursor: 'pointer',
-  fontWeight: 800
-};
-
-const secondaryButtonStyle = {
-  ...primaryButtonStyle,
-  background: '#0f766e'
-};
-
 function statusCopy(status: CandidatePublishStatus, reason: string) {
   switch (status) {
     case 'consented':
@@ -216,7 +163,12 @@ function MemberProfileHero({
   ];
 
   return (
-    <section className={styles.profileHero} aria-label="求职者个人信息横幅">
+    <section
+      className={styles.profileHero}
+      aria-label="求职者个人信息横幅"
+      data-testid="candidate-profile-refined"
+      data-ui-stage="ui-6-refined"
+    >
       <div className={styles.profileInner}>
         <div className={styles.avatarCard} aria-hidden="true">
           <span>{profileName(closureData).slice(0, 1)}</span>
@@ -405,10 +357,10 @@ function JobRecommendations({ closureData }: { closureData: CandidateClosureData
 
 function SummaryCard({ title, value, helper }: { title: string; value: string; helper: string }) {
   return (
-    <article style={cardStyle}>
-      <p style={{ margin: 0, color: 'var(--lt-ink-muted)', fontWeight: 700 }}>{title}</p>
-      <h2 style={{ margin: '12px 0 8px', fontSize: '1.35rem' }}>{value}</h2>
-      <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.7 }}>{helper}</p>
+    <article className={styles.summaryCard}>
+      <p>{title}</p>
+      <h2>{value}</h2>
+      <span>{helper}</span>
     </article>
   );
 }
@@ -446,12 +398,12 @@ function privateList<T>({
   render: (item: T) => ReactNode;
 }) {
   return (
-    <section style={cardStyle}>
-      <h3 style={sectionTitleStyle}>{title}</h3>
+    <section className={styles.closureCard}>
+      <h3 className={styles.closureTitle}>{title}</h3>
       {items.length === 0 ? (
-        <p style={{ margin: 0, color: 'var(--lt-ink-muted)' }}>{empty}</p>
+        <p className={styles.closureMuted}>{empty}</p>
       ) : (
-        <div style={{ display: 'grid', gap: '12px' }}>{items.map(render)}</div>
+        <div className={styles.privateList}>{items.map(render)}</div>
       )}
     </section>
   );
@@ -526,9 +478,9 @@ function CandidateClosurePanel({
 
   if (!overview.features.candidate_closure_enabled) {
     return (
-      <section style={{ ...cardStyle, marginTop: '20px', borderStyle: 'dashed' }}>
-        <h2 style={sectionTitleStyle}>三期求职者闭环未开启</h2>
-        <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
+      <section className={`${styles.closureCard} ${styles.closureDisabled}`}>
+        <h2 className={styles.closureTitle}>三期求职者闭环未开启</h2>
+        <p className={styles.closureMuted}>
           服务端返回 candidate_closure_enabled=false，因此本页仅展示一期/二期概览能力。简历编辑、收藏、订阅和站内通知需要灰度开关开启后才可使用。
         </p>
       </section>
@@ -537,7 +489,7 @@ function CandidateClosurePanel({
 
   if (closureStatus === 'loading' || !closureData) {
     return (
-      <section style={{ marginTop: '20px' }}>
+      <section className={styles.closureState}>
         <StateView
           variant={closureStatus === 'error' ? 'error' : 'loading'}
           title={closureStatus === 'error' ? '三期求职者闭环暂不可用' : '正在读取三期求职者闭环'}
@@ -553,8 +505,13 @@ function CandidateClosurePanel({
   const preview = closureData.preview;
 
   return (
-    <section aria-label="三期求职者真实闭环" style={{ marginTop: '20px', display: 'grid', gap: '18px' }}>
-      <section aria-label="三期私有统计" style={gridStyle}>
+    <section
+      aria-label="三期求职者真实闭环"
+      className={styles.closureGrid}
+      data-testid="candidate-closure-refined"
+      data-ui-stage="ui-6-refined"
+    >
+      <section aria-label="三期私有统计" className={styles.privateStats}>
         <SummaryCard
           title="职位收藏"
           value={`${overview.stats.favorite_count} 条`}
@@ -572,23 +529,23 @@ function CandidateClosurePanel({
         />
       </section>
 
-      <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>简历编辑</h2>
+      <section className={styles.closureCard}>
+        <h2 className={styles.closureTitle}>简历编辑</h2>
         <form
           aria-label="简历编辑表单"
           onSubmit={onResumeSave}
-          style={{ display: 'grid', gap: '14px' }}
+          className={styles.closureForm}
         >
-          <label style={labelStyle}>
+          <label className={styles.closureField}>
             简历名称
-            <input name="resume_name" defaultValue={resume.resume_name} style={fieldStyle} />
+            <input name="resume_name" defaultValue={resume.resume_name} className={styles.closureInput} />
           </label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
-            <label style={labelStyle}>
+          <div className={styles.closureFormGrid}>
+            <label className={styles.closureField}>
               展示名
-              <input name="display_name" defaultValue={resume.base_profile.display_name} style={fieldStyle} />
+              <input name="display_name" defaultValue={resume.base_profile.display_name} className={styles.closureInput} />
             </label>
-            <label style={labelStyle}>
+            <label className={styles.closureField}>
               期望地区
               <ExpectedRegionPicker
                 selectedRegions={selectedExpectedRegions}
@@ -601,7 +558,7 @@ function CandidateClosurePanel({
               <input type="hidden" name="city_code" value={selectedExpectedCityCode} />
               <input type="hidden" name="expected_cities" value={selectedExpectedRegions.join('，')} />
             </label>
-            <label style={labelStyle}>
+            <label className={styles.closureField}>
               期望职位
               <ExpectedPositionPicker
                 selectedPositions={selectedExpectedPositions}
@@ -614,7 +571,7 @@ function CandidateClosurePanel({
               <input type="hidden" name="category_code" value={selectedExpectedCategoryCode} />
               <input type="hidden" name="expected_positions" value={selectedExpectedPositions.join('，')} />
             </label>
-            <label style={labelStyle}>
+            <label className={styles.closureField}>
               经验年限
               <input
                 name="experience_years"
@@ -622,113 +579,108 @@ function CandidateClosurePanel({
                 min="0"
                 max="80"
                 defaultValue={resume.base_profile.experience_years ?? ''}
-                style={fieldStyle}
+                className={styles.closureInput}
               />
             </label>
           </div>
-          <label style={labelStyle}>
+          <label className={styles.closureField}>
             个人摘要
-            <textarea name="summary" defaultValue={resume.base_profile.summary} rows={3} style={fieldStyle} />
+            <textarea name="summary" defaultValue={resume.base_profile.summary} rows={3} className={styles.closureInput} />
           </label>
-          <label style={labelStyle}>
+          <label className={styles.closureField}>
             技能标签（逗号或换行分隔）
-            <textarea name="skills" defaultValue={resume.skills.join(', ')} rows={2} style={fieldStyle} />
+            <textarea name="skills" defaultValue={resume.skills.join(', ')} rows={2} className={styles.closureInput} />
           </label>
-          <label style={labelStyle}>
+          <label className={styles.closureField}>
             教育经历（每行一条）
-            <textarea name="education" defaultValue={resume.education.join('\n')} rows={3} style={fieldStyle} />
+            <textarea name="education" defaultValue={resume.education.join('\n')} rows={3} className={styles.closureInput} />
           </label>
-          <label style={labelStyle}>
+          <label className={styles.closureField}>
             工作经历（每行一条）
-            <textarea name="experience" defaultValue={resume.experience.join('\n')} rows={3} style={fieldStyle} />
+            <textarea name="experience" defaultValue={resume.experience.join('\n')} rows={3} className={styles.closureInput} />
           </label>
-          <button type="submit" style={primaryButtonStyle}>
+          <button type="submit" className={styles.candidatePrimary}>
             保存简历并重新读取状态
           </button>
         </form>
       </section>
 
-      <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>简历预览</h2>
-        <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
+      <section className={styles.closureCard}>
+        <h2 className={styles.closureTitle}>简历预览</h2>
+        <p className={styles.closureMuted}>
           状态：{preview.resume_status}；完成度：{preview.completion_percent}%；附件：{preview.has_attachment ? '已存在附件' : '暂无附件'}。
         </p>
-        <p style={{ margin: '10px 0 0', color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
+        <p className={styles.closureMuted}>
           展示名：{preview.base_profile.display_name || '待补充'}；技能：{preview.skills.join(' / ') || '待补充'}。
         </p>
         {overview.features.resume_attachment_upload_enabled ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px', marginTop: '16px' }}>
-            <span style={{ color: 'var(--lt-ink-muted)', fontWeight: 800 }}>
+          <div className={styles.attachmentToolbar}>
+            <span>
               附件：{attachment?.has_attachment ? `${attachment.file_name || '附件简历'} · ${attachment.size_bytes ?? 0} bytes` : '暂无附件'}
             </span>
-            <label style={secondaryButtonStyle}>
+            <label className={styles.candidateSecondary}>
               {attachment?.has_attachment ? '替换附件' : '上传附件'}
               <input
                 aria-label="求职者中心上传附件简历"
                 type="file"
                 accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                style={{ display: 'none' }}
+                className={styles.hiddenFile}
                 onChange={onAttachmentUpload}
               />
             </label>
             {attachment?.has_attachment ? (
               <>
-                <button type="button" style={secondaryButtonStyle} onClick={onAttachmentDownload}>下载附件</button>
-                <button type="button" style={primaryButtonStyle} onClick={onAttachmentDelete}>删除附件</button>
+                <button type="button" className={styles.candidateSecondary} onClick={onAttachmentDownload}>下载附件</button>
+                <button type="button" className={styles.candidatePrimary} onClick={onAttachmentDelete}>删除附件</button>
               </>
             ) : null}
           </div>
         ) : (
-          <p style={{ margin: '14px 0 0', color: 'var(--lt-ink-muted)' }}>
+          <p className={styles.closureMuted}>
             附件上传开关未开启，当前仅展示附件状态占位。
           </p>
         )}
       </section>
 
-      <section style={cardStyle} aria-label="智能优化建议">
-        <h2 style={sectionTitleStyle}>智能优化建议（安全规则版）</h2>
-        <p style={{ margin: 0, color: 'var(--lt-ink-muted)', lineHeight: 1.8 }}>
+      <section className={styles.closureCard} aria-label="智能优化建议">
+        <h2 className={styles.closureTitle}>智能优化建议（安全规则版）</h2>
+        <p className={styles.closureMuted}>
           只在求职者本人私有域内基于服务端规范化简历生成规则建议；不调用外部模型，不上传原始候选人数据，建议需手动逐条应用。
         </p>
         {overview.features.resume_ai_assist_enabled ? (
           <>
             <button
               type="button"
-              style={{ ...primaryButtonStyle, marginTop: '16px' }}
+              className={styles.candidatePrimary}
               disabled={aiBusy}
               onClick={onAiGenerate}
             >
               {aiBusy ? '正在处理建议' : '生成优化建议'}
             </button>
-            <div style={{ display: 'grid', gap: '12px', marginTop: '16px' }}>
+            <div className={styles.aiSuggestionList}>
               {(aiSuggestions?.items ?? []).length === 0 ? (
-                <p style={{ margin: 0, color: 'var(--lt-ink-muted)' }}>
+                <p className={styles.closureMuted}>
                   暂无优化建议。补充工作经历、自我描述或求职意向后可重新生成。
                 </p>
               ) : aiSuggestions?.items.map((item) => (
                 <article
                   key={item.suggestion_id}
-                  style={{
-                    border: '1px solid var(--lt-line)',
-                    borderRadius: '18px',
-                    padding: '16px',
-                    background: '#ffffff'
-                  }}
+                  className={styles.aiSuggestionCard}
                 >
                   <strong>{item.title}</strong>
-                  <p style={{ margin: '8px 0 0', color: 'var(--lt-ink-muted)', lineHeight: 1.7 }}>
+                  <p>
                     {item.reason_summary}
                   </p>
                   {item.before_preview ? (
-                    <p style={{ margin: '8px 0 0', color: 'var(--lt-ink-muted)' }}>当前：{item.before_preview}</p>
+                    <p className={styles.aiSuggestionPreview}>当前：{item.before_preview}</p>
                   ) : null}
                   {item.suggested_value ? (
-                    <p style={{ margin: '8px 0 0', color: 'var(--lt-ink)' }}>建议：{item.suggested_value}</p>
+                    <p className={styles.aiSuggestionPreview}>建议：{item.suggested_value}</p>
                   ) : null}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '12px' }}>
+                  <div className={styles.aiSuggestionActions}>
                     <button
                       type="button"
-                      style={secondaryButtonStyle}
+                      className={styles.candidateSecondary}
                       disabled={!item.can_apply || item.apply_status !== 'pending' || aiBusy}
                       onClick={() => onAiApply(item.suggestion_id)}
                     >
@@ -736,13 +688,13 @@ function CandidateClosurePanel({
                     </button>
                     <button
                       type="button"
-                      style={primaryButtonStyle}
+                      className={styles.candidatePrimary}
                       disabled={item.apply_status !== 'pending' || aiBusy}
                       onClick={() => onAiDismiss(item.suggestion_id)}
                     >
                       忽略
                     </button>
-                    <span style={{ color: 'var(--lt-ink-muted)', alignSelf: 'center' }}>
+                    <span className={styles.statusPill}>
                       状态：{item.apply_status}
                     </span>
                   </div>
@@ -751,7 +703,7 @@ function CandidateClosurePanel({
             </div>
           </>
         ) : (
-          <p style={{ margin: '14px 0 0', color: 'var(--lt-ink-muted)' }}>
+          <p className={styles.closureMuted}>
             AI 优化建议开关未开启，当前仅展示安全占位；不会调用外部模型。
           </p>
         )}
@@ -762,28 +714,28 @@ function CandidateClosurePanel({
         items: closureData.applications,
         empty: '暂无投递记录。',
         render: (item) => (
-          <article key={item.application_id} style={{ borderBottom: '1px solid var(--lt-line)', paddingBottom: '10px' }}>
+          <article key={item.application_id} className={styles.privateListItem}>
             <strong>{item.job_title}</strong>
-            <p style={{ margin: '6px 0 0', color: 'var(--lt-ink-muted)' }}>
+            <p>
               {item.company_name} · {item.status_label} · {item.apply_time || '时间待同步'}
             </p>
           </article>
         )
       })}
 
-      <section style={cardStyle}>
-        <h3 style={sectionTitleStyle}>职位收藏</h3>
-        <form aria-label="收藏职位表单" onSubmit={onFavoriteCreate} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <input name="job_id" type="number" min="1" placeholder="公开职位 ID" style={{ ...fieldStyle, maxWidth: '220px' }} />
-          <button type="submit" style={secondaryButtonStyle}>收藏公开职位</button>
+      <section className={styles.closureCard}>
+        <h3 className={styles.closureTitle}>职位收藏</h3>
+        <form aria-label="收藏职位表单" onSubmit={onFavoriteCreate} className={styles.inlineForm}>
+          <input name="job_id" type="number" min="1" placeholder="公开职位 ID" className={styles.closureInput} />
+          <button type="submit" className={styles.candidateSecondary}>收藏公开职位</button>
         </form>
-        <div style={{ display: 'grid', gap: '12px', marginTop: '16px' }}>
+        <div className={styles.privateList}>
           {closureData.favorites.length === 0 ? (
-            <p style={{ margin: 0, color: 'var(--lt-ink-muted)' }}>暂无收藏职位。</p>
+            <p className={styles.closureMuted}>暂无收藏职位。</p>
           ) : closureData.favorites.map((item) => (
-            <article key={item.favorite_id} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', borderTop: '1px solid var(--lt-line)', paddingTop: '12px' }}>
+            <article key={item.favorite_id} className={styles.privateListRow}>
               <span>{item.job_title} · {item.company_name}</span>
-              <button type="button" style={secondaryButtonStyle} onClick={() => onFavoriteCancel(item.favorite_id)}>
+              <button type="button" className={styles.candidateSecondary} onClick={() => onFavoriteCancel(item.favorite_id)}>
                 取消收藏
               </button>
             </article>
@@ -791,24 +743,24 @@ function CandidateClosurePanel({
         </div>
       </section>
 
-      <section style={cardStyle}>
-        <h3 style={sectionTitleStyle}>搜索订阅</h3>
-        <form aria-label="搜索订阅表单" onSubmit={onSubscriptionCreate} style={{ display: 'grid', gap: '10px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
-            <input name="subscription_name" placeholder="订阅名称" style={fieldStyle} />
-            <input name="keyword" placeholder="关键词" style={fieldStyle} />
-            <input name="city_code" placeholder="城市" style={fieldStyle} />
-            <input name="category_code" placeholder="职类" style={fieldStyle} />
+      <section className={styles.closureCard}>
+        <h3 className={styles.closureTitle}>搜索订阅</h3>
+        <form aria-label="搜索订阅表单" onSubmit={onSubscriptionCreate} className={styles.closureForm}>
+          <div className={styles.closureFormGrid}>
+            <input name="subscription_name" placeholder="订阅名称" className={styles.closureInput} />
+            <input name="keyword" placeholder="关键词" className={styles.closureInput} />
+            <input name="city_code" placeholder="城市" className={styles.closureInput} />
+            <input name="category_code" placeholder="职类" className={styles.closureInput} />
           </div>
-          <button type="submit" style={secondaryButtonStyle}>保存站内订阅</button>
+          <button type="submit" className={styles.candidateSecondary}>保存站内订阅</button>
         </form>
-        <div style={{ display: 'grid', gap: '12px', marginTop: '16px' }}>
+        <div className={styles.privateList}>
           {closureData.subscriptions.length === 0 ? (
-            <p style={{ margin: 0, color: 'var(--lt-ink-muted)' }}>暂无搜索订阅。</p>
+            <p className={styles.closureMuted}>暂无搜索订阅。</p>
           ) : closureData.subscriptions.map((item) => (
-            <article key={item.subscription_id} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', borderTop: '1px solid var(--lt-line)', paddingTop: '12px' }}>
+            <article key={item.subscription_id} className={styles.privateListRow}>
               <span>{item.subscription_name} · {item.keyword || '不限关键词'} · {item.subscription_status}</span>
-              <button type="button" style={secondaryButtonStyle} onClick={() => onSubscriptionCancel(item.subscription_id)}>
+              <button type="button" className={styles.candidateSecondary} onClick={() => onSubscriptionCancel(item.subscription_id)}>
                 取消订阅
               </button>
             </article>
@@ -816,16 +768,16 @@ function CandidateClosurePanel({
         </div>
       </section>
 
-      <section style={cardStyle}>
-        <h3 style={sectionTitleStyle}>站内通知</h3>
-        <div style={{ display: 'grid', gap: '12px' }}>
+      <section className={styles.closureCard}>
+        <h3 className={styles.closureTitle}>站内通知</h3>
+        <div className={styles.privateList}>
           {closureData.notifications.length === 0 ? (
-            <p style={{ margin: 0, color: 'var(--lt-ink-muted)' }}>暂无站内通知。</p>
+            <p className={styles.closureMuted}>暂无站内通知。</p>
           ) : closureData.notifications.map((item) => (
-            <article key={item.notification_id} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', borderTop: '1px solid var(--lt-line)', paddingTop: '12px' }}>
+            <article key={item.notification_id} className={styles.privateListRow}>
               <span>{item.title} · {item.content_summary || '无摘要'} · {item.read_status}</span>
               {item.read_status === 'unread' ? (
-                <button type="button" style={secondaryButtonStyle} onClick={() => onNotificationRead(item.notification_id)}>
+                <button type="button" className={styles.candidateSecondary} onClick={() => onNotificationRead(item.notification_id)}>
                   标记已读
                 </button>
               ) : null}
@@ -1121,7 +1073,12 @@ export function CandidateCenter() {
   const copy = overview ? statusCopy(overview.consent.publish_status, overview.consent.reason) : null;
 
   return (
-    <main aria-label="求职者中心" className={styles.memberShell}>
+    <main
+      aria-label="求职者中心"
+      className={styles.memberShell}
+      data-testid="candidate-center-refined"
+      data-ui-stage="ui-6-refined"
+    >
       <MemberUtilityBar />
       <MemberSearchHeader />
 

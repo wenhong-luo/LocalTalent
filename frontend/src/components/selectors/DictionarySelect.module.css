@@ -22,7 +22,7 @@
   gap: 8px;
   box-sizing: border-box;
   border: 1px solid var(--lt-ui-line);
-  border-radius: var(--lt-radius-xs);
+  border-radius: 6px;
   padding: 0 var(--lt-control-padding-x);
   background: #ffffff;
   color: var(--lt-ink);
@@ -64,7 +64,7 @@
   max-height: 250px;
   overflow: auto;
   border: 1px solid var(--lt-ui-line);
-  border-radius: var(--lt-radius-xs);
+  border-radius: 8px;
   background: #ffffff;
   box-shadow: var(--lt-shadow-popover);
 }

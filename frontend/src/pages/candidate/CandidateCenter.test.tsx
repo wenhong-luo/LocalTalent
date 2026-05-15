@@ -485,6 +485,9 @@ describe('CandidateCenter', () => {
     render(<CandidateCenter />);
 
     expect(await screen.findByRole('region', { name: '求职者个人信息横幅' })).toBeInTheDocument();
+    expect(screen.getByTestId('candidate-center-refined')).toHaveAttribute('data-ui-stage', 'ui-6-refined');
+    expect(screen.getByTestId('candidate-profile-refined')).toHaveAttribute('data-ui-stage', 'ui-6-refined');
+    expect(await screen.findByTestId('candidate-closure-refined')).toHaveAttribute('data-ui-stage', 'ui-6-refined');
     expect(screen.getByRole('complementary', { name: '求职者中心菜单' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: '我的简历' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: '优选服务' })).toBeInTheDocument();

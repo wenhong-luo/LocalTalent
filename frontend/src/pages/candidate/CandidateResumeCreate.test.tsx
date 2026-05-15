@@ -252,6 +252,7 @@ describe('CandidateResumeCreate', () => {
     render(<CandidateResumeCreate />);
 
     expect(await screen.findByLabelText('完善简历基本信息表单')).toBeInTheDocument();
+    expect(screen.getByTestId('resume-create-basic-refined')).toHaveAttribute('data-ui-stage', 'ui-6-refined');
     expect(screen.getByText('导入附件简历，一键完成在线简历填写')).toBeInTheDocument();
     expect(screen.getByLabelText('上传附件简历')).toBeInTheDocument();
     expect(screen.getByLabelText('简历创建进度')).toHaveTextContent('1基本信息2完善简历3创建完成');
@@ -404,6 +405,7 @@ describe('CandidateResumeCreate', () => {
     await user.click(screen.getByRole('button', { name: '下一步' }));
 
     expect(await screen.findByLabelText('完善简历详情表单')).toBeInTheDocument();
+    expect(screen.getByTestId('resume-create-detail-refined')).toHaveAttribute('data-ui-stage', 'ui-6-refined');
     expect(screen.getByRole('button', { name: 'AI 优化暂未开放' })).toBeDisabled();
 
     await user.type(screen.getByPlaceholderText('请填写公司名称'), 'LocalTalent 科技');
@@ -414,6 +416,7 @@ describe('CandidateResumeCreate', () => {
     await user.click(screen.getByRole('button', { name: '完成' }));
 
     expect(await screen.findByText('恭喜您，简历创建完成')).toBeInTheDocument();
+    expect(screen.getByTestId('resume-create-done-refined')).toHaveAttribute('data-ui-stage', 'ui-6-refined');
     expect(screen.getByRole('link', { name: '进入会员中心' })).toHaveAttribute('href', '/candidate/center');
     expect(screen.getByRole('button', { name: '继续完善简历' })).toBeInTheDocument();
 

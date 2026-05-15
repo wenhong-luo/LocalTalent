@@ -1,6 +1,8 @@
 .memberShell {
   min-height: 100vh;
-  background: #f3f4f6;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(22, 119, 255, 0.08), transparent 26%),
+    linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
   color: #263142;
 }
 
@@ -8,7 +10,7 @@
   border-bottom: 1px solid #e5e7eb;
   background: #ffffff;
   color: #667085;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .utilityInner,
@@ -23,7 +25,7 @@
   display: flex;
   justify-content: space-between;
   gap: 24px;
-  min-height: 36px;
+  min-height: 32px;
   align-items: center;
 }
 
@@ -52,9 +54,9 @@
 .searchHeader {
   display: grid;
   grid-template-columns: 240px minmax(320px, 1fr) 240px;
-  gap: 28px;
+  gap: 24px;
   align-items: center;
-  min-height: 86px;
+  min-height: 78px;
   background: #ffffff;
 }
 
@@ -68,10 +70,10 @@
 
 .brandMark {
   display: grid;
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   place-items: center;
-  border-radius: 16px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #1c7ed6, #34d399);
   color: #ffffff;
   font-weight: 950;
@@ -85,7 +87,7 @@
 }
 
 .brand strong {
-  font-size: 22px;
+  font-size: 20px;
   letter-spacing: -0.04em;
 }
 
@@ -97,7 +99,7 @@
 .searchBox {
   display: grid;
   grid-template-columns: 118px 1fr 72px;
-  min-height: 44px;
+  min-height: 40px;
   overflow: hidden;
   border: 1px solid #e4e7ec;
   border-radius: 6px;
@@ -132,13 +134,14 @@
 .headerActions {
   display: flex;
   justify-content: flex-end;
-  gap: 24px;
+  gap: 18px;
   color: #344054;
   font-weight: 800;
+  font-size: 13px;
 }
 
 .profileHero {
-  min-height: 178px;
+  min-height: 166px;
   background:
     radial-gradient(circle at 75% 25%, rgba(255, 255, 255, 0.22), transparent 35%),
     linear-gradient(105deg, #39a8f4 0%, #4f79f7 58%, #5969ef 100%);
@@ -147,22 +150,22 @@
 
 .profileInner {
   display: grid;
-  grid-template-columns: 132px minmax(240px, 1fr) minmax(360px, 520px);
-  gap: 28px;
+  grid-template-columns: 118px minmax(240px, 1fr) minmax(340px, 500px);
+  gap: 24px;
   align-items: center;
-  min-height: 178px;
+  min-height: 166px;
 }
 
 .avatarCard {
   display: grid;
-  width: 124px;
-  height: 124px;
+  width: 108px;
+  height: 108px;
   place-items: center;
   border: 5px solid rgba(255, 255, 255, 0.88);
   border-radius: 999px;
   background: #eef4ff;
   color: #2563eb;
-  font-size: 48px;
+  font-size: 42px;
   font-weight: 950;
   box-shadow: 0 18px 34px rgba(31, 41, 55, 0.16);
 }
@@ -174,7 +177,7 @@
 
 .profileCopy h1 {
   margin-top: 8px;
-  font-size: 30px;
+  font-size: 27px;
   letter-spacing: -0.04em;
 }
 
@@ -197,11 +200,11 @@
 .heroStats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .heroStats article {
-  min-height: 82px;
+  min-height: 74px;
   display: grid;
   place-items: center;
   border-radius: 4px;
@@ -215,7 +218,7 @@
 }
 
 .heroStats strong {
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .heroStats span {
@@ -224,19 +227,19 @@
 }
 
 .memberFrame {
-  padding: 32px 0 44px;
+  padding: 26px 0 38px;
 }
 
 .dashboardLayout {
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: 20px;
   align-items: start;
 }
 
 .sideColumn {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .pointsCard,
@@ -298,14 +301,14 @@
 
 .sideNav {
   display: grid;
-  padding: 12px 0;
+  padding: 10px 0;
 }
 
 .sideNav a {
   display: flex;
-  min-height: 52px;
+  min-height: 46px;
   align-items: center;
-  padding: 0 34px;
+  padding: 0 26px;
   color: #475467;
   text-decoration: none;
   border-left: 3px solid transparent;
@@ -348,7 +351,7 @@
 
 .mainColumn {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .traceLine {
@@ -360,14 +363,17 @@
 
 .dashboardCard,
 .onboardingAlert {
-  padding: 28px 34px;
+  padding: 22px 24px;
   border: 1px solid #edf0f5;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.045);
 }
 
 .dashboardCard h2 {
   margin: 0;
   color: #1d2939;
-  font-size: 24px;
+  font-size: 21px;
   letter-spacing: -0.04em;
 }
 
@@ -402,10 +408,10 @@
 .disabledButton,
 .onboardingAlert a {
   display: inline-flex;
-  min-height: 42px;
+  min-height: 38px;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 0 18px;
   font-weight: 900;
   text-decoration: none;
@@ -433,16 +439,16 @@
 .resumeGrid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 170px;
-  gap: 26px;
+  gap: 22px;
   align-items: center;
-  margin-top: 24px;
+  margin-top: 20px;
 }
 
 .resumeFacts {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   color: #344054;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .resumeFacts p {
@@ -513,24 +519,26 @@
 .serviceGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 22px;
-  margin-top: 26px;
+  gap: 14px;
+  margin-top: 20px;
 }
 
 .serviceCard {
   display: grid;
   justify-items: center;
-  gap: 10px;
-  min-height: 156px;
-  padding: 24px 18px;
+  gap: 8px;
+  min-height: 136px;
+  padding: 18px 14px;
   border: 1px solid #edf0f5;
+  border-radius: 10px;
   text-align: center;
+  background: #ffffff;
 }
 
 .serviceCard span {
   display: grid;
-  width: 62px;
-  height: 62px;
+  width: 52px;
+  height: 52px;
   place-items: center;
   border-radius: 999px;
   color: #ffffff;
@@ -548,7 +556,7 @@
 
 .serviceCard strong {
   color: #1d2939;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .serviceCard p,
@@ -625,6 +633,250 @@
   display: grid;
 }
 
+.closureGrid {
+  display: grid;
+  gap: 16px;
+}
+
+.privateStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.summaryCard,
+.closureCard,
+.closureState {
+  border: 1px solid #e7edf5;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.summaryCard {
+  padding: 18px;
+}
+
+.summaryCard p,
+.summaryCard h2,
+.summaryCard span {
+  margin: 0;
+}
+
+.summaryCard p {
+  color: #667085;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.summaryCard h2 {
+  margin-top: 8px;
+  color: #111827;
+  font-size: 22px;
+}
+
+.summaryCard span {
+  display: block;
+  margin-top: 8px;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.closureCard {
+  padding: 20px;
+}
+
+.closureDisabled {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+}
+
+.closureState {
+  overflow: hidden;
+}
+
+.closureTitle {
+  margin: 0 0 14px;
+  color: #111827;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.closureMuted {
+  margin: 0;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.closureForm {
+  display: grid;
+  gap: 16px;
+}
+
+.closureFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.closureField {
+  display: grid;
+  gap: 7px;
+  color: #344054;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.closureInput {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #d9e1ea;
+  border-radius: 6px;
+  padding: 9px 11px;
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+  font-weight: 500;
+}
+
+textarea.closureInput {
+  min-height: 94px;
+  resize: vertical;
+}
+
+.closureInput:focus {
+  outline: none;
+  border-color: #2f80ed;
+  box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.12);
+}
+
+.candidatePrimary,
+.candidateSecondary {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.candidatePrimary {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.candidateSecondary {
+  border: 1px solid #d7dee8;
+  background: #ffffff;
+  color: #2563eb;
+}
+
+.candidatePrimary:disabled,
+.candidateSecondary:disabled {
+  border-color: #d0d5dd;
+  background: #f2f4f7;
+  color: #98a2b3;
+  cursor: not-allowed;
+}
+
+.hiddenFile {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.attachmentToolbar,
+.aiSuggestionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.aiSuggestionList,
+.privateList {
+  display: grid;
+  gap: 10px;
+}
+
+.aiSuggestionCard,
+.privateListItem,
+.privateListRow {
+  border: 1px solid #edf0f5;
+  border-radius: 8px;
+  padding: 14px;
+  background: #fbfcfe;
+}
+
+.aiSuggestionCard h4,
+.aiSuggestionCard p,
+.privateListItem p,
+.privateListRow p {
+  margin: 0;
+}
+
+.aiSuggestionCard h4,
+.privateListItem strong,
+.privateListRow strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.aiSuggestionCard p,
+.privateListItem p,
+.privateListRow p {
+  margin-top: 6px;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.aiSuggestionPreview {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f0f9ff;
+  color: #344054;
+  font-size: 13px;
+}
+
+.statusPill {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px 9px;
+  background: #ecfdf3;
+  color: #047857;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.inlineForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.inlineForm .closureInput {
+  width: min(280px, 100%);
+}
+
 .floatChat {
   position: fixed;
   right: 46px;
@@ -678,7 +930,9 @@
   }
 
   .heroStats,
-  .serviceGrid {
+  .serviceGrid,
+  .privateStats,
+  .closureFormGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -718,7 +972,9 @@
   }
 
   .heroStats,
-  .serviceGrid {
+  .serviceGrid,
+  .privateStats,
+  .closureFormGrid {
     grid-template-columns: 1fr;
   }
 

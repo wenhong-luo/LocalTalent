@@ -187,7 +187,7 @@ function Progress({ step }: { step: Step }) {
 
 function PageChrome({ step, children }: { step: Step; children: React.ReactNode }) {
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-ui-stage="ui-6-refined">
       <div className={styles.topbar}>
         <div className={styles.topbarInner}>
           <span>LocalTalent 求职者</span>
@@ -637,7 +637,12 @@ export function CandidateResumeCreate() {
   if (step === 'done') {
     return (
       <PageChrome step="done">
-        <section className={`${styles.panel} ${styles.successPanel}`} aria-label="简历创建完成">
+        <section
+          className={`${styles.panel} ${styles.successPanel}`}
+          aria-label="简历创建完成"
+          data-testid="resume-create-done-refined"
+          data-ui-stage="ui-6-refined"
+        >
           <div className={styles.successIcon} aria-hidden="true">✓</div>
           <h1>恭喜您，简历创建完成</h1>
           <p>
@@ -698,7 +703,13 @@ export function CandidateResumeCreate() {
               </button>
             )}
           </section>
-          <form className={styles.panel} aria-label="完善简历基本信息表单" onSubmit={submitBasic}>
+          <form
+            className={styles.panel}
+            aria-label="完善简历基本信息表单"
+            data-testid="resume-create-basic-refined"
+            data-ui-stage="ui-6-refined"
+            onSubmit={submitBasic}
+          >
             {message ? <p className={styles.notice}>{message}</p> : null}
             {error ? <p className={styles.notice}>{error}</p> : null}
             <section className={styles.section}>
@@ -810,7 +821,13 @@ export function CandidateResumeCreate() {
           </form>
         </>
       ) : (
-        <form className={styles.panel} aria-label="完善简历详情表单" onSubmit={submitDetail}>
+        <form
+          className={styles.panel}
+          aria-label="完善简历详情表单"
+          data-testid="resume-create-detail-refined"
+          data-ui-stage="ui-6-refined"
+          onSubmit={submitDetail}
+        >
           {message ? <p className={styles.notice}>{message}</p> : null}
           {error ? <p className={styles.notice}>{error}</p> : null}
           <section className={styles.section}>
