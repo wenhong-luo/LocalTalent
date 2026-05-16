@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { PortalHomePage } from './PortalHomePage';
 import { type PortalHomeSlotItem } from './portalHomeSlotApi';
@@ -127,8 +127,11 @@ describe('PortalHomePage', () => {
     expect(screen.getByLabelText('门户搜索头部')).toBeInTheDocument();
     expect(screen.getByLabelText('门户主导航')).toBeInTheDocument();
     expect(screen.getByTestId('portal-home-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByTestId('portal-home-page')).toHaveAttribute('data-responsive', 'home-mobile-safe');
     expect(screen.getByLabelText('职位分类墙')).toBeInTheDocument();
+    expect(screen.getByLabelText('职位分类墙')).toHaveAttribute('data-responsive', 'category-wall-collapse');
     expect(screen.getByLabelText('首页搜索增强')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页搜索增强')).toHaveAttribute('data-responsive', 'home-search-collapse');
     expect(screen.getByLabelText('首页快捷入口')).toBeInTheDocument();
     expect(screen.getByLabelText('首页右侧运营面板')).toBeInTheDocument();
     expect(screen.getByLabelText('安全登录入口')).toBeInTheDocument();
@@ -159,11 +162,25 @@ describe('PortalHomePage', () => {
       '/jobs?category=construction_property_agriculture'
     );
     expect(screen.getByText('餐饮')).toBeInTheDocument();
+    expect(screen.getByTestId('category-flyout-life_service')).toHaveAccessibleName('生活 | 服务业 职位浮层');
+    expect(screen.getByTestId('category-flyout-life_service')).toHaveTextContent('查看该类全部职位');
     expect(screen.getByRole('link', { name: '服务员' })).toHaveAttribute('href', expect.stringContaining('/jobs?category=life_service'));
     expect(screen.getByRole('link', { name: '前端工程师' })).toHaveAttribute(
       'href',
       expect.stringContaining('/jobs?category=network_communication_electronics')
     );
+  });
+
+  it('keeps the home search interactions on safe public routes', () => {
+    renderHome();
+
+    const searchPanel = within(screen.getByLabelText('首页搜索增强'));
+    expect(searchPanel.getByRole('link', { name: '找工作' })).toHaveAttribute('href', '/jobs');
+    expect(searchPanel.getByRole('link', { name: '找企业' })).toHaveAttribute('href', '/companies');
+    expect(searchPanel.getByRole('link', { name: '人才服务区' })).toHaveAttribute('href', '/portal/talent-service-area');
+    expect(searchPanel.getByRole('link', { name: '搜索' })).toHaveAttribute('href', '/jobs');
+    expect(searchPanel.getByRole('link', { name: '高级搜索' })).toHaveAttribute('href', '/jobs?advanced=1');
+    expect(searchPanel.getByRole('button', { name: '地图搜索占位' })).toBeDisabled();
   });
 
   it('renders service entrances, public recommendations and below-fold modules', () => {
@@ -183,6 +200,7 @@ describe('PortalHomePage', () => {
     renderHome();
 
     expect(screen.getByLabelText('首页运营广告位体系')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页运营广告位体系')).toHaveAttribute('data-responsive', 'ad-band-collapse');
     expect(screen.getByLabelText('首页通栏广告位')).toHaveTextContent('首页通栏运营位');
     expect(screen.getByLabelText('首页通栏广告位')).toHaveAttribute('href', '/job-fairs');
     expect(screen.getByAltText('首页通栏运营图')).toBeInTheDocument();

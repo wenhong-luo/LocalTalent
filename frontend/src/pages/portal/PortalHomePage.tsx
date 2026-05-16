@@ -342,7 +342,11 @@ function buildHomeAdSlot(homeSlots: PortalHomeSlotItem[], fallback: HomeAdFallba
 
 function JobCategoryWall() {
   return (
-    <aside className={`${styles.card} ${styles.categoryWall}`} aria-label="职位分类墙">
+    <aside
+      className={`${styles.card} ${styles.categoryWall}`}
+      aria-label="职位分类墙"
+      data-responsive="category-wall-collapse"
+    >
       <ul className={styles.categoryList}>
         {categoryGroups.map((category) => (
           <li key={category.code} className={styles.categoryItem}>
@@ -350,7 +354,15 @@ function JobCategoryWall() {
               {category.label}
               <span>›</span>
             </Link>
-            <div className={styles.categoryFlyout} aria-label={`${category.label} 职位浮层`}>
+            <div
+              className={styles.categoryFlyout}
+              aria-label={`${category.label} 职位浮层`}
+              data-testid={`category-flyout-${category.code}`}
+            >
+              <div className={styles.categoryFlyoutHeader}>
+                <strong>{category.label}</strong>
+                <Link href={`/jobs?category=${category.code}`}>查看该类全部职位</Link>
+              </div>
               {category.groups.map((group) => (
                 <section key={group.title} className={styles.categoryGroup}>
                   <h3>{group.title}</h3>
@@ -376,11 +388,13 @@ function JobCategoryWall() {
 
 function HomeSearchPanel() {
   return (
-    <section className={`${styles.card} ${styles.homeSearchPanel}`} aria-label="首页搜索增强">
+    <section className={`${styles.card} ${styles.homeSearchPanel}`} aria-label="首页搜索增强" data-responsive="home-search-collapse">
       <div className={styles.homeSearchTabs} aria-label="首页搜索类型">
-        <span className={styles.searchTabActive}>找工作</span>
-        <span>找企业</span>
-        <span>人才服务区</span>
+        <Link className={styles.searchTabActive} href="/jobs">
+          找工作
+        </Link>
+        <Link href="/companies">找企业</Link>
+        <Link href="/portal/talent-service-area">人才服务区</Link>
       </div>
       <div className={styles.homeSearchRow}>
         <input aria-label="首页职位关键词" placeholder="请输入职位、企业或帮扶内容关键词" />
@@ -487,7 +501,7 @@ function AdvertisementBand({ homeSlots }: { homeSlots: PortalHomeSlotItem[] }) {
   const bottomSlot = buildHomeAdSlot(homeSlots, adSlots.bottom);
 
   return (
-    <section className={styles.adBand} aria-label="首页运营广告位体系">
+    <section className={styles.adBand} aria-label="首页运营广告位体系" data-responsive="ad-band-collapse">
       <Link className={styles.primaryAd} aria-label="首页通栏广告位" href={fullWidthSlot.href}>
         <img src={fullWidthSlot.image} alt={fullWidthSlot.alt} />
         <span>
@@ -691,7 +705,12 @@ export function PortalHomePage({ hotJobs = [], featuredCompanies = [], homeSlots
   const quickEntryList = buildQuickEntries(homeSlots);
 
   return (
-    <main className={styles.home} data-layout="portal-ad-rails" data-testid="portal-home-page">
+    <main
+      className={styles.home}
+      data-layout="portal-ad-rails"
+      data-responsive="home-mobile-safe"
+      data-testid="portal-home-page"
+    >
       <section className={styles.heroGrid} aria-label="首页高保真首屏">
         <JobCategoryWall />
         <div className={styles.centerStage}>
