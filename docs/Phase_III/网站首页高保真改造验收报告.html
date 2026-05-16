@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalTalent 网站首页高保真改造验收报告</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #13233b;
+      --muted: #64748b;
+      --line: #dbe7ef;
+      --bg: #f4f8fb;
+      --card: #fff;
+      --brand: #0f9f8a;
+      --brand-weak: #e8fbf7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+      background: linear-gradient(180deg, #eefbf7 0, var(--bg) 260px);
+      color: var(--ink);
+      line-height: 1.75;
+    }
+    main { width: min(1120px, calc(100vw - 40px)); margin: 0 auto; padding: 42px 0 64px; }
+    header, section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 16px 42px rgba(15, 45, 78, 0.08);
+      margin-bottom: 18px;
+      padding: 28px;
+    }
+    .eyebrow { color: var(--brand); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 8px; }
+    h1 { margin: 0; font-size: 34px; line-height: 1.2; }
+    h2 { margin: 0 0 14px; font-size: 22px; }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 0; padding-left: 22px; }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 14px; }
+    th, td { border: 1px solid var(--line); padding: 12px 14px; vertical-align: top; text-align: left; }
+    th { background: var(--brand-weak); color: #0f6f63; }
+    code { background: #eef6ff; border-radius: 6px; padding: 2px 6px; color: #0f4c81; }
+    pre { background: #102033; color: #e6f0ff; border-radius: 16px; padding: 18px; overflow: auto; }
+    pre code { background: transparent; color: inherit; padding: 0; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .pill {
+      border: 1px solid #b9eadf;
+      background: #f0fffb;
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: #0f6f63;
+      font-weight: 700;
+    }
+    .warn {
+      border-left: 4px solid #f59e0b;
+      background: #fff8e8;
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: #7a4a00;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">LocalTalent Phase III</p>
+      <h1>网站首页高保真改造验收报告</h1>
+      <p>本报告只收口 <code>Prompt Home-1</code> 至 <code>Prompt Home-6</code> 的公开网站首页高保真专项。首页运营位按“运营位/推荐位”理解，不是广告售卖系统。</p>
+      <div class="summary">
+        <div class="pill">Home-1 至 Home-6 已完成</div>
+        <div class="pill">首页可作为领导演示第一屏</div>
+        <div class="pill">后台运营位可配置图片和上下线</div>
+        <div class="pill">风险能力未开放</div>
+      </div>
+    </header>
+
+    <section>
+      <h2>结论</h2>
+      <ul>
+        <li>首页已对齐 <code>docs/page/网站首页/人才网(目标页面效果).jpeg</code> 的核心结构：首屏三栏、职位分类墙、运营右栏、通栏/半宽/三列/底部运营位、热招职位、名企展示、招聘会、资讯公告、HR 工具箱和友情链接。</li>
+        <li>后台运营人员可以配置首页运营位和图片资产；公开首页只读取在线、已发布、未过期的安全运营位。</li>
+        <li>无运营位配置时，首页展示安全占位或标注为“演示数据”的公开职位/企业卡片，不回退到敏感假数据。</li>
+        <li>未开放真实广告售卖、支付、点击结算、外部广告平台、公共简历库、联系解锁、真实短信/微信/小程序/App、地图、视频、直播或 ATS/RPA。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>完成矩阵</h2>
+      <table>
+        <tr><th>轮次</th><th>完成内容</th><th>边界</th></tr>
+        <tr><td>Home-1</td><td>首页运营位模型、运营后台配置接口、公开读取接口</td><td>不含广告价格、订单、点击结算或外部投放字段</td></tr>
+        <tr><td>Home-2</td><td>首页运营位图片上传、预览、替换、删除和公开图片代理</td><td>object key 只保存在服务端，不返回前端、公开接口或审计摘要</td></tr>
+        <tr><td>Home-3</td><td>首页首屏三栏高保真重构</td><td>移除短信验证码登录表单感，不接真实短信/微信/小程序/App</td></tr>
+        <tr><td>Home-4</td><td>通栏、半宽、三列、底部运营位与中下部公开内容模块</td><td>只展示公开职位、认证企业、公开内容和安全占位</td></tr>
+        <tr><td>Home-5</td><td>分类 hover/focus、搜索安全入口、响应式折叠</td><td>地图搜索只占位，分类入口只跳公开职位频道</td></tr>
+        <tr><td>Home-6</td><td>测试补强、演示说明、投喂手册状态和本验收报告</td><td>不新增后端接口、迁移或业务能力</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>验收覆盖</h2>
+      <ul>
+        <li>首页首屏：三栏布局、职位分类墙、banner、快捷入口、公告/招聘会、安全登录入口。</li>
+        <li>首页运营位：后台配置的 hero、通栏、半宽、三列、快捷入口、底部 banner 可渲染。</li>
+        <li>内容模块：热招职位、名企展示、招聘会、资讯公告、HR 工具箱、友情链接。</li>
+        <li>响应式：公开首页保留 <code>portal-ad-rails</code>、<code>home-mobile-safe</code>、<code>category-wall-collapse</code>、<code>ad-band-collapse</code> 等结构标记。</li>
+        <li>运营后台：operator 可保存首页运营位、上传/删除图片；auditor 只读，不能上传、删除或保存。</li>
+        <li>字段黑名单：公开首页和运营位 DOM 不展示手机号、邮箱、微信、附件 key、完整简历正文、原始 JSON、审核材料、<code>contact_unlock</code>、公共简历库或搜索简历入口。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>必跑命令</h2>
+      <pre><code>cd frontend && npm test -- PortalHomePage.test.tsx AdminDashboard.test.tsx
+cd frontend && npm test
+cd frontend && npm run build
+cd backend && ./mvnw test
+./scripts/check_phase3_boundary
+./scripts/check_phase3_ops
+./scripts/check_phase3_security_acceptance
+./scripts/check_portal_snapshot_fields
+./scripts/check_boundary</code></pre>
+      <div class="warn">首页广告位是运营位/推荐位，不是商业广告售卖系统；后续真实广告商业化必须单独进入风险评审。</div>
+    </section>
+
+    <section>
+      <h2>演示口径</h2>
+      <ul>
+        <li>首页是 LocalTalent 的公开门户第一屏，展示公开职位、认证企业、招聘会、资讯和运营位。</li>
+        <li>首页运营位由后台运营人员配置图片、标题、链接、排序和上下线，但不产生广告售卖、支付、点击结算或外部平台能力。</li>
+        <li>人才服务区仍只展示候选人授权发布快照摘要，不是公共简历库。</li>
+        <li>公开页面不展示原始候选人数据、联系方式、附件或完整简历。</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

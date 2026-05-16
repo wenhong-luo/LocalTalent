@@ -438,6 +438,22 @@ describe('AdminDashboard', () => {
     });
   });
 
+  it('keeps homepage operation slot image management read-only for auditor', async () => {
+    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'auditor-token');
+    window.localStorage.setItem(ADMIN_ROLE_HINT_STORAGE_KEY, 'auditor');
+    installAdminFetchMock({ operatorOpsEnabled: true });
+
+    render(<AdminDashboard />);
+
+    expect(await screen.findByText(/三期运营化已开启/)).toBeInTheDocument();
+    expect(screen.getByLabelText('首页运营位配置')).toBeInTheDocument();
+    expect(screen.getByText(/首页运营位图片已上传/)).toBeInTheDocument();
+    expect(screen.getByText('只读：auditor 可预览配置，不能上传或删除图片。')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '保存首页运营位' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('上传 home_hero_banner 图片')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '删除首页运营位图片' })).not.toBeInTheDocument();
+  });
+
   it('renders sanitized audit trace details without raw sensitive payloads', async () => {
     window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, 'operator-token');
     window.localStorage.setItem(ADMIN_ROLE_HINT_STORAGE_KEY, 'operator');

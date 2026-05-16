@@ -115,7 +115,7 @@ export LOCALTALENT_PHASE3_COMPANY_STYLE_UPLOAD=true</code></pre>
         <tr><td>招聘会</td><td><code>/job-fairs</code></td><td>公开招聘会频道</td></tr>
         <tr><td>校园招聘</td><td><code>/campus</code></td><td>校园职位、活动、资讯聚合</td></tr>
       </table>
-      <div class="note">首页右侧不再放置短信验证码登录表单，改为公告、招聘会和安全登录入口按钮；首页广告位仅为运营占位，不接真实广告投放、点击计费、支付、外部平台或统计；首页已加入本地 SVG 演示素材和安全演示数据兜底，当推荐位无后端配置时，会展示标注为“演示数据”的公开职位/企业卡片，避免演示空白；职位分类墙支持大类、二级分组和岗位浮层，但所有入口仍跳转公开职位频道，不开放公共简历库或联系解锁。</div>
+      <div class="note">首页右侧不再放置短信验证码登录表单，改为公告、招聘会和安全登录入口按钮；首页广告位仅为运营占位，不接真实广告投放、点击计费、支付、外部平台或统计；首页已加入本地 SVG 演示素材和安全演示数据兜底，当推荐位无后端配置时，会展示标注为“演示数据”的公开职位/企业卡片，避免演示空白；职位分类墙支持大类、二级分组和岗位浮层，但所有入口仍跳转公开职位频道，不开放公共简历库或联系解锁。首页高保真专项 <code>Prompt Home-1</code> 至 <code>Prompt Home-6</code> 已收口：后台运营位模型、图片资产、首屏三栏、中下部模块、分类交互、响应式与验收报告均已完成；演示前建议确认 <code>/admin</code> 可配置首页运营位与图片，<code>/</code> 可读取在线运营位，无配置时仍展示安全占位。</div>
       <h3>私有中心</h3>
       <ul>
         <li><code>/candidate/resume/create</code>：首次完善简历 1、完善简历 2、创建完成三页；进度由服务端 <code>candidate_resume_onboarding</code> 表判断；开启 <code>LOCALTALENT_PHASE3_RESUME_ATTACHMENT_UPLOAD=true</code> 后支持本人私有简历附件上传、下载、替换、删除；开启 <code>LOCALTALENT_PHASE3_RESUME_AI_ASSIST=true</code> 后支持安全规则版简历优化建议。</li>

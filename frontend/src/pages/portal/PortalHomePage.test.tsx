@@ -215,6 +215,19 @@ describe('PortalHomePage', () => {
     expect(screen.getByText('广告位仅为运营占位，不接真实投放、计费、支付或外部平台。')).toBeInTheDocument();
   });
 
+  it('covers the final Home-1 through Home-6 acceptance surface', () => {
+    renderHome();
+
+    expect(screen.getByTestId('portal-home-page')).toHaveAttribute('data-layout', 'portal-ad-rails');
+    expect(screen.getByTestId('portal-home-page')).toHaveAttribute('data-responsive', 'home-mobile-safe');
+    expect(screen.getByLabelText('职位分类墙')).toHaveAttribute('data-responsive', 'category-wall-collapse');
+    expect(screen.getByLabelText('首页运营广告位体系')).toHaveAttribute('data-responsive', 'ad-band-collapse');
+    expect(screen.getByLabelText('首页招聘会模块')).toBeInTheDocument();
+    expect(screen.getByLabelText('资讯公告与 HR 工具箱')).toBeInTheDocument();
+    expect(screen.getByLabelText('友情链接与合作入口')).toBeInTheDocument();
+    expect(screen.getByText('广告位仅为运营占位，不接真实投放、计费、支付或外部平台。')).toBeInTheDocument();
+  });
+
   it('uses safe demo data when recommendation slots are empty', () => {
     render(
       <PortalShell>
