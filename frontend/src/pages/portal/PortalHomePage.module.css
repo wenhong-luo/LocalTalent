@@ -202,6 +202,7 @@
 
 .banner {
   position: relative;
+  display: block;
   overflow: hidden;
   min-height: 288px;
   padding: 34px;
@@ -209,6 +210,7 @@
     radial-gradient(circle at 78% 24%, rgba(255, 255, 255, 0.8), transparent 8rem),
     linear-gradient(135deg, #0d776f 0%, #16b59f 48%, #f3b532 100%);
   color: #ffffff;
+  text-decoration: none;
 }
 
 .banner::after {
@@ -220,6 +222,35 @@
   height: 250px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.18);
+}
+
+.bannerWithImage {
+  background: #0f766e;
+}
+
+.bannerImage,
+.bannerOverlay {
+  position: absolute;
+  inset: 0;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.01);
+}
+
+.bannerOverlay {
+  z-index: 1;
+  background:
+    radial-gradient(circle at 82% 30%, rgba(255, 255, 255, 0.28), transparent 9rem),
+    linear-gradient(90deg, rgba(9, 89, 80, 0.9) 0%, rgba(13, 119, 111, 0.72) 50%, rgba(15, 118, 110, 0.24) 100%);
+}
+
+.bannerContent {
+  position: relative;
+  z-index: 2;
 }
 
 .eyebrow {
@@ -344,6 +375,25 @@
   margin-top: 12px;
   color: #94a3b8;
   line-height: 1.6;
+}
+
+.boundaryMiniCard {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, #f0fdfa, #ffffff);
+}
+
+.boundaryMiniCard strong {
+  display: block;
+  color: #0f766e;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.boundaryMiniCard p {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.65;
 }
 
 .noticeCard {

@@ -1,8 +1,34 @@
 import { render, screen } from '@testing-library/react';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { PortalHomePage } from './PortalHomePage';
+import { type PortalHomeSlotItem } from './portalHomeSlotApi';
 
-function renderHome() {
+const configuredHomeSlots: PortalHomeSlotItem[] = [
+  {
+    slot_id: 188,
+    slot_code: 'home_hero_banner',
+    title: '城市人才服务首屏',
+    subtitle: '后台运营配置的首页 banner，只展示公开职位、认证企业和活动资讯。',
+    image_url: '/api/portal/home-slots/188/image',
+    image_alt: '城市人才服务首屏运营图',
+    link_url: '/jobs?from=home-hero',
+    display_order: 1,
+    updated_at: '2026-05-15T10:00:00'
+  },
+  {
+    slot_id: 189,
+    slot_code: 'home_quick_1',
+    title: '岗位直达',
+    subtitle: '公开职位入口',
+    image_url: '',
+    image_alt: '',
+    link_url: '/jobs?from=quick',
+    display_order: 2,
+    updated_at: '2026-05-15T10:01:00'
+  }
+];
+
+function renderHome(homeSlots: PortalHomeSlotItem[] = configuredHomeSlots) {
   render(
     <PortalShell>
       <PortalHomePage
@@ -32,6 +58,7 @@ function renderHome() {
             display_order: 1
           }
         ]}
+        homeSlots={homeSlots}
       />
     </PortalShell>
   );
@@ -51,10 +78,21 @@ describe('PortalHomePage', () => {
     expect(screen.getByLabelText('首页右侧运营面板')).toBeInTheDocument();
     expect(screen.getByLabelText('安全登录入口')).toBeInTheDocument();
     expect(screen.getByLabelText('公告与招聘会')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页公开边界提示')).toBeInTheDocument();
     expect(screen.getByLabelText('右侧浮动工具条')).toBeInTheDocument();
     expect(screen.queryByLabelText('手机号视觉占位')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('验证码视觉占位')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '短信占位' })).not.toBeInTheDocument();
+  });
+
+  it('uses backend-configured home slots for the hero banner and quick entrances', () => {
+    renderHome();
+
+    expect(screen.getByRole('link', { name: '首页首屏广告位' })).toHaveAttribute('href', '/jobs?from=home-hero');
+    expect(screen.getByText('城市人才服务首屏')).toBeInTheDocument();
+    expect(screen.getByText('后台运营配置的首页 banner，只展示公开职位、认证企业和活动资讯。')).toBeInTheDocument();
+    expect(screen.getByAltText('城市人才服务首屏运营图')).toHaveAttribute('src', '/api/portal/home-slots/188/image');
+    expect(screen.getByRole('link', { name: /岗位直达/ })).toHaveAttribute('href', '/jobs?from=quick');
   });
 
   it('renders the ten-category wall with flyout position groups', () => {
