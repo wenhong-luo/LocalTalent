@@ -190,6 +190,7 @@ const demoCompanies: PortalRecommendationItem[] = [
 
 const adSlots = {
   banner: {
+    slotCode: 'home_full_width_banner',
     title: '城市人才服务季',
     subtitle: '公开职位、招聘会、政策资讯一站式触达',
     image: '/demo/home-ad-hero.svg',
@@ -198,6 +199,7 @@ const adSlots = {
   },
   half: [
     {
+      slotCode: 'home_half_left',
       title: '企业发布职位',
       subtitle: '灰度演示入口 · 不含付费投放',
       image: '/demo/home-ad-company.svg',
@@ -205,6 +207,7 @@ const adSlots = {
       alt: '企业发布职位运营图'
     },
     {
+      slotCode: 'home_half_right',
       title: '求职者完善资料',
       subtitle: '私有中心维护 · 发布快照可撤回',
       image: '/demo/home-ad-candidate.svg',
@@ -214,24 +217,35 @@ const adSlots = {
   ],
   third: [
     {
+      slotCode: 'home_third_1',
       title: '招聘会预约',
       image: '/demo/home-ad-fair.svg',
       href: '/job-fairs',
       alt: '招聘会运营图'
     },
     {
+      slotCode: 'home_third_2',
       title: '就业政策公开',
       image: '/demo/home-ad-policy.svg',
       href: '/articles/policies',
       alt: '就业政策运营图'
     },
     {
+      slotCode: 'home_third_3',
       title: 'HR 工具箱',
       image: '/demo/home-ad-toolkit.svg',
       href: '/hr-tools',
       alt: 'HR 工具箱运营图'
     }
-  ]
+  ],
+  bottom: {
+    slotCode: 'home_bottom_banner',
+    title: '地方人才服务公开矩阵',
+    subtitle: '职位、企业、招聘会、资讯与工具箱统一运营',
+    image: '/demo/home-ad-hero.svg',
+    href: '/more-services',
+    alt: '地方人才服务公开矩阵运营图'
+  }
 };
 
 const jobFairCards = [
@@ -292,6 +306,38 @@ function buildQuickEntries(homeSlots: PortalHomeSlotItem[]): QuickEntry[] {
   const configuredLabels = new Set(configuredEntries.map((entry) => entry.label));
   const fallbackEntries = defaultQuickEntries.filter((entry) => !configuredLabels.has(entry.label));
   return [...configuredEntries, ...fallbackEntries].slice(0, 4);
+}
+
+type HomeAdSlot = {
+  slotCode: string;
+  title: string;
+  subtitle?: string;
+  image: string;
+  href: string;
+  alt: string;
+  configured: boolean;
+};
+
+type HomeAdFallback = Omit<HomeAdSlot, 'configured'>;
+
+function buildHomeAdSlot(homeSlots: PortalHomeSlotItem[], fallback: HomeAdFallback): HomeAdSlot {
+  const slot = findHomeSlot(homeSlots, fallback.slotCode);
+  if (!slot) {
+    return {
+      ...fallback,
+      configured: false
+    };
+  }
+
+  return {
+    slotCode: fallback.slotCode,
+    title: slot.title || fallback.title,
+    subtitle: slot.subtitle || fallback.subtitle,
+    image: slot.image_url || fallback.image,
+    href: safeLocalHref(slot.link_url, fallback.href),
+    alt: slot.image_alt || fallback.alt,
+    configured: true
+  };
 }
 
 function JobCategoryWall() {
@@ -434,35 +480,47 @@ function NoticeTabs() {
   );
 }
 
-function AdvertisementBand() {
+function AdvertisementBand({ homeSlots }: { homeSlots: PortalHomeSlotItem[] }) {
+  const fullWidthSlot = buildHomeAdSlot(homeSlots, adSlots.banner);
+  const halfSlots = adSlots.half.map((slot) => buildHomeAdSlot(homeSlots, slot));
+  const thirdSlots = adSlots.third.map((slot) => buildHomeAdSlot(homeSlots, slot));
+  const bottomSlot = buildHomeAdSlot(homeSlots, adSlots.bottom);
+
   return (
     <section className={styles.adBand} aria-label="首页运营广告位体系">
-      <Link className={styles.primaryAd} aria-label="首页通栏广告位" href={adSlots.banner.href}>
-        <img src={adSlots.banner.image} alt={adSlots.banner.alt} />
+      <Link className={styles.primaryAd} aria-label="首页通栏广告位" href={fullWidthSlot.href}>
+        <img src={fullWidthSlot.image} alt={fullWidthSlot.alt} />
         <span>
-          <strong>{adSlots.banner.title}</strong>
-          <small>{adSlots.banner.subtitle}</small>
+          <strong>{fullWidthSlot.title}</strong>
+          <small>{fullWidthSlot.subtitle || (fullWidthSlot.configured ? '后台运营位已配置' : '运营位待配置')}</small>
         </span>
       </Link>
       <div className={styles.halfAds} aria-label="首页1/2广告位">
-        {adSlots.half.map((slot) => (
+        {halfSlots.map((slot) => (
           <Link key={slot.title} href={slot.href}>
             <img src={slot.image} alt={slot.alt} />
             <span>
               <strong>{slot.title}</strong>
-              <small>{slot.subtitle}</small>
+              <small>{slot.subtitle || (slot.configured ? '后台运营位已配置' : '运营位待配置')}</small>
             </span>
           </Link>
         ))}
       </div>
       <div className={styles.thirdAds} aria-label="首页1/3广告位">
-        {adSlots.third.map((slot) => (
+        {thirdSlots.map((slot) => (
           <Link key={slot.title} href={slot.href}>
             <img src={slot.image} alt={slot.alt} />
             <strong>{slot.title}</strong>
           </Link>
         ))}
       </div>
+      <Link className={styles.bottomAd} aria-label="首页底部运营横幅" href={bottomSlot.href}>
+        <img src={bottomSlot.image} alt={bottomSlot.alt} />
+        <span>
+          <strong>{bottomSlot.title}</strong>
+          <small>{bottomSlot.subtitle || (bottomSlot.configured ? '后台运营位已配置' : '运营位待配置')}</small>
+        </span>
+      </Link>
       <div className={styles.smallAdGrid} aria-label="首页快捷广告位">
         {['岗位直达', '名企展示', '帮扶专区', '招聘会', '更多服务'].map((slot) => (
           <div key={slot}>{slot}</div>
@@ -644,7 +702,7 @@ export function PortalHomePage({ hotJobs = [], featuredCompanies = [], homeSlots
         <HomeOperationsPanel />
       </section>
 
-      <AdvertisementBand />
+      <AdvertisementBand homeSlots={homeSlots} />
       <section className={styles.homeContent} aria-label="首页公开内容模块">
         <HotJobs items={hotJobs} />
         <RecommendedCompanies items={featuredCompanies} />

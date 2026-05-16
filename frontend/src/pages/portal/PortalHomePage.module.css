@@ -550,6 +550,48 @@
   bottom: 16px;
 }
 
+.bottomAd {
+  position: relative;
+  min-height: 88px;
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #eff6ff, #ecfdf5);
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.bottomAd img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.28;
+}
+
+.bottomAd span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 5px;
+  padding: 18px 24px;
+}
+
+.bottomAd strong {
+  color: #0f172a;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.bottomAd small {
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 850;
+}
+
 .smallAdGrid div {
   min-height: 52px;
   background: #ffffff;

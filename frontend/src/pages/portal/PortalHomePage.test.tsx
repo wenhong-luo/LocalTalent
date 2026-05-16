@@ -25,6 +25,61 @@ const configuredHomeSlots: PortalHomeSlotItem[] = [
     link_url: '/jobs?from=quick',
     display_order: 2,
     updated_at: '2026-05-15T10:01:00'
+  },
+  {
+    slot_id: 190,
+    slot_code: 'home_full_width_banner',
+    title: '首页通栏运营位',
+    subtitle: '后台配置的通栏展示位',
+    image_url: '/api/portal/home-slots/190/image',
+    image_alt: '首页通栏运营图',
+    link_url: '/job-fairs',
+    display_order: 3,
+    updated_at: '2026-05-15T10:02:00'
+  },
+  {
+    slot_id: 191,
+    slot_code: 'home_half_left',
+    title: '企业服务半宽位',
+    subtitle: '认证企业公开入口',
+    image_url: '/api/portal/home-slots/191/image',
+    image_alt: '企业服务半宽运营图',
+    link_url: '/companies',
+    display_order: 4,
+    updated_at: '2026-05-15T10:03:00'
+  },
+  {
+    slot_id: 192,
+    slot_code: 'home_half_right',
+    title: '求职服务半宽位',
+    subtitle: '求职者私有中心入口',
+    image_url: '/api/portal/home-slots/192/image',
+    image_alt: '求职服务半宽运营图',
+    link_url: '/auth/login?role=candidate',
+    display_order: 5,
+    updated_at: '2026-05-15T10:04:00'
+  },
+  {
+    slot_id: 193,
+    slot_code: 'home_third_1',
+    title: '招聘会三列位',
+    subtitle: '',
+    image_url: '/api/portal/home-slots/193/image',
+    image_alt: '招聘会三列运营图',
+    link_url: '/job-fairs',
+    display_order: 6,
+    updated_at: '2026-05-15T10:05:00'
+  },
+  {
+    slot_id: 194,
+    slot_code: 'home_bottom_banner',
+    title: '首页底部运营位',
+    subtitle: '公开服务矩阵',
+    image_url: '/api/portal/home-slots/194/image',
+    image_alt: '首页底部运营图',
+    link_url: '/more-services',
+    display_order: 7,
+    updated_at: '2026-05-15T10:06:00'
   }
 ];
 
@@ -124,16 +179,20 @@ describe('PortalHomePage', () => {
     expect(screen.getByLabelText('友情链接与合作入口')).toBeInTheDocument();
   });
 
-  it('renders the full home operation slot system as placeholders', () => {
+  it('renders the full home operation slot system from configured slots', () => {
     renderHome();
 
     expect(screen.getByLabelText('首页运营广告位体系')).toBeInTheDocument();
-    expect(screen.getByLabelText('首页通栏广告位')).toHaveTextContent('城市人才服务季');
-    expect(screen.getByAltText('城市人才服务季运营图')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页通栏广告位')).toHaveTextContent('首页通栏运营位');
+    expect(screen.getByLabelText('首页通栏广告位')).toHaveAttribute('href', '/job-fairs');
+    expect(screen.getByAltText('首页通栏运营图')).toBeInTheDocument();
     expect(screen.getByLabelText('首页1/2广告位')).toBeInTheDocument();
+    expect(screen.getByText('企业服务半宽位')).toBeInTheDocument();
+    expect(screen.getByText('求职服务半宽位')).toBeInTheDocument();
     expect(screen.getByLabelText('首页1/3广告位')).toBeInTheDocument();
-    expect(screen.getByAltText('企业发布职位运营图')).toBeInTheDocument();
-    expect(screen.getByAltText('就业政策运营图')).toBeInTheDocument();
+    expect(screen.getByText('招聘会三列位')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页底部运营横幅')).toHaveTextContent('首页底部运营位');
+    expect(screen.getByAltText('首页底部运营图')).toBeInTheDocument();
     expect(screen.getByLabelText('首页快捷广告位')).toBeInTheDocument();
     expect(screen.getByText('广告位仅为运营占位，不接真实投放、计费、支付或外部平台。')).toBeInTheDocument();
   });
@@ -148,6 +207,8 @@ describe('PortalHomePage', () => {
     expect(screen.getByText('前端开发工程师')).toBeInTheDocument();
     expect(screen.getByText('生产质检员')).toBeInTheDocument();
     expect(screen.getByText('LocalTalent 数字服务示范企业')).toBeInTheDocument();
+    expect(screen.getByLabelText('首页通栏广告位')).toHaveTextContent('城市人才服务季');
+    expect(screen.getByLabelText('首页底部运营横幅')).toHaveTextContent('地方人才服务公开矩阵');
     expect(screen.getAllByText('演示数据').length).toBeGreaterThan(0);
   });
 
